@@ -81,7 +81,7 @@ importers:
         version: 1.11.13
       drizzle-orm:
         specifier: ^0.44.4
-        version: 0.44.4(@cloudflare/workers-types@4.20250810.0)(@libsql/client-wasm@0.14.0)(gel@2.0.2)(kysely@0.28.4)(postgres@3.4.7)
+        version: 0.44.4(@cloudflare/workers-types@4.20250810.0)(@libsql/client-wasm@0.14.0)(gel@2.0.2)(kysely@0.28.5)(postgres@3.4.7)
       hono:
         specifier: ^4.9.0
         version: 4.9.0
@@ -216,16 +216,16 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@augment-vir/assert@31.31.0':
-    resolution: {integrity: sha512-qzZPsQ30HpkQlZXGaFdsHyy6Hu4VJSSIUlNDZAtF9yGa7sNJdXMOatbgX4GBqJQzqyy1OKLsgSRZLUd2KmBtgw==}
+  '@augment-vir/assert@31.32.2':
+    resolution: {integrity: sha512-7Rr/8eG7f1lO3dHJD+hyCXYwvPUUiVhUEO6cLBDJvVbPY6ik+esGw2FoxK60yKoXees9LjpJwnTv3dxCGPrzCg==}
     engines: {node: '>=22'}
 
-  '@augment-vir/common@31.31.0':
-    resolution: {integrity: sha512-lczXfA+ZqqrqBoW8D2+KFbV1g8qNoMlhdIw6l4ad5FCdg85avfRaSHaAOkSejYwn09lfYefxQA7+NxoOzyybLQ==}
+  '@augment-vir/common@31.32.2':
+    resolution: {integrity: sha512-985knsn+fALPLcK+qh1auq45u2zQrFPZo2qQYu98Gbd0n72J5AVV7qFYeRGclsEo8yiHYlcAfZVJnHGIN5dS9w==}
     engines: {node: '>=22'}
 
-  '@augment-vir/core@31.31.0':
-    resolution: {integrity: sha512-cxrv4qvoT0avodosOgZfTv+zSkSxkEyo3UGuSmSETCVOQxi1oYXY8O5TgL6NbmVtwfAecObrJAonMJv98qaRcA==}
+  '@augment-vir/core@31.32.2':
+    resolution: {integrity: sha512-7y4omyzlfFyN6BwiBJ78oJiEd7b2qQAhLhNEOZRH8ZCj0gipaXDnWZ/ifAqhcyMWMkX0n7Se/gwQLDCb4rz6nw==}
     engines: {node: '>=22'}
 
   '@babel/code-frame@7.27.1':
@@ -2075,8 +2075,8 @@ packages:
   jose@6.0.12:
     resolution: {integrity: sha512-T8xypXs8CpmiIi78k0E+Lk7T2zlK4zDyg+o1CZ4AkOHgDg98ogdP2BeZ61lTFKFyoEwJ9RgAgN+SdM3iPgNonQ==}
 
-  js-base64@3.7.7:
-    resolution: {integrity: sha512-7rCnleh0z2CkXhH67J8K1Ytz0b2Y+yxTPL+/KOJoa20hfnVQ/3/T6W/KflYI4bRHRagNeXeU2bkNGI3v1oS/lw==}
+  js-base64@3.7.8:
+    resolution: {integrity: sha512-hNngCeKxIUQiEUN3GPJOkz4wF/YvdUdbNL9hsBcMQTkKzboD7T/q3OYOuuPZLUE6dBxSGpwhk5mwuDud7JVAow==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -2119,8 +2119,8 @@ packages:
   known-css-properties@0.37.0:
     resolution: {integrity: sha512-JCDrsP4Z1Sb9JwG0aJ8Eo2r7k4Ou5MwmThS/6lcIe1ICyb7UBJKGRIUUdqc2ASdE/42lgz6zFUnzAIhtXnBVrQ==}
 
-  kysely@0.28.4:
-    resolution: {integrity: sha512-pfQj8/Bo3KSzC1HIZB5MeeYRWcDmx1ZZv8H25LsyeygqXE+gfsbUAgPT1GSYZFctB1cdOVlv+OifuCls2mQSnw==}
+  kysely@0.28.5:
+    resolution: {integrity: sha512-rlB0I/c6FBDWPcQoDtkxi9zIvpmnV5xoIalfCMSMCa7nuA6VGA3F54TW9mEgX4DVf10sXAWCF5fDbamI/5ZpKA==}
     engines: {node: '>=20.0.0'}
 
   levn@0.4.1:
@@ -3050,18 +3050,18 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.12
       '@jridgewell/trace-mapping': 0.3.29
 
-  '@augment-vir/assert@31.31.0':
+  '@augment-vir/assert@31.32.2':
     dependencies:
-      '@augment-vir/core': 31.31.0
+      '@augment-vir/core': 31.32.2
       '@date-vir/duration': 7.4.0
       deep-eql: 5.0.2
       expect-type: 1.2.2
       type-fest: 4.41.0
 
-  '@augment-vir/common@31.31.0':
+  '@augment-vir/common@31.32.2':
     dependencies:
-      '@augment-vir/assert': 31.31.0
-      '@augment-vir/core': 31.31.0
+      '@augment-vir/assert': 31.32.2
+      '@augment-vir/core': 31.32.2
       '@date-vir/duration': 7.4.0
       ansi-styles: 6.2.1
       deepcopy-esm: 2.1.1
@@ -3069,7 +3069,7 @@ snapshots:
       type-fest: 4.41.0
       typed-event-target: 4.1.0
 
-  '@augment-vir/core@31.31.0':
+  '@augment-vir/core@31.32.2':
     dependencies:
       '@date-vir/duration': 7.4.0
       browser-or-node: 3.0.0
@@ -3630,12 +3630,12 @@ snapshots:
   '@libsql/client-wasm@0.14.0':
     dependencies:
       '@libsql/core': 0.14.0
-      js-base64: 3.7.7
+      js-base64: 3.7.8
     optional: true
 
   '@libsql/core@0.14.0':
     dependencies:
-      js-base64: 3.7.7
+      js-base64: 3.7.8
     optional: true
 
   '@manypkg/find-root@1.1.0':
@@ -4265,7 +4265,7 @@ snapshots:
       better-call: 1.0.13
       defu: 6.1.4
       jose: 6.0.12
-      kysely: 0.28.4
+      kysely: 0.28.5
       nanostores: 0.11.4
       zod: 4.0.17
 
@@ -4422,12 +4422,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.44.4(@cloudflare/workers-types@4.20250810.0)(@libsql/client-wasm@0.14.0)(gel@2.0.2)(kysely@0.28.4)(postgres@3.4.7):
+  drizzle-orm@0.44.4(@cloudflare/workers-types@4.20250810.0)(@libsql/client-wasm@0.14.0)(gel@2.0.2)(kysely@0.28.5)(postgres@3.4.7):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20250810.0
       '@libsql/client-wasm': 0.14.0
       gel: 2.0.2
-      kysely: 0.28.4
+      kysely: 0.28.5
       postgres: 3.4.7
 
   enhanced-resolve@5.18.3:
@@ -4810,7 +4810,7 @@ snapshots:
 
   jose@6.0.12: {}
 
-  js-base64@3.7.7:
+  js-base64@3.7.8:
     optional: true
 
   js-tokens@4.0.0: {}
@@ -4846,7 +4846,7 @@ snapshots:
 
   known-css-properties@0.37.0: {}
 
-  kysely@0.28.4: {}
+  kysely@0.28.5: {}
 
   levn@0.4.1:
     dependencies:
@@ -5100,7 +5100,7 @@ snapshots:
 
   prettier-plugin-multiline-arrays@4.0.3(prettier@3.6.2):
     dependencies:
-      '@augment-vir/common': 31.31.0
+      '@augment-vir/common': 31.32.2
       prettier: 3.6.2
       proxy-vir: 2.0.1
 
@@ -5128,8 +5128,8 @@ snapshots:
 
   proxy-vir@2.0.1:
     dependencies:
-      '@augment-vir/assert': 31.31.0
-      '@augment-vir/common': 31.31.0
+      '@augment-vir/assert': 31.32.2
+      '@augment-vir/common': 31.32.2
 
   punycode@2.3.1: {}
 
@@ -5480,9 +5480,9 @@ snapshots:
 
   typed-event-target@4.1.0:
     dependencies:
-      '@augment-vir/assert': 31.31.0
-      '@augment-vir/common': 31.31.0
-      '@augment-vir/core': 31.31.0
+      '@augment-vir/assert': 31.32.2
+      '@augment-vir/common': 31.32.2
+      '@augment-vir/core': 31.32.2
 
   typescript@5.9.2: {}
 

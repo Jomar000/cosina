@@ -28,7 +28,6 @@
 
         return authClientState.value.organization.checkRolePermission({
             permissions,
-            // @ts-expect-error IGNORE
             role: sessionDataState.value.roleName,
         })
     }

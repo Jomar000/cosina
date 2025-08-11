@@ -320,7 +320,7 @@ export const auth = async (opts: {
                     .reduce((accumulator, value) => {
                         accumulator = { ...accumulator, ...value }
                         return accumulator
-                    }),
+                    }, {}),
             }),
             username({
                 usernameValidator: (value) => /^[\w-.]+$/.test(value),

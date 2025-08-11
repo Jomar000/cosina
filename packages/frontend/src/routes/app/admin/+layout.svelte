@@ -34,7 +34,7 @@
         if (roleName === 'admin') {
             renderView = true
         } else {
-            goto(`/u/${roleName}/dashboard`, {
+            goto(`/app/${roleName}/dashboard`, {
                 replaceState: true,
             })
         }
