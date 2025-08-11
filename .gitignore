@@ -1,0 +1,10 @@
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.env
+.env.*
+!.env.example
+drizzle-pg-*.config.ts
+.wrangler/
+dist/
+node_modules/

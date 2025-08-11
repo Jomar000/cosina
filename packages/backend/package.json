@@ -1,0 +1,42 @@
+{
+    "name": "@hyperion/backend",
+    "version": "0.0.1",
+    "author": "4thDEVisionTech",
+    "description": "Hyperion Backend Component",
+    "type": "module",
+    "private": true,
+    "license": "ISC",
+    "engines": {
+        "pnpm": ">=10.14.0"
+    },
+    "scripts": {
+        "dev": "wrangler dev",
+        "build": "wrangler deploy --outdir=dist --dry-run --env=",
+        "test": "vitest --run",
+        "deploy:staging": "wrangler deploy --minify --outdir=dist --env=staging",
+        "deploy:prod": "wrangler deploy --minify --outdir=dist --env=production",
+        "migrate:pg:dev": "drizzle-kit migrate --config=drizzle-pg-dev.config.ts",
+        "migrate:pg:staging": "drizzle-kit migrate --config=drizzle-pg-staging.config.ts",
+        "migrate:pg:prod": "drizzle-kit migrate --config=drizzle-pg-prod.config.ts",
+        "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging",
+        "secret:prod": "wrangler secret bulk .dev.vars.production --env=production"
+    },
+    "dependencies": {
+        "@hyperion/validator": "workspace:*",
+        "@noble/hashes": "^1.8.0",
+        "better-auth": "^1.3.4",
+        "dayjs": "^1.11.13",
+        "drizzle-orm": "^0.44.4",
+        "hono": "^4.9.0",
+        "nanoid": "^5.1.5",
+        "postgres": "^3.4.7",
+        "zod": "^4.0.17"
+    },
+    "devDependencies": {
+        "@cloudflare/workers-types": "^4.20250810.0",
+        "@vitest/ui": "^3.2.4",
+        "drizzle-kit": "^0.31.4",
+        "vite": "^7.1.1",
+        "vitest": "^3.2.4"
+    }
+}

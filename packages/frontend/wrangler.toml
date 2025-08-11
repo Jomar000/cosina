@@ -1,0 +1,21 @@
+name = "hyperion-frontend"
+compatibility_date = "2025-07-16"
+
+[assets]
+directory = "./dist"
+run_worker_first = false
+
+[placement]
+mode = "smart"
+
+###########
+# STAGING #
+###########
+
+[env.staging]
+
+##############
+# PRODUCTION #
+##############
+
+[env.production]

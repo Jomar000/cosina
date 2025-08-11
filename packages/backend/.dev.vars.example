@@ -1,0 +1,13 @@
+###############
+# Better Auth #
+###############
+
+BETTER_AUTH_SECRET="better-auth-secret-123456789"
+
+########################
+# CloudFlare Turnstile #
+########################
+
+# https://developers.cloudflare.com/turnstile/troubleshooting/testing
+
+CF_TURNSTILE_SECRET_KEY="1x0000000000000000000000000000000AA"

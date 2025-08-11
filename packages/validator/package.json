@@ -1,0 +1,33 @@
+{
+    "name": "@hyperion/validator",
+    "version": "0.0.1",
+    "author": "4thDEVisionTech",
+    "description": "Hyperion Validator Component",
+    "type": "module",
+    "private": true,
+    "license": "ISC",
+    "engines": {
+        "pnpm": ">=10.14.0"
+    },
+    "scripts": {
+        "build": "tsc --project ./tsconfig.json"
+    },
+    "dependencies": {
+        "dayjs": "^1.11.13",
+        "zod": "^4.0.17"
+    },
+    "exports": {
+        "./shared": {
+            "types": "./dist/shared.d.ts",
+            "default": "./dist/shared.js"
+        },
+        "./internal/auth": {
+            "types": "./dist/internal/auth.d.ts",
+            "default": "./dist/internal/auth.js"
+        },
+        "./internal/objectStorage": {
+            "types": "./dist/internal/objectStorage.d.ts",
+            "default": "./dist/internal/objectStorage.js"
+        }
+    }
+}

@@ -1,0 +1,14 @@
+# Prettier Ignore File
+# https://prettier.io/docs/en/ignore
+
+# Global Ignores
+packages/*/dist/
+packages/frontend/.svelte-kit/
+
+# Add files not to be ignored
+*.*
+!*.html
+!*.js
+!*.json
+!*.svelte
+!*.ts

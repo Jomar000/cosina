@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+echo
+echo ==============================
+echo = BEGIN: git pre-commit hook =
+echo ==============================
+echo
+
+# Create a list of non-deleted staged files
+stagedFiles=$( git diff --name-only --diff-filter=d --staged )
+
+if [ -n "$stagedFiles" ]; then
+    # Use ESLint to do syntax checking of staged files
+    echo 'Linting code with ESLint...'
+    echo -e $stagedFiles | xargs -n 10 pnpm eslint --no-warn-ignored --no-error-on-unmatched-pattern
+
+    # Use prettier to format code style of staged files
+    echo 'Formatting staged files with Prettier...'
+    echo -e $stagedFiles | xargs -n 10 pnpm prettier --write --ignore-unknown --no-error-on-unmatched-pattern
+    echo -e $stagedFiles | xargs -n 10 git add
+fi
+
+echo
+echo ============================
+echo = END: git pre-commit hook =
+echo ============================
+echo
