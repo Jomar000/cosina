@@ -21,7 +21,7 @@
     // Handlers //
     //////////////
 
-    const checkRolePermission = (permissions: Record<string, string[]>) => {
+    const checkRolePermission: TCheckRolePermission = (permissions) => {
         if (!sessionDataState.value) {
             return false
         }

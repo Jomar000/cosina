@@ -2,6 +2,7 @@
 // for information about these interfaces
 
 import type { authSignInOutputSchema } from '@hyperion/validator/internal/auth'
+import type { Component } from 'svelte'
 import type { z } from 'zod'
 
 declare global {
@@ -12,8 +13,13 @@ declare global {
         // interface Platform {}
     }
 
-    // Make *.svelte imports recognizable by Typescript
-    module '*.svelte'
+    // Make *.svelte imports recognizable by Typescript when imported in *.ts files
+    // Primarily used when testing individual components
+    // node_modules/svelte/types/index.d.ts
+    module '*.svelte' {
+        const Comp: Component
+        export default Comp
+    }
 
     // Vite ImageTools Optimized Imports
     // https://github.com/microsoft/TypeScript/issues/38638#issuecomment-1088247956
@@ -25,6 +31,10 @@ declare global {
     type TSessionData = z.output<
         (typeof authSignInOutputSchema.def.options)['0']['shape']['data']
     >
+
+    type TCheckRolePermission = (
+        permissions: Record<string, string[]>,
+    ) => boolean
 }
 
 export {}

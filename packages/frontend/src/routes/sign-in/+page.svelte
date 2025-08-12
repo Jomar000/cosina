@@ -137,7 +137,7 @@
                 sessionDataState.value.expiresAt
 
         if (!renderPage) {
-            window.location.assign(
+            goto(
                 `/app/${sessionDataState.value!.roleName.toLowerCase()}/dashboard`,
             )
         }
