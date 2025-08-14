@@ -22,7 +22,6 @@ hono.use(async (ctx, next) => {
 
     await next()
 })
-hono.use(initContext())
 hono.use(csrfHandler())
 
 // Error Handler
@@ -49,10 +48,12 @@ hono.onError((err, ctx) => {
 
 // Routes
 hono.use(corsHandler('reflect')).get('/healthCheck', (ctx) => {
-    return ctx.json({ success: true }, 200)
+    return ctx.json({ success: true, message: '✅ Operational ✅' }, 200)
 })
-hono.use(corsHandler('default')).route('/internal', internalRoute)
-hono.use(corsHandler('reflect')).route('/v1', v1Route)
+hono.use(corsHandler('default'))
+    .use(initContext())
+    .route('/internal', internalRoute)
+hono.use(corsHandler('reflect')).use(initContext()).route('/v1', v1Route)
 
 export default hono
 export { WebSocketServer }
