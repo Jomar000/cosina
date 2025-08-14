@@ -4,6 +4,7 @@
     import { goto } from '$app/navigation'
     import { authClientState } from '$lib/states/auth.svelte.js'
     import { sessionDataState } from '$lib/states/session.svelte.js'
+    import { getCookie } from '$lib/utilities.js'
 
     ////////////////
     // Properties //
@@ -38,7 +39,11 @@
     }
 
     const signOut = async () => {
-        await authClientState.value.signOut()
+        await authClientState.value.signOut(undefined, {
+            headers: {
+                'x-csrf-token': getCookie('csrf_token') ?? '',
+            },
+        })
         clearSessionDataAndRedirect()
     }
 
