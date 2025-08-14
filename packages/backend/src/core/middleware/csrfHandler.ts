@@ -15,8 +15,12 @@ export const csrfHandler = () => {
 
         if (safeMethods.includes(ctx.req.method)) {
             setCookie(ctx, 'csrf_token', nanoid(32), {
-                ...ctx.get('auth').options.advanced.defaultCookieAttributes,
+                domain: ctx.env.COOKIE_DOMAIN,
                 httpOnly: false,
+                partitioned: true,
+                path: '/',
+                sameSite: 'strict' as const,
+                secure: true,
             })
         } else {
             if (!ctx.req.header('origin')) {
