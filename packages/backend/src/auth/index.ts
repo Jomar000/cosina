@@ -271,7 +271,11 @@ export const auth = async (opts: {
                     // Inject the permissions to the request context
                     // and make it available to the after hook
                     ctx.context._permissions = aclPermissions
-                    ctx.context._roles = aclRoles
+                    ctx.context._roles = {
+                        // Only return the role of the authenticated user
+                        [orgMemberData.role.name]:
+                            aclRoles[orgMemberData.role.name],
+                    }
                     ctx.context._roleName = orgMemberData.role.name
                 }
             }),

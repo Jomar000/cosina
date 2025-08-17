@@ -89,7 +89,7 @@ CREATE TABLE "role" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "629pi1o76z2z_unique" UNIQUE("name"),
-	CONSTRAINT "629pi1o76z2z_check" CHECK (name = UPPER(name))
+	CONSTRAINT "629pi1o76z2z_check" CHECK (name = LOWER(name))
 );
 --> statement-breakpoint
 CREATE TABLE "session" (

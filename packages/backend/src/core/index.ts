@@ -2,11 +2,10 @@ import { Hono } from 'hono'
 import { requestId } from 'hono/request-id'
 
 import { WebSocketServer } from './durableObject/webSocketServer.js'
-import internalRoute from './internal/_index.js'
-import { corsHandler } from './middleware/corsHandler.js'
 import { csrfHandler } from './middleware/csrfHandler.js'
-import { initContext } from './middleware/initContext.js'
-import v1Route from './v1/_index.js'
+import baseRoute from './route/base/_index.js'
+import internalRoute from './route/internal/_index.js'
+import v1Route from './route/v1/_index.js'
 
 const hono = new Hono<THonoInstance>()
 
@@ -47,13 +46,9 @@ hono.onError((err, ctx) => {
 })
 
 // Routes
-hono.use(corsHandler('reflect')).get('/healthCheck', (ctx) => {
-    return ctx.json({ success: true, message: '✅ Operational ✅' }, 200)
-})
-hono.use(corsHandler('default'))
-    .use(initContext())
-    .route('/internal', internalRoute)
-hono.use(corsHandler('reflect')).use(initContext()).route('/v1', v1Route)
+hono.route('/', baseRoute)
+hono.route('/internal', internalRoute)
+hono.route('/v1', v1Route)
 
 export default hono
 export { WebSocketServer }

@@ -1,7 +1,7 @@
 import { objectStoragePutInputSchema } from '@hyperion/validator/internal/objectStorage'
 import { Hono } from 'hono'
 
-import { isAuthenticated } from '../middleware/isAuthenticated.js'
+import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 
 const internalRouteObjectStorage = new Hono<THonoInstance>()
 

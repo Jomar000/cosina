@@ -33,7 +33,7 @@
         "zod": "^4.0.17"
     },
     "devDependencies": {
-        "@cloudflare/workers-types": "^4.20250813.0",
+        "@cloudflare/workers-types": "^4.20250816.0",
         "@vitest/ui": "^3.2.4",
         "drizzle-kit": "^0.31.4",
         "vite": "^7.1.2",

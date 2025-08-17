@@ -1,5 +1,5 @@
 {
-    "id": "67e1ee05-3345-4c54-a024-84ad539d52e2",
+    "id": "aa611e1d-c720-43f0-ae13-d17b1f1eb330",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "7",
     "dialect": "postgresql",
@@ -888,7 +888,7 @@
             "checkConstraints": {
                 "629pi1o76z2z_check": {
                     "name": "629pi1o76z2z_check",
-                    "value": "name = UPPER(name)"
+                    "value": "name = LOWER(name)"
                 }
             },
             "isRLSEnabled": false

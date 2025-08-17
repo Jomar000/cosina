@@ -8,9 +8,9 @@ import type { APIError } from 'better-auth'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 
-import { cfTurnstileVerifier } from '../../utilities.js'
-import { isAuthenticated } from '../middleware/isAuthenticated.js'
-import { isAuthorized } from '../middleware/isAuthorized.js'
+import { cfTurnstileVerifier } from '../../../utilities.js'
+import { isAuthenticated } from '../../middleware/isAuthenticated.js'
+import { isAuthorized } from '../../middleware/isAuthorized.js'
 
 const internalRouteUser = new Hono<THonoInstance>()
 

@@ -1,3 +1,9 @@
+import {
+    adminAc,
+    defaultStatements,
+    memberAc,
+    ownerAc,
+} from 'better-auth/plugins/organization/access'
 import { eq } from 'drizzle-orm'
 
 export const aclBuilder = async (
@@ -26,19 +32,23 @@ export const aclBuilder = async (
 
     // Define permissions for Components
     // This is the complete set of actions for each component
+    // https://www.better-auth.com/docs/plugins/organization#create-access-control
     const permissions = _permissions.reduce(
         (accumulator, { action, component }) => {
             if (!accumulator[component]) {
                 accumulator[component] = []
             }
-            accumulator[component].push(action)
+            if (!accumulator[component].includes(action)) {
+                accumulator[component].push(action)
+            }
             return accumulator
         },
-        {} as Record<string, string[]>,
+        { ...defaultStatements } as unknown as Record<string, string[]>,
     )
 
     // Define capabilities of each Role
     // These are the actions allowed for each role
+    // https://www.better-auth.com/docs/plugins/organization#create-roles
     const roles = _roles.reduce(
         (accumulator, { action, component, role }) => {
             if (!accumulator[role]) {
@@ -47,10 +57,16 @@ export const aclBuilder = async (
             if (!accumulator[role][component]) {
                 accumulator[role][component] = []
             }
-            accumulator[role][component].push(action)
+            if (!accumulator[role][component].includes(action)) {
+                accumulator[role][component].push(action)
+            }
             return accumulator
         },
-        {} as Record<string, Record<string, string[]>>,
+        {
+            admin: adminAc.statements,
+            owner: ownerAc.statements,
+            member: memberAc.statements,
+        } as Record<string, Record<string, string[]>>,
     )
 
     return {

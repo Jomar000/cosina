@@ -307,7 +307,7 @@ export const role = pgTable(
             .defaultNow(),
     },
     () => [
-        check('629pi1o76z2z_check', sql`name = UPPER(name)`),
+        check('629pi1o76z2z_check', sql`name = LOWER(name)`),
     ],
 )
 

@@ -13,7 +13,7 @@ VALUES
 INSERT INTO "member"
     (id, user_id, organization_id, role)
 VALUES
-    ('MEMBER_001', 'USER_001', 'ORGANIZATION_001', 'OWNER');
+    ('MEMBER_001', 'USER_001', 'ORGANIZATION_001', 'owner');
 
 -- Organization
 INSERT INTO "organization"
@@ -38,9 +38,9 @@ VALUES
 INSERT INTO "role"
     (id, name, description)
 VALUES
-    (1, 'OWNER', 'Organization Owner'),
-    (2, 'ADMIN', 'Organization Administrator'),
-    (3, 'MEMBER', 'Organization Member');
+    (1, 'owner', 'Organization Owner'),
+    (2, 'admin', 'Organization Administrator'),
+    (3, 'member', 'Organization Member');
 
 -- User
 INSERT INTO "user"
