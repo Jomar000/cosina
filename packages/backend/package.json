@@ -24,7 +24,7 @@
     "dependencies": {
         "@hyperion/validator": "workspace:*",
         "@noble/hashes": "^1.8.0",
-        "better-auth": "^1.3.6",
+        "better-auth": "^1.3.7",
         "dayjs": "^1.11.13",
         "drizzle-orm": "^0.44.4",
         "hono": "^4.9.2",
