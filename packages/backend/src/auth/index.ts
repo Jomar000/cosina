@@ -59,6 +59,7 @@ export const auth = async (opts: {
     const { roles: aclRoles, permissions: aclPermissions } = await aclBuilder(
         db,
         dbSchema,
+        kv,
     )
 
     /**
