@@ -7,7 +7,7 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "pnpm": ">=10.14.0"
+        "pnpm": ">=10.15.0"
     },
     "scripts": {
         "build": "pnpm --recursive --stream build",
@@ -29,7 +29,7 @@
         "prettier-plugin-tailwindcss": "^0.6.14",
         "svelte-eslint-parser": "^1.3.1",
         "typescript": "^5.9.2",
-        "wrangler": "^4.31.0"
+        "wrangler": "^4.32.0"
     },
     "pnpm": {
         "allowedDeprecatedVersions": {
@@ -40,6 +40,8 @@
             "@sveltejs/kit>cookie": "^0.7.2",
             "better-auth>@noble/ciphers": "^1.3.0",
             "better-auth>jose": "^6.0.12",
+            "drizzle-kit>@esbuild-kit/core-utils": "npm:tsx@^4.20.4",
+            "drizzle-kit>@esbuild-kit/esm-loader": "npm:tsx@^4.20.4",
             "esbuild": "0.25.7",
             "glob": "^11.0.3",
             "semver": "^7.7.2",
