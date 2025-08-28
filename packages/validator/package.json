@@ -13,8 +13,8 @@
         "build": "tsc --project ./tsconfig.json"
     },
     "dependencies": {
-        "dayjs": "^1.11.13",
-        "zod": "^4.0.17"
+        "dayjs": "^1.11.15",
+        "zod": "^4.1.4"
     },
     "exports": {
         "./shared": {
