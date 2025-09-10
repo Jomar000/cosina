@@ -8,8 +8,8 @@ const baseRoute = new Hono<THonoInstance>()
 baseRoute.use(corsHandler('default'))
 
 // Routes
-baseRoute.get('/healthCheck', (ctx) => {
-    return ctx.json({ success: true, message: '✅ Operational ✅' }, 200)
+baseRoute.get('/heartbeat', (ctx) => {
+    return ctx.body(null, 204)
 })
 
 export default baseRoute

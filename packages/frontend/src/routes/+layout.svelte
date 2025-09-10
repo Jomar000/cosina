@@ -31,20 +31,20 @@
         },
     })
 
-    const healthCheckQuery = createQuery(
+    const heartbeatQuery = createQuery(
         {
             queryKey: [
-                'healthCheck',
+                'heartbeat',
             ],
-            queryFn: async () => await fetchClient('/healthCheck'),
+            queryFn: async () => await fetchClient('/heartbeat'),
         },
         queryClient,
     )
 </script>
 
-{#if $healthCheckQuery.isFetching}
+{#if $heartbeatQuery.isFetching}
     <Loader />
-{:else if $healthCheckQuery.isSuccess && $healthCheckQuery.data.success}
+{:else if $heartbeatQuery.isSuccess}
     <QueryClientProvider client={queryClient}>
         <!--
             Flowbite Blocks - Application UI
