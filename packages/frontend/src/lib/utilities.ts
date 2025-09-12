@@ -72,11 +72,21 @@ export const fetchClient = async <
     init?: RequestInit,
 ) => {
     const modPath = path.startsWith('/') ? path : `/${path}`
+
     const response = await fetch(`${PUBLIC_API_URL}${modPath}`, {
         ...init,
         credentials: 'include',
     })
-    return (await response.json()) as T
+
+    let data: T | null = null
+
+    try {
+        data = await response.json()
+    } catch (err) {
+        /* EMPTY */
+    }
+
+    return data
 }
 
 /**

@@ -7,7 +7,7 @@
     } from '@tanstack/svelte-query'
 
     import ServiceUnavailable from '$lib/components/Error/503.svelte'
-    import Loader from '$lib/components/Loader/loader2.svelte'
+    import Loader from '$lib/components/Loader/Loader2.svelte'
     import { fetchClient } from '$lib/utilities.js'
     import '../app.css'
 
