@@ -18,8 +18,12 @@ declare global {
         ipAddress: string
         kvClient: KVNamespace
         r2Client: R2Bucket
-        session: ReturnType<typeof auth>['$Infer']['Session']['session'] | null
-        user: ReturnType<typeof auth>['$Infer']['Session']['user'] | null
+        session:
+            | Awaited<ReturnType<typeof auth>>['$Infer']['Session']['session']
+            | null
+        user:
+            | Awaited<ReturnType<typeof auth>>['$Infer']['Session']['user']
+            | null
         userAgent: string
     }
 
