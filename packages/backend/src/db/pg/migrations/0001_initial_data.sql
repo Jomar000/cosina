@@ -25,14 +25,10 @@ VALUES
 INSERT INTO "permission"
     (component, action, role_id)
 VALUES
-    ('contribution', 'create', 1),
-    ('contribution', 'read', 1),
-    ('contribution', 'update', 1),
-    ('contribution', 'delete', 1),
-    ('contribution', 'create', 2),
-    ('contribution', 'read', 2),
-    ('contribution', 'update', 2),
-    ('contribution', 'delete', 2);
+    ('owner', 'ANY', 1),
+    ('admin', 'ANY', 1),
+    ('admin', 'ANY', 2),
+    ('member', 'ANY', 3);
 
 -- Role
 INSERT INTO "role"

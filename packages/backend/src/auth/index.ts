@@ -163,7 +163,7 @@ export const auth = async (opts: {
             )[0]?.isLocked ?? false
 
         if (isLocked) {
-            throw new APIError('FORBIDDEN', {
+            throw new APIError('LOCKED', {
                 code: undefined,
                 success: false,
                 message: 'Account is currently locked.',

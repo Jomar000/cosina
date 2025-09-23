@@ -54,12 +54,6 @@ CREATE TABLE "member" (
 	CONSTRAINT "qticc263mdrn_unique" UNIQUE("organization_id","user_id")
 );
 --> statement-breakpoint
-CREATE TABLE "object_storage" (
-	"id" text PRIMARY KEY NOT NULL,
-	"uploaded_by" text NOT NULL,
-	"uploaded_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "organization" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
@@ -105,6 +99,29 @@ CREATE TABLE "session" (
 	CONSTRAINT "d3j63aa60m5j_unique" UNIQUE("token")
 );
 --> statement-breakpoint
+CREATE TABLE "upload" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "upload_attachment" (
+	"user_id" text PRIMARY KEY NOT NULL,
+	"object_storage_id" text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "upload_storage" (
+	"id" text PRIMARY KEY NOT NULL,
+	"file_name" text NOT NULL,
+	"mime_type" text,
+	"size" bigint,
+	"hash_sha256" text NOT NULL,
+	"is_deleted" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
@@ -146,9 +163,11 @@ ALTER TABLE "invitation" ADD CONSTRAINT "to5af3ntvzc0_fkey" FOREIGN KEY ("role")
 ALTER TABLE "member" ADD CONSTRAINT "0xl3tx6iju2c_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "member" ADD CONSTRAINT "ey8flhlguwkb_fkey" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "member" ADD CONSTRAINT "kn8m1fkitar0_fkey" FOREIGN KEY ("role") REFERENCES "public"."role"("name") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
-ALTER TABLE "object_storage" ADD CONSTRAINT "qpw5yvo4b967_fkey" FOREIGN KEY ("uploaded_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "11rzmcpm3uv0_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "n6ebx1rg81k4_fkey" FOREIGN KEY ("active_organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
+ALTER TABLE "upload" ADD CONSTRAINT "dwolixf6w8hp_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
+ALTER TABLE "upload_attachment" ADD CONSTRAINT "c0g7vcldgcc1_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."upload"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
+ALTER TABLE "upload_attachment" ADD CONSTRAINT "o7xm4my0uq10_fkey" FOREIGN KEY ("object_storage_id") REFERENCES "public"."upload_storage"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "user_attribute" ADD CONSTRAINT "nhsl7a2vq0j4_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 CREATE INDEX "ame54f8rq90m_index" ON "account" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "kg5nldbccqqf_index" ON "audit_trail" USING btree ("user_id");--> statement-breakpoint
@@ -159,10 +178,12 @@ CREATE INDEX "to5af3ntvzc0_index" ON "invitation" USING btree ("role");--> state
 CREATE INDEX "0xl3tx6iju2c_index" ON "member" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "ey8flhlguwkb_index" ON "member" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "kn8m1fkitar0_index" ON "member" USING btree ("role");--> statement-breakpoint
-CREATE INDEX "qpw5yvo4b967_index" ON "object_storage" USING btree ("uploaded_by");--> statement-breakpoint
 CREATE INDEX "7vz0lkc6bbu7_index" ON "permission" USING btree ("role_id");--> statement-breakpoint
 CREATE INDEX "11rzmcpm3uv0_index" ON "session" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "n6ebx1rg81k4_index" ON "session" USING btree ("active_organization_id");--> statement-breakpoint
+CREATE INDEX "dwolixf6w8hp_index" ON "upload" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "c0g7vcldgcc1_index" ON "upload_attachment" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "o7xm4my0uq10_index" ON "upload_attachment" USING btree ("object_storage_id");--> statement-breakpoint
 CREATE INDEX "nhsl7a2vq0j4_index" ON "user_attribute" USING btree ("user_id");
 
 /**

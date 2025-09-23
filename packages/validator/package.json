@@ -14,7 +14,7 @@
     },
     "dependencies": {
         "dayjs": "^1.11.18",
-        "zod": "^4.1.8"
+        "zod": "^4.1.11"
     },
     "exports": {
         "./shared": {

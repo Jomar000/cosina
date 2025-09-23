@@ -58,29 +58,82 @@ export const auditTrail = pgTable(
     ],
 )
 
-export const objectStorage = pgTable(
-    'object_storage',
+export const upload = pgTable(
+    'upload',
     {
         id: text('id').primaryKey(),
-        uploadedBy: text('uploaded_by').notNull(),
-        uploadedAt: timestamp('uploaded_at', {
+        userId: text('user_id').notNull(),
+        createdAt: timestamp('created_at', {
             withTimezone: true,
             mode: 'date',
         })
-            .defaultNow()
-            .notNull(),
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
     },
     (t) => [
-        index('qpw5yvo4b967_index').on(t.uploadedBy),
+        index('dwolixf6w8hp_index').on(t.userId),
         foreignKey({
-            name: 'qpw5yvo4b967_fkey',
-            columns: [t.uploadedBy],
+            name: 'dwolixf6w8hp_fkey',
+            columns: [t.userId],
             foreignColumns: [user.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
     ],
 )
+
+export const uploadAttachment = pgTable(
+    'upload_attachment',
+    {
+        uploadId: text('user_id').primaryKey(),
+        objectStorageId: text('object_storage_id').notNull(),
+    },
+    (t) => [
+        index('c0g7vcldgcc1_index').on(t.uploadId),
+        foreignKey({
+            name: 'c0g7vcldgcc1_fkey',
+            columns: [t.uploadId],
+            foreignColumns: [upload.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+        index('o7xm4my0uq10_index').on(t.objectStorageId),
+        foreignKey({
+            name: 'o7xm4my0uq10_fkey',
+            columns: [t.objectStorageId],
+            foreignColumns: [uploadStorage.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+    ],
+)
+
+export const uploadStorage = pgTable('upload_storage', {
+    id: text('id').primaryKey(),
+    filename: text('file_name').notNull(),
+    mimeType: text('mime_type'),
+    size: bigint('size', { mode: 'bigint' }),
+    hashSha256: text('hash_sha256').notNull(),
+    isDeleted: boolean('is_deleted').notNull().default(false),
+    createdAt: timestamp('created_at', {
+        withTimezone: true,
+        mode: 'date',
+    })
+        .notNull()
+        .defaultNow(),
+    updatedAt: timestamp('updated_at', {
+        withTimezone: true,
+        mode: 'date',
+    })
+        .notNull()
+        .defaultNow(),
+})
 
 ///////////////////
 // Tables - Auth //
