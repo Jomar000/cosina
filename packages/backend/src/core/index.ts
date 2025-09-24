@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { requestId } from 'hono/request-id'
 
+import { AppError } from '../errors.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
 import { csrfHandler } from './middleware/csrfHandler.js'
 import baseRoute from './route/base/_index.js'
@@ -38,8 +39,12 @@ hono.onError((err, ctx) => {
 
     return ctx.json(
         {
-            message: 'An error has occurred.',
-            requestId: ctx.get('requestId'),
+            error: {
+                requestId: ctx.get('requestId'),
+                code: err instanceof AppError ? err.code : 'UNCAUGHT_EXCEPTION',
+                message:
+                    'An error has occurred. Please contact the administrator and provide the requestId.',
+            },
         },
         500,
     )

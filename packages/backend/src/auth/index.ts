@@ -1,5 +1,5 @@
-import { scryptAsync } from '@noble/hashes/scrypt'
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
+import { scryptAsync } from '@noble/hashes/scrypt.js'
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError } from 'better-auth/api'

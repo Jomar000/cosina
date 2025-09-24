@@ -78,6 +78,10 @@ export const fetchClient = async <
         credentials: 'include',
     })
 
+    if (!response.ok) {
+        throw new Error('FETCH_RESPONSE_NOT_OK')
+    }
+
     let data: T | null = null
 
     try {
