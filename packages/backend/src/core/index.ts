@@ -1,3 +1,5 @@
+import '../polyfills.js'
+
 import { Hono } from 'hono'
 import { requestId } from 'hono/request-id'
 

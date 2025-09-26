@@ -58,6 +58,27 @@ export const auditTrail = pgTable(
     ],
 )
 
+export const objectStorage = pgTable('object_storage', {
+    id: text('id').primaryKey(),
+    filename: text('file_name').notNull(),
+    mimeType: text('mime_type'),
+    size: bigint('size', { mode: 'bigint' }),
+    hashSha256: text('hash_sha256').notNull(),
+    isDeleted: boolean('is_deleted').notNull().default(false),
+    createdAt: timestamp('created_at', {
+        withTimezone: true,
+        mode: 'date',
+    })
+        .notNull()
+        .defaultNow(),
+    updatedAt: timestamp('updated_at', {
+        withTimezone: true,
+        mode: 'date',
+    })
+        .notNull()
+        .defaultNow(),
+})
+
 export const upload = pgTable(
     'upload',
     {
@@ -107,33 +128,12 @@ export const uploadAttachment = pgTable(
         foreignKey({
             name: 'o7xm4my0uq10_fkey',
             columns: [t.objectStorageId],
-            foreignColumns: [uploadStorage.id],
+            foreignColumns: [objectStorage.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
     ],
 )
-
-export const uploadStorage = pgTable('upload_storage', {
-    id: text('id').primaryKey(),
-    filename: text('file_name').notNull(),
-    mimeType: text('mime_type'),
-    size: bigint('size', { mode: 'bigint' }),
-    hashSha256: text('hash_sha256').notNull(),
-    isDeleted: boolean('is_deleted').notNull().default(false),
-    createdAt: timestamp('created_at', {
-        withTimezone: true,
-        mode: 'date',
-    })
-        .notNull()
-        .defaultNow(),
-    updatedAt: timestamp('updated_at', {
-        withTimezone: true,
-        mode: 'date',
-    })
-        .notNull()
-        .defaultNow(),
-})
 
 ///////////////////
 // Tables - Auth //

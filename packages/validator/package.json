@@ -7,7 +7,7 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "pnpm": ">=10.15.1"
+        "pnpm": ">=10.17.1"
     },
     "scripts": {
         "build": "tsc --project ./tsconfig.json"

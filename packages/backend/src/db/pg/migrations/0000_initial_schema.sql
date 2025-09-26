@@ -54,6 +54,17 @@ CREATE TABLE "member" (
 	CONSTRAINT "qticc263mdrn_unique" UNIQUE("organization_id","user_id")
 );
 --> statement-breakpoint
+CREATE TABLE "object_storage" (
+	"id" text PRIMARY KEY NOT NULL,
+	"file_name" text NOT NULL,
+	"mime_type" text,
+	"size" bigint,
+	"hash_sha256" text NOT NULL,
+	"is_deleted" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "organization" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
@@ -111,17 +122,6 @@ CREATE TABLE "upload_attachment" (
 	"object_storage_id" text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "upload_storage" (
-	"id" text PRIMARY KEY NOT NULL,
-	"file_name" text NOT NULL,
-	"mime_type" text,
-	"size" bigint,
-	"hash_sha256" text NOT NULL,
-	"is_deleted" boolean DEFAULT false NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
@@ -167,7 +167,7 @@ ALTER TABLE "session" ADD CONSTRAINT "11rzmcpm3uv0_fkey" FOREIGN KEY ("user_id")
 ALTER TABLE "session" ADD CONSTRAINT "n6ebx1rg81k4_fkey" FOREIGN KEY ("active_organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "upload" ADD CONSTRAINT "dwolixf6w8hp_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "upload_attachment" ADD CONSTRAINT "c0g7vcldgcc1_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."upload"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
-ALTER TABLE "upload_attachment" ADD CONSTRAINT "o7xm4my0uq10_fkey" FOREIGN KEY ("object_storage_id") REFERENCES "public"."upload_storage"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
+ALTER TABLE "upload_attachment" ADD CONSTRAINT "o7xm4my0uq10_fkey" FOREIGN KEY ("object_storage_id") REFERENCES "public"."object_storage"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "user_attribute" ADD CONSTRAINT "nhsl7a2vq0j4_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 CREATE INDEX "ame54f8rq90m_index" ON "account" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "kg5nldbccqqf_index" ON "audit_trail" USING btree ("user_id");--> statement-breakpoint

@@ -1,3 +1,5 @@
+import type { S3Client } from '@aws-sdk/client-s3'
+
 import type { auth } from './auth/index.js'
 import type { dbClient } from './db/pg/client.js'
 import type * as dbSchema from './db/pg/schema.js'
@@ -17,7 +19,8 @@ declare global {
         doWssClient: DurableObjectNamespace<WebSocketServer>
         ipAddress: string
         kvClient: KVNamespace
-        r2Client: R2Bucket
+        r2ClientWorker: R2Bucket
+        r2ClientS3Api: S3Client
         session:
             | Awaited<ReturnType<typeof auth>>['$Infer']['Session']['session']
             | null

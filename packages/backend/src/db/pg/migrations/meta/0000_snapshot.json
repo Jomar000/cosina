@@ -1,5 +1,5 @@
 {
-    "id": "5e0d80e2-e813-4751-94b7-2c2fe74583ed",
+    "id": "76238551-0911-47ca-a551-50c560dcf142",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "7",
     "dialect": "postgresql",
@@ -604,6 +604,70 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
+        "public.object_storage": {
+            "name": "object_storage",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "file_name": {
+                    "name": "file_name",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "mime_type": {
+                    "name": "mime_type",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "size": {
+                    "name": "size",
+                    "type": "bigint",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "hash_sha256": {
+                    "name": "hash_sha256",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "is_deleted": {
+                    "name": "is_deleted",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
         "public.organization": {
             "name": "organization",
             "schema": "",
@@ -1102,7 +1166,7 @@
                 "o7xm4my0uq10_fkey": {
                     "name": "o7xm4my0uq10_fkey",
                     "tableFrom": "upload_attachment",
-                    "tableTo": "upload_storage",
+                    "tableTo": "object_storage",
                     "columnsFrom": [
                         "object_storage_id"
                     ],
@@ -1113,70 +1177,6 @@
                     "onUpdate": "no action"
                 }
             },
-            "compositePrimaryKeys": {},
-            "uniqueConstraints": {},
-            "policies": {},
-            "checkConstraints": {},
-            "isRLSEnabled": false
-        },
-        "public.upload_storage": {
-            "name": "upload_storage",
-            "schema": "",
-            "columns": {
-                "id": {
-                    "name": "id",
-                    "type": "text",
-                    "primaryKey": true,
-                    "notNull": true
-                },
-                "file_name": {
-                    "name": "file_name",
-                    "type": "text",
-                    "primaryKey": false,
-                    "notNull": true
-                },
-                "mime_type": {
-                    "name": "mime_type",
-                    "type": "text",
-                    "primaryKey": false,
-                    "notNull": false
-                },
-                "size": {
-                    "name": "size",
-                    "type": "bigint",
-                    "primaryKey": false,
-                    "notNull": false
-                },
-                "hash_sha256": {
-                    "name": "hash_sha256",
-                    "type": "text",
-                    "primaryKey": false,
-                    "notNull": true
-                },
-                "is_deleted": {
-                    "name": "is_deleted",
-                    "type": "boolean",
-                    "primaryKey": false,
-                    "notNull": true,
-                    "default": false
-                },
-                "created_at": {
-                    "name": "created_at",
-                    "type": "timestamp with time zone",
-                    "primaryKey": false,
-                    "notNull": true,
-                    "default": "now()"
-                },
-                "updated_at": {
-                    "name": "updated_at",
-                    "type": "timestamp with time zone",
-                    "primaryKey": false,
-                    "notNull": true,
-                    "default": "now()"
-                }
-            },
-            "indexes": {},
-            "foreignKeys": {},
             "compositePrimaryKeys": {},
             "uniqueConstraints": {},
             "policies": {},
