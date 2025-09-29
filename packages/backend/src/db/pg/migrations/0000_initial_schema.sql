@@ -56,13 +56,21 @@ CREATE TABLE "member" (
 --> statement-breakpoint
 CREATE TABLE "object_storage" (
 	"id" text PRIMARY KEY NOT NULL,
-	"file_name" text NOT NULL,
+	"name" text NOT NULL,
+	"size" bigint NOT NULL,
 	"mime_type" text,
-	"size" bigint,
 	"hash_sha256" text NOT NULL,
 	"is_deleted" boolean DEFAULT false NOT NULL,
+	"is_public" boolean DEFAULT false NOT NULL,
+	"is_uploaded" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "object_storage_acl" (
+	"object_storage_id" text NOT NULL,
+	"user_id" text NOT NULL,
+	"mode" integer DEFAULT 1 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "organization" (
@@ -163,6 +171,8 @@ ALTER TABLE "invitation" ADD CONSTRAINT "to5af3ntvzc0_fkey" FOREIGN KEY ("role")
 ALTER TABLE "member" ADD CONSTRAINT "0xl3tx6iju2c_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "member" ADD CONSTRAINT "ey8flhlguwkb_fkey" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "member" ADD CONSTRAINT "kn8m1fkitar0_fkey" FOREIGN KEY ("role") REFERENCES "public"."role"("name") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
+ALTER TABLE "object_storage_acl" ADD CONSTRAINT "xabdmms1rce4_fkey" FOREIGN KEY ("object_storage_id") REFERENCES "public"."object_storage"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
+ALTER TABLE "object_storage_acl" ADD CONSTRAINT "68ghia6fpgvj_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "11rzmcpm3uv0_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "n6ebx1rg81k4_fkey" FOREIGN KEY ("active_organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
 ALTER TABLE "upload" ADD CONSTRAINT "dwolixf6w8hp_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action DEFERRABLE INITIALLY IMMEDIATE;--> statement-breakpoint
@@ -178,6 +188,8 @@ CREATE INDEX "to5af3ntvzc0_index" ON "invitation" USING btree ("role");--> state
 CREATE INDEX "0xl3tx6iju2c_index" ON "member" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "ey8flhlguwkb_index" ON "member" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "kn8m1fkitar0_index" ON "member" USING btree ("role");--> statement-breakpoint
+CREATE INDEX "xabdmms1rce4_index" ON "object_storage_acl" USING btree ("object_storage_id");--> statement-breakpoint
+CREATE INDEX "68ghia6fpgvj_index" ON "object_storage_acl" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "7vz0lkc6bbu7_index" ON "permission" USING btree ("role_id");--> statement-breakpoint
 CREATE INDEX "11rzmcpm3uv0_index" ON "session" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "n6ebx1rg81k4_index" ON "session" USING btree ("active_organization_id");--> statement-breakpoint

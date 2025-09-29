@@ -1,5 +1,6 @@
 import type { Context } from 'hono'
 import { customAlphabet } from 'nanoid'
+import type { ZodObject } from 'zod'
 
 /**
  * NanoID Custom Character Set
@@ -92,4 +93,33 @@ export const auditTrailLogger = async (
             ipAddress: ctx.get('ipAddress'),
             userAgent: ctx.get('userAgent'),
         })
+}
+
+/**
+ * Hono Validator Callback Function
+ *
+ * @description
+ * Callback function for the built-in Hono Validator Middleware.
+ */
+export const honoValidatorCb = async <TSchema extends ZodObject>(
+    value: unknown,
+    ctx: Context<THonoInstance>,
+    schema: TSchema,
+) => {
+    const validator = await schema.safeParseAsync(value)
+
+    if (!validator.data) {
+        return ctx.json(
+            {
+                error: {
+                    code: 'DATA_VALIDATION',
+                    message: 'An error occurred while validating input data.',
+                },
+                validationErrors: validator.error?.issues,
+            },
+            400,
+        )
+    }
+
+    return validator.data
 }

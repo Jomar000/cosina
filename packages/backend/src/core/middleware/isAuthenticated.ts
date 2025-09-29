@@ -9,13 +9,20 @@ export const isAuthenticated = () => {
         if (!authData) {
             return ctx.json(
                 {
-                    success: false,
-                    message: 'You are not allowed to access this resource.',
+                    error: {
+                        code: 'UNAUTHORIZED',
+                        message: 'You are not allowed to access this resource.',
+                    },
                 },
                 401,
             )
         }
 
+        const { role } = await ctx.get('auth').api.getActiveMemberRole({
+            headers: ctx.req.raw.headers,
+        })
+
+        ctx.set('role', role)
         ctx.set('session', authData.session)
         ctx.set('user', authData.user)
 

@@ -17,8 +17,11 @@ export const isAuthorized = (permissions: Record<string, string[]>) => {
             if (!success) {
                 return ctx.json(
                     {
-                        success: false,
-                        message: 'You are not allowed to access this resource.',
+                        error: {
+                            code: 'FORBIDDEN',
+                            message:
+                                'You are not allowed to access this resource.',
+                        },
                     },
                     403,
                 )

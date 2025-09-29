@@ -27,7 +27,7 @@ port = 8080
 ENVIRONMENT = "development"
 STATUS = "up"
 ALLOWED_ORIGINS = "http://localhost:5173"
-CF_R2_REGION = "auto"
+CF_R2_BUCKET = "hyperion-development"
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
 CORS_ALLOW_CREDENTIALS = 1 # (0|1)
@@ -68,7 +68,7 @@ route = { custom_domain = true, pattern = "" }
 ENVIRONMENT = "staging"
 STATUS = "up"
 ALLOWED_ORIGINS = "http://localhost:5173"
-CF_R2_REGION = "auto"
+CF_R2_BUCKET = "hyperion-staging"
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
 CORS_ALLOW_CREDENTIALS = 1 # (0|1)
@@ -108,7 +108,7 @@ route = { custom_domain = true, pattern = "" }
 ENVIRONMENT = "production"
 STATUS = "up"
 ALLOWED_ORIGINS = "http://localhost:5173"
-CF_R2_REGION = "auto"
+CF_R2_BUCKET = "hyperion-production"
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
 CORS_ALLOW_CREDENTIALS = 1 # (0|1)

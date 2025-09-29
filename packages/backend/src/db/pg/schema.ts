@@ -60,11 +60,13 @@ export const auditTrail = pgTable(
 
 export const objectStorage = pgTable('object_storage', {
     id: text('id').primaryKey(),
-    filename: text('file_name').notNull(),
+    name: text('name').notNull(),
+    size: bigint('size', { mode: 'bigint' }).notNull(),
     mimeType: text('mime_type'),
-    size: bigint('size', { mode: 'bigint' }),
     hashSha256: text('hash_sha256').notNull(),
     isDeleted: boolean('is_deleted').notNull().default(false),
+    isPublic: boolean('is_public').notNull().default(false),
+    isUploaded: boolean('is_uploaded').notNull().default(false),
     createdAt: timestamp('created_at', {
         withTimezone: true,
         mode: 'date',
@@ -78,6 +80,37 @@ export const objectStorage = pgTable('object_storage', {
         .notNull()
         .defaultNow(),
 })
+
+export const objectStorageAcl = pgTable(
+    'object_storage_acl',
+    {
+        objectStorageId: text('object_storage_id').notNull(),
+        userId: text('user_id').notNull(),
+        /**
+         * @description
+         * Uses bit-masking for mode
+         */
+        mode: integer('mode').notNull().default(1),
+    },
+    (t) => [
+        index('xabdmms1rce4_index').on(t.objectStorageId),
+        foreignKey({
+            name: 'xabdmms1rce4_fkey',
+            columns: [t.objectStorageId],
+            foreignColumns: [objectStorage.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+        index('68ghia6fpgvj_index').on(t.userId),
+        foreignKey({
+            name: '68ghia6fpgvj_fkey',
+            columns: [t.userId],
+            foreignColumns: [user.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+    ],
+)
 
 export const upload = pgTable(
     'upload',

@@ -1,4 +1,4 @@
-import type { S3Client } from '@aws-sdk/client-s3'
+import type { AwsClient } from 'aws4fetch'
 
 import type { auth } from './auth/index.js'
 import type { dbClient } from './db/pg/client.js'
@@ -14,13 +14,14 @@ declare global {
 
     type THonoVariables = {
         auth: Awaited<ReturnType<typeof auth>>
+        aws4FetchClient: AwsClient
         dbClient: ReturnType<typeof dbClient>
         dbSchema: typeof dbSchema
         doWssClient: DurableObjectNamespace<WebSocketServer>
         ipAddress: string
         kvClient: KVNamespace
-        r2ClientWorker: R2Bucket
-        r2ClientS3Api: S3Client
+        r2Client: R2Bucket
+        role: string
         session:
             | Awaited<ReturnType<typeof auth>>['$Infer']['Session']['session']
             | null

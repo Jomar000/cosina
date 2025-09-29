@@ -1,36 +1,19 @@
 import { z } from 'zod'
 
-import { textField } from '../shared.js'
+import { booleanField, numericField, textField } from '../shared.js'
 
-/////////
-// put //
-/////////
+export const objectStorageCreateDownloadLinkInputSchema = z.object({
+    key: textField({ fieldName: 'Key', min: 12 }),
+})
 
-export const objectStoragePutInputSchema = z.object({
-    // file: z
-    //     .custom<File>()
-    //     .check((ctx) => {
-    //         if (ctx.value instanceof File === false) {
-    //             ctx.issues.push({
-    //                 code: 'custom',
-    //                 message: 'Invalid file provided.',
-    //                 input: ctx.value,
-    //             })
-    //         }
-    //     })
-    //     .check((ctx) => {
-    //         if (ctx.value.size > 5242880) {
-    //             ctx.issues.push({
-    //                 code: 'custom',
-    //                 message: 'Maximum file size is 5 MB.',
-    //                 input: ctx.value,
-    //             })
-    //         }
-    //     }),
-    // contentType: textField({
-    //     fieldName: 'Content Type',
-    // }),
-    // ownerId: textField({
-    //     fieldName: 'Owner ID',
-    // }).optional(),
+export const objectStorageCreateUploadLinkInputSchema = z.object({
+    name: textField({ fieldName: 'Name' }),
+    size: numericField({ fieldName: 'Size', max: 10485760 }),
+    mimeType: textField({ fieldName: 'MIME Type', min: 8 }).optional(),
+    hashSha256: textField({
+        fieldName: 'SHA-256 hash',
+        min: 64,
+        max: 64,
+    }),
+    isPublic: booleanField('isPublic Flag').optional().default(false),
 })
