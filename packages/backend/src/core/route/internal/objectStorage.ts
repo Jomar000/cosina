@@ -141,7 +141,7 @@ internalRouteObjectStorage.post(
             status: 200 | 409
         }[] = []
 
-        // Duplicate SHA-256 checksum detection
+        // Existing SHA-256 hash detection
         const hashesToCheck = objectData.map(({ hashSha256 }) => hashSha256)
 
         const existingObjects = await ctx
@@ -153,7 +153,7 @@ internalRouteObjectStorage.post(
             .from(objectStorage)
             .where(inArray(objectStorage.hashSha256, hashesToCheck))
 
-        const duplicateHashes = existingObjects.map(
+        const existingHashes = existingObjects.map(
             ({ hashSha256 }) => hashSha256,
         )
 
@@ -162,7 +162,7 @@ internalRouteObjectStorage.post(
 
         // Generate pre-signed upload URLs
         for (const obj of objectData) {
-            if (duplicateHashes.includes(obj.hashSha256)) {
+            if (existingHashes.includes(obj.hashSha256)) {
                 signedUrls.push({
                     key: existingObjects.filter(
                         ({ hashSha256 }) => hashSha256 === obj.hashSha256,
