@@ -1,6 +1,6 @@
 import type { Context } from 'hono'
 import { customAlphabet } from 'nanoid'
-import type { ZodObject } from 'zod'
+import type { ZodType } from 'zod'
 
 /**
  * NanoID Custom Character Set
@@ -101,7 +101,7 @@ export const auditTrailLogger = async (
  * @description
  * Callback function for the built-in Hono Validator Middleware.
  */
-export const honoValidatorCb = async <TSchema extends ZodObject>(
+export const honoValidatorCb = async <TSchema extends ZodType>(
     value: unknown,
     ctx: Context<THonoInstance>,
     schema: TSchema,

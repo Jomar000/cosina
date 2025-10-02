@@ -63,7 +63,7 @@ export const objectStorage = pgTable('object_storage', {
     name: text('name').notNull(),
     size: bigint('size', { mode: 'bigint' }).notNull(),
     mimeType: text('mime_type'),
-    hashSha256: text('hash_sha256').notNull(),
+    hashSha256: text('hash_sha256').unique('ectz8nfqt8mj_unique').notNull(),
     isDeleted: boolean('is_deleted').notNull().default(false),
     isPublic: boolean('is_public').notNull().default(false),
     isUploaded: boolean('is_uploaded').notNull().default(false),
@@ -109,6 +109,7 @@ export const objectStorageAcl = pgTable(
         })
             .onDelete('no action')
             .onUpdate('no action'),
+        unique('i9c1la91qvh8_unique').on(t.objectStorageId, t.userId),
     ],
 )
 
@@ -145,7 +146,7 @@ export const upload = pgTable(
 export const uploadAttachment = pgTable(
     'upload_attachment',
     {
-        uploadId: text('user_id').primaryKey(),
+        uploadId: text('upload_id').notNull(),
         objectStorageId: text('object_storage_id').notNull(),
     },
     (t) => [
@@ -165,6 +166,7 @@ export const uploadAttachment = pgTable(
         })
             .onDelete('no action')
             .onUpdate('no action'),
+        unique('23aso68ioiyj_unique').on(t.uploadId, t.objectStorageId),
     ],
 )
 

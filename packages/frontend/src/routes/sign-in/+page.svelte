@@ -27,7 +27,7 @@
     let submissionErrors: string[] = $state([])
 
     // Query
-    const authSignInQuery = createMutation({
+    const authSignInQuery = createMutation(() => ({
         mutationKey: [
             'authSignIn',
         ],
@@ -99,7 +99,7 @@
                 submissionErrors.push((err as Error).message)
             }
         },
-    })
+    }))
 
     // Form
     const {
@@ -109,7 +109,7 @@
     } = createForm(() => ({
         onSubmit: async ({ value }) => {
             submissionErrors = []
-            await $authSignInQuery.mutateAsync(value)
+            await authSignInQuery.mutateAsync(value)
         },
         validators: {
             // Make sure form is valid everytime it changes.
