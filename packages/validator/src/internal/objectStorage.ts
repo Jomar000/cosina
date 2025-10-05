@@ -37,12 +37,25 @@ export const objectStorageCreateUploadLinkInputSchema = z
         z.object({
             name: textField({ fieldName: 'Name' }),
             size: numericField({ fieldName: 'Size', max: 10485760 }),
-            mimeType: textField({ fieldName: 'MIME Type', min: 8 }).optional(),
+            mimeType: textField({ fieldName: 'MIME Type', min: 8 })
+                .lowercase()
+                .optional(),
             hashSha256: textField({
                 fieldName: 'SHA-256 hash',
-                min: 64,
-                max: 64,
-            }),
+            })
+                .lowercase()
+                .check((ctx) => {
+                    if (
+                        !/^[0-9a-fA-F]+$/.test(ctx.value) ||
+                        !(ctx.value.length === 64)
+                    ) {
+                        ctx.issues.push({
+                            code: 'custom',
+                            message: `Invalid SHA-256 hash provided.`,
+                            input: ctx.value,
+                        })
+                    }
+                }),
             isPublic: booleanField('isPublic Flag').optional().default(false),
         }),
     )

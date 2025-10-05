@@ -89,7 +89,10 @@ internalRouteObjectStorage.post(
                                 `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET}/${obj.objectStorage.id}?X-Amz-Expires=${300}`,
                                 {
                                     method: 'GET',
-                                    aws: { signQuery: true },
+                                    aws: {
+                                        service: 's3',
+                                        signQuery: true,
+                                    },
                                 },
                             )
                     ).url,
@@ -137,6 +140,7 @@ internalRouteObjectStorage.post(
 
         const signedUrls: {
             key: string
+            encodedHash: string | null
             signedUrl: string | null
             status: 200 | 409
         }[] = []
@@ -167,11 +171,23 @@ internalRouteObjectStorage.post(
                     key: existingObjects.filter(
                         ({ hashSha256 }) => hashSha256 === obj.hashSha256,
                     )[0].id,
+                    encodedHash: null,
                     signedUrl: null,
                     status: 409,
                 })
             } else {
                 const objectStorageId = nanoidCustom(32)
+
+                // Convert hex-encoded hash to bytes
+                const hashBytes = new Uint8Array(
+                    obj.hashSha256.match(/.{2}/g)!.map((b) => parseInt(b, 16)),
+                )
+
+                // Convert bytes to binary representation
+                const hashBinaryString = String.fromCharCode(...hashBytes)
+
+                // Encode to Base64
+                const hashBase64 = btoa(hashBinaryString)
 
                 objectStorageData.push({
                     id: objectStorageId,
@@ -188,6 +204,7 @@ internalRouteObjectStorage.post(
 
                 signedUrls.push({
                     key: objectStorageId,
+                    encodedHash: hashBase64,
                     signedUrl: (
                         await ctx
                             .get('aws4FetchClient')
@@ -196,9 +213,13 @@ internalRouteObjectStorage.post(
                                 {
                                     method: 'PUT',
                                     headers: {
-                                        'x-amz-checksum-sha256': obj.hashSha256,
+                                        // https://developers.cloudflare.com/r2/api/s3/api/#checksum-types
+                                        'x-amz-checksum-sha256': hashBase64,
                                     },
-                                    aws: { signQuery: true },
+                                    aws: {
+                                        service: 's3',
+                                        signQuery: true,
+                                    },
                                 },
                             )
                     ).url,
