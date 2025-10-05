@@ -27,6 +27,7 @@ export const initContext = () => {
         ctx.set('dbSchema', dbSchema)
         ctx.set('doWssClient', ctx.env.HYPERION_DO_WSS)
         ctx.set('ipAddress', ctx.req.header('cf-connecting-ip') || 'N/A')
+        ctx.set('isPrivilegedRole', false)
         ctx.set('kvClient', ctx.env.HYPERION_KV)
         ctx.set('r2Client', ctx.env.HYPERION_R2)
         ctx.set('role', 'N/A')

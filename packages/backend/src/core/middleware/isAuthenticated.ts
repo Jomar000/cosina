@@ -22,6 +22,13 @@ export const isAuthenticated = () => {
             headers: ctx.req.raw.headers,
         })
 
+        ctx.set(
+            'isPrivilegedRole',
+            [
+                'admin',
+                'owner',
+            ].includes(role),
+        )
         ctx.set('role', role)
         ctx.set('session', authData.session)
         ctx.set('user', authData.user)

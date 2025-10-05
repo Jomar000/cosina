@@ -19,6 +19,7 @@ declare global {
         dbSchema: typeof dbSchema
         doWssClient: DurableObjectNamespace<WebSocketServer>
         ipAddress: string
+        isPrivilegedRole: boolean
         kvClient: KVNamespace
         r2Client: R2Bucket
         role: string

@@ -45,11 +45,6 @@ internalRouteObjectStorage.post(
             .innerJoin(upload, eq(upload.id, uploadAttachment.uploadId))
             .where(inArray(objectStorage.id, providedKeys))
 
-        const isAdminRole = [
-            'admin',
-            'owner',
-        ].includes(ctx.get('role'))
-
         const signedUrls: {
             key: string
             signedUrl: string | null
@@ -73,13 +68,17 @@ internalRouteObjectStorage.post(
 
         // Existent Keys
         for (const obj of objectData) {
-            const isPublic = obj.objectStorage.isPublic
+            const isPublicObject = obj.objectStorage.isPublic
 
             const hasObjectPermission =
                 obj.objectStorageAcl.userId === ctx.get('user')!.id &&
                 obj.objectStorageAcl.mode & 1
 
-            if (isAdminRole || isPublic || hasObjectPermission) {
+            if (
+                ctx.get('isPrivilegedRole') ||
+                isPublicObject ||
+                hasObjectPermission
+            ) {
                 signedUrls.push({
                     key: obj.objectStorage.id,
                     signedUrl: (
