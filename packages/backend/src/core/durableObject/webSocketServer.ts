@@ -44,6 +44,7 @@ export class WebSocketServer extends DurableObject {
                     // Don't send back to self
                     if (
                         wsClient.readyState === wsClient.OPEN &&
+                        wsClient.bufferedAmount === 0 &&
                         wsClient !== ws
                     ) {
                         wsClient.send(
@@ -61,7 +62,7 @@ export class WebSocketServer extends DurableObject {
 
     sendMessage(message: string) {
         this.ctx.getWebSockets().forEach((ws) => {
-            if (ws.readyState === ws.OPEN) {
+            if (ws.readyState === ws.OPEN && ws.bufferedAmount === 0) {
                 ws.send(message)
             }
         })
