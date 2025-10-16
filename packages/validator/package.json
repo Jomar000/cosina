@@ -10,7 +10,8 @@
         "pnpm": ">=10.18.3"
     },
     "scripts": {
-        "build": "tsc --project ./tsconfig.json"
+        "build": "tsc --project ./tsconfig.json",
+        "prepare": "pnpm build"
     },
     "dependencies": {
         "dayjs": "^1.11.18",

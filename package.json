@@ -12,7 +12,7 @@
     "scripts": {
         "build": "pnpm --recursive --stream build",
         "format": "prettier --write .",
-        "lint": "eslint ."
+        "lint": "prettier --check . && eslint ."
     },
     "devDependencies": {
         "@changesets/cli": "^2.29.7",
@@ -22,6 +22,7 @@
         "@typescript-eslint/parser": "^8.46.1",
         "eslint": "^9.37.0",
         "eslint-plugin-svelte": "^3.12.4",
+        "globals": "^16.4.0",
         "husky": "^9.1.7",
         "prettier": "^3.6.2",
         "prettier-plugin-multiline-arrays": "^4.0.3",
@@ -38,9 +39,9 @@
         },
         "overrides": {
             "@sveltejs/kit>cookie": "^0.7.2",
-            "drizzle-kit>@esbuild-kit/core-utils": "npm:tsx@^4.20.5",
-            "drizzle-kit>@esbuild-kit/esm-loader": "npm:tsx@^4.20.5",
-            "esbuild": "0.25.9"
+            "drizzle-kit>@esbuild-kit/core-utils": "npm:tsx@^4.20.6",
+            "drizzle-kit>@esbuild-kit/esm-loader": "npm:tsx@^4.20.6",
+            "esbuild": "0.25.11"
         },
         "peerDependencyRules": {
             "allowedVersions": {

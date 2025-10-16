@@ -1,10 +1,17 @@
-.dev.vars
-.dev.vars.*
-!.dev.vars.example
+dist
+node_modules
+
+# Env
 .env
 .env.*
 !.env.example
-drizzle-*.config.ts
-.wrangler/
-dist/
-node_modules/
+
+# Wrangler
+.wrangler
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+
+# OS
+.DS_Store
+Thumbs.db
