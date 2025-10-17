@@ -27,18 +27,18 @@
         />
         <Dialog.Content
             interactOutsideBehavior="ignore"
-            class="outline-hidden fixed left-[50%]
-                top-[50%] z-50
-                w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] overflow-auto rounded-lg
-                border border-neutral-600 bg-neutral-800 p-5
-                text-neutral-200 shadow md:h-auto md:w-1/4"
+            class="fixed top-[50%] left-[50%]
+                z-50 w-full
+                max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] overflow-auto rounded-lg border
+                border-neutral-600 bg-neutral-800 p-5 text-neutral-200
+                shadow outline-hidden md:h-auto md:w-1/4"
         >
             <Dialog.Title
                 class="flex w-full items-center justify-center text-lg font-semibold tracking-tight"
             >
                 {title}
             </Dialog.Title>
-            <Separator.Root class="-mx-5 mb-4 mt-5 block h-px bg-neutral-600" />
+            <Separator.Root class="-mx-5 mt-5 mb-4 block h-px bg-neutral-600" />
             <div
                 class="relative mx-auto h-auto w-full space-y-2 overflow-auto rounded-md bg-neutral-100 md:space-y-4 dark:bg-neutral-800"
             >

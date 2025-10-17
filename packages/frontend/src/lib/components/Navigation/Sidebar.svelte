@@ -22,7 +22,7 @@
 </script>
 
 <aside
-    class="fixed left-0 top-0 z-40 h-screen w-64 -translate-x-full border-r border-gray-200 bg-white pt-14 transition-transform md:translate-x-0 dark:border-gray-700 dark:bg-gray-800"
+    class="fixed top-0 left-0 z-40 h-screen w-64 -translate-x-full border-r border-gray-200 bg-white pt-14 transition-transform md:translate-x-0 dark:border-gray-700 dark:bg-gray-800"
     aria-label="Sidenav"
     id="drawer-navigation"
 >
@@ -102,7 +102,7 @@
                             clip-rule="evenodd"
                         ></path>
                     </svg>
-                    <span class="ml-3 flex-1 whitespace-nowrap text-left"
+                    <span class="ml-3 flex-1 text-left whitespace-nowrap"
                         >Pages</span
                     >
                     <svg
@@ -166,7 +166,7 @@
                             clip-rule="evenodd"
                         ></path>
                     </svg>
-                    <span class="ml-3 flex-1 whitespace-nowrap text-left"
+                    <span class="ml-3 flex-1 text-left whitespace-nowrap"
                         >Sales</span
                     >
                     <svg
@@ -189,14 +189,14 @@
                 >
                     <li>
                         <a
-                            href="/u/sr1/products"
+                            href="#"
                             class="group flex w-full items-center rounded-lg p-2 pl-11 text-base font-medium text-gray-900 transition duration-75 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                             >Products</a
                         >
                     </li>
                     <li>
                         <a
-                            href="/u/sr1/billing"
+                            href="#"
                             class="group flex w-full items-center rounded-lg p-2 pl-11 text-base font-medium text-gray-900 transition duration-75 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                             >Billing</a
                         >
@@ -257,7 +257,7 @@
                             clip-rule="evenodd"
                         ></path>
                     </svg>
-                    <span class="ml-3 flex-1 whitespace-nowrap text-left"
+                    <span class="ml-3 flex-1 text-left whitespace-nowrap"
                         >Authentication</span
                     >
                     <svg

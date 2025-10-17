@@ -4,92 +4,64 @@
 // ESLint Rules
 // https://eslint.org/docs/latest/rules/
 
-// ESLint Parser for Svelte & Typescript
-// https://github.com/sveltejs/eslint-plugin-svelte
-// https://github.com/sveltejs/svelte-eslint-parser
+import { includeIgnoreFile } from '@eslint/compat'
+import js from '@eslint/js'
+import prettier from 'eslint-config-prettier'
+import svelte from 'eslint-plugin-svelte'
+import { defineConfig } from 'eslint/config'
+import globals from 'globals'
+import { fileURLToPath } from 'node:url'
+import ts from 'typescript-eslint'
 
-import eslintJs from '@eslint/js'
-import tsPlugin from '@typescript-eslint/eslint-plugin'
-import tsParser from '@typescript-eslint/parser'
-import sveltePlugin from 'eslint-plugin-svelte'
-import svelteParser from 'svelte-eslint-parser'
+import svelteConfig from './packages/frontend/svelte.config.js'
 
-const config = [
+const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url))
+
+export default defineConfig(
+    includeIgnoreFile(gitignorePath),
+    js.configs.recommended,
+    ...ts.configs.recommended,
+    ...svelte.configs.recommended,
+    prettier,
+    ...svelte.configs.prettier,
     {
-        // Global Ignores
-        // https://eslint.org/docs/latest/use/configure/configuration-files-new#globally-ignoring-files-with-ignores
-        ignores: [
-            'packages/*/dist/**',
-            'packages/frontend/.svelte-kit/**',
-        ],
-    },
-    {
-        // Global Rules
+        // Rule Overrides
+        languageOptions: {
+            globals: { ...globals.browser, ...globals.node },
+        },
         rules: {
-            ...eslintJs.configs.recommended.rules,
+            '@typescript-eslint/no-unused-expressions': [
+                'error',
+                { allowShortCircuit: true, allowTernary: true },
+            ],
+            '@typescript-eslint/no-unused-vars': 'off',
             eqeqeq: [
                 'error',
                 'always',
             ],
             'no-throw-literal': ['error'],
+            // typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
+            // see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
             'no-undef': 'off',
-            'no-unused-private-class-members': 'off',
             'no-useless-concat': ['error'],
             'no-var': ['error'],
             'prefer-template': ['error'],
+            'svelte/no-navigation-without-resolve': 'off',
         },
     },
     {
-        // TypeScript Rules
         files: [
-            '**/*.ts',
-            '**/*.cts',
-            '**/*.mts',
+            '**/*.svelte',
+            '**/*.svelte.ts',
+            '**/*.svelte.js',
         ],
         languageOptions: {
-            parser: tsParser,
-        },
-        plugins: {
-            '@typescript-eslint': tsPlugin,
-        },
-        rules: {
-            ...tsPlugin.configs.recommended.rules,
-            '@typescript-eslint/no-unused-expressions': [
-                'error',
-                { allowShortCircuit: true, allowTernary: true },
-            ],
-            '@typescript-eslint/no-unused-vars': 'off',
-        },
-    },
-    {
-        // Svelte Rules
-        files: ['**/*.svelte'],
-        languageOptions: {
-            parser: svelteParser,
             parserOptions: {
-                parser: tsParser,
+                projectService: true,
+                extraFileExtensions: ['.svelte'],
+                parser: ts.parser,
+                svelteConfig,
             },
         },
-        plugins: {
-            '@typescript-eslint': tsPlugin,
-            svelte: sveltePlugin,
-        },
-        rules: {
-            ...tsPlugin.configs.recommended.rules,
-            '@typescript-eslint/no-unused-expressions': [
-                'error',
-                { allowShortCircuit: true, allowTernary: true },
-            ],
-            '@typescript-eslint/no-unused-vars': 'off',
-            ...sveltePlugin.configs.recommended.rules,
-            'svelte/valid-compile': [
-                'error',
-                {
-                    ignoreWarnings: true,
-                },
-            ],
-        },
     },
-]
-
-export default config
+)

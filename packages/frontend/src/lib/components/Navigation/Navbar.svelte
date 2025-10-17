@@ -23,7 +23,7 @@
 </script>
 
 <nav
-    class="fixed left-0 right-0 top-0 z-50 border-b border-gray-200 bg-white px-4 py-2.5 dark:border-gray-700 dark:bg-gray-800"
+    class="fixed top-0 right-0 left-0 z-50 border-b border-gray-200 bg-white px-4 py-2.5 dark:border-gray-700 dark:bg-gray-800"
 >
     <div class="flex flex-wrap items-center justify-between">
         <div class="flex items-center justify-start">
@@ -71,7 +71,7 @@
                     alt="Flowbite Logo"
                 />
                 <span
-                    class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white"
+                    class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
                     >Flowbite</span
                 >
             </a>

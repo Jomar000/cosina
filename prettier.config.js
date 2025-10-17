@@ -23,10 +23,18 @@ const pluginMultilineArraysConfig = {
     multilineArraysWrapThreshold: 1,
 }
 
+// prettier-plugin-multiline-arrays Options
+// https://github.com/tailwindlabs/prettier-plugin-tailwindcss?tab=readme-ov-file#options
+
+const pluginTailwindCssConfig = {
+    tailwindStylesheet: './packages/frontend/src/app.css',
+}
+
 // Export Configuration
 const config = {
     ...prettierConfig,
     ...pluginMultilineArraysConfig,
+    ...pluginTailwindCssConfig,
 }
 
 export default config

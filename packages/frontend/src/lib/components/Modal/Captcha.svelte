@@ -25,10 +25,10 @@
         <Dialog.Content
             escapeKeydownBehavior="ignore"
             interactOutsideBehavior="ignore"
-            class="outline-hidden fixed left-[50%]
-                top-[50%] z-50
-                w-full max-w-sm translate-x-[-50%] translate-y-[-50%] overflow-auto rounded-lg
-                border border-neutral-300 bg-neutral-200 p-5 text-neutral-200 shadow
+            class="fixed top-[50%] left-[50%]
+                z-50 w-full
+                max-w-sm translate-x-[-50%] translate-y-[-50%] overflow-auto rounded-lg border
+                border-neutral-300 bg-neutral-200 p-5 text-neutral-200 shadow outline-hidden
                 md:h-auto md:w-[600px] dark:border-neutral-600 dark:bg-neutral-800"
         >
             <Dialog.Title
@@ -36,7 +36,7 @@
             >
                 CAPTCHA Verification
             </Dialog.Title>
-            <Separator.Root class="-mx-5 mb-4 mt-4 block h-px bg-neutral-300" />
+            <Separator.Root class="-mx-5 mt-4 mb-4 block h-px bg-neutral-300" />
             <div
                 class="relative mx-auto h-auto w-full space-y-2 overflow-auto rounded-md md:space-y-4"
             >

@@ -1,3 +1,7 @@
+########
+# Root #
+########
+
 dist
 node_modules
 
@@ -15,3 +19,23 @@ node_modules
 # OS
 .DS_Store
 Thumbs.db
+
+###########
+# Backend #
+###########
+
+drizzle-*.config.ts
+
+############
+# Frontend #
+############
+
+test-results
+
+# Output
+.svelte-kit
+build
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*

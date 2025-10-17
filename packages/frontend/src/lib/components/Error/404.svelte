@@ -16,12 +16,12 @@
         <div class="z-50 w-full md:w-1/2">
             <div class="mb-10 font-light text-gray-600 md:mb-20">
                 <h1
-                    class="text-5xl font-black uppercase text-neutral-500 lg:text-8xl"
+                    class="text-5xl font-black text-neutral-500 uppercase lg:text-8xl"
                 >
                     404
                 </h1>
                 <h1
-                    class="mb-10 text-3xl font-black uppercase text-neutral-500 lg:text-5xl"
+                    class="mb-10 text-3xl font-black text-neutral-500 uppercase lg:text-5xl"
                 >
                     NOT FOUND
                 </h1>
@@ -33,7 +33,7 @@
             </div>
             <div class=" mb-0 flex w-full justify-center md:justify-start">
                 <button
-                    class="flex transform cursor-pointer items-center text-sm font-light text-neutral-500 outline-none transition-all hover:scale-110 hover:text-neutral-600 focus:outline-none md:text-lg"
+                    class="flex transform cursor-pointer items-center text-sm font-light text-neutral-500 transition-all outline-none hover:scale-110 hover:text-neutral-600 focus:outline-none md:text-lg"
                     ><span class=" mr-1"
                         ><svg
                             xmlns="http://www.w3.org/2000/svg"

@@ -195,7 +195,7 @@
                         <div class="mb-4">
                             <div
                                 role="alert"
-                                class="alert alert-error alert-outline alert-vertical sm:alert-horizontal"
+                                class="alert alert-vertical alert-outline alert-error sm:alert-horizontal"
                             >
                                 <i class="ph-bold ph-info text-lg"></i>
                                 <div>
@@ -203,7 +203,7 @@
                                         Looks like something didn't work right
                                     </h3>
                                     <ul>
-                                        {#each submissionErrors as error}
+                                        {#each submissionErrors as error, index (index)}
                                             <li>
                                                 <span class="text-xs"
                                                     >● {error}</span
