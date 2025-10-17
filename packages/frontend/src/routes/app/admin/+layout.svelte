@@ -30,11 +30,10 @@
     ///////////////
 
     onMount(() => {
-        const roleName = sessionData.roleName.toLowerCase()
-        if (roleName === 'admin') {
+        if (sessionData.userRoles.includes('admin')) {
             renderView = true
         } else {
-            goto(`/app/${roleName}/dashboard`, {
+            goto(`/app/admin/dashboard`, {
                 replaceState: true,
             })
         }
@@ -53,7 +52,7 @@
     <Sidebar />
     <div
         id="main-content"
-        class="relative ml-0 mt-20 h-full w-full overflow-hidden bg-white md:mt-14 xl:ml-64 dark:bg-neutral-800"
+        class="relative mt-20 ml-0 h-full w-full overflow-hidden bg-white md:mt-14 xl:ml-64 dark:bg-neutral-800"
     >
         <main class="min-h-screen">
             <section class="relative bg-white p-4 dark:bg-neutral-800">

@@ -272,12 +272,8 @@ export const auth = async (opts: {
                     // Inject the permissions to the request context
                     // and make it available to the after hook
                     ctx.context._permissions = aclPermissions
-                    ctx.context._roles = {
-                        // Only return the role of the authenticated user
-                        [orgMemberData.role.name]:
-                            aclRoles[orgMemberData.role.name],
-                    }
-                    ctx.context._roleName = orgMemberData.role.name
+                    ctx.context._roles = aclRoles
+                    ctx.context._userRoles = orgMemberData.role.name.split(',')
                 }
             }),
             after: createAuthMiddleware(async (ctx) => {
@@ -295,7 +291,7 @@ export const auth = async (opts: {
                         data: {
                             permissions: ctx.context._permissions,
                             roles: ctx.context._roles,
-                            roleName: ctx.context._roleName,
+                            userRoles: ctx.context._userRoles,
                             expiresAt:
                                 Math.floor(new Date().getTime() / 1000) +
                                 Number(env.SESSION_EXPIRATION),

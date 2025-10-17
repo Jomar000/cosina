@@ -92,9 +92,13 @@
 
                 sessionDataState.set(response.data.data)
 
-                goto(
-                    `/app/${sessionDataState.value!.roleName.toLowerCase()}/dashboard`,
-                )
+                if (sessionDataState.value!.userRoles.length === 1) {
+                    goto(
+                        `/app/${sessionDataState.value!.userRoles[0]}/dashboard`,
+                    )
+                } else {
+                    goto('/app')
+                }
             } catch (err) {
                 submissionErrors.push((err as Error).message)
             }
@@ -137,9 +141,17 @@
                 sessionDataState.value.expiresAt
 
         if (!renderPage) {
-            goto(
-                `/app/${sessionDataState.value!.roleName.toLowerCase()}/dashboard`,
-            )
+            let activeRole = localStorage.getItem('active_role')
+
+            if (!activeRole) {
+                if (sessionDataState.value!.userRoles.length === 1) {
+                    activeRole = sessionDataState.value!.userRoles[0]
+                }
+
+                goto('/app')
+            }
+
+            goto(`/app/${activeRole}/dashboard`)
         }
     })
 
@@ -339,7 +351,7 @@
                                     />
                                     <button
                                         type="button"
-                                        class="pointer-events-auto absolute right-2.5 top-2.5 focus:outline-none"
+                                        class="pointer-events-auto absolute top-2.5 right-2.5 focus:outline-none"
                                         onclick={() =>
                                             (showPassword = !showPassword)}
                                         tabindex={-1}
@@ -386,7 +398,7 @@
                                     type="submit"
                                     class="{isDisabled
                                         ? 'cursor-not-allowed opacity-50'
-                                        : ''} w-full rounded-lg bg-orange-400 px-4 py-2.5 text-sm font-medium text-white hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 md:px-5 md:py-2.5"
+                                        : ''} w-full rounded-lg bg-orange-400 px-4 py-2.5 text-sm font-medium text-white hover:bg-orange-500 focus:ring-2 focus:ring-orange-500 focus:outline-none md:px-5 md:py-2.5"
                                     disabled={isDisabled}
                                 >
                                     {form.isSubmitting

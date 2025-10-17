@@ -29,7 +29,7 @@
 
         return authClientState.value.organization.checkRolePermission({
             permissions,
-            role: sessionDataState.value.roleName,
+            role: sessionDataState.value.userRoles.join(','),
         })
     }
 
