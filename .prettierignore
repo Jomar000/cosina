@@ -5,6 +5,7 @@
 *.*
 
 # Add files not to be ignored
+!*.css
 !*.html
 !*.js
 !*.json

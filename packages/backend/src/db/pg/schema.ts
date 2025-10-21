@@ -60,7 +60,6 @@ export const auditTrail = pgTable(
 
 export const objectStorage = pgTable('object_storage', {
     id: text('id').primaryKey(),
-    name: text('name').notNull(),
     size: bigint('size', { mode: 'bigint' }).notNull(),
     mimeType: text('mime_type'),
     hashSha256: text('hash_sha256').unique('ectz8nfqt8mj_unique').notNull(),

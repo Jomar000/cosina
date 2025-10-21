@@ -124,7 +124,7 @@ internalRouteObjectStorage.post(
 
         const objectStorageData: Pick<
             typeof objectStorage.$inferInsert,
-            'id' | 'name' | 'size' | 'mimeType' | 'hashSha256' | 'isPublic'
+            'id' | 'size' | 'mimeType' | 'hashSha256' | 'isPublic'
         >[] = []
 
         const uploadAttachmentData: Pick<

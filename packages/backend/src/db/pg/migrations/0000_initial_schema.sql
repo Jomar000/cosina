@@ -56,7 +56,6 @@ CREATE TABLE "member" (
 --> statement-breakpoint
 CREATE TABLE "object_storage" (
 	"id" text PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
 	"size" bigint NOT NULL,
 	"mime_type" text,
 	"hash_sha256" text NOT NULL,

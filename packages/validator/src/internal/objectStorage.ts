@@ -64,7 +64,6 @@ export const objectStorageCreateDownloadLinkOutputSchema = baseOutputSchema(
 export const objectStorageCreateUploadLinkInputSchema = z
     .array(
         z.object({
-            name: textField({ fieldName: 'Name' }),
             size: numericField({ fieldName: 'Size', max: 10485760 }),
             mimeType: textField({ fieldName: 'MIME Type', min: 8 })
                 .lowercase()
