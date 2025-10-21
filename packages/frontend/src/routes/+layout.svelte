@@ -1,13 +1,10 @@
 <script lang="ts">
-    import '@phosphor-icons/web/bold'
     import {
         createQuery,
         QueryClient,
         QueryClientProvider,
     } from '@tanstack/svelte-query'
 
-    import ServiceUnavailable from '$lib/components/Error/503.svelte'
-    import Loader from '$lib/components/Loader/Loader2.svelte'
     import { fetchClient } from '$lib/utilities.js'
     import '../app.css'
 
@@ -43,17 +40,11 @@
 </script>
 
 {#if heartbeatQuery.isFetching}
-    <Loader />
+    LOADING
 {:else if heartbeatQuery.isSuccess}
     <QueryClientProvider client={queryClient}>
-        <!--
-            Flowbite Blocks - Application UI
-            https://flowbite.com/blocks/application/shells/#application-shell-with-sidebar-and-navbar
-        -->
-        <div class="min-w-[360px] bg-gray-50 antialiased dark:bg-neutral-900">
-            {@render children()}
-        </div>
+        {@render children()}
     </QueryClientProvider>
 {:else}
-    <ServiceUnavailable />
+    UNAVAILABLE
 {/if}

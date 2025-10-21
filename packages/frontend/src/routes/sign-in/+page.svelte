@@ -10,7 +10,7 @@
         PUBLIC_CF_TURNSTILE_SITE_KEY,
         PUBLIC_NAME,
     } from '$env/static/public'
-    import { IMG_LOGO } from '$lib/assets/image/_index.js'
+    import { IMG_default } from '$lib/assets/image/_index.js'
     import Captcha from '$lib/components/Modal/Captcha.svelte'
     import { authClientState } from '$lib/states/auth.svelte.js'
     import { sessionDataState } from '$lib/states/session.svelte.js'
@@ -183,7 +183,7 @@
                             class="flex items-center"
                         >
                             <img
-                                src={IMG_LOGO}
+                                src={IMG_default}
                                 class="mx-auto w-72"
                                 alt="logo"
                             />
