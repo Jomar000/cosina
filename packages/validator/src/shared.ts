@@ -233,17 +233,18 @@ export const readManyBaseInputSchema = z.object({
 export const baseOutputSchema = <Data extends z.ZodType = z.ZodType>(
     data: Data,
 ) =>
-    z.discriminatedUnion('success', [
+    z.union([
         z.object({
-            success: z.literal(true),
             data,
             count: z.number().nullish(),
             limit: z.number().nullish(),
             offset: z.number().nullish(),
         }),
         z.object({
-            success: z.literal(false),
-            message: z.string(),
+            error: z.object({
+                code: z.string(),
+                message: z.string(),
+            }),
             validationErrors: z.array(z.custom<z.core.$ZodIssue>()).optional(),
         }),
     ])

@@ -1,6 +1,11 @@
 import { z } from 'zod'
 
-import { booleanField, numericField, textField } from '../shared.js'
+import {
+    baseOutputSchema,
+    booleanField,
+    numericField,
+    textField,
+} from '../shared.js'
 
 export const objectStorageCreateDownloadLinkInputSchema = z
     .array(
@@ -31,6 +36,30 @@ export const objectStorageCreateDownloadLinkInputSchema = z
             }
         }
     })
+
+export const objectStorageCreateDownloadLinkOutputSchema = baseOutputSchema(
+    z.array(
+        z.discriminatedUnion('status', [
+            z.object({
+                key: z.string(),
+                signedUrl: z.string(),
+                status: z.literal(200),
+            }),
+            z.object({
+                key: z.string(),
+                encodedHash: z.null(),
+                signedUrl: z.null(),
+                status: z.literal(403),
+            }),
+            z.object({
+                key: z.string(),
+                encodedHash: z.null(),
+                signedUrl: z.null(),
+                status: z.literal(404),
+            }),
+        ]),
+    ),
+)
 
 export const objectStorageCreateUploadLinkInputSchema = z
     .array(
@@ -82,3 +111,27 @@ export const objectStorageCreateUploadLinkInputSchema = z
             }
         }
     })
+
+export const objectStorageCreateUploadLinkOutputSchema = baseOutputSchema(
+    z.object({
+        uploadId: z.string(),
+        signedUrls: z.array(
+            z.discriminatedUnion('status', [
+                z.object({
+                    key: z.string(),
+                    hash: z.string(),
+                    encodedHash: z.string(),
+                    signedUrl: z.string(),
+                    status: z.literal(200),
+                }),
+                z.object({
+                    key: z.string(),
+                    hash: z.string(),
+                    encodedHash: z.null(),
+                    signedUrl: z.null(),
+                    status: z.literal(409),
+                }),
+            ]),
+        ),
+    }),
+)

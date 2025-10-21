@@ -30,11 +30,6 @@ export default defineConfig(
             globals: { ...globals.browser, ...globals.node },
         },
         rules: {
-            '@typescript-eslint/no-unused-expressions': [
-                'error',
-                { allowShortCircuit: true, allowTernary: true },
-            ],
-            '@typescript-eslint/no-unused-vars': 'off',
             eqeqeq: [
                 'error',
                 'always',
@@ -44,6 +39,10 @@ export default defineConfig(
             // see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
             'no-undef': 'off',
             'no-useless-concat': ['error'],
+            'no-unused-expressions': [
+                'error',
+                { allowShortCircuit: true, allowTernary: true },
+            ],
             'no-var': ['error'],
             'prefer-template': ['error'],
             'svelte/no-navigation-without-resolve': 'off',

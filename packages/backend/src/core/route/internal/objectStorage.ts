@@ -139,6 +139,7 @@ internalRouteObjectStorage.post(
 
         const signedUrls: {
             key: string
+            hash: string
             encodedHash: string | null
             signedUrl: string | null
             status: 200 | 409
@@ -166,13 +167,23 @@ internalRouteObjectStorage.post(
         // Generate pre-signed upload URLs
         for (const obj of objectData) {
             if (existingHashes.includes(obj.hashSha256)) {
+                const objectStorageId = existingObjects.filter(
+                    ({ hashSha256 }) => hashSha256 === obj.hashSha256,
+                )[0].id
+
                 signedUrls.push({
-                    key: existingObjects.filter(
-                        ({ hashSha256 }) => hashSha256 === obj.hashSha256,
-                    )[0].id,
+                    key: objectStorageId,
+                    hash: obj.hashSha256,
                     encodedHash: null,
                     signedUrl: null,
                     status: 409,
+                })
+
+                uploadAttachmentData.push({ uploadId, objectStorageId })
+
+                objectStorageAclData.push({
+                    userId: ctx.get('user')!.id,
+                    objectStorageId,
                 })
             } else {
                 const objectStorageId = nanoidCustom(32)
@@ -203,6 +214,7 @@ internalRouteObjectStorage.post(
 
                 signedUrls.push({
                     key: objectStorageId,
+                    hash: obj.hashSha256,
                     encodedHash: hashBase64,
                     signedUrl: (
                         await ctx
@@ -228,19 +240,38 @@ internalRouteObjectStorage.post(
         }
 
         // Save object metadata to DB
-        if (objectStorageData.length > 0) {
+        if (
+            uploadAttachmentData.length > 0 ||
+            objectStorageAclData.length > 0
+        ) {
             await ctx.get('dbClient').transaction(async (tx) => {
                 await tx.insert(upload).values({
                     id: uploadId,
                     userId: ctx.get('user')!.id,
                 })
-                await tx.insert(objectStorage).values(objectStorageData)
+
+                if (objectStorageData.length > 0) {
+                    await tx.insert(objectStorage).values(objectStorageData)
+                }
+
                 await tx.insert(uploadAttachment).values(uploadAttachmentData)
-                await tx.insert(objectStorageAcl).values(objectStorageAclData)
+
+                await tx
+                    .insert(objectStorageAcl)
+                    .values(objectStorageAclData)
+                    .onConflictDoNothing() // Handles the case when the same user uploads the same file.
             })
         }
 
-        return ctx.json({ data: signedUrls }, 200)
+        return ctx.json(
+            {
+                data: {
+                    uploadId,
+                    signedUrls,
+                },
+            },
+            200,
+        )
     },
 )
 
