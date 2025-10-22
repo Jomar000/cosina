@@ -5,7 +5,7 @@
         QueryClientProvider,
     } from '@tanstack/svelte-query'
 
-    import { fetchClient } from '$lib/utilities.js'
+    import { apiClient } from '$lib/utilities.js'
     import '../app.css'
 
     ////////////////
@@ -33,7 +33,7 @@
             queryKey: [
                 'heartbeat',
             ],
-            queryFn: async () => await fetchClient('/heartbeat'),
+            queryFn: async () => await apiClient('heartbeat'),
         }),
         () => queryClient,
     )

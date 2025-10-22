@@ -72,7 +72,7 @@ internalRouteObjectStorage.post(
 
             const hasObjectPermission =
                 obj.objectStorageAcl.userId === ctx.get('user')!.id &&
-                obj.objectStorageAcl.mode & 1
+                Boolean(obj.objectStorageAcl.mode & 1)
 
             if (
                 ctx.get('isPrivilegedRole') ||
@@ -200,8 +200,8 @@ internalRouteObjectStorage.post(
                 const hashBase64 = btoa(hashBinaryString)
 
                 objectStorageData.push({
-                    id: objectStorageId,
                     ...obj,
+                    id: objectStorageId,
                     size: BigInt(obj.size),
                 })
 
