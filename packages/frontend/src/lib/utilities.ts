@@ -1,6 +1,7 @@
 import type { objectStorageCreateUploadLinkOutputSchema } from '@hyperion/validator/internal/objectStorage'
 import type { baseOutputSchema } from '@hyperion/validator/shared'
 import { fileTypeFromBuffer } from 'file-type'
+import ky from 'ky'
 import { customAlphabet } from 'nanoid'
 import type { z } from 'zod'
 
@@ -62,37 +63,25 @@ export const nanoidCustom = customAlphabet(
 )
 
 /**
- * Typed Fetch Client
+ * API Client
  *
  * @description
- * Standard fetch client with type generics & additional tweaks.
+ * Handle calls to Internal APIs using Ky HTTP client.
+ *
+ * @link
+ * https://github.com/sindresorhus/ky
  */
-export const fetchClient = async <
+export const apiClient = async <
     T extends z.output<ReturnType<typeof baseOutputSchema>>,
 >(
     path: string,
     init?: RequestInit,
 ) => {
-    const modPath = path.startsWith('/') ? path : `/${path}`
-
-    const response = await fetch(`${PUBLIC_API_URL}${modPath}`, {
+    return ky<T>(path, {
         ...init,
         credentials: 'include',
-    })
-
-    if (!response.ok) {
-        throw new Error('FETCH_RESPONSE_NOT_OK')
-    }
-
-    let data: T | null = null
-
-    try {
-        data = await response.json()
-    } catch {
-        /* EMPTY */
-    }
-
-    return data
+        prefixUrl: PUBLIC_API_URL,
+    }).json()
 }
 
 /**
@@ -108,6 +97,8 @@ export const stripEmptyProps = <T = unknown>(obj: Record<string, unknown>) => {
 }
 
 /**
+ * Object Storage Client
+ *
  * @description
  * Handle file uploads to Cloudflare R2 object storage.
  *
@@ -145,7 +136,7 @@ type TStatusIndices = {
     uploaded: number[]
 }
 
-export const uploadToObjectStorage: (
+export const objectStorageClient: (
     files: {
         file: File
         isPublic: boolean
@@ -207,17 +198,16 @@ export const uploadToObjectStorage: (
     > | null = null
 
     try {
-        presignedUrls = await fetchClient(
-            '/internal/objectStorage/create/uploadLink',
-            {
-                method: 'POST',
-                headers: {
-                    'content-type': 'application/json',
-                    'x-csrf-token': getCookie('csrf_token') ?? '',
-                },
-                body: JSON.stringify(dataToSign),
+        presignedUrls = await apiClient<
+            z.output<typeof objectStorageCreateUploadLinkOutputSchema>
+        >('internal/objectStorage/create/uploadLink', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+                'x-csrf-token': getCookie('csrf_token') ?? '',
             },
-        )
+            body: JSON.stringify(dataToSign),
+        })
 
         if (!presignedUrls) {
             throw new Error('Failed to request pre-signed URLs.')
@@ -274,17 +264,13 @@ export const uploadToObjectStorage: (
                     statusIndices.conflict.push(index)
                 } else {
                     try {
-                        const response = await fetch(signedUrl, {
+                        await ky(signedUrl, {
                             method: 'PUT',
                             headers: {
                                 'x-amz-checksum-sha256': encodedHash,
                             },
                             body: file,
                         })
-
-                        if (!response.ok) {
-                            throw new Error()
-                        }
 
                         statusIndices.uploaded.push(index)
                     } catch {
@@ -330,5 +316,5 @@ export const getCookie = (name: string) => {
             {} as Record<string, string>,
         )
 
-    return cookies[name] ? cookies[name] : null
+    return cookies[name] ?? null
 }

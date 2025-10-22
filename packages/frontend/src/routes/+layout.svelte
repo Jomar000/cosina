@@ -8,7 +8,7 @@
 
     import ServiceUnavailable from '$lib/components/Error/503.svelte'
     import Loader from '$lib/components/Loader/Loader2.svelte'
-    import { fetchClient } from '$lib/utilities.js'
+    import { apiClient } from '$lib/utilities.js'
     import '../app.css'
 
     ////////////////
@@ -36,7 +36,7 @@
             queryKey: [
                 'heartbeat',
             ],
-            queryFn: async () => await fetchClient('/heartbeat'),
+            queryFn: async () => await apiClient('heartbeat'),
         }),
         () => queryClient,
     )
