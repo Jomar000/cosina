@@ -49,7 +49,7 @@ export const cfTurnstileVerifier = async (
         }
 
         return false
-    } catch (err) {
+    } catch {
         return false
     }
 }
