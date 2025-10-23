@@ -26,7 +26,7 @@ export class WebSocketServer extends DurableObject {
     webSocketClose(ws: WebSocket, code: number) {
         try {
             ws.close(code)
-        } catch (err) {
+        } catch {
             /* EMPTY */
         }
     }
@@ -55,7 +55,7 @@ export class WebSocketServer extends DurableObject {
                     }
                 })
             }
-        } catch (err) {
+        } catch {
             /* EMPTY */
         }
     }

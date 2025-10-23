@@ -13,7 +13,7 @@ export const sessionDataState = {
                     JSON.parse(localStorage.getItem('session_data')!),
                 )
             return defaultValue
-        } catch (err) {
+        } catch {
             return defaultValue
         }
     },
@@ -22,7 +22,7 @@ export const sessionDataState = {
             defaultValue =
                 authSignInOutputSchema.def.options[0].shape.data.parse(newValue)
             localStorage.setItem('session_data', JSON.stringify(defaultValue))
-        } catch (err) {
+        } catch {
             /* EMPTY */
         }
     },

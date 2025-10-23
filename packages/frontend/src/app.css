@@ -5,12 +5,12 @@
  * https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually
  */
 
-@import "tailwindcss";
-@import "flowbite/src/themes/default";
+@import 'tailwindcss';
+@import 'flowbite/src/themes/default';
 
-@plugin "daisyui";
-@plugin "flowbite/plugin";
+@plugin 'daisyui';
+@plugin 'flowbite/plugin';
 
-@source "../node_modules/flowbite";
+@source '../node_modules/flowbite';
 
 @custom-variant dark (&:where(.dark, .dark *));
