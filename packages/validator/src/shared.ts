@@ -195,14 +195,36 @@ export const updatedFieldsRefinement = (
 /////////////
 
 export const readManyBaseInputSchema = z.object({
-    limit: z
-        .number()
+    limit: z.coerce
+        .number<number>({
+            error: 'Limit must be a number or a string that can be cast as a number.',
+        })
+        .check((ctx) => {
+            if (!Number.isInteger(ctx.value)) {
+                ctx.issues.push({
+                    code: 'custom',
+                    message: 'Limit must be an integer.',
+                    input: ctx.value,
+                })
+            }
+        })
         .min(1, { error: 'Limit must be greater than or equal to 1.' })
         .max(100, { error: 'Limit must be less than or equal to 100.' })
         .optional()
         .default(100),
-    offset: z
-        .number()
+    offset: z.coerce
+        .number<number>({
+            error: 'Offset must be a number or a string that can be cast as a number.',
+        })
+        .check((ctx) => {
+            if (!Number.isInteger(ctx.value)) {
+                ctx.issues.push({
+                    code: 'custom',
+                    message: 'Offset must be an integer.',
+                    input: ctx.value,
+                })
+            }
+        })
         .gte(0, { error: 'Offset must be greater than or equal to 0.' })
         .optional()
         .default(0),
