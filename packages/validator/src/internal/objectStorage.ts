@@ -42,6 +42,7 @@ export const objectStorageCreateDownloadLinkOutputSchema = baseOutputSchema(
         z.discriminatedUnion('status', [
             z.object({
                 key: z.string(),
+                encodedHash: z.string(),
                 signedUrl: z.string(),
                 status: z.literal(200),
             }),
