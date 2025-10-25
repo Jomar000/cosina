@@ -86,11 +86,13 @@
                     )
                 }
 
-                if (!response.data) {
-                    throw new Error(response.error.message)
+                if ('error' in response) {
+                    const { error: _error } = response.error
+                    throw new Error(_error.message)
                 }
 
-                sessionDataState.set(response.data.data)
+                const { data: _data } = response.data
+                sessionDataState.set(_data)
 
                 if (sessionDataState.value!.userRoles.length === 1) {
                     goto(

@@ -165,7 +165,6 @@ export const auth = async (opts: {
         if (isLocked) {
             throw new APIError('LOCKED', {
                 code: undefined,
-                success: false,
                 message: 'Account is currently locked.',
             })
         }
@@ -248,7 +247,6 @@ export const auth = async (opts: {
                     if (!ctx.query?.organizationId) {
                         throw new APIError('BAD_REQUEST', {
                             code: undefined,
-                            success: false,
                             message: 'Organization ID was not provided.',
                         })
                     }
@@ -262,7 +260,6 @@ export const auth = async (opts: {
                     if (!orgMemberData) {
                         throw new APIError('UNPROCESSABLE_ENTITY', {
                             code: undefined,
-                            success: false,
                             message: 'Invalid credentials provided.',
                         })
                     }
@@ -287,13 +284,11 @@ export const auth = async (opts: {
                     if (!ctx.context.newSession) {
                         throw new APIError('UNPROCESSABLE_ENTITY', {
                             code: undefined,
-                            success: false,
                             message: 'Invalid credentials provided.',
                         })
                     }
 
                     return ctx.json({
-                        success: true,
                         data: {
                             name: ctx.context._name,
                             email: ctx.context._email,

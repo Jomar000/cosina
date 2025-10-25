@@ -26,8 +26,10 @@ export const csrfHandler = () => {
             if (!ctx.req.header('origin')) {
                 return ctx.json(
                     {
-                        success: false,
-                        message: 'Missing Origin request header.',
+                        error: {
+                            code: 'NOT_FOUND',
+                            message: 'Missing Origin request header.',
+                        },
                     },
                     400,
                 )
@@ -38,8 +40,10 @@ export const csrfHandler = () => {
             if (!allowedOrigins.includes(ctx.req.header('origin')!)) {
                 return ctx.json(
                     {
-                        success: false,
-                        message: 'Invalid request origin.',
+                        error: {
+                            code: 'FORBIDDEN',
+                            message: 'Invalid request origin.',
+                        },
                     },
                     403,
                 )
@@ -51,8 +55,10 @@ export const csrfHandler = () => {
             if (!tokenFromCookie || tokenFromCookie !== tokenFromHeader) {
                 return ctx.json(
                     {
-                        success: false,
-                        message: 'Invalid CSRF token received.',
+                        error: {
+                            code: 'FORBIDDEN',
+                            message: 'Invalid CSRF token received.',
+                        },
                     },
                     403,
                 )
