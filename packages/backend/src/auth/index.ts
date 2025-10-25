@@ -172,6 +172,9 @@ export const auth = async (opts: {
     }
 
     return betterAuth({
+        onAPIError: {
+            throw: true,
+        },
         advanced: {
             cookiePrefix: 'hyperion',
             defaultCookieAttributes: cookieAttrs,
@@ -269,8 +272,11 @@ export const auth = async (opts: {
                         email: ctx.body.email,
                     })
 
-                    // Inject the permissions to the request context
+                    // Inject member data to the request context
                     // and make it available to the after hook
+                    ctx.context._name = orgMemberData.user.username
+                    ctx.context._email = orgMemberData.user.email
+                    ctx.context._avatar = orgMemberData.user.image
                     ctx.context._permissions = aclPermissions
                     ctx.context._roles = aclRoles
                     ctx.context._userRoles = orgMemberData.role.name.split(',')
@@ -289,6 +295,11 @@ export const auth = async (opts: {
                     return ctx.json({
                         success: true,
                         data: {
+                            name: ctx.context._name,
+                            email: ctx.context._email,
+                            ...(ctx.context._avatar
+                                ? { avatar: ctx.context._avatar }
+                                : {}),
                             permissions: ctx.context._permissions,
                             roles: ctx.context._roles,
                             userRoles: ctx.context._userRoles,
