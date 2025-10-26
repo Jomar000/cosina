@@ -11,17 +11,37 @@ export class AuthState {
     // Fields //
     ////////////
 
-    #session: SessionState
-
-    #aclPermissions = $derived(() => {
-        return this.#session.data?.permissions ?? {}
+    #aclInstance = $derived(() => {
+        const permissions = this.#session.data?.permissions ?? {}
+        return createAccessControl(permissions)
     })
 
     #aclRoles = $derived(() => {
-        return this.#session.data?.roles ?? {}
+        const roles = this.#session.data?.roles ?? {}
+        return Object.keys(roles)
+            .map((role) => ({
+                [role]: this.#aclInstance().newRole(roles[role]),
+            }))
+            .reduce((accumulator, value) => {
+                accumulator = { ...accumulator, ...value }
+                return accumulator
+            }, {})
     })
 
-    #aclInstance = $derived(() => createAccessControl(this.#aclPermissions()))
+    #auth = $derived(
+        createAuthClient({
+            baseURL: `${PUBLIC_API_URL}/internal/auth`,
+            plugins: [
+                usernameClient(),
+                organizationClient({
+                    ac: this.#aclInstance(),
+                    roles: this.#aclRoles(),
+                }),
+            ],
+        }),
+    )
+
+    #session: SessionState
 
     /////////////////
     // Constructor //
@@ -36,25 +56,7 @@ export class AuthState {
     /////////////
 
     get client() {
-        return createAuthClient({
-            baseURL: `${PUBLIC_API_URL}/internal/auth`,
-            plugins: [
-                usernameClient(),
-                organizationClient({
-                    ac: this.#aclInstance(),
-                    roles: Object.keys(this.#aclRoles())
-                        .map((role) => ({
-                            [role]: this.#aclInstance().newRole(
-                                this.#aclRoles()[role],
-                            ),
-                        }))
-                        .reduce((accumulator, value) => {
-                            accumulator = { ...accumulator, ...value }
-                            return accumulator
-                        }, {}),
-                }),
-            ],
-        })
+        return this.#auth
     }
 }
 
