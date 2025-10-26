@@ -2,8 +2,8 @@
     import { onMount, setContext } from 'svelte'
 
     import { goto } from '$app/navigation'
-    import { authClientState } from '$lib/states/auth.svelte.js'
-    import { sessionDataState } from '$lib/states/session.svelte.js'
+    import { useAuthContext } from '$lib/states/auth/index.js'
+    import { useSessionContext } from '$lib/states/session/index.js'
     import { getCookie } from '$lib/utilities.js'
 
     ////////////////
@@ -11,6 +11,13 @@
     ////////////////
 
     let { children } = $props()
+
+    //////////////
+    // Contexts //
+    //////////////
+
+    const session = useSessionContext()
+    const auth = useAuthContext()
 
     ////////////////////
     // Initialization //
@@ -23,23 +30,23 @@
     //////////////
 
     const checkRolePermission: TCheckRolePermission = (permissions) => {
-        if (!sessionDataState.value) {
+        if (!session.data) {
             return false
         }
 
-        return authClientState.value.organization.checkRolePermission({
+        return auth.client.organization.checkRolePermission({
             permissions,
-            role: sessionDataState.value.userRoles.join(','),
+            role: session.data.userRoles.join(','),
         })
     }
 
     const clearSessionDataAndRedirect = () => {
-        sessionDataState.clear()
+        session.clear()
         goto('/sign-in')
     }
 
     const signOut = async () => {
-        await authClientState.value.signOut(undefined, {
+        await auth.client.signOut(undefined, {
             headers: {
                 'x-csrf-token': getCookie('csrf_token') ?? '',
             },
@@ -51,16 +58,14 @@
     // Lifecycle //
     ///////////////
 
-    setContext('authClient', authClientState.value)
     setContext('checkRolePermission', checkRolePermission)
-    setContext('sessionData', sessionDataState.value)
     setContext('signOut', signOut)
 
     onMount(() => {
         renderView =
-            sessionDataState.value !== null && // Valid session
+            session.data !== null && // Valid session
             Math.floor(new Date().getTime() / 1000) < // Non-expired session
-                sessionDataState.value.expiresAt
+                session.data.expiresAt
 
         if (!renderView) {
             clearSessionDataAndRedirect()

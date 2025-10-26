@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { getContext, onMount } from 'svelte'
+    import { onMount } from 'svelte'
 
     import { goto } from '$app/navigation'
     import Navbar from '$lib/components/Navigation/Navbar.svelte'
     import Sidebar from '$lib/components/Navigation/Sidebar.svelte'
+    import { useSessionContext } from '$lib/states/session/index.js'
 
     ////////////////
     // Properties //
@@ -11,11 +12,15 @@
 
     let { children } = $props()
 
+    //////////////
+    // Contexts //
+    //////////////
+
+    const session = useSessionContext()
+
     ////////////////////
     // Initialization //
     ////////////////////
-
-    const sessionData = getContext<TSessionData>('sessionData')
 
     let renderView = $state(false)
 
@@ -30,7 +35,7 @@
     ///////////////
 
     onMount(() => {
-        if (sessionData.userRoles.includes('owner')) {
+        if (session.data?.userRoles.includes('owner')) {
             renderView = true
         } else {
             goto(`/app/owner/dashboard`, {
@@ -43,8 +48,7 @@
     // Classes //
     /////////////
 
-    const siClass =
-        'flex w-full items-center rounded-lg p-2 text-sm font-normal text-neutral-900 transition duration-75 hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white'
+    //
 </script>
 
 {#if renderView}

@@ -5,6 +5,8 @@
         QueryClientProvider,
     } from '@tanstack/svelte-query'
 
+    import { AuthProvider } from '$lib/states/auth/index.js'
+    import { SessionProvider } from '$lib/states/session/index.js'
     import { apiClient } from '$lib/utilities.js'
     import '../app.css'
 
@@ -43,7 +45,11 @@
     LOADING
 {:else if heartbeatQuery.isSuccess}
     <QueryClientProvider client={queryClient}>
-        {@render children()}
+        <SessionProvider>
+            <AuthProvider>
+                {@render children()}
+            </AuthProvider>
+        </SessionProvider>
     </QueryClientProvider>
 {:else}
     UNAVAILABLE

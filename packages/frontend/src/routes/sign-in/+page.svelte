@@ -12,9 +12,16 @@
     } from '$env/static/public'
     import { IMG_default } from '$lib/assets/image/_index.js'
     import Captcha from '$lib/components/Modal/Captcha.svelte'
-    import { authClientState } from '$lib/states/auth.svelte.js'
-    import { sessionDataState } from '$lib/states/session.svelte.js'
+    import { useAuthContext } from '$lib/states/auth/index.js'
+    import { useSessionContext } from '$lib/states/session/index.js'
     import { getCookie } from '$lib/utilities.js'
+
+    //////////////
+    // Contexts //
+    //////////////
+
+    const session = useSessionContext()
+    const auth = useAuthContext()
 
     ////////////////////
     // Initialization //
@@ -50,14 +57,14 @@
             })
 
             let response:
-                | ReturnType<typeof authClientState.value.signIn.email>
-                | ReturnType<typeof authClientState.value.signIn.username>
+                | ReturnType<typeof auth.client.signIn.email>
+                | ReturnType<typeof auth.client.signIn.username>
                 | null = null
 
             // Submit Form Data
             try {
                 if (data.accountId.includes('@')) {
-                    response = await authClientState.value.signIn.email(
+                    response = await auth.client.signIn.email(
                         {
                             email: data.accountId,
                             password: data.password,
@@ -71,7 +78,7 @@
                         },
                     )
                 } else {
-                    response = await authClientState.value.signIn.username(
+                    response = await auth.client.signIn.username(
                         {
                             username: data.accountId,
                             password: data.password,
@@ -86,16 +93,16 @@
                     )
                 }
 
-                if (!response.data) {
-                    throw new Error(response.error.message)
+                if (response.error) {
+                    const { error: _error } = response.error
+                    throw new Error(_error.message)
                 }
 
-                sessionDataState.set(response.data.data)
+                const { data: _data } = response.data
+                session.set(_data)
 
-                if (sessionDataState.value!.userRoles.length === 1) {
-                    goto(
-                        `/app/${sessionDataState.value!.userRoles[0]}/dashboard`,
-                    )
+                if (session.data?.userRoles.length === 1) {
+                    goto(`/app/${session.data?.userRoles[0]}/dashboard`)
                 } else {
                     goto('/app')
                 }
@@ -136,16 +143,16 @@
 
     onMount(() => {
         renderPage =
-            sessionDataState.value === null || // Invalid session
+            session.data === null || // Invalid session
             Math.floor(new Date().getTime() / 1000) >= // Expired session
-                sessionDataState.value.expiresAt
+                session.data.expiresAt
 
         if (!renderPage) {
             let activeRole = localStorage.getItem('active_role')
 
             if (!activeRole) {
-                if (sessionDataState.value!.userRoles.length === 1) {
-                    activeRole = sessionDataState.value!.userRoles[0]
+                if (session.data?.userRoles.length === 1) {
+                    activeRole = session.data?.userRoles[0]
                 }
 
                 goto('/app')

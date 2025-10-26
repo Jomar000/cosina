@@ -15,7 +15,12 @@ hono.use(requestId({ headerName: '' }))
 hono.use(async (ctx, next) => {
     if (ctx.env.STATUS !== 'up') {
         return ctx.json(
-            { success: false, message: '🛠️ Service Unavailable 🛠️' },
+            {
+                error: {
+                    code: 'SERVICE_UNAVAILABLE',
+                    message: '🛠️ Service Unavailable 🛠️',
+                },
+            },
             503,
         )
     }
