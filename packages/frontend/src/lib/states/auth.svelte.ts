@@ -1,29 +1,54 @@
 import { createAuthClient } from 'better-auth/client'
 import { organizationClient, usernameClient } from 'better-auth/client/plugins'
 import { createAccessControl } from 'better-auth/plugins/access'
+import { createContext } from 'svelte'
 
 import { PUBLIC_API_URL } from '$env/static/public'
-import { sessionDataState } from '$lib/states/session.svelte.js'
+import type { SessionState } from './session.svelte.js'
 
-const aclPermissions = $derived(sessionDataState.value?.permissions ?? {})
-const aclRoles = $derived(sessionDataState.value?.roles ?? {})
-const aclInstance = $derived(createAccessControl(aclPermissions))
+export class AuthState {
+    ////////////
+    // Fields //
+    ////////////
 
-/**
- * @description
- * Better Auth Client wrapped in SvelteKit reactivity
- */
-export const authClientState = {
-    get value() {
+    #session: SessionState
+
+    #aclPermissions = $derived(() => {
+        const { state: session } = this.#session
+        return session?.permissions ?? {}
+    })
+
+    #aclRoles = $derived(() => {
+        const { state: session } = this.#session
+        return session?.roles ?? {}
+    })
+
+    #aclInstance = $derived(() => createAccessControl(this.#aclPermissions()))
+
+    /////////////////
+    // Constructor //
+    /////////////////
+
+    constructor(session: SessionState) {
+        this.#session = session
+    }
+
+    /////////////
+    // Getters //
+    /////////////
+
+    get state() {
         return createAuthClient({
             baseURL: `${PUBLIC_API_URL}/internal/auth`,
             plugins: [
                 usernameClient(),
                 organizationClient({
-                    ac: aclInstance,
-                    roles: Object.keys(aclRoles)
+                    ac: this.#aclInstance(),
+                    roles: Object.keys(this.#aclRoles())
                         .map((role) => ({
-                            [role]: aclInstance.newRole(aclRoles[role]),
+                            [role]: this.#aclInstance().newRole(
+                                this.#aclRoles()[role],
+                            ),
                         }))
                         .reduce((accumulator, value) => {
                             accumulator = { ...accumulator, ...value }
@@ -32,5 +57,10 @@ export const authClientState = {
                 }),
             ],
         })
-    },
+    }
 }
+
+export const [
+    useAuthContext,
+    setAuthContext,
+] = createContext<AuthState>()

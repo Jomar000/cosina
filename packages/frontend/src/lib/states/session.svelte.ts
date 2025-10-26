@@ -1,33 +1,58 @@
 import { authSignInOutputSchema } from '@hyperion/validator/internal/auth'
-import { z } from 'zod'
+import { createContext } from 'svelte'
 
-let defaultValue: z.output<
-    (typeof authSignInOutputSchema.def.options)['0']['shape']['data']
-> | null = $state(null)
+export class SessionState {
+    ////////////
+    // Fields //
+    ////////////
 
-export const sessionDataState = {
-    get value() {
+    #session = $state<TSessionData | null>(null)
+
+    /////////////////
+    // Constructor //
+    /////////////////
+
+    constructor() {
         try {
-            defaultValue =
-                authSignInOutputSchema.def.options[0].shape.data.parse(
-                    JSON.parse(localStorage.getItem('session_data')!),
-                )
-            return defaultValue
-        } catch {
-            return defaultValue
-        }
-    },
-    set: (newValue: typeof defaultValue) => {
-        try {
-            defaultValue =
-                authSignInOutputSchema.def.options[0].shape.data.parse(newValue)
-            localStorage.setItem('session_data', JSON.stringify(defaultValue))
+            this.#session = this.#parseData(
+                JSON.parse(localStorage.getItem('session_data')!),
+            )
         } catch {
             /* EMPTY */
         }
-    },
-    clear: () => {
-        defaultValue = null
+    }
+
+    /////////////
+    // Getters //
+    /////////////
+
+    get state() {
+        return this.#session
+    }
+
+    /////////////
+    // Methods //
+    /////////////
+
+    #parseData: (data: unknown) => TSessionData = (data) =>
+        authSignInOutputSchema.def.options[0].shape.data.parse(data)
+
+    clearSession = () => {
+        this.#session = null
         localStorage.removeItem('session_data')
-    },
+    }
+
+    setSession = (newState: TSessionData | null) => {
+        try {
+            this.#session = this.#parseData(newState)
+            localStorage.setItem('session_data', JSON.stringify(this.#session))
+        } catch {
+            /* EMPTY */
+        }
+    }
 }
+
+export const [
+    useSessionContext,
+    setSessionContext,
+] = createContext<SessionState>()

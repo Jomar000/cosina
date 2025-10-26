@@ -8,6 +8,11 @@
 
     import ServiceUnavailable from '$lib/components/Error/503.svelte'
     import Loader from '$lib/components/Loader/Loader2.svelte'
+    import { AuthState, setAuthContext } from '$lib/states/auth.svelte.js'
+    import {
+        SessionState,
+        setSessionContext,
+    } from '$lib/states/session.svelte.js'
     import { apiClient } from '$lib/utilities.js'
     import '../app.css'
 
@@ -16,6 +21,14 @@
     ////////////////
 
     let { children } = $props()
+
+    //////////////
+    // Contexts //
+    //////////////
+
+    const sessionState = new SessionState()
+    setSessionContext(sessionState)
+    setAuthContext(new AuthState(sessionState))
 
     ////////////////////
     // Initialization //
