@@ -8,11 +8,8 @@
 
     import ServiceUnavailable from '$lib/components/Error/503.svelte'
     import Loader from '$lib/components/Loader/Loader2.svelte'
-    import { AuthState, setAuthContext } from '$lib/states/auth.svelte.js'
-    import {
-        SessionState,
-        setSessionContext,
-    } from '$lib/states/session.svelte.js'
+    import { AuthProvider } from '$lib/states/auth/index.js'
+    import { SessionProvider } from '$lib/states/session/index.js'
     import { apiClient } from '$lib/utilities.js'
     import '../app.css'
 
@@ -21,14 +18,6 @@
     ////////////////
 
     let { children } = $props()
-
-    //////////////
-    // Contexts //
-    //////////////
-
-    const sessionState = new SessionState()
-    setSessionContext(sessionState)
-    setAuthContext(new AuthState(sessionState))
 
     ////////////////////
     // Initialization //
@@ -59,13 +48,19 @@
     <Loader />
 {:else if heartbeatQuery.isSuccess}
     <QueryClientProvider client={queryClient}>
-        <!--
-            Flowbite Blocks - Application UI
-            https://flowbite.com/blocks/application/shells/#application-shell-with-sidebar-and-navbar
-        -->
-        <div class="min-w-[360px] bg-gray-50 antialiased dark:bg-neutral-900">
-            {@render children()}
-        </div>
+        <SessionProvider>
+            <AuthProvider>
+                <!--
+                    Flowbite Blocks - Application UI
+                    https://flowbite.com/blocks/application/shells/#application-shell-with-sidebar-and-navbar
+                -->
+                <div
+                    class="min-w-[360px] bg-gray-50 antialiased dark:bg-neutral-900"
+                >
+                    {@render children()}
+                </div>
+            </AuthProvider>
+        </SessionProvider>
     </QueryClientProvider>
 {:else}
     <ServiceUnavailable />

@@ -12,8 +12,8 @@
     } from '$env/static/public'
     import { IMG_LOGO } from '$lib/assets/image/_index.js'
     import Captcha from '$lib/components/Modal/Captcha.svelte'
-    import { useAuthContext } from '$lib/states/auth.svelte.js'
-    import { useSessionContext } from '$lib/states/session.svelte.js'
+    import { useAuthContext } from '$lib/states/auth/index.js'
+    import { useSessionContext } from '$lib/states/session/index.js'
     import { getCookie } from '$lib/utilities.js'
 
     //////////////

@@ -4,7 +4,7 @@
     import { goto } from '$app/navigation'
     import Navbar from '$lib/components/Navigation/Navbar.svelte'
     import Sidebar from '$lib/components/Navigation/Sidebar.svelte'
-    import { useSessionContext } from '$lib/states/session.svelte.js'
+    import { useSessionContext } from '$lib/states/session/index.js'
 
     ////////////////
     // Properties //

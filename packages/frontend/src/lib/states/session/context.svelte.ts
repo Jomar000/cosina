@@ -8,20 +8,6 @@ export class SessionState {
 
     #session = $state<TSessionData | null>(null)
 
-    /////////////////
-    // Constructor //
-    /////////////////
-
-    constructor() {
-        try {
-            this.#session = this.#parseData(
-                JSON.parse(localStorage.getItem('session_data')!),
-            )
-        } catch {
-            /* EMPTY */
-        }
-    }
-
     /////////////
     // Getters //
     /////////////
@@ -44,6 +30,16 @@ export class SessionState {
 
     isValid = () => {
         return this.#session !== null
+    }
+
+    loadFromLocalStorage = () => {
+        try {
+            this.#session = this.#parseData(
+                JSON.parse(localStorage.getItem('session_data')!),
+            )
+        } catch {
+            /* EMPTY */
+        }
     }
 
     set = (newState: TSessionData | null) => {

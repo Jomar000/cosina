@@ -207,16 +207,16 @@ importers:
 
 packages:
 
-  '@augment-vir/assert@31.46.0':
-    resolution: {integrity: sha512-IQNW62FEmYgO9aWpkc51Vtv4w+KhuKU0xO8RfDZ+9ci9XBQx0+cTWll0YH38IDbEFf8ly3ZxNeyPUJSgfXZeIQ==}
+  '@augment-vir/assert@31.46.1':
+    resolution: {integrity: sha512-7KzyA14dSEROzkeCjZDwRXjSbrXtkSlCI9WfYmMNuHpc68v57PmmWUUjCg6mmZFVS0Fq7Jh44B7cz71uHuVo7A==}
     engines: {node: '>=22'}
 
-  '@augment-vir/common@31.46.0':
-    resolution: {integrity: sha512-wXrdniMCBbCCRtlQPKe48WyyY/0NFisS3NNS9hsG2cxviVFPrWX5ldZIrHVVHghLhDEkHmvbvnyubQk+UWAcog==}
+  '@augment-vir/common@31.46.1':
+    resolution: {integrity: sha512-jkerXGTcslZd41wRxsgjmDEc0v1nTj0l/gDbnIU1GykeC7j+R4bZLgC4W0Ug7lWVIGtlLMgicvk2dujVlSCLkQ==}
     engines: {node: '>=22'}
 
-  '@augment-vir/core@31.46.0':
-    resolution: {integrity: sha512-PGtxApe9iCWgNvtL1JTJ/sZGUCUro4wStCIr4BDCGXJpwHlbgR+6lxc4Gdlf4Hi90A5ZeYT0JC1tfc4eBhAVaQ==}
+  '@augment-vir/core@31.46.1':
+    resolution: {integrity: sha512-caej1rzDdW7LguPveYCp+ovF7mHrEp5gy/3iBlwrRUJQCBS85ClRli9dA3bZcNomDcg/gW5N/lEg/EeL6rxe+Q==}
     engines: {node: '>=22'}
 
   '@babel/runtime@7.28.4':
@@ -3181,18 +3181,18 @@ packages:
 
 snapshots:
 
-  '@augment-vir/assert@31.46.0':
+  '@augment-vir/assert@31.46.1':
     dependencies:
-      '@augment-vir/core': 31.46.0
+      '@augment-vir/core': 31.46.1
       '@date-vir/duration': 8.0.0
       deep-eql: 5.0.2
       expect-type: 1.2.2
       type-fest: 5.1.0
 
-  '@augment-vir/common@31.46.0':
+  '@augment-vir/common@31.46.1':
     dependencies:
-      '@augment-vir/assert': 31.46.0
-      '@augment-vir/core': 31.46.0
+      '@augment-vir/assert': 31.46.1
+      '@augment-vir/core': 31.46.1
       '@date-vir/duration': 8.0.0
       ansi-styles: 6.2.3
       deepcopy-esm: 2.1.1
@@ -3200,7 +3200,7 @@ snapshots:
       type-fest: 5.1.0
       typed-event-target: 4.1.0
 
-  '@augment-vir/core@31.46.0':
+  '@augment-vir/core@31.46.1':
     dependencies:
       '@date-vir/duration': 8.0.0
       browser-or-node: 3.0.0
@@ -5395,7 +5395,7 @@ snapshots:
 
   prettier-plugin-multiline-arrays@4.0.3(prettier@3.6.2):
     dependencies:
-      '@augment-vir/common': 31.46.0
+      '@augment-vir/common': 31.46.1
       prettier: 3.6.2
       proxy-vir: 2.0.1
 
@@ -5417,8 +5417,8 @@ snapshots:
 
   proxy-vir@2.0.1:
     dependencies:
-      '@augment-vir/assert': 31.46.0
-      '@augment-vir/common': 31.46.0
+      '@augment-vir/assert': 31.46.1
+      '@augment-vir/common': 31.46.1
 
   pump@3.0.3:
     dependencies:
@@ -5823,9 +5823,9 @@ snapshots:
 
   typed-event-target@4.1.0:
     dependencies:
-      '@augment-vir/assert': 31.46.0
-      '@augment-vir/common': 31.46.0
-      '@augment-vir/core': 31.46.0
+      '@augment-vir/assert': 31.46.1
+      '@augment-vir/common': 31.46.1
+      '@augment-vir/core': 31.46.1
 
   typescript-eslint@8.46.2(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
