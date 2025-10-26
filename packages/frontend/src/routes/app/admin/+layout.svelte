@@ -35,7 +35,7 @@
     ///////////////
 
     onMount(() => {
-        if (session.state?.userRoles.includes('admin')) {
+        if (session.data?.userRoles.includes('admin')) {
             renderView = true
         } else {
             goto(`/app/admin/dashboard`, {

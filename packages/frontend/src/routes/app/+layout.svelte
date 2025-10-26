@@ -30,23 +30,23 @@
     //////////////
 
     const checkRolePermission: TCheckRolePermission = (permissions) => {
-        if (!session.state) {
+        if (!session.data) {
             return false
         }
 
-        return auth.state.organization.checkRolePermission({
+        return auth.client.organization.checkRolePermission({
             permissions,
-            role: session.state.userRoles.join(','),
+            role: session.data.userRoles.join(','),
         })
     }
 
     const clearSessionDataAndRedirect = () => {
-        session.clearSession()
+        session.clear()
         goto('/sign-in')
     }
 
     const signOut = async () => {
-        await auth.state.signOut(undefined, {
+        await auth.client.signOut(undefined, {
             headers: {
                 'x-csrf-token': getCookie('csrf_token') ?? '',
             },
@@ -63,9 +63,9 @@
 
     onMount(() => {
         renderView =
-            session.state !== null && // Valid session
+            session.data !== null && // Valid session
             Math.floor(new Date().getTime() / 1000) < // Non-expired session
-                session.state.expiresAt
+                session.data.expiresAt
 
         if (!renderView) {
             clearSessionDataAndRedirect()

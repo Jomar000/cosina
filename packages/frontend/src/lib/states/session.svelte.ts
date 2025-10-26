@@ -26,7 +26,7 @@ export class SessionState {
     // Getters //
     /////////////
 
-    get state() {
+    get data() {
         return this.#session
     }
 
@@ -37,12 +37,16 @@ export class SessionState {
     #parseData: (data: unknown) => TSessionData = (data) =>
         authSignInOutputSchema.def.options[0].shape.data.parse(data)
 
-    clearSession = () => {
+    clear = () => {
         this.#session = null
         localStorage.removeItem('session_data')
     }
 
-    setSession = (newState: TSessionData | null) => {
+    isValid = () => {
+        return this.#session !== null
+    }
+
+    set = (newState: TSessionData | null) => {
         try {
             this.#session = this.#parseData(newState)
             localStorage.setItem('session_data', JSON.stringify(this.#session))

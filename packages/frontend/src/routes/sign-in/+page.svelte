@@ -57,14 +57,14 @@
             })
 
             let response:
-                | ReturnType<typeof auth.state.signIn.email>
-                | ReturnType<typeof auth.state.signIn.username>
+                | ReturnType<typeof auth.client.signIn.email>
+                | ReturnType<typeof auth.client.signIn.username>
                 | null = null
 
             // Submit Form Data
             try {
                 if (data.accountId.includes('@')) {
-                    response = await auth.state.signIn.email(
+                    response = await auth.client.signIn.email(
                         {
                             email: data.accountId,
                             password: data.password,
@@ -78,7 +78,7 @@
                         },
                     )
                 } else {
-                    response = await auth.state.signIn.username(
+                    response = await auth.client.signIn.username(
                         {
                             username: data.accountId,
                             password: data.password,
@@ -99,10 +99,10 @@
                 }
 
                 const { data: _data } = response.data
-                session.setSession(_data)
+                session.set(_data)
 
-                if (session.state?.userRoles.length === 1) {
-                    goto(`/app/${session.state?.userRoles[0]}/dashboard`)
+                if (session.data?.userRoles.length === 1) {
+                    goto(`/app/${session.data?.userRoles[0]}/dashboard`)
                 } else {
                     goto('/app')
                 }
@@ -143,16 +143,16 @@
 
     onMount(() => {
         renderPage =
-            session.state === null || // Invalid session
+            session.data === null || // Invalid session
             Math.floor(new Date().getTime() / 1000) >= // Expired session
-                session.state.expiresAt
+                session.data.expiresAt
 
         if (!renderPage) {
             let activeRole = localStorage.getItem('active_role')
 
             if (!activeRole) {
-                if (session.state?.userRoles.length === 1) {
-                    activeRole = session.state?.userRoles[0]
+                if (session.data?.userRoles.length === 1) {
+                    activeRole = session.data?.userRoles[0]
                 }
 
                 goto('/app')

@@ -14,13 +14,11 @@ export class AuthState {
     #session: SessionState
 
     #aclPermissions = $derived(() => {
-        const { state: session } = this.#session
-        return session?.permissions ?? {}
+        return this.#session.data?.permissions ?? {}
     })
 
     #aclRoles = $derived(() => {
-        const { state: session } = this.#session
-        return session?.roles ?? {}
+        return this.#session.data?.roles ?? {}
     })
 
     #aclInstance = $derived(() => createAccessControl(this.#aclPermissions()))
@@ -37,7 +35,7 @@ export class AuthState {
     // Getters //
     /////////////
 
-    get state() {
+    get client() {
         return createAuthClient({
             baseURL: `${PUBLIC_API_URL}/internal/auth`,
             plugins: [

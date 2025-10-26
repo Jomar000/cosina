@@ -35,7 +35,7 @@
     ///////////////
 
     onMount(() => {
-        if (session.state?.userRoles.includes('member')) {
+        if (session.data?.userRoles.includes('member')) {
             renderView = true
         } else {
             goto(`/app/member/dashboard`, {
