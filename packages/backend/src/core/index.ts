@@ -42,13 +42,20 @@ hono.onError((err, ctx) => {
         cause: err.cause,
     })
 
+    let code = 'INTERNAL_SERVER_ERROR'
+    let message = `ERROR: ${ctx.get('requestId')}`
+
+    if (err instanceof AppError) {
+        code = err.code
+        message = err.message
+    }
+
     return ctx.json(
         {
             error: {
                 requestId: ctx.get('requestId'),
-                code: err instanceof AppError ? err.code : 'UNCAUGHT_EXCEPTION',
-                message:
-                    'An error has occurred. Please contact the administrator and provide the requestId.',
+                code,
+                message,
             },
         },
         500,
