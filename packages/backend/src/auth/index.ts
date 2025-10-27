@@ -2,7 +2,6 @@ import { scryptAsync } from '@noble/hashes/scrypt.js'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { APIError } from 'better-auth/api'
 import { constantTimeEqual } from 'better-auth/crypto'
 import {
     captcha,
@@ -14,6 +13,7 @@ import { createAccessControl } from 'better-auth/plugins/access'
 import { and, eq, or } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 
+import { AppError } from '../errors.js'
 import { aclBuilder } from './acl.js'
 
 /**
@@ -163,9 +163,10 @@ export const auth = async (opts: {
             )[0]?.isLocked ?? false
 
         if (isLocked) {
-            throw new APIError('LOCKED', {
-                code: undefined,
+            throw new AppError({
+                code: 'LOCKED',
                 message: 'Account is currently locked.',
+                status: 423,
             })
         }
     }
@@ -245,9 +246,10 @@ export const auth = async (opts: {
             before: createAuthMiddleware(async (ctx) => {
                 if (ctx.path.startsWith('/sign-in/')) {
                     if (!ctx.query?.organizationId) {
-                        throw new APIError('BAD_REQUEST', {
-                            code: undefined,
+                        throw new AppError({
+                            code: 'BAD_REQUEST',
                             message: 'Organization ID was not provided.',
+                            status: 400,
                         })
                     }
 
@@ -258,9 +260,10 @@ export const auth = async (opts: {
                     })
 
                     if (!orgMemberData) {
-                        throw new APIError('UNPROCESSABLE_ENTITY', {
-                            code: undefined,
+                        throw new AppError({
+                            code: 'UNPROCESSABLE_CONTENT',
                             message: 'Invalid credentials provided.',
+                            status: 422,
                         })
                     }
 
@@ -282,9 +285,10 @@ export const auth = async (opts: {
             after: createAuthMiddleware(async (ctx) => {
                 if (ctx.path.startsWith('/sign-in/')) {
                     if (!ctx.context.newSession) {
-                        throw new APIError('UNPROCESSABLE_ENTITY', {
-                            code: undefined,
+                        throw new AppError({
+                            code: 'UNPROCESSABLE_CONTENT',
                             message: 'Invalid credentials provided.',
+                            status: 422,
                         })
                     }
 
