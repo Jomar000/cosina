@@ -5,9 +5,9 @@
         "baseColor": "neutral"
     },
     "aliases": {
-        "components": "$lib/components",
-        "utils": "$lib/utilities-shadcn",
-        "ui": "$lib/components/ui",
+        "components": "$lib/components/default",
+        "utils": "$lib/shadcn",
+        "ui": "$lib/components/shadcn",
         "hooks": "$lib/hooks",
         "lib": "$lib"
     },

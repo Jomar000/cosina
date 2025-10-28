@@ -1,8 +1,8 @@
 <script lang="ts">
-    import AppSidebar from '$lib/components/app-sidebar.svelte'
-    import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js'
-    import { Separator } from '$lib/components/ui/separator/index.js'
-    import * as Sidebar from '$lib/components/ui/sidebar/index.js'
+    import AppSidebar from '$lib/components/default/app-sidebar.svelte'
+    import * as Breadcrumb from '$lib/components/shadcn/breadcrumb/index.js'
+    import { Separator } from '$lib/components/shadcn/separator/index.js'
+    import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
 </script>
 
 <Sidebar.Provider>
@@ -20,7 +20,7 @@
                 <Breadcrumb.Root>
                     <Breadcrumb.List>
                         <Breadcrumb.Item class="hidden md:block">
-                            <Breadcrumb.Link href="#"
+                            <Breadcrumb.Link href="##"
                                 >Building Your Application</Breadcrumb.Link
                             >
                         </Breadcrumb.Item>
@@ -39,7 +39,7 @@
                 <div class="aspect-video rounded-xl bg-muted/50"></div>
             </div>
             <div
-                class="min-h-screen flex-1 rounded-xl bg-muted/50 md:min-h-min"
+                class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min"
             ></div>
         </div>
     </Sidebar.Inset>
