@@ -6,6 +6,13 @@ import {
 } from 'better-auth/plugins/organization/access'
 import { eq } from 'drizzle-orm'
 
+/**
+ * Define permissions for Components
+ * This is the complete set of actions for each component
+ *
+ * @link
+ * https://www.better-auth.com/docs/plugins/organization#create-access-control
+ */
 const buildPermissions = async (
     db: THonoVariables['dbClient'],
     dbSchema: THonoVariables['dbSchema'],
@@ -18,7 +25,7 @@ const buildPermissions = async (
     if (!permissions) {
         const { permission, role } = dbSchema
 
-        const _permissions = await db
+        const dbPermissions = await db
             .select({
                 component: permission.component,
                 action: permission.action,
@@ -27,10 +34,7 @@ const buildPermissions = async (
             .innerJoin(role, eq(permission.roleId, role.id))
             .groupBy(permission.component, permission.action)
 
-        // Define permissions for Components
-        // This is the complete set of actions for each component
-        // https://www.better-auth.com/docs/plugins/organization#create-access-control
-        permissions = _permissions.reduce(
+        permissions = dbPermissions.reduce(
             (accumulator, { action, component }) => {
                 if (!accumulator[component]) {
                     accumulator[component] = []
@@ -51,6 +55,13 @@ const buildPermissions = async (
     return permissions
 }
 
+/**
+ * Define capabilities of each Role
+ * These are the actions allowed for each role
+ *
+ * @link
+ * https://www.better-auth.com/docs/plugins/organization#create-roles
+ */
 const buildRoles = async (
     db: THonoVariables['dbClient'],
     dbSchema: THonoVariables['dbSchema'],
@@ -63,7 +74,7 @@ const buildRoles = async (
     if (!roles) {
         const { permission, role } = dbSchema
 
-        const _roles = await db
+        const dbRoles = await db
             .select({
                 component: permission.component,
                 action: permission.action,
@@ -72,10 +83,7 @@ const buildRoles = async (
             .from(permission)
             .innerJoin(role, eq(permission.roleId, role.id))
 
-        // Define capabilities of each Role
-        // These are the actions allowed for each role
-        // https://www.better-auth.com/docs/plugins/organization#create-roles
-        roles = _roles.reduce(
+        roles = dbRoles.reduce(
             (accumulator, { action, component, role }) => {
                 if (!accumulator[role]) {
                     accumulator[role] = {}
