@@ -12,6 +12,7 @@
     //////////////
 
     const session = new SessionState()
+
     session.loadFromLocalStorage()
 
     setSessionContext(session)
