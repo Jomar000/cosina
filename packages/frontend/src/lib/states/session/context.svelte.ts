@@ -1,5 +1,6 @@
 import { authSignInOutputSchema } from '@hyperion/validator/internal/auth'
 import { createContext } from 'svelte'
+import { SvelteDate } from 'svelte/reactivity'
 
 export class SessionState {
     ////////////
@@ -28,8 +29,12 @@ export class SessionState {
         localStorage.removeItem('session_data')
     }
 
-    isValid = () => {
-        return this.#session !== null
+    isValid = (): boolean => {
+        return (
+            this.#session !== null &&
+            Math.floor(new SvelteDate().getTime() / 1000) >=
+                this.#session.expiresAt
+        )
     }
 
     loadFromLocalStorage = () => {
