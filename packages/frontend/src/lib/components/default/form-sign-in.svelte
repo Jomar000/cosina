@@ -2,10 +2,13 @@
 
 <script lang="ts">
     import { authSignInInputSchema } from '@hyperion/validator/internal/auth'
+    import Eye from '@lucide/svelte/icons/eye'
+    import EyeOff from '@lucide/svelte/icons/eye-off'
     import { createForm } from '@tanstack/svelte-form'
     import { createMutation } from '@tanstack/svelte-query'
     import { tick } from 'svelte'
     import type { HTMLAttributes } from 'svelte/elements'
+    import { toast } from 'svelte-sonner'
     import type { z } from 'zod'
 
     import { goto } from '$app/navigation'
@@ -46,7 +49,6 @@
     ////////////////////
 
     let showPassword = $state(false)
-    let submissionErrors: string[] = $state([])
 
     const id = $props.id()
 
@@ -124,7 +126,19 @@
                     goto('/app')
                 }
             } catch (err) {
-                submissionErrors.push((err as Error).message)
+                toast.error('Something went wrong', {
+                    class: 'min-w-[360px]',
+                    description: (err as Error).message,
+                    action: {
+                        label: 'COPY',
+                        onClick: async (e) => {
+                            e.preventDefault()
+                            await navigator.clipboard.writeText(
+                                (err as Error).message,
+                            )
+                        },
+                    },
+                })
             }
         },
     }))
@@ -136,7 +150,6 @@
         handleSubmit: authSignInFormHandleSubmit,
     } = createForm(() => ({
         onSubmit: async ({ value }) => {
-            submissionErrors = []
             await authSignInQuery.mutateAsync(value)
         },
         validators: {
@@ -283,22 +296,43 @@
                                         Forgot your password?
                                     </a>
                                 </div>
-                                <Input
-                                    aria-invalid={!isValid}
-                                    autocomplete="current-password"
-                                    id="password-{id}"
-                                    name={field.name}
-                                    onblur={field.handleBlur}
-                                    oninput={(e) =>
-                                        field.handleChange(
-                                            e.currentTarget.value,
-                                        )}
-                                    placeholder="⊛⊛⊛⊛⊛⊛⊛⊛"
-                                    required
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={field.state.value}
-                                />
-                                <!-- TODO: Add Show/Hide button -->
+                                <div class="relative">
+                                    <Input
+                                        aria-invalid={!isValid}
+                                        autocomplete="current-password"
+                                        class="pr-10"
+                                        id="password-{id}"
+                                        name={field.name}
+                                        onblur={field.handleBlur}
+                                        oninput={(e) =>
+                                            field.handleChange(
+                                                e.currentTarget.value,
+                                            )}
+                                        placeholder="⊛⊛⊛⊛⊛⊛⊛⊛"
+                                        required
+                                        type={showPassword
+                                            ? 'text'
+                                            : 'password'}
+                                        value={field.state.value}
+                                    />
+                                    <Button
+                                        type="button"
+                                        class="pointer-events-auto absolute top-0 right-0 z-20 cursor-pointer bg-transparent hover:bg-transparent focus:outline-none dark:hover:bg-transparent"
+                                        onclick={() =>
+                                            (showPassword = !showPassword)}
+                                        tabindex={-1}
+                                    >
+                                        {#if showPassword}
+                                            <Eye
+                                                class="font-extrabold text-black"
+                                            />
+                                        {:else}
+                                            <EyeOff
+                                                class="font-extrabold text-black"
+                                            />
+                                        {/if}
+                                    </Button>
+                                </div>
                                 {#if !isValid}
                                     <FieldError>{errors.join('\n')}</FieldError>
                                 {/if}

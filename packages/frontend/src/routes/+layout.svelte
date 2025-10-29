@@ -5,6 +5,7 @@
         QueryClientProvider,
     } from '@tanstack/svelte-query'
 
+    import Sonner from '$lib/components/shadcn/sonner/sonner.svelte'
     import { AuthProvider } from '$lib/states/auth/index.js'
     import { SessionProvider } from '$lib/states/session/index.js'
     import { apiClient } from '$lib/utilities.js'
@@ -47,6 +48,11 @@
     <QueryClientProvider client={queryClient}>
         <SessionProvider>
             <AuthProvider>
+                <Sonner
+                    closeButton={true}
+                    duration={30000}
+                    position="top-center"
+                />
                 {@render children()}
             </AuthProvider>
         </SessionProvider>
