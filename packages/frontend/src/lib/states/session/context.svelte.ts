@@ -29,7 +29,7 @@ export class SessionState {
         localStorage.removeItem('session_data')
     }
 
-    isValid = (): boolean => {
+    isValid = (): this is { data: TSessionData } => {
         return (
             this.#session !== null &&
             Math.floor(new SvelteDate().getTime() / 1000) >=
