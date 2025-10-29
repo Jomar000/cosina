@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { requestId } from 'hono/request-id'
+import type { ContentfulStatusCode } from 'hono/utils/http-status'
 
 import { AppError } from '../errors.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
@@ -44,10 +45,12 @@ hono.onError((err, ctx) => {
 
     let code = 'INTERNAL_SERVER_ERROR'
     let message = `ERROR: ${ctx.get('requestId')}`
+    let status: ContentfulStatusCode = 500
 
     if (err instanceof AppError) {
         code = err.code
         message = err.message
+        status = err.status
     }
 
     return ctx.json(
@@ -58,7 +61,7 @@ hono.onError((err, ctx) => {
                 message,
             },
         },
-        500,
+        status,
     )
 })
 

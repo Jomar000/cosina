@@ -10,7 +10,6 @@
 
     import { goto } from '$app/navigation'
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
-    // import Captcha from '$lib/components/Modal/Captcha.svelte'
     import { Button } from '$lib/components/shadcn/button/index.js'
     import * as Card from '$lib/components/shadcn/card/index.js'
     import {
@@ -34,17 +33,18 @@
         class: className,
         auth,
         session,
+        showCaptchaModal = $bindable(false),
         ...restProps
     }: HTMLAttributes<HTMLDivElement> & {
         auth: AuthState
         session: SessionState
+        showCaptchaModal: boolean
     } = $props()
 
     ////////////////////
     // Initialization //
     ////////////////////
 
-    // let showCaptchaModal = $state(false)
     let showPassword = $state(false)
     let submissionErrors: string[] = $state([])
 
@@ -56,7 +56,7 @@
             'authSignIn',
         ],
         mutationFn: async (data: z.input<typeof authSignInInputSchema>) => {
-            // showCaptchaModal = true
+            showCaptchaModal = true
 
             // Wait for DOM update
             await tick()
@@ -66,7 +66,7 @@
                 turnstile.execute('#captchaModalRenderArea', {
                     sitekey: PUBLIC_CF_TURNSTILE_SITE_KEY,
                     callback: (token: string) => {
-                        // showCaptchaModal = false
+                        showCaptchaModal = false
                         turnstile.remove('#captchaModalRenderArea')
                         resolve(token)
                     },
@@ -305,15 +305,14 @@
                             </Field>
                         {/snippet}
                     </AuthSignInFormField>
-
                     <AuthSignInFormSubscribe>
                         <!--
-                                README: canSubmit is always true on first form render
-                                https://github.com/TanStack/form/issues/723
+                            README: canSubmit is always true on first form render
+                            https://github.com/TanStack/form/issues/723
 
-                                README: Set field errors based on response
-                                https://github.com/TanStack/form/discussions/623
-                            -->
+                            README: Set field errors based on response
+                            https://github.com/TanStack/form/discussions/623
+                        -->
                         {#snippet children(form)}
                             {@const isDisabled =
                                 !form.canSubmit ||

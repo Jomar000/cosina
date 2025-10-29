@@ -4,7 +4,8 @@
 
     import { goto } from '$app/navigation'
     import { PUBLIC_NAME } from '$env/static/public'
-    import SignInForm from '$lib/components/default/sign-in.svelte'
+    import SignInForm from '$lib/components/default/form-sign-in.svelte'
+    import CaptchaModal from '$lib/components/default/modal-captcha.svelte'
     import { useAuthContext } from '$lib/states/auth/index.js'
     import { useSessionContext } from '$lib/states/session/index.js'
 
@@ -15,14 +16,20 @@
     const session = useSessionContext()
     const auth = useAuthContext()
 
+    ////////////////////
+    // Initialization //
+    ////////////////////
+
+    let showCaptchaModal = $state(false)
+
     ///////////////
     // Lifecycle //
     ///////////////
 
     onMount(() => {
         if (session.isValid()) {
-            if (session.data!.userRoles.length === 1) {
-                goto(`/app/${session.data!.userRoles[0]}/dashboard`)
+            if (session.data.userRoles.length === 1) {
+                goto(`/app/${session.data.userRoles[0]}/dashboard`)
             }
 
             // TODO: Role Selection Page
@@ -54,7 +61,9 @@
             <SignInForm
                 {session}
                 {auth}
+                bind:showCaptchaModal
             />
         </div>
     </div>
+    <CaptchaModal open={showCaptchaModal} />
 {/if}

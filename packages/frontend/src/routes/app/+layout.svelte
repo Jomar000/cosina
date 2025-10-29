@@ -19,18 +19,12 @@
     const session = useSessionContext()
     const auth = useAuthContext()
 
-    ////////////////////
-    // Initialization //
-    ////////////////////
-
-    let renderView = $state(false)
-
     //////////////
     // Handlers //
     //////////////
 
     const checkRolePermission: TCheckRolePermission = (permissions) => {
-        if (!session.data) {
+        if (!session.isValid()) {
             return false
         }
 
@@ -62,18 +56,13 @@
     setContext('signOut', signOut)
 
     onMount(() => {
-        renderView =
-            session.data !== null && // Valid session
-            Math.floor(new Date().getTime() / 1000) < // Non-expired session
-                session.data.expiresAt
-
-        if (!renderView) {
+        if (!session.isValid()) {
             clearSessionDataAndRedirect()
         }
     })
 </script>
 
-{#if renderView}
+{#if session.isValid()}
     <div class="flex overflow-hidden">
         {@render children()}
     </div>
