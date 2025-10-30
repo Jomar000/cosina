@@ -1,3 +1,5 @@
+<!-- https://shadcn-svelte.com/blocks/sidebar#sidebar-07 -->
+
 <script
     lang="ts"
     module

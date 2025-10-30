@@ -4,6 +4,7 @@
         QueryClient,
         QueryClientProvider,
     } from '@tanstack/svelte-query'
+    import { ModeWatcher } from 'mode-watcher'
 
     import Sonner from '$lib/components/shadcn/sonner/sonner.svelte'
     import { AuthProvider } from '$lib/states/auth/index.js'
@@ -41,6 +42,8 @@
         () => queryClient,
     )
 </script>
+
+<ModeWatcher defaultMode="dark" />
 
 {#if heartbeatQuery.isFetching}
     LOADING

@@ -63,7 +63,5 @@
 </script>
 
 {#if session.isValid()}
-    <div class="flex overflow-hidden">
-        {@render children()}
-    </div>
+    {@render children()}
 {/if}
