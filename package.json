@@ -7,7 +7,7 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "pnpm": ">=10.19.0"
+        "pnpm": ">=10.20.0"
     },
     "scripts": {
         "build": "pnpm --recursive --stream build",
@@ -22,7 +22,7 @@
         "@types/node": "^24.9.2",
         "eslint": "^9.38.0",
         "eslint-config-prettier": "^10.1.8",
-        "eslint-plugin-svelte": "^3.12.5",
+        "eslint-plugin-svelte": "^3.13.0",
         "globals": "^16.4.0",
         "husky": "^9.1.7",
         "prettier": "^3.6.2",
@@ -31,7 +31,7 @@
         "prettier-plugin-tailwindcss": "^0.7.1",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.46.2",
-        "wrangler": "^4.45.2"
+        "wrangler": "^4.45.3"
     },
     "pnpm": {
         "allowedDeprecatedVersions": {

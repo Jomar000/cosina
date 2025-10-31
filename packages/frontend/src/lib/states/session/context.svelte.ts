@@ -32,8 +32,8 @@ export class SessionState {
     isValid = (): this is { data: TSessionData } => {
         return (
             this.#session !== null &&
-            Math.floor(new SvelteDate().getTime() / 1000) >=
-                this.#session.expiresAt
+            this.#session.expiresAt >
+                Math.floor(new SvelteDate().getTime() / 1000)
         )
     }
 
