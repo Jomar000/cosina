@@ -2,7 +2,7 @@
     import { onMount } from 'svelte'
 
     import { goto } from '$app/navigation'
-    import AppSidebar from '$lib/components/default/app-sidebar.svelte'
+    import AppSidebar from '$lib/components/default/sidebar.svelte'
     import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
     import { useSessionContext } from '$lib/states/session/index.js'
 

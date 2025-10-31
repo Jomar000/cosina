@@ -1,13 +1,7 @@
 <script lang="ts">
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
     import { IMG_default } from '$lib/assets/image/_index.js'
-    import {
-        Dialog,
-        DialogContent,
-        DialogOverlay,
-        DialogPortal,
-        DialogTitle,
-    } from '$lib/components/shadcn/dialog/index.js'
+    import * as Dialog from '$lib/components/shadcn/dialog/index.js'
 
     ////////////////
     // Properties //
@@ -20,16 +14,18 @@
     } = $props()
 </script>
 
-<Dialog {open}>
-    <DialogPortal>
-        <DialogOverlay />
-        <DialogContent
+<Dialog.Root {open}>
+    <Dialog.Portal>
+        <Dialog.Overlay />
+        <Dialog.Content
             class="w-[360px]"
             escapeKeydownBehavior="ignore"
             interactOutsideBehavior="ignore"
             showCloseButton={false}
         >
-            <DialogTitle class="text-center">CAPTCHA Verification</DialogTitle>
+            <Dialog.Title class="text-center">
+                CAPTCHA Verification
+            </Dialog.Title>
             <div
                 class="relative mx-auto h-auto w-full space-y-2 overflow-auto rounded-md md:space-y-4"
             >
@@ -49,6 +45,6 @@
                     class="mb-2 flex justify-center"
                 ></div>
             </div>
-        </DialogContent>
-    </DialogPortal>
-</Dialog>
+        </Dialog.Content>
+    </Dialog.Portal>
+</Dialog.Root>

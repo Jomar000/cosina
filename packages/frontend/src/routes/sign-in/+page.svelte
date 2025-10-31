@@ -4,8 +4,8 @@
 
     import { goto } from '$app/navigation'
     import { PUBLIC_NAME } from '$env/static/public'
-    import SignInForm from '$lib/components/default/form-sign-in.svelte'
     import CaptchaModal from '$lib/components/default/modal-captcha.svelte'
+    import SignInForm from '$lib/components/default/sign-in.svelte'
     import { useAuthContext } from '$lib/states/auth/index.js'
     import { useSessionContext } from '$lib/states/session/index.js'
 

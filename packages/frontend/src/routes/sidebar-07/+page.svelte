@@ -1,5 +1,5 @@
 <script lang="ts">
-    import AppSidebar from '$lib/components/default/app-sidebar.svelte'
+    import AppSidebar from '$lib/components/default/sidebar.svelte'
     import * as Breadcrumb from '$lib/components/shadcn/breadcrumb/index.js'
     import { Separator } from '$lib/components/shadcn/separator/index.js'
     import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'

@@ -147,12 +147,12 @@
 </script>
 
 <script lang="ts">
-    import NavMain from './nav-main.svelte'
-    import NavProjects from './nav-projects.svelte'
-    import NavUser from './nav-user.svelte'
-    import TeamSwitcher from './team-switcher.svelte'
     import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
     import type { ComponentProps } from 'svelte'
+    import NavMain from './sidebar-nav-main.svelte'
+    import NavProjects from './sidebar-nav-projects.svelte'
+    import NavUser from './sidebar-nav-user.svelte'
+    import TeamSwitcher from './sidebar-team-switcher.svelte'
 
     let {
         ref = $bindable(null),
