@@ -1,9 +1,6 @@
 <!-- https://shadcn-svelte.com/blocks/sidebar#sidebar-07 -->
 
-<script
-    lang="ts"
-    module
->
+<script lang="ts">
     import AudioWaveformIcon from '@lucide/svelte/icons/audio-waveform'
     import BookOpenIcon from '@lucide/svelte/icons/book-open'
     import BotIcon from '@lucide/svelte/icons/bot'
@@ -14,14 +11,31 @@
     import MapIcon from '@lucide/svelte/icons/map'
     import Settings2Icon from '@lucide/svelte/icons/settings-2'
     import SquareTerminalIcon from '@lucide/svelte/icons/square-terminal'
+    import { type ComponentProps } from 'svelte'
+
+    import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
+    import type { SessionState } from '$lib/states/session/context.svelte'
+    import NavMain from './sidebar-nav-main.svelte'
+    // import NavProjects from './sidebar-nav-projects.svelte'
+    import NavUser from './sidebar-nav-user.svelte'
+    import TeamSwitcher from './sidebar-team-switcher.svelte'
+
+    let {
+        ref = $bindable(null),
+        collapsible = 'icon',
+        session,
+        ...restProps
+    }: ComponentProps<typeof Sidebar.Root> & {
+        session: SessionState
+    } = $props()
 
     // This is sample data.
     const data = {
-        user: {
-            name: 'shadcn',
-            email: 'm@example.com',
-            avatar: '/avatars/shadcn.jpg',
-        },
+        // user: {
+        //     name: 'shadcn',
+        //     email: 'm@example.com',
+        //     avatar: '/avatars/shadcn.jpg',
+        // },
         teams: [
             {
                 name: 'Acme Inc',
@@ -146,21 +160,6 @@
     }
 </script>
 
-<script lang="ts">
-    import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
-    import type { ComponentProps } from 'svelte'
-    import NavMain from './sidebar-nav-main.svelte'
-    import NavProjects from './sidebar-nav-projects.svelte'
-    import NavUser from './sidebar-nav-user.svelte'
-    import TeamSwitcher from './sidebar-team-switcher.svelte'
-
-    let {
-        ref = $bindable(null),
-        collapsible = 'icon',
-        ...restProps
-    }: ComponentProps<typeof Sidebar.Root> = $props()
-</script>
-
 <Sidebar.Root
     {collapsible}
     {...restProps}
@@ -170,10 +169,10 @@
     </Sidebar.Header>
     <Sidebar.Content>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <!-- <NavProjects projects={data.projects} /> -->
     </Sidebar.Content>
     <Sidebar.Footer>
-        <NavUser user={data.user} />
+        <NavUser user={session.data} />
     </Sidebar.Footer>
     <Sidebar.Rail />
 </Sidebar.Root>

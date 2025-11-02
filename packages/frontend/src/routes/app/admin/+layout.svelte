@@ -47,7 +47,7 @@
 
 {#if render}
     <Sidebar.Provider>
-        <AppSidebar />
+        <AppSidebar {session} />
         <Sidebar.Inset>
             {@render children()}
         </Sidebar.Inset>

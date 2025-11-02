@@ -19,6 +19,12 @@
     const session = useSessionContext()
     const auth = useAuthContext()
 
+    ////////////////////
+    // Initialization //
+    ////////////////////
+
+    let render = $state(false)
+
     //////////////
     // Handlers //
     //////////////
@@ -56,12 +62,14 @@
     setContext('signOut', signOut)
 
     onMount(() => {
-        if (!session.isValid()) {
+        if (session.isValid()) {
+            render = true
+        } else {
             clearSessionDataAndRedirect()
         }
     })
 </script>
 
-{#if session.isValid()}
+{#if render}
     {@render children()}
 {/if}

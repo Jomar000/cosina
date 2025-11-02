@@ -54,7 +54,7 @@ export const authSignInOutputSchema = baseOutputSchema(
     z.object({
         name: z.string(),
         email: z.string(),
-        avatar: z.string().optional(),
+        avatar: z.string().optional().default(''),
         permissions: z.record(z.string(), z.array(z.string())),
         roles: z.record(z.string(), z.record(z.string(), z.array(z.string()))),
         userRoles: z.array(z.string()).min(1),

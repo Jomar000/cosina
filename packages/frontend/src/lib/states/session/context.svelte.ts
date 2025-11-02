@@ -7,7 +7,17 @@ export class SessionState {
     // Fields //
     ////////////
 
-    #session = $state<TSessionData | null>(null)
+    #sessionInitValue = {
+        name: '{{name}}',
+        email: '{{email}}',
+        permissions: {},
+        roles: {},
+        userRoles: [],
+        expiresAt: 0,
+        avatar: '{{avatar}}',
+    }
+
+    #session = $state<TSessionData>(this.#sessionInitValue)
 
     /////////////
     // Getters //
@@ -25,15 +35,14 @@ export class SessionState {
         authSignInOutputSchema.def.options[0].shape.data.parse(data)
 
     clear = () => {
-        this.#session = null
+        this.#session = this.#sessionInitValue
         localStorage.removeItem('session_data')
     }
 
     isValid = (): this is { data: TSessionData } => {
         return (
-            this.#session !== null &&
             this.#session.expiresAt >
-                Math.floor(new SvelteDate().getTime() / 1000)
+            Math.floor(new SvelteDate().getTime() / 1000)
         )
     }
 
@@ -47,7 +56,7 @@ export class SessionState {
         }
     }
 
-    set = (newState: TSessionData | null) => {
+    set = (newState: TSessionData) => {
         try {
             this.#session = this.#parseData(newState)
             localStorage.setItem('session_data', JSON.stringify(this.#session))

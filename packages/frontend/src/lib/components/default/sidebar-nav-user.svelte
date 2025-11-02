@@ -1,18 +1,23 @@
 <script lang="ts">
-    import * as Avatar from '$lib/components/shadcn/avatar/index.js'
-    import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js'
-    import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
-    import { useSidebar } from '$lib/components/shadcn/sidebar/index.js'
     import BadgeCheckIcon from '@lucide/svelte/icons/badge-check'
     import BellIcon from '@lucide/svelte/icons/bell'
     import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down'
     import CreditCardIcon from '@lucide/svelte/icons/credit-card'
     import LogOutIcon from '@lucide/svelte/icons/log-out'
     import SparklesIcon from '@lucide/svelte/icons/sparkles'
+    import { getContext } from 'svelte'
 
-    let { user }: { user: { name: string; email: string; avatar: string } } =
-        $props()
+    import * as Avatar from '$lib/components/shadcn/avatar/index.js'
+    import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js'
+    import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
+    import { useSidebar } from '$lib/components/shadcn/sidebar/index.js'
+
+    // let { user }: { user: { name: string; email: string; avatar: string } } =
+    //     $props()
+    let { user }: { user: { name: string; email: string } } = $props()
+
     const sidebar = useSidebar()
+    const signOut = getContext<() => void>('signOut')
 </script>
 
 <Sidebar.Menu>
@@ -26,10 +31,7 @@
                         {...props}
                     >
                         <Avatar.Root class="size-8 rounded-lg">
-                            <Avatar.Image
-                                src={user.avatar}
-                                alt={user.name}
-                            />
+                            <Avatar.Image alt={user.name} />
                             <Avatar.Fallback class="rounded-lg"
                                 >CN</Avatar.Fallback
                             >
@@ -56,10 +58,7 @@
                         class="flex items-center gap-2 px-1 py-1.5 text-left text-sm"
                     >
                         <Avatar.Root class="size-8 rounded-lg">
-                            <Avatar.Image
-                                src={user.avatar}
-                                alt={user.name}
-                            />
+                            <Avatar.Image alt={user.name} />
                             <Avatar.Fallback class="rounded-lg"
                                 >CN</Avatar.Fallback
                             >
@@ -96,9 +95,9 @@
                     </DropdownMenu.Item>
                 </DropdownMenu.Group>
                 <DropdownMenu.Separator />
-                <DropdownMenu.Item>
+                <DropdownMenu.Item onclick={signOut}>
                     <LogOutIcon />
-                    Log out
+                    Sign-out
                 </DropdownMenu.Item>
             </DropdownMenu.Content>
         </DropdownMenu.Root>

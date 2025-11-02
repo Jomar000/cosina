@@ -20,6 +20,7 @@
     // Initialization //
     ////////////////////
 
+    let render = $state(false)
     let showCaptchaModal = $state(false)
 
     ///////////////
@@ -27,13 +28,14 @@
     ///////////////
 
     onMount(() => {
-        if (session.isValid()) {
+        if (!session.isValid()) {
+            render = true
+        } else {
             if (session.data.userRoles.length === 1) {
                 goto(`/app/${session.data.userRoles[0]}/dashboard`)
+            } else {
+                goto('/app')
             }
-
-            // TODO: Role Selection Page
-            goto('/app')
         }
     })
 </script>
@@ -42,7 +44,7 @@
     <title>Sign-in | {PUBLIC_NAME}</title>
 </svelte:head>
 
-{#if !session.isValid()}
+{#if render}
     <div
         class="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10"
     >

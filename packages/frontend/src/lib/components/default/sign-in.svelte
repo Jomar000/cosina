@@ -7,8 +7,8 @@
     import { createForm } from '@tanstack/svelte-form'
     import { createMutation } from '@tanstack/svelte-query'
     import { tick } from 'svelte'
-    import type { HTMLAttributes } from 'svelte/elements'
     import { toast } from 'svelte-sonner'
+    import type { HTMLAttributes } from 'svelte/elements'
     import type { z } from 'zod'
 
     import { goto } from '$app/navigation'
@@ -120,22 +120,33 @@
                 const { data: _data } = response.data
                 session.set(_data)
 
-                if (session.data?.userRoles.length === 1) {
-                    goto(`/app/${session.data?.userRoles[0]}/dashboard`)
-                } else {
-                    goto('/app')
+                if (!session.isValid()) {
+                    throw new Error('Invalid session data.')
                 }
+
+                return session.data.userRoles.length === 1
+                    ? `/app/${session.data.userRoles[0]}/dashboard`
+                    : '/app'
             } catch (err) {
                 toast.error('Something went wrong', {
                     class: 'min-w-[360px]',
                     description: (err as Error).message,
                     action: {
                         label: 'COPY',
-                        onClick: async (e) => {
+                        onClick: async function (e) {
                             e.preventDefault()
+
                             await navigator.clipboard.writeText(
                                 (err as Error).message,
                             )
+
+                            // @ts-expect-error TS can't narrow 'this'
+                            this.label = 'COPIED'
+
+                            setTimeout(() => {
+                                // @ts-expect-error TS can't narrow 'this'
+                                this.label = 'COPY'
+                            }, 2000)
                         },
                     },
                 })
@@ -150,7 +161,11 @@
         handleSubmit: authSignInFormHandleSubmit,
     } = createForm(() => ({
         onSubmit: async ({ value }) => {
-            await authSignInQuery.mutateAsync(value)
+            toast.dismiss()
+            const redirect = await authSignInQuery.mutateAsync(value)
+            if (redirect) {
+                goto(redirect)
+            }
         },
         validators: {
             // Make sure form is valid everytime it changes.
