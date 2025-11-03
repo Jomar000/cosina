@@ -1,7 +1,10 @@
 <script lang="ts">
+    import ChevronRightIcon from '@lucide/svelte/icons/chevron-right'
+    import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
+    import type { Component } from 'svelte'
+
     import * as Collapsible from '$lib/components/shadcn/collapsible/index.js'
     import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
-    import ChevronRightIcon from '@lucide/svelte/icons/chevron-right'
 
     let {
         items,
@@ -9,9 +12,7 @@
         items: {
             title: string
             url: string
-            // this should be `Component` after @lucide/svelte updates types
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            icon?: any
+            icon?: Component
             isActive?: boolean
             items?: {
                 title: string
@@ -24,6 +25,19 @@
 <Sidebar.Group>
     <Sidebar.GroupLabel>Platform</Sidebar.GroupLabel>
     <Sidebar.Menu>
+        <Sidebar.MenuItem>
+            <Sidebar.MenuButton>
+                {#snippet child({ props })}
+                    <a
+                        href="##"
+                        {...props}
+                    >
+                        <LayoutDashboardIcon />
+                        <span>Dashboard</span>
+                    </a>
+                {/snippet}
+            </Sidebar.MenuButton>
+        </Sidebar.MenuItem>
         {#each items as item (item.title)}
             <Collapsible.Root
                 open={item.isActive}

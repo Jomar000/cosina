@@ -1,4 +1,6 @@
 <script lang="ts">
+    import ListIcon from '@lucide/svelte/icons/list'
+    import UsersIcon from '@lucide/svelte/icons/users'
     import { onMount } from 'svelte'
 
     import { goto } from '$app/navigation'
@@ -24,6 +26,33 @@
 
     let render = $state(false)
 
+    const navItems = [
+        {
+            title: 'Transactions',
+            url: '#',
+            icon: ListIcon,
+            isActive: true,
+            items: [
+                {
+                    title: 'History',
+                    url: '#',
+                },
+            ],
+        },
+        {
+            title: 'Visitors',
+            url: '#',
+            icon: UsersIcon,
+            isActive: true,
+            items: [
+                {
+                    title: 'History',
+                    url: '#',
+                },
+            ],
+        },
+    ]
+
     //////////////
     // Handlers //
     //////////////
@@ -47,7 +76,10 @@
 
 {#if render}
     <Sidebar.Provider>
-        <AppSidebar {session} />
+        <AppSidebar
+            {session}
+            {navItems}
+        />
         <Sidebar.Inset>
             {@render children()}
         </Sidebar.Inset>
