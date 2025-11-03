@@ -224,6 +224,7 @@
                                 <Input
                                     aria-invalid={!isValid}
                                     autocomplete="organization"
+                                    autofocus
                                     id="organization-id-{id}"
                                     name={field.name}
                                     onblur={field.handleBlur}
@@ -307,6 +308,7 @@
                                     <a
                                         href="##"
                                         class="ml-auto text-sm underline-offset-4 hover:underline"
+                                        tabindex="-1"
                                     >
                                         Forgot your password?
                                     </a>
@@ -380,8 +382,9 @@
                                         : 'Sign-in'}</Button
                                 >
                                 <FieldDescription class="text-center">
-                                    Don't have an account? <a href="##"
-                                        >Sign-up</a
+                                    Don't have an account? <a
+                                        href="##"
+                                        tabindex="-1">Sign-up</a
                                     >
                                 </FieldDescription>
                             </Field>
@@ -392,7 +395,14 @@
         </Card.Content>
     </Card.Root>
     <FieldDescription class="px-6 text-center">
-        By clicking continue, you agree to our <a href="##">Terms of Service</a>
-        and <a href="##">Privacy Policy</a>.
+        By clicking continue, you agree to our <a
+            href="##"
+            tabindex="-1">Terms of Service</a
+        >
+        and
+        <a
+            href="##"
+            tabindex="-1">Privacy Policy</a
+        >.
     </FieldDescription>
 </div>
