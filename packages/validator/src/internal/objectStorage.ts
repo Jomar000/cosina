@@ -89,6 +89,7 @@ export const objectStorageCreateUploadLinkInputSchema = z
         }),
     )
     .min(1, { error: 'At least one object metadata must be provided.' })
+    .max(10, { error: 'A maximum of 10 object metadata is allowed.' })
     .check((ctx) => {
         if (ctx.value.length > 1) {
             const allHashes = ctx.value.map(({ hashSha256 }) => hashSha256)

@@ -3,6 +3,7 @@ import type { baseOutputSchema } from '@hyperion/validator/shared'
 import { fileTypeFromBuffer } from 'file-type'
 import ky from 'ky'
 import { customAlphabet } from 'nanoid'
+import PQueue from 'p-queue'
 import type { z } from 'zod'
 
 import { PUBLIC_API_URL } from '$env/static/public'
@@ -149,45 +150,56 @@ export const objectStorageClient: (
       }
     | undefined
 > = async (files, allowedMimeTypes = []) => {
+    const queue = new PQueue({ concurrency: 5 })
+
     ///
     // STEP #1 - Prepare metadata to be pre-signed
     ///
 
-    const dataToSign = (
-        await Promise.all(
-            files.map(async ({ file, isPublic }, index) => {
-                const fileBuffer = await file.arrayBuffer()
-                const mimeType =
-                    (await fileTypeFromBuffer(fileBuffer.slice(0, 32)))?.mime ??
-                    'application/octet-stream'
+    const dataToSign: {
+        index: number
+        name: string
+        size: number
+        mimeType: string
+        hashSha256: string
+        isPublic: boolean
+    }[] = []
 
-                if (
-                    allowedMimeTypes.length > 0 &&
-                    !allowedMimeTypes.includes(mimeType)
-                ) {
-                    return undefined
-                }
+    for (const [
+        index,
+        { file, isPublic },
+    ] of files.entries()) {
+        queue.add(async () => {
+            const fileBuffer = await file.arrayBuffer()
+            const mimeType =
+                (await fileTypeFromBuffer(fileBuffer.slice(0, 32)))?.mime ??
+                'application/octet-stream'
 
-                // Compute SHA-256 checksum
-                const hashBuffer = await crypto.subtle.digest(
-                    'SHA-256',
-                    fileBuffer,
-                )
-                const hashArray = Array.from(new Uint8Array(hashBuffer))
+            if (
+                allowedMimeTypes.length > 0 &&
+                !allowedMimeTypes.includes(mimeType)
+            ) {
+                return
+            }
 
-                return {
-                    index, // Needed for matching the files to their signed URLs
-                    name: file.name,
-                    size: file.size,
-                    mimeType,
-                    hashSha256: hashArray
-                        .map((b) => b.toString(16).padStart(2, '0'))
-                        .join(''),
-                    isPublic,
-                }
-            }),
-        )
-    ).filter((data) => data !== undefined)
+            // Compute SHA-256 checksum
+            const hashBuffer = await crypto.subtle.digest('SHA-256', fileBuffer)
+            const hashArray = Array.from(new Uint8Array(hashBuffer))
+
+            dataToSign.push({
+                index, // Needed for matching the files to their signed URLs
+                name: file.name,
+                size: file.size,
+                mimeType,
+                hashSha256: hashArray
+                    .map((b) => b.toString(16).padStart(2, '0'))
+                    .join(''),
+                isPublic,
+            })
+        })
+    }
+
+    await queue.onIdle()
 
     ///
     // STEP #2 - Submit metadata to pre-signing endpoint
@@ -255,8 +267,12 @@ export const objectStorageClient: (
             uploaded: [],
         }
 
-        await Promise.all(
-            files.map(async ({ file }, index) => {
+        // Queue files for upload
+        for (const [
+            index,
+            { file },
+        ] of files.entries()) {
+            queue.add(async () => {
                 const { encodedHash, signedUrl, status } =
                     fileToUrlMap.get(index)!
 
@@ -277,8 +293,11 @@ export const objectStorageClient: (
                         statusIndices.failed.push(index)
                     }
                 }
-            }),
-        )
+            })
+        }
+
+        // Upload queued files concurrently
+        await queue.onIdle()
 
         return {
             uploadId: presignedUrls.data.uploadId,
