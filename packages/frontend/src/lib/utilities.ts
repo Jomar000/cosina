@@ -117,6 +117,15 @@ export const stripEmptyProps = <T = unknown>(obj: Record<string, unknown>) => {
  * When upload fails, undefined will be returned.
  */
 
+type TDataToSign = {
+    index: number
+    name: string
+    size: number
+    mimeType: string
+    hashSha256: string
+    isPublic: boolean
+}
+
 type TFileToUrlMap =
     | {
           key: string
@@ -134,6 +143,7 @@ type TFileToUrlMap =
 type TStatusIndices = {
     conflict: number[]
     failed: number[]
+    invalid: number[]
     uploaded: number[]
 }
 
@@ -152,62 +162,92 @@ export const objectStorageClient: (
 > = async (files, allowedMimeTypes = []) => {
     const queue = new PQueue({ concurrency: 5 })
 
-    ///
-    // STEP #1 - Prepare metadata to be pre-signed
-    ///
+    const dataToSign: TDataToSign[] = []
 
-    const dataToSign: {
-        index: number
-        name: string
-        size: number
-        mimeType: string
-        hashSha256: string
-        isPublic: boolean
-    }[] = []
-
-    for (const [
-        index,
-        { file, isPublic },
-    ] of files.entries()) {
-        queue.add(async () => {
-            const fileBuffer = await file.arrayBuffer()
-            const mimeType =
-                (await fileTypeFromBuffer(fileBuffer.slice(0, 32)))?.mime ??
-                'application/octet-stream'
-
-            if (
-                allowedMimeTypes.length > 0 &&
-                !allowedMimeTypes.includes(mimeType)
-            ) {
-                return
-            }
-
-            // Compute SHA-256 checksum
-            const hashBuffer = await crypto.subtle.digest('SHA-256', fileBuffer)
-            const hashArray = Array.from(new Uint8Array(hashBuffer))
-
-            dataToSign.push({
-                index, // Needed for matching the files to their signed URLs
-                name: file.name,
-                size: file.size,
-                mimeType,
-                hashSha256: hashArray
-                    .map((b) => b.toString(16).padStart(2, '0'))
-                    .join(''),
-                isPublic,
-            })
-        })
+    const statusIndices: TStatusIndices = {
+        conflict: [],
+        failed: [],
+        invalid: [],
+        uploaded: [],
     }
-
-    await queue.onIdle()
-
-    ///
-    // STEP #2 - Submit metadata to pre-signing endpoint
-    ///
 
     let presignedUrls: z.output<
         typeof objectStorageCreateUploadLinkOutputSchema
     > | null = null
+
+    ///
+    // STEP #1 - Prepare metadata to be pre-signed
+    ///
+
+    try {
+        for (const [
+            index,
+            { file, isPublic },
+        ] of files.entries()) {
+            const queuedFn = async () => {
+                const fileBuffer = await file.arrayBuffer()
+
+                const mimeType =
+                    (await fileTypeFromBuffer(fileBuffer))?.mime ??
+                    'application/octet-stream'
+
+                // Check if the detected MIME Type matches the allowed MIME types
+                // Full matches & wildcard subtypes are supported
+                const matchedMimeTypes = allowedMimeTypes.filter((amt) => {
+                    return (
+                        mimeType === amt ||
+                        (amt.includes('*') &&
+                            mimeType.startsWith(
+                                amt.substring(0, amt.indexOf('*')),
+                            ))
+                    )
+                })
+
+                if (
+                    allowedMimeTypes.length > 0 &&
+                    matchedMimeTypes.length === 0
+                ) {
+                    // Don't include invalid files to the signing request
+                    return
+                }
+
+                // Compute SHA-256 checksum
+                const hashBuffer = await crypto.subtle.digest(
+                    'SHA-256',
+                    fileBuffer,
+                )
+                const hashArray = Array.from(new Uint8Array(hashBuffer))
+
+                dataToSign.push({
+                    index, // Needed for matching the files to their signed URLs
+                    name: file.name,
+                    size: file.size,
+                    mimeType,
+                    hashSha256: hashArray
+                        .map((b) => b.toString(16).padStart(2, '0'))
+                        .join(''),
+                    isPublic,
+                })
+            }
+
+            queue.add(queuedFn).catch(() => {})
+        }
+
+        await queue.onIdle()
+
+        if (dataToSign.length === 0) {
+            throw new Error('No items to process.')
+        }
+    } catch (err) {
+        console.error(
+            `uploadToObjectStorage.prepareMetadata: ${(err as Error).message}`,
+        )
+        return
+    }
+
+    ///
+    // STEP #2 - Submit metadata to pre-signing endpoint
+    ///
 
     try {
         presignedUrls = await apiClient<
@@ -248,52 +288,54 @@ export const objectStorageClient: (
             } = presignedUrls.data.signedUrls.filter(
                 (psu) => psu.hash === dts.hashSha256,
             )
+
             const {
                 0: { index },
             } = dataToSign.filter((dts) => dts.hashSha256 === hash)
+
             accumulator.set(index, {
                 key,
                 encodedHash,
                 signedUrl,
                 status,
             } as TFileToUrlMap)
+
             return accumulator
         }, new Map<number, TFileToUrlMap>())
-
-        // Store the indices of the processed files based on their status
-        const statusIndices: TStatusIndices = {
-            conflict: [],
-            failed: [],
-            uploaded: [],
-        }
 
         // Queue files for upload
         for (const [
             index,
             { file },
         ] of files.entries()) {
-            queue.add(async () => {
-                const { encodedHash, signedUrl, status } =
-                    fileToUrlMap.get(index)!
+            const queuedFn = async () => {
+                if (fileToUrlMap.has(index)) {
+                    const { encodedHash, signedUrl, status } =
+                        fileToUrlMap.get(index)!
 
-                if (status === 409) {
-                    statusIndices.conflict.push(index)
-                } else {
-                    try {
-                        await ky(signedUrl, {
-                            method: 'PUT',
-                            headers: {
-                                'x-amz-checksum-sha256': encodedHash,
-                            },
-                            body: file,
-                        })
+                    if (status === 409) {
+                        statusIndices.conflict.push(index)
+                    } else {
+                        try {
+                            await ky(signedUrl, {
+                                method: 'PUT',
+                                headers: {
+                                    'x-amz-checksum-sha256': encodedHash,
+                                },
+                                body: file,
+                            })
 
-                        statusIndices.uploaded.push(index)
-                    } catch {
-                        statusIndices.failed.push(index)
+                            statusIndices.uploaded.push(index)
+                        } catch {
+                            statusIndices.failed.push(index)
+                        }
                     }
+                } else {
+                    statusIndices.invalid.push(index)
                 }
-            })
+            }
+
+            queue.add(queuedFn).catch(() => {})
         }
 
         // Upload queued files concurrently
