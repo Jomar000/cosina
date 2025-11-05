@@ -139,8 +139,8 @@ importers:
         specifier: ^1.23.8
         version: 1.23.8(svelte@5.43.3)
       '@tanstack/svelte-query':
-        specifier: ^6.0.4
-        version: 6.0.4(svelte@5.43.3)
+        specifier: ^6.0.5
+        version: 6.0.5(svelte@5.43.3)
       '@types/cloudflare-turnstile':
         specifier: ^0.2.2
         version: 0.2.2
@@ -157,8 +157,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       daisyui:
-        specifier: ^5.4.4
-        version: 5.4.4
+        specifier: ^5.4.5
+        version: 5.4.5
       dayjs:
         specifier: ^1.11.19
         version: 1.11.19
@@ -1265,8 +1265,8 @@ packages:
     resolution: {integrity: sha512-vGY+CWsFZeac3dELgB6UZ4c7OacwsLb8hvL2gLS6hTgy8Fl0Bm/aLokHaeDIP+q9F9HUZTnp360z9uv78eg8pg==}
     engines: {node: '>=18'}
 
-  '@tanstack/query-core@5.90.6':
-    resolution: {integrity: sha512-AnZSLF26R8uX+tqb/ivdrwbVdGemdEDm1Q19qM6pry6eOZ6bEYiY7mWhzXT1YDIPTNEVcZ5kYP9nWjoxDLiIVw==}
+  '@tanstack/query-core@5.90.7':
+    resolution: {integrity: sha512-6PN65csiuTNfBMXqQUxQhCNdtm1rV+9kC9YwWAIKcaxAauq3Wu7p18j3gQY3YIBJU70jT/wzCCZ2uqto/vQgiQ==}
 
   '@tanstack/store@0.7.7':
     resolution: {integrity: sha512-xa6pTan1bcaqYDS9BDpSiS63qa6EoDkPN9RsRaxHuDdVDNntzq3xNwR5YKTU/V3SkSyC9T4YVOPh2zRQN0nhIQ==}
@@ -1276,8 +1276,8 @@ packages:
     peerDependencies:
       svelte: ^5.0.0
 
-  '@tanstack/svelte-query@6.0.4':
-    resolution: {integrity: sha512-oSHm9n9BEp5Dnks/asSi95V0nkug2JvbDpxtSA7bRpLW4LRUuQ7Ot0CMTViCkw3jErduNnU5agZ9UKHLylDhvg==}
+  '@tanstack/svelte-query@6.0.5':
+    resolution: {integrity: sha512-9YgwlQJc1leQVknEalcvIzhUhKUHaxdq3xn8fc735fOAiS0uelvY6lBncKFS4uzfbj+iLyw/XsABU6FKj8XP4Q==}
     peerDependencies:
       svelte: ^5.25.0
 
@@ -1653,8 +1653,8 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
-  daisyui@5.4.4:
-    resolution: {integrity: sha512-FEfdwmGdb3ZbtYN3OqaZn/RMarlZTPOv6mWpGUo7KX42RkcBanEZk5tgYp2ZgirKl7QvH8pCiwpuy55wi2dHyQ==}
+  daisyui@5.4.5:
+    resolution: {integrity: sha512-IPA3LESd0i1nC9/K4olTtVPf32G367MnRnd9xeekhS8SmdaXDc0o6L1eqnBGxuhSN7aQM0z7d3bJWNPdYEKMSw==}
 
   dayjs@1.11.19:
     resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
@@ -4256,7 +4256,7 @@ snapshots:
       '@tanstack/devtools-event-client': 0.3.4
       '@tanstack/store': 0.7.7
 
-  '@tanstack/query-core@5.90.6': {}
+  '@tanstack/query-core@5.90.7': {}
 
   '@tanstack/store@0.7.7': {}
 
@@ -4266,9 +4266,9 @@ snapshots:
       '@tanstack/svelte-store': 0.7.7(svelte@5.43.3)
       svelte: 5.43.3
 
-  '@tanstack/svelte-query@6.0.4(svelte@5.43.3)':
+  '@tanstack/svelte-query@6.0.5(svelte@5.43.3)':
     dependencies:
-      '@tanstack/query-core': 5.90.6
+      '@tanstack/query-core': 5.90.7
       svelte: 5.43.3
 
   '@tanstack/svelte-store@0.7.7(svelte@5.43.3)':
@@ -4683,7 +4683,7 @@ snapshots:
 
   cssesc@3.0.0: {}
 
-  daisyui@5.4.4: {}
+  daisyui@5.4.5: {}
 
   dayjs@1.11.19: {}
 
