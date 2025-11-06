@@ -1,10 +1,12 @@
 <script lang="ts">
     import CircleXIcon from '@lucide/svelte/icons/circle-x'
+    import PaperClipIcon from '@lucide/svelte/icons/paperclip'
     import Trash2Icon from '@lucide/svelte/icons/trash-2'
 
     import Badge from '$lib/components/shadcn/badge/badge.svelte'
     import { Button } from '$lib/components/shadcn/button/index.js'
     import * as Dialog from '$lib/components/shadcn/dialog/index.js'
+    import { Switch } from '$lib/components/shadcn/switch/index.js'
     import * as Tooltip from '$lib/components/shadcn/tooltip/index.js'
     import { objectStorageClient } from '$lib/utilities.js'
 
@@ -27,6 +29,8 @@
             status: string
         }[]
     >([])
+
+    let isPublic = $state(false)
 
     //////////////
     // Handlers //
@@ -53,10 +57,6 @@
                 ...newFiles,
             ]
         }
-    }
-
-    const markAsPrivate = () => {
-        alert('You have marked this photo as private.')
     }
 
     const removeFromQueue = (index: number) => {
@@ -95,7 +95,7 @@
                     /></Dialog.Close
                 >
             </div>
-            <div class="flex flex-col items-center gap-4">
+            <div class="flex min-h-[520px] w-full flex-col items-center gap-4">
                 <button
                     onclick={() =>
                         document.getElementById('fileInput')?.click()}
@@ -127,8 +127,8 @@
                                 class="mb-2 text-sm text-gray-500 dark:text-neutral-400"
                             >
                                 <span class="font-semibold"
-                                    >Click to upload</span
-                                > or drag and drop
+                                    >Click to queue or drag and drop</span
+                                >
                             </p>
                             <p
                                 class="text-xs text-gray-500 dark:text-neutral-400"
@@ -146,83 +146,89 @@
                         />
                     </label>
                 </button>
+                <div
+                    class=" flex w-full items-center justify-between border-t border-neutral-300 dark:border-neutral-400"
+                >
+                    <h4
+                        class="pt-4 text-sm font-semibold text-neutral-700 dark:text-neutral-300"
+                    >
+                        Queued Attachments ({uploadQueue.length})
+                    </h4>
+                    <button
+                        onclick={clearQueue}
+                        class={uploadQueue.length === 0
+                            ? 'cursor-not-allowed pt-4 text-xs font-semibold text-neutral-700 opacity-50  dark:text-neutral-300'
+                            : 'cursor-pointer pt-4 text-xs font-semibold text-neutral-700 hover:underline dark:text-neutral-300'}
+                    >
+                        Clear All
+                    </button>
+                </div>
                 {#if uploadQueue.length > 0}
-                    <div class="mt-4 w-full border-t border-neutral-200 pt-4">
+                    <div class=" w-full">
                         <div
-                            class="mb-3 flex w-full items-center justify-between"
-                        >
-                            <h4
-                                class="text-sm font-semibold text-neutral-700 dark:text-neutral-300"
-                            >
-                                Queued Files ({uploadQueue.length})
-                            </h4>
-                            <button
-                                onclick={markAsPrivate}
-                                class="cursor-pointer text-xs font-semibold text-neutral-700 hover:underline dark:text-neutral-300"
-                            >
-                                Mark All As Private
-                            </button>
-                        </div>
-                        <div
-                            class="flex h-56 flex-col gap-3 overflow-y-auto pr-1"
+                            class="flex h-60 w-full flex-col gap-3 overflow-y-auto pr-1"
                         >
                             {#each uploadQueue as uq, index (index)}
                                 <div
                                     class="flex items-center justify-between rounded-md border border-neutral-200 bg-neutral-50 p-2 transition hover:bg-neutral-100 dark:border-neutral-600 dark:bg-neutral-800 dark:hover:bg-neutral-700"
                                 >
-                                    <div class="flex items-center gap-3">
-                                        <img
-                                            src={uq.preview}
-                                            alt={uq.name}
-                                            class="h-12 w-12 rounded border object-cover"
-                                        />
-                                        <div>
-                                            <p
-                                                class="w-40 truncate text-sm text-neutral-700 dark:text-neutral-300"
-                                            >
-                                                {uq.name}
-                                            </p>
-                                            {#if uq.status === 'UPLOADED' || uq.status === 'CONFLICT'}
-                                                <Badge
-                                                    variant="secondary"
-                                                    class="bg-green-500"
-                                                    >UPLOADED</Badge
-                                                >
-                                            {:else if uq.status === 'FAILED' || uq.status === 'INVALID'}
-                                                <Badge variant="destructive"
-                                                    >{uq.status}</Badge
-                                                >
-                                            {:else}
-                                                <Badge variant="default"
-                                                    >{uq.status}</Badge
-                                                >
-                                            {/if}
-                                        </div>
-                                    </div>
                                     <div>
                                         <Tooltip.Provider>
                                             <Tooltip.Root>
-                                                <Tooltip.Trigger
-                                                    ><Button
-                                                        variant="default"
-                                                        class=" cursor-pointer bg-transparent text-xs text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-600"
-                                                        onclick={markAsPrivate}
+                                                <Tooltip.Trigger>
+                                                    <div
+                                                        class="flex items-center gap-3"
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 576 512"
-                                                            ><path
-                                                                fill="currentColor"
-                                                                d="M224 8a120 120 0 1 1 0 240a120 120 0 1 1 0-240m-29.7 296h59.4c29.7 0 57.7 7.3 82.3 20.1v4.3c-19.6 17.6-32 43.1-32 71.5v96c0 5.5.5 10.9 1.3 16.1H45.7C29.3 512 16 498.7 16 482.3C16 383.8 95.8 304 194.3 304m301.7.1c0-17.7-14.3-32-32-32s-32 14.3-32 32V352h64zM352 400c0-20.9 13.4-38.7 32-45.3v-50.6c0-44.2 35.8-80 80-80s80 35.8 80 80v50.6c18.6 6.6 32 24.4 32 45.3v96c0 26.5-21.5 48-48 48H400c-26.5 0-48-21.5-48-48z"
-                                                            /></svg
+                                                        {#if uq.file.type.startsWith('image/')}
+                                                            <img
+                                                                src={uq.preview}
+                                                                alt={uq.name}
+                                                                class="h-12 w-12 rounded border object-cover"
+                                                            />
+                                                        {:else}
+                                                            <div
+                                                                class="flex h-12 w-12 items-center justify-center rounded border bg-neutral-100 dark:bg-neutral-700"
+                                                            >
+                                                                <PaperClipIcon
+                                                                    class="h-6 w-6 text-neutral-500 dark:text-neutral-300"
+                                                                />
+                                                            </div>
+                                                        {/if}
+                                                        <div
+                                                            class="flex w-full flex-col"
                                                         >
-                                                    </Button></Tooltip.Trigger
-                                                >
+                                                            <p
+                                                                class="w-24 truncate text-start text-sm text-neutral-700 md:w-64 dark:text-neutral-300"
+                                                            >
+                                                                {uq.name}
+                                                            </p>
+                                                            {#if uq.status === 'UPLOADED' || uq.status === 'CONFLICT'}
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    class="bg-green-500 "
+                                                                    >UPLOADED</Badge
+                                                                >
+                                                            {:else if uq.status === 'FAILED' || uq.status === 'INVALID'}
+                                                                <Badge
+                                                                    variant="destructive"
+                                                                    >{uq.status}</Badge
+                                                                >
+                                                            {:else}
+                                                                <Badge
+                                                                    variant="default"
+                                                                    >{uq.status}</Badge
+                                                                >
+                                                            {/if}
+                                                        </div>
+                                                    </div>
+                                                </Tooltip.Trigger>
                                                 <Tooltip.Content>
-                                                    <p>Mark as Private</p>
+                                                    <p>{uq.name}</p>
                                                 </Tooltip.Content>
                                             </Tooltip.Root>
                                         </Tooltip.Provider>
+                                    </div>
+                                    <div>
                                         <Button
                                             variant="default"
                                             class="cursor-pointer bg-transparent text-xs hover:bg-neutral-100 dark:hover:bg-neutral-600"
@@ -235,24 +241,41 @@
                                 </div>
                             {/each}
                         </div>
-                        <div class="mt-4 flex justify-between">
-                            <Button
-                                class="font-semibold"
-                                variant="default"
-                                onclick={clearQueue}
-                            >
-                                Clear All
-                            </Button>
-                            <Button
-                                class="inline-flex cursor-pointer items-center rounded-lg bg-blue-700 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                variant="default"
-                                onclick={processQueue}
-                            >
-                                Upload
-                            </Button>
-                        </div>
+                    </div>
+                {:else}
+                    <div class="mb-16 flex h-full items-center justify-center">
+                        <p class="text-neutral-600 dark:text-neutral-400">
+                            No attachments queued
+                        </p>
                     </div>
                 {/if}
+                <div class="absolute bottom-0 flex w-full justify-between p-4">
+                    <div class="flex items-center space-x-2">
+                        <Switch
+                            id="isPublic"
+                            disabled={uploadQueue.length === 0}
+                            class={uploadQueue.length === 0
+                                ? 'cursor-not-allowed opacity-50'
+                                : ''}
+                            bind:checked={isPublic}
+                        />
+                        <p
+                            class={`text-xs text-neutral-600 dark:text-neutral-300 ${uploadQueue.length === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
+                        >
+                            Public
+                        </p>
+                    </div>
+                    <Button
+                        class={uploadQueue.length === 0
+                            ? 'inline-flex cursor-not-allowed items-center rounded-lg bg-blue-700 px-4 py-2.5 text-center text-sm font-medium text-white opacity-50 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+                            : 'inline-flex cursor-pointer items-center rounded-lg bg-blue-700 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'}
+                        variant="default"
+                        onclick={processQueue}
+                        disabled={uploadQueue.length === 0}
+                    >
+                        Upload
+                    </Button>
+                </div>
             </div>
         </Dialog.Content>
     </Dialog.Portal>
