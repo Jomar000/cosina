@@ -249,7 +249,9 @@
                         </p>
                     </div>
                 {/if}
-                <div class="absolute bottom-0 flex w-full justify-between p-4">
+                <div
+                    class="absolute bottom-0 flex w-full justify-between px-6 py-4"
+                >
                     <div class="flex items-center space-x-2">
                         <Switch
                             id="isPublic"
@@ -267,8 +269,8 @@
                     </div>
                     <Button
                         class={uploadQueue.length === 0
-                            ? 'inline-flex cursor-not-allowed items-center rounded-lg bg-blue-700 px-4 py-2.5 text-center text-sm font-medium text-white opacity-50 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
-                            : 'inline-flex cursor-pointer items-center rounded-lg bg-blue-700 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'}
+                            ? 'mb-2.5 inline-flex cursor-not-allowed items-center rounded-lg bg-blue-700 px-4 py-2 text-center text-sm font-medium text-white opacity-50 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+                            : 'mb-2.5 inline-flex cursor-pointer items-center rounded-lg bg-blue-700 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'}
                         variant="default"
                         onclick={processQueue}
                         disabled={uploadQueue.length === 0}
