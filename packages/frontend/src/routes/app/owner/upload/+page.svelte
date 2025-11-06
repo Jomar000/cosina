@@ -2,4 +2,4 @@
     import Upload from '$lib/components/default/upload.svelte'
 </script>
 
-<Upload />
+<Upload open={true} />

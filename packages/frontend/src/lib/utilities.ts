@@ -140,12 +140,7 @@ type TFileToUrlMap =
           status: 409
       }
 
-type TStatusIndices = {
-    conflict: number[]
-    failed: number[]
-    invalid: number[]
-    uploaded: number[]
-}
+type TStatusIndices = Record<string, string>
 
 export const objectStorageClient: (
     files: {
@@ -164,12 +159,7 @@ export const objectStorageClient: (
 
     const dataToSign: TDataToSign[] = []
 
-    const statusIndices: TStatusIndices = {
-        conflict: [],
-        failed: [],
-        invalid: [],
-        uploaded: [],
-    }
+    const statusIndices: TStatusIndices = {}
 
     let presignedUrls: z.output<
         typeof objectStorageCreateUploadLinkOutputSchema
@@ -234,10 +224,6 @@ export const objectStorageClient: (
         }
 
         await queue.onIdle()
-
-        if (dataToSign.length === 0) {
-            throw new Error('No items to process.')
-        }
     } catch (err) {
         console.error(
             `uploadToObjectStorage.prepareMetadata: ${(err as Error).message}`,
@@ -250,24 +236,26 @@ export const objectStorageClient: (
     ///
 
     try {
-        presignedUrls = await apiClient<
-            z.output<typeof objectStorageCreateUploadLinkOutputSchema>
-        >('internal/objectStorage/create/uploadLink', {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-                'x-csrf-token': getCookie('csrf_token') ?? '',
-            },
-            body: JSON.stringify(dataToSign),
-        })
+        if (dataToSign.length > 0) {
+            presignedUrls = await apiClient<
+                z.output<typeof objectStorageCreateUploadLinkOutputSchema>
+            >('internal/objectStorage/create/uploadLink', {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                    'x-csrf-token': getCookie('csrf_token') ?? '',
+                },
+                body: JSON.stringify(dataToSign),
+            })
 
-        if (!presignedUrls) {
-            throw new Error('Failed to request pre-signed URLs.')
-        }
+            if (!presignedUrls) {
+                throw new Error('Failed to request pre-signed URLs.')
+            }
 
-        if ('error' in presignedUrls) {
-            console.error(presignedUrls.validationErrors)
-            throw new Error(presignedUrls.error.message)
+            if ('error' in presignedUrls) {
+                console.error(presignedUrls.validationErrors)
+                throw new Error(presignedUrls.error.message)
+            }
         }
     } catch (err) {
         console.error(
@@ -282,26 +270,28 @@ export const objectStorageClient: (
 
     try {
         // Map the files to their pre-signed URLs via ther SHA-256 checksum
-        const fileToUrlMap = dataToSign.reduce((accumulator, dts) => {
-            const {
-                0: { key, hash, encodedHash, signedUrl, status },
-            } = presignedUrls.data.signedUrls.filter(
-                (psu) => psu.hash === dts.hashSha256,
-            )
+        const fileToUrlMap = presignedUrls
+            ? dataToSign.reduce((accumulator, dts) => {
+                  const {
+                      0: { key, hash, encodedHash, signedUrl, status },
+                  } = presignedUrls.data.signedUrls.filter(
+                      (psu) => psu.hash === dts.hashSha256,
+                  )
 
-            const {
-                0: { index },
-            } = dataToSign.filter((dts) => dts.hashSha256 === hash)
+                  const {
+                      0: { index },
+                  } = dataToSign.filter((dts) => dts.hashSha256 === hash)
 
-            accumulator.set(index, {
-                key,
-                encodedHash,
-                signedUrl,
-                status,
-            } as TFileToUrlMap)
+                  accumulator.set(index, {
+                      key,
+                      encodedHash,
+                      signedUrl,
+                      status,
+                  } as TFileToUrlMap)
 
-            return accumulator
-        }, new Map<number, TFileToUrlMap>())
+                  return accumulator
+              }, new Map<number, TFileToUrlMap>())
+            : new Map<number, TFileToUrlMap>()
 
         // Queue files for upload
         for (const [
@@ -314,7 +304,7 @@ export const objectStorageClient: (
                         fileToUrlMap.get(index)!
 
                     if (status === 409) {
-                        statusIndices.conflict.push(index)
+                        statusIndices[index] = 'CONFLICT'
                     } else {
                         try {
                             await ky(signedUrl, {
@@ -325,13 +315,13 @@ export const objectStorageClient: (
                                 body: file,
                             })
 
-                            statusIndices.uploaded.push(index)
+                            statusIndices[index] = 'UPLOADED'
                         } catch {
-                            statusIndices.failed.push(index)
+                            statusIndices[index] = 'FAILED'
                         }
                     }
                 } else {
-                    statusIndices.invalid.push(index)
+                    statusIndices[index] = 'INVALID'
                 }
             }
 
@@ -342,7 +332,7 @@ export const objectStorageClient: (
         await queue.onIdle()
 
         return {
-            uploadId: presignedUrls.data.uploadId,
+            uploadId: presignedUrls?.data.uploadId ?? 'N/A',
             status: statusIndices,
         }
     } catch (err) {
