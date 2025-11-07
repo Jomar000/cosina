@@ -55,6 +55,47 @@ class_name = "WebSocketServer"
 binding = 'HYPERION_R2'
 bucket_name = '00000000000000000000000000000000'
 
+########
+# TEST #
+########
+
+[env.test]
+workers_dev = false
+preview_urls = false
+route = { custom_domain = true, pattern = "" }
+
+[env.test.vars]
+ENVIRONMENT = "test"
+STATUS = "up"
+ALLOWED_ORIGINS = "http://localhost:5173"
+CF_R2_BUCKET = "hyperion-test"
+CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+COOKIE_DOMAIN = "localhost"
+CORS_ALLOW_CREDENTIALS = 1 # (0|1)
+CORS_ALLOW_HEADERS = "Content-Type,X-CAPTCHA-Response,X-CSRF-Token"
+CORS_ALLOW_METHODS = "GET,OPTIONS,POST,PUT"
+CORS_EXPOSE_HEADERS = "Content-Length"
+CORS_MAX_AGE = 7200 # 2 hours (seconds)
+SESSION_EXPIRATION = 604800 # 7 days (seconds)
+SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
+
+[[env.test.kv_namespaces]]
+binding = "HYPERION_KV"
+id = "00000000000000000000000000000000"
+
+[[env.test.hyperdrive]]
+binding = "HYPERION_HD"
+id = "00000000000000000000000000000000"
+localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion"
+
+[[env.test.durable_objects.bindings]]
+name = "HYPERION_DO_WSS"
+class_name = "WebSocketServer"
+
+[[env.test.r2_buckets]]
+binding = 'HYPERION_R2'
+bucket_name = '00000000000000000000000000000000'
+
 ###########
 # STAGING #
 ###########

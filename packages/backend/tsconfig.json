@@ -8,7 +8,7 @@
         "rootDir": "./src/",
         "moduleResolution": "bundler",
         "types": [
-            "@cloudflare/workers-types",
+            "@cloudflare/vitest-pool-workers",
             "node"
         ],
 

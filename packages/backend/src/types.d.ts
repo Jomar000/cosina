@@ -10,7 +10,7 @@ declare global {
         HYPERION_HD: Hyperdrive
         HYPERION_KV: KVNamespace
         HYPERION_R2: R2Bucket
-    } & Record<string, string>
+    } & Env
 
     type THonoVariables = {
         auth: Awaited<ReturnType<typeof auth>>
@@ -38,6 +38,12 @@ declare global {
         // Context [ctx.get() & ctx.set()]
         Variables: THonoVariables
     }
+}
+
+declare module 'cloudflare:test' {
+    /* eslint-disable @typescript-eslint/no-empty-object-type */
+    // ProvidedEnv controls the type of `import("cloudflare:test").env`
+    interface ProvidedEnv extends Env {}
 }
 
 export {}

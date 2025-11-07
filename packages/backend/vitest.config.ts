@@ -1,10 +1,24 @@
 // Vitest Configuration
 // https://vitest.dev/guide/#configuring-vitest
 
-import { defineConfig } from 'vitest/config'
+// CloudFlare Workers Vitest Integration
+// https://developers.cloudflare.com/workers/testing/vitest-integration
 
-export default defineConfig({
+// NOTE
+// @cloudflare/vitest-pool-workers does not run on Vitest 4 as of this writing
+// https://github.com/cloudflare/workers-sdk/issues/11064
+
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+export default defineWorkersConfig({
     test: {
-        // ... Specify options here.
+        poolOptions: {
+            workers: {
+                wrangler: {
+                    configPath: './wrangler.toml',
+                    environment: 'test',
+                },
+            },
+        },
     },
 })

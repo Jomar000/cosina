@@ -311,17 +311,21 @@ export const auth = async (opts: {
             }),
         },
         plugins: [
-            captcha({
-                provider: 'cloudflare-turnstile',
-                secretKey: env.CF_TURNSTILE_SECRET_KEY,
-                siteVerifyURLOverride: env.CF_TURNSTILE_SITE_VERIFY,
-                endpoints: [
-                    '/forget-password',
-                    '/sign-in/email',
-                    '/sign-in/username',
-                    '/sign-up/email',
-                ],
-            }),
+            ...(env.ENVIRONMENT === 'test'
+                ? []
+                : [
+                      captcha({
+                          provider: 'cloudflare-turnstile',
+                          secretKey: env.CF_TURNSTILE_SECRET_KEY,
+                          siteVerifyURLOverride: env.CF_TURNSTILE_SITE_VERIFY,
+                          endpoints: [
+                              '/forget-password',
+                              '/sign-in/email',
+                              '/sign-in/username',
+                              '/sign-up/email',
+                          ],
+                      }),
+                  ]),
             organizationPlugin({
                 ac: aclInstance,
                 roles: Object.keys(aclRoles)

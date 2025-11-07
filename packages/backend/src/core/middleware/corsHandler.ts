@@ -6,7 +6,7 @@ export const corsHandler = (mode: 'default' | 'reflect' = 'default') => {
         // Skip CORS on WebSockets Route
         // https://github.com/honojs/hono/issues/3206#issuecomment-2410593981
         if (ctx.req.path.startsWith('/internal/ws')) {
-            return await next()
+            await next()
         }
 
         let allowedOrigins: string[] = ctx.env.ALLOWED_ORIGINS.split(',')

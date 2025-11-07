@@ -8,6 +8,10 @@ import { nanoid } from 'nanoid'
  */
 export const csrfHandler = () => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
+        if (ctx.env.ENVIRONMENT === 'test') {
+            await next()
+        }
+
         const safeMethods = [
             'GET',
             'OPTIONS',
@@ -27,7 +31,7 @@ export const csrfHandler = () => {
                 return ctx.json(
                     {
                         error: {
-                            code: 'NOT_FOUND',
+                            code: 'BAD_REQUEST',
                             message: 'Missing Origin request header.',
                         },
                     },
