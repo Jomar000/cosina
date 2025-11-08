@@ -15,6 +15,12 @@ type TErrorOutput = Extract<
     { error: unknown }
 >
 
+/**
+ * @description
+ * Some marked tests trigger a false-positive unhandled rejection error.
+ * Silenced by `dangerouslyIgnoreUnhandledErrors: true` on the Vitest config.
+ */
+
 describe('Auth Endpoint', () => {
     it('[username] Sign-in with valid credentials should pass.', async () => {
         const response = await app.request(
@@ -114,8 +120,8 @@ describe('Auth Endpoint', () => {
         expect(responseData.error.message).toBe('Invalid credentials provided.')
     })
 
-    // This test currently triggers a false-positive failure.
-    it.skip('[username] Sign-in with invalid password should fail.', async () => {
+    // INFO: Unhandled Rejection Error
+    it('[username] Sign-in with invalid password should fail.', async () => {
         const response = await app.request(
             '/internal/auth/sign-in/username?organizationId=superorganization',
             {
@@ -261,8 +267,8 @@ describe('Auth Endpoint', () => {
         expect(responseData.error.message).toBe('Invalid credentials provided.')
     })
 
-    // This test currently triggers a false-positive failure.
-    it.skip('[email] Sign-in with invalid password should fail.', async () => {
+    // INFO: Unhandled Rejection Error
+    it('[email] Sign-in with invalid password should fail.', async () => {
         const response = await app.request(
             '/internal/auth/sign-in/email?organizationId=superorganization',
             {

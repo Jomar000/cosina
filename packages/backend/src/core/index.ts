@@ -9,11 +9,11 @@ import baseRoute from './route/base/_index.js'
 import internalRoute from './route/internal/_index.js'
 import v1Route from './route/v1/_index.js'
 
-const hono = new Hono<THonoInstance>()
+const app = new Hono<THonoInstance>()
 
 // Middleware
-hono.use(requestId({ headerName: '' }))
-hono.use(async (ctx, next) => {
+app.use(requestId({ headerName: '' }))
+app.use(async (ctx, next) => {
     if (ctx.env.STATUS !== 'up') {
         return ctx.json(
             {
@@ -28,10 +28,10 @@ hono.use(async (ctx, next) => {
 
     await next()
 })
-hono.use(csrfHandler())
+app.use(csrfHandler())
 
 // Error Handler
-hono.onError((err, ctx) => {
+app.onError((err, ctx) => {
     // CloudFlare Workers Observability Logs
     // https://developers.cloudflare.com/workers/observability/logs/
 
@@ -66,9 +66,9 @@ hono.onError((err, ctx) => {
 })
 
 // Routes
-hono.route('/', baseRoute)
-hono.route('/internal', internalRoute)
-hono.route('/v1', v1Route)
+app.route('/', baseRoute)
+app.route('/internal', internalRoute)
+app.route('/v1', v1Route)
 
-export default hono
+export default app
 export { WebSocketServer }
