@@ -20,6 +20,6 @@ export default defineWorkersConfig({
                 },
             },
         },
-        dangerouslyIgnoreUnhandledErrors: true,
+        setupFiles: ['./vitest.setup.ts'],
     },
 })

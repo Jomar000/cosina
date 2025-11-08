@@ -8,27 +8,33 @@
     import * as Dialog from '$lib/components/shadcn/dialog/index.js'
     import { Switch } from '$lib/components/shadcn/switch/index.js'
     import * as Tooltip from '$lib/components/shadcn/tooltip/index.js'
-    import { objectStorageClient } from '$lib/utilities.js'
+    import { nanoidCustom, objectStorageClient } from '$lib/utilities.js'
 
     ////////////////
     // Properties //
     ////////////////
 
-    let { open = $bindable(false) }: { open: boolean } = $props()
-
-    ////////////////////
-    // Initialization //
-    ////////////////////
-
-    let uploadQueue = $state<
-        {
+    let {
+        open = $bindable(false),
+        onUploadCompleted = () => {},
+        uploadQueue = [],
+    }: {
+        open: boolean
+        onUploadCompleted: (uploadId?: string) => void
+        uploadQueue: {
             name: string
             preview: string
             file: File
             isPublic: boolean
             status: string
         }[]
-    >([])
+    } = $props()
+
+    ////////////////////
+    // Initialization //
+    ////////////////////
+
+    const cid = nanoidCustom(4)
 
     let isPublic = $state(false)
 
@@ -48,7 +54,7 @@
                 name: file.name,
                 preview: URL.createObjectURL(file),
                 file,
-                isPublic: false,
+                isPublic,
                 status: 'QUEUED',
             }))
 
@@ -57,6 +63,15 @@
                 ...newFiles,
             ]
         }
+    }
+
+    const handlePublicCheckedChange = () => {
+        uploadQueue = uploadQueue.map((item) => {
+            return {
+                ...item,
+                isPublic,
+            }
+        })
     }
 
     const removeFromQueue = (index: number) => {
@@ -71,6 +86,8 @@
                 uploadQueue[Number(index)].status = oscResponse.status[index]
             }
         }
+
+        onUploadCompleted(oscResponse?.uploadId)
     }
 </script>
 
@@ -98,7 +115,7 @@
             <div class="flex min-h-[520px] w-full flex-col items-center gap-4">
                 <button
                     onclick={() =>
-                        document.getElementById('fileInput')?.click()}
+                        document.getElementById(`file-input-${cid}`)!.click()}
                     class="flex w-full items-center justify-center"
                 >
                     <label
@@ -139,7 +156,7 @@
                         <input
                             accept="image/*"
                             class="hidden"
-                            id="fileInput"
+                            id="file-input-{cid}"
                             multiple
                             onchange={handleFileChange}
                             type="file"
@@ -254,12 +271,12 @@
                 >
                     <div class="flex items-center space-x-2">
                         <Switch
-                            id="isPublic"
                             disabled={uploadQueue.length === 0}
                             class={uploadQueue.length === 0
                                 ? 'cursor-not-allowed opacity-50'
                                 : ''}
                             bind:checked={isPublic}
+                            onCheckedChange={handlePublicCheckedChange}
                         />
                         <p
                             class={`text-xs text-neutral-600 dark:text-neutral-300 ${uploadQueue.length === 0 ? 'cursor-not-allowed opacity-50' : ''}`}

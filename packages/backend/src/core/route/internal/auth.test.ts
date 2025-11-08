@@ -18,7 +18,7 @@ type TErrorOutput = Extract<
 /**
  * @description
  * Some marked tests trigger a false-positive unhandled rejection error.
- * Silenced by `dangerouslyIgnoreUnhandledErrors: true` on the Vitest config.
+ * Handled by the event listeners defined on vitest.setup.ts
  */
 
 describe('Auth Endpoint', () => {
