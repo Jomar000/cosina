@@ -40,7 +40,7 @@
                     Hang on, we are checking a few things...
                 </p>
                 <div
-                    id="captchaModalRenderArea"
+                    id="captchaRenderArea"
                     data-sitekey={PUBLIC_CF_TURNSTILE_SITE_KEY}
                     class="mb-2 flex justify-center"
                 ></div>

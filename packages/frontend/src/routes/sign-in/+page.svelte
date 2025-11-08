@@ -61,9 +61,9 @@
                 Acme Inc.
             </a>
             <SignInForm
+                bind:showCaptchaModal
                 {session}
                 {auth}
-                bind:showCaptchaModal
             />
         </div>
     </div>

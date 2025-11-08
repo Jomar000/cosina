@@ -50,8 +50,6 @@
 
     let showPassword = $state(false)
 
-    const id = $props.id()
-
     // Query
     const authSignInQuery = createMutation(() => ({
         mutationKey: [
@@ -65,11 +63,11 @@
 
             // Retrieve CAPTCHA Token
             const captchaToken = await new Promise<string>((resolve) => {
-                turnstile.execute('#captchaModalRenderArea', {
+                turnstile.execute('#captchaRenderArea', {
                     sitekey: PUBLIC_CF_TURNSTILE_SITE_KEY,
                     callback: (token: string) => {
                         showCaptchaModal = false
-                        turnstile.remove('#captchaModalRenderArea')
+                        turnstile.remove('#captchaRenderArea')
                         resolve(token)
                     },
                 })
@@ -218,14 +216,14 @@
                         {#snippet children(field)}
                             {@const { isValid, errors } = field.state.meta}
                             <Field data-invalid={!isValid}>
-                                <FieldLabel for="organization-id-{id}"
+                                <FieldLabel for="organizationId"
                                     >Organization ID</FieldLabel
                                 >
                                 <Input
                                     aria-invalid={!isValid}
                                     autocomplete="organization"
                                     autofocus
-                                    id="organization-id-{id}"
+                                    id="organizationId"
                                     name={field.name}
                                     onblur={field.handleBlur}
                                     oninput={(e) =>
@@ -260,13 +258,13 @@
                         {#snippet children(field)}
                             {@const { isValid, errors } = field.state.meta}
                             <Field data-invalid={!isValid}>
-                                <FieldLabel for="account-id-{id}"
+                                <FieldLabel for="accountId"
                                     >Account ID</FieldLabel
                                 >
                                 <Input
                                     aria-invalid={!isValid}
                                     autocomplete="username"
-                                    id="account-id-{id}"
+                                    id="accountId"
                                     name={field.name}
                                     onblur={field.handleBlur}
                                     oninput={(e) =>
@@ -302,7 +300,7 @@
                             {@const { isValid, errors } = field.state.meta}
                             <Field data-invalid={!isValid}>
                                 <div class="flex items-center">
-                                    <FieldLabel for="password-{id}"
+                                    <FieldLabel for="password"
                                         >Password</FieldLabel
                                     >
                                     <a
@@ -318,7 +316,7 @@
                                         aria-invalid={!isValid}
                                         autocomplete="current-password"
                                         class="pr-10"
-                                        id="password-{id}"
+                                        id="password"
                                         name={field.name}
                                         onblur={field.handleBlur}
                                         oninput={(e) =>

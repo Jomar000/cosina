@@ -15,10 +15,12 @@
     ////////////////
 
     let {
+        cid = nanoidCustom(4),
         open = $bindable(false),
         onUploadCompleted = () => {},
         uploadQueue = [],
     }: {
+        cid?: string
         open: boolean
         onUploadCompleted: (uploadId?: string) => void
         uploadQueue: {
@@ -33,8 +35,6 @@
     ////////////////////
     // Initialization //
     ////////////////////
-
-    const cid = nanoidCustom(4)
 
     let isPublic = $state(false)
 
@@ -115,7 +115,7 @@
             <div class="flex min-h-[520px] w-full flex-col items-center gap-4">
                 <button
                     onclick={() =>
-                        document.getElementById(`file-input-${cid}`)!.click()}
+                        document.getElementById(`fileInput-${cid}`)!.click()}
                     class="flex w-full items-center justify-center"
                 >
                     <label
@@ -156,7 +156,7 @@
                         <input
                             accept="image/*"
                             class="hidden"
-                            id="file-input-{cid}"
+                            id="fileInput-{cid}"
                             multiple
                             onchange={handleFileChange}
                             type="file"
