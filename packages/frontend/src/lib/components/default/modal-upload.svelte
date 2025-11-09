@@ -183,7 +183,7 @@
                 {#if uploadQueue.length > 0}
                     <div class=" w-full">
                         <div
-                            class="flex h-58 w-full flex-col gap-2 overflow-y-auto pr-1"
+                            class="flex h-58 w-full flex-col gap-2 overflow-y-auto"
                         >
                             {#each uploadQueue as uq, index (index)}
                                 <div
@@ -267,7 +267,7 @@
                     </div>
                 {/if}
                 <div
-                    class="absolute bottom-0 flex w-full justify-between px-6 py-2"
+                    class="absolute bottom-4 flex w-full justify-between px-6 py-2"
                 >
                     <div class="flex items-center space-x-2">
                         <Switch
@@ -286,8 +286,8 @@
                     </div>
                     <Button
                         class={uploadQueue.length === 0
-                            ? 'mb-4 inline-flex cursor-not-allowed items-center rounded-lg bg-blue-700 px-4 py-2 text-center text-sm font-medium text-white opacity-50 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
-                            : 'mb-4 inline-flex cursor-pointer items-center rounded-lg bg-blue-700 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'}
+                            ? 'inline-flex cursor-not-allowed items-center rounded-lg bg-blue-700 px-4 py-2 text-center text-sm font-medium text-white opacity-50 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+                            : 'inline-flex cursor-pointer items-center rounded-lg bg-blue-700 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'}
                         variant="default"
                         onclick={processQueue}
                         disabled={uploadQueue.length === 0}
