@@ -6,6 +6,8 @@ import {
     foreignKey,
     index,
     integer,
+    numeric,
+    pgEnum,
     pgTable,
     smallint,
     text,
@@ -13,9 +15,57 @@ import {
     unique,
 } from 'drizzle-orm/pg-core'
 
+///////////
+// Enums //
+///////////
+
+export const genderEnum = pgEnum('gender', [
+    'MALE',
+    'FEMALE',
+])
+
 ///////////////////
 // Tables - Core //
 ///////////////////
+
+export const address = pgTable(
+    'address',
+    {
+        id: bigint('id', { mode: 'number' })
+            .generatedByDefaultAsIdentity()
+            .primaryKey(),
+        addressLine1: text('address_line_1').notNull(),
+        addressLine2: text('address_line_2'),
+        city: text('city').notNull(),
+        stateOrRegion: text('state_or_region').notNull(),
+        postalCode: text('postal_code').notNull(),
+        country: text('country').notNull(),
+        latitude: numeric('latitude'),
+        longitude: numeric('longitude'),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        unique('krv6smuu6pvc_unique').on(
+            t.addressLine1,
+            t.addressLine2,
+            t.city,
+            t.stateOrRegion,
+            t.postalCode,
+            t.country,
+        ),
+    ],
+)
 
 export const auditTrail = pgTable(
     'audit_trail',
@@ -60,12 +110,11 @@ export const auditTrail = pgTable(
 
 export const objectStorage = pgTable('object_storage', {
     id: text('id').primaryKey(),
-    size: bigint('size', { mode: 'bigint' }).notNull(),
+    size: bigint('size', { mode: 'number' }).notNull(),
     mimeType: text('mime_type'),
     hashSha256: text('hash_sha256').unique('ectz8nfqt8mj_unique').notNull(),
-    isDeleted: boolean('is_deleted').notNull().default(false),
     isPublic: boolean('is_public').notNull().default(false),
-    isUploaded: boolean('is_uploaded').notNull().default(false),
+    isDeleted: boolean('is_deleted').notNull().default(false),
     createdAt: timestamp('created_at', {
         withTimezone: true,
         mode: 'date',
@@ -166,6 +215,114 @@ export const uploadAttachment = pgTable(
             .onDelete('no action')
             .onUpdate('no action'),
         unique('23aso68ioiyj_unique').on(t.uploadId, t.objectStorageId),
+    ],
+)
+
+export const userAttribute = pgTable(
+    'user_attribute',
+    {
+        userId: text('user_id').primaryKey(),
+        isLocked: boolean('is_locked').default(false).notNull(),
+    },
+    (t) => [
+        index('nhsl7a2vq0j4_index').on(t.userId),
+        foreignKey({
+            name: 'nhsl7a2vq0j4_fkey',
+            columns: [t.userId],
+            foreignColumns: [user.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+    ],
+)
+
+export const userProfile = pgTable(
+    'user_profile',
+    {
+        userId: text('user_id').primaryKey(),
+        firstName: text('first_name').notNull(),
+        middleName: text('middle_name'),
+        lastName: text('last_name').notNull(),
+        nameExtension: text('name_extension'),
+        gender: genderEnum('gender').notNull(),
+        backupPhoneNumber: text('backup_phone_number'),
+        addressId: bigint('address_id', { mode: 'number' }),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        index('eem2zxeduyfv_index').on(t.userId),
+        foreignKey({
+            name: 'eem2zxeduyfv_fkey',
+            columns: [t.userId],
+            foreignColumns: [user.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+        index('qun382y3zidg_index').on(t.addressId),
+        foreignKey({
+            name: 'qun382y3zidg_fkey',
+            columns: [t.addressId],
+            foreignColumns: [address.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+    ],
+)
+
+export const userRelationship = pgTable(
+    'user_relationship',
+    {
+        userId: text('user_id').primaryKey(),
+        name: text('name').notNull(),
+        relationship: text('relationship').notNull(),
+        phoneNumber: text('phone_number').notNull(),
+        backupPhoneNumber: text('backup_phone_number'),
+        email: text('email'),
+        addressId: bigint('address_id', { mode: 'number' }),
+        isEmergencyContact: boolean('is_emergency_contact')
+            .notNull()
+            .default(false),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        index('pa6kbv7tko20_index').on(t.userId),
+        foreignKey({
+            name: 'pa6kbv7tko20_fkey',
+            columns: [t.userId],
+            foreignColumns: [user.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+        index('7ms4oot44t7x_index').on(t.addressId),
+        foreignKey({
+            name: '7ms4oot44t7x_fkey',
+            columns: [t.addressId],
+            foreignColumns: [address.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
     ],
 )
 
@@ -475,24 +632,6 @@ export const user = pgTable(
     () => [
         check('mfll9xelu6gc_check', sql`email = LOWER(email)`),
         check('2qajnnnraodw_check', sql`username = LOWER(username)`),
-    ],
-)
-
-export const userAttribute = pgTable(
-    'user_attribute',
-    {
-        userId: text('user_id').primaryKey(),
-        isLocked: boolean('is_locked').default(false).notNull(),
-    },
-    (t) => [
-        index('nhsl7a2vq0j4_index').on(t.userId),
-        foreignKey({
-            name: 'nhsl7a2vq0j4_fkey',
-            columns: [t.userId],
-            foreignColumns: [user.id],
-        })
-            .onDelete('no action')
-            .onUpdate('no action'),
     ],
 )
 

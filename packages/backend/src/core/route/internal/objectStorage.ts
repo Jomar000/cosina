@@ -202,7 +202,7 @@ internalRouteObjectStorage.post(
                 objectStorageData.push({
                     ...obj,
                     id: objectStorageId,
-                    size: BigInt(obj.size),
+                    size: Number(obj.size),
                 })
 
                 uploadAttachmentData.push({ uploadId, objectStorageId })
