@@ -8,12 +8,12 @@ BETTER_AUTH_SECRET="better-auth-secret-123456789"
 # CloudFlare #
 ##############
 
-CF_ACCOUNT_ID = "<ACCOUNT_ID>"
+CF_ACCOUNT_ID="<ACCOUNT_ID>"
 
 # R2
 # https://developers.cloudflare.com/r2
-CF_R2_ACCESS_KEY_ID = "<ACCESS_KEY_ID>"
-CF_R2_SECRET_ACCESS_KEY = "<SECRET_ACCESS_KEY>"
+CF_R2_ACCESS_KEY_ID="<ACCESS_KEY_ID>"
+CF_R2_SECRET_ACCESS_KEY="<SECRET_ACCESS_KEY>"
 
 # Turnstile
 # https://developers.cloudflare.com/turnstile/troubleshooting/testing

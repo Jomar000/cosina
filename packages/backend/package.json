@@ -16,6 +16,7 @@
         "deploy:staging": "wrangler deploy --minify --outdir=dist --env=staging",
         "deploy:prod": "wrangler deploy --minify --outdir=dist --env=production",
         "migrate:dev": "drizzle-kit migrate --config=drizzle-dev.config.ts",
+        "migrate:test": "drizzle-kit migrate --config=drizzle-test.config.ts",
         "migrate:staging": "drizzle-kit migrate --config=drizzle-staging.config.ts",
         "migrate:prod": "drizzle-kit migrate --config=drizzle-prod.config.ts",
         "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging",
