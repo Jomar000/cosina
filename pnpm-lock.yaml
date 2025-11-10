@@ -199,8 +199,8 @@ importers:
         specifier: ^4.3.3
         version: 4.3.3(picomatch@4.0.3)(svelte@5.43.5)(typescript@5.9.3)
       svelte-sonner:
-        specifier: ^1.0.5
-        version: 1.0.5(svelte@5.43.5)
+        specifier: ^1.0.6
+        version: 1.0.6(svelte@5.43.5)
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
@@ -240,16 +240,16 @@ importers:
 
 packages:
 
-  '@augment-vir/assert@31.48.0':
-    resolution: {integrity: sha512-AAAjHELFpwBz1zQf/XwEmUD94frfG5JckekBNNmfBrgR0kAahtANQ3Uhpsc2kWOCYVvp1NWwVKXTXMYvkxKisQ==}
+  '@augment-vir/assert@31.49.0':
+    resolution: {integrity: sha512-DrkHxM/AaMfo2lTh1wdM0qi2lk94FdQubYlO8ppeYPasgKqNGjaMg7qvsR2NofYSgPt/jGujfUbSONoHqPgSAg==}
     engines: {node: '>=22'}
 
-  '@augment-vir/common@31.48.0':
-    resolution: {integrity: sha512-AQFAcXoAlJXa39WwN4mb8q03OgLlHwW+AVnfGiUq8k79TjEMUhIAfazwyW9k+dDd5yLlRcetkVRp+FOgX9RDpA==}
+  '@augment-vir/common@31.49.0':
+    resolution: {integrity: sha512-0r8qQIweqD4IB2zUZUtMrixDOrxhdeBpTN2QILuIhKQ7RJzqDTA+7nLrV36F5/T9Q2KVd5FwYfvMa2ahvg+B0Q==}
     engines: {node: '>=22'}
 
-  '@augment-vir/core@31.48.0':
-    resolution: {integrity: sha512-2LZs8qrx+xZZQKtfQVhQBIJ767juSBQ/3A578+43Q5zThQb1PojgzJRDhHQCC72BNIQi7zBmzjKrxx3M4VUfOg==}
+  '@augment-vir/core@31.49.0':
+    resolution: {integrity: sha512-iPE31SxWF7sfBxzS9n499bXBi3RXta51nT11qs97RCS1eDzX/juGYDP0YnkM55GWQqHSHf5E+UojohHQvp5Z5Q==}
     engines: {node: '>=22'}
 
   '@babel/runtime@7.28.4':
@@ -2973,8 +2973,8 @@ packages:
       svelte:
         optional: true
 
-  svelte-sonner@1.0.5:
-    resolution: {integrity: sha512-9dpGPFqKb/QWudYqGnEz93vuY+NgCEvyNvxoCLMVGw6sDN/3oVeKV1xiEirW2E1N3vJEyj5imSBNOGltQHA7mg==}
+  svelte-sonner@1.0.6:
+    resolution: {integrity: sha512-cOB6fKVPnJ/wuqHV4dqoTJ/l/g7n3V8goUHqnhIV2wyv55DdoCI1D3VQSBIs7Iy8pkH5ZaNPB8T53jFfXE/6og==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -3395,18 +3395,18 @@ packages:
 
 snapshots:
 
-  '@augment-vir/assert@31.48.0':
+  '@augment-vir/assert@31.49.0':
     dependencies:
-      '@augment-vir/core': 31.48.0
+      '@augment-vir/core': 31.49.0
       '@date-vir/duration': 8.0.0
       deep-eql: 5.0.2
       expect-type: 1.2.2
       type-fest: 5.2.0
 
-  '@augment-vir/common@31.48.0':
+  '@augment-vir/common@31.49.0':
     dependencies:
-      '@augment-vir/assert': 31.48.0
-      '@augment-vir/core': 31.48.0
+      '@augment-vir/assert': 31.49.0
+      '@augment-vir/core': 31.49.0
       '@date-vir/duration': 8.0.0
       ansi-styles: 6.2.3
       deepcopy-esm: 2.1.1
@@ -3414,7 +3414,7 @@ snapshots:
       type-fest: 5.2.0
       typed-event-target: 4.1.0
 
-  '@augment-vir/core@31.48.0':
+  '@augment-vir/core@31.49.0':
     dependencies:
       '@date-vir/duration': 8.0.0
       browser-or-node: 3.0.0
@@ -5714,7 +5714,7 @@ snapshots:
 
   prettier-plugin-multiline-arrays@4.0.3(prettier@3.6.2):
     dependencies:
-      '@augment-vir/common': 31.48.0
+      '@augment-vir/common': 31.49.0
       prettier: 3.6.2
       proxy-vir: 2.0.1
 
@@ -5736,8 +5736,8 @@ snapshots:
 
   proxy-vir@2.0.1:
     dependencies:
-      '@augment-vir/assert': 31.48.0
-      '@augment-vir/common': 31.48.0
+      '@augment-vir/assert': 31.49.0
+      '@augment-vir/common': 31.49.0
 
   pump@3.0.3:
     dependencies:
@@ -6034,7 +6034,7 @@ snapshots:
     optionalDependencies:
       svelte: 5.43.5
 
-  svelte-sonner@1.0.5(svelte@5.43.5):
+  svelte-sonner@1.0.6(svelte@5.43.5):
     dependencies:
       runed: 0.28.0(svelte@5.43.5)
       svelte: 5.43.5
@@ -6191,9 +6191,9 @@ snapshots:
 
   typed-event-target@4.1.0:
     dependencies:
-      '@augment-vir/assert': 31.48.0
-      '@augment-vir/common': 31.48.0
-      '@augment-vir/core': 31.48.0
+      '@augment-vir/assert': 31.49.0
+      '@augment-vir/common': 31.49.0
+      '@augment-vir/core': 31.49.0
 
   typescript-eslint@8.46.3(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
