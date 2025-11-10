@@ -29,6 +29,10 @@
         "./internal/objectStorage": {
             "types": "./dist/internal/objectStorage.d.ts",
             "default": "./dist/internal/objectStorage.js"
+        },
+        "./internal/user": {
+            "types": "./dist/internal/user.d.ts",
+            "default": "./dist/internal/user.js"
         }
     }
 }

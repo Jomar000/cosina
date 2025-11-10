@@ -206,6 +206,7 @@ export const objectStorageClient: (
                     'SHA-256',
                     fileBuffer,
                 )
+
                 const hashArray = Array.from(new Uint8Array(hashBuffer))
 
                 dataToSign.push({

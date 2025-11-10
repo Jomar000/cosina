@@ -24,11 +24,10 @@ CREATE TABLE "address" (
 	"state_or_region" text NOT NULL,
 	"postal_code" text NOT NULL,
 	"country" text NOT NULL,
-	"latitude" numeric,
-	"longitude" numeric,
+	"hash_sha256" text NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "krv6smuu6pvc_unique" UNIQUE("address_line_1","address_line_2","city","state_or_region","postal_code","country")
+	CONSTRAINT "md0u1710gkv4_unique" UNIQUE("hash_sha256")
 );
 --> statement-breakpoint
 CREATE TABLE "audit_trail" (
@@ -248,7 +247,6 @@ CREATE INDEX "eem2zxeduyfv_index" ON "user_profile" USING btree ("user_id");--> 
 CREATE INDEX "qun382y3zidg_index" ON "user_profile" USING btree ("address_id");--> statement-breakpoint
 CREATE INDEX "pa6kbv7tko20_index" ON "user_relationship" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "7ms4oot44t7x_index" ON "user_relationship" USING btree ("address_id");
-
 
 /**
  * CUSTOM SQL STATEMENTS

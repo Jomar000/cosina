@@ -270,3 +270,14 @@ export const baseOutputSchema = <Data extends z.ZodType = z.ZodType>(
             validationErrors: z.array(z.custom<z.core.$ZodIssue>()).optional(),
         }),
     ])
+
+export const baseAddressInputSchema = z.object({
+    addressLine1: textField({ fieldName: 'Address Line 1' }).uppercase(),
+    addressLine2: textField({ fieldName: 'Address Line 2' })
+        .uppercase()
+        .optional(),
+    city: textField({ fieldName: 'City' }).uppercase(),
+    stateOrRegion: textField({ fieldName: 'State/Region' }).uppercase(),
+    postalCode: textField({ fieldName: 'Postal Code' }).uppercase(),
+    country: textField({ fieldName: 'Country' }).uppercase(),
+})

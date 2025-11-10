@@ -1,5 +1,5 @@
 {
-    "id": "28e629a2-7185-49e4-8b07-e3cec219c9b7",
+    "id": "ea963280-0e57-42bd-872e-ec0857fbfd95",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "7",
     "dialect": "postgresql",
@@ -193,17 +193,11 @@
                     "primaryKey": false,
                     "notNull": true
                 },
-                "latitude": {
-                    "name": "latitude",
-                    "type": "numeric",
+                "hash_sha256": {
+                    "name": "hash_sha256",
+                    "type": "text",
                     "primaryKey": false,
-                    "notNull": false
-                },
-                "longitude": {
-                    "name": "longitude",
-                    "type": "numeric",
-                    "primaryKey": false,
-                    "notNull": false
+                    "notNull": true
                 },
                 "created_at": {
                     "name": "created_at",
@@ -224,16 +218,11 @@
             "foreignKeys": {},
             "compositePrimaryKeys": {},
             "uniqueConstraints": {
-                "krv6smuu6pvc_unique": {
-                    "name": "krv6smuu6pvc_unique",
+                "md0u1710gkv4_unique": {
+                    "name": "md0u1710gkv4_unique",
                     "nullsNotDistinct": false,
                     "columns": [
-                        "address_line_1",
-                        "address_line_2",
-                        "city",
-                        "state_or_region",
-                        "postal_code",
-                        "country"
+                        "hash_sha256"
                     ]
                 }
             },

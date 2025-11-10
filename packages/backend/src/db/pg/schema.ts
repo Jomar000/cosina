@@ -6,7 +6,6 @@ import {
     foreignKey,
     index,
     integer,
-    numeric,
     pgEnum,
     pgTable,
     smallint,
@@ -28,44 +27,30 @@ export const genderEnum = pgEnum('gender', [
 // Tables - Core //
 ///////////////////
 
-export const address = pgTable(
-    'address',
-    {
-        id: bigint('id', { mode: 'number' })
-            .generatedByDefaultAsIdentity()
-            .primaryKey(),
-        addressLine1: text('address_line_1').notNull(),
-        addressLine2: text('address_line_2'),
-        city: text('city').notNull(),
-        stateOrRegion: text('state_or_region').notNull(),
-        postalCode: text('postal_code').notNull(),
-        country: text('country').notNull(),
-        latitude: numeric('latitude'),
-        longitude: numeric('longitude'),
-        createdAt: timestamp('created_at', {
-            withTimezone: true,
-            mode: 'date',
-        })
-            .notNull()
-            .defaultNow(),
-        updatedAt: timestamp('updated_at', {
-            withTimezone: true,
-            mode: 'date',
-        })
-            .notNull()
-            .defaultNow(),
-    },
-    (t) => [
-        unique('krv6smuu6pvc_unique').on(
-            t.addressLine1,
-            t.addressLine2,
-            t.city,
-            t.stateOrRegion,
-            t.postalCode,
-            t.country,
-        ),
-    ],
-)
+export const address = pgTable('address', {
+    id: bigint('id', { mode: 'number' })
+        .generatedByDefaultAsIdentity()
+        .primaryKey(),
+    addressLine1: text('address_line_1').notNull(),
+    addressLine2: text('address_line_2'),
+    city: text('city').notNull(),
+    stateOrRegion: text('state_or_region').notNull(),
+    postalCode: text('postal_code').notNull(),
+    country: text('country').notNull(),
+    hashSha256: text('hash_sha256').unique('md0u1710gkv4_unique').notNull(),
+    createdAt: timestamp('created_at', {
+        withTimezone: true,
+        mode: 'date',
+    })
+        .notNull()
+        .defaultNow(),
+    updatedAt: timestamp('updated_at', {
+        withTimezone: true,
+        mode: 'date',
+    })
+        .notNull()
+        .defaultNow(),
+})
 
 export const auditTrail = pgTable(
     'audit_trail',
