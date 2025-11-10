@@ -2,14 +2,16 @@ import {
     userProfileAddressUpdateInputSchema,
     userProfileUpdateInputSchema,
 } from '@hyperion/validator/internal/user'
+import { sha256 } from '@noble/hashes/sha2.js'
+import { bytesToHex } from '@noble/hashes/utils.js'
 import { eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 
+import { AppError } from '../../../errors.js'
 import { honoValidatorCb } from '../../../utilities.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 import { isAuthorized } from '../../middleware/isAuthorized.js'
-import { AppError } from '../../../errors.js'
 
 const internalRouteUser = new Hono<THonoInstance>()
 
@@ -37,6 +39,23 @@ internalRouteUser.post(
 internalRouteUser.get(
     '/user/profile/read',
     isAuthenticated(),
+    // validator('json', async (value, ctx) =>
+    //     honoValidatorCb(value, ctx, objectStorageCreateDownloadLinkInputSchema),
+    // ),
+    async (ctx) => {
+        // const keys = ctx.req.valid('json')
+
+        // const { user, userProfile } = ctx.get('dbSchema')
+
+        return ctx.json({ data: '' }, 200)
+    },
+)
+
+internalRouteUser.get(
+    '/user/profile/readMany',
+    isAuthorized({
+        admin: ['ANY'],
+    }),
     // validator('json', async (value, ctx) =>
     //     honoValidatorCb(value, ctx, objectStorageCreateDownloadLinkInputSchema),
     // ),
@@ -158,22 +177,20 @@ internalRouteUser.post(
             }
 
             const data = await ctx.get('dbClient').transaction(async (tx) => {
-                // Compute SHA-256 checksum
-                const hashBuffer = await crypto.subtle.digest(
-                    'SHA-256',
-                    new TextEncoder().encode(
-                        [
-                            addressLine1,
-                            addressLine2,
-                            city,
-                            stateOrRegion,
-                            postalCode,
-                            country,
-                        ].join('|'),
+                const hashSha256 = bytesToHex(
+                    sha256(
+                        new TextEncoder().encode(
+                            [
+                                addressLine1,
+                                addressLine2,
+                                city,
+                                stateOrRegion,
+                                postalCode,
+                                country,
+                            ].join('|'),
+                        ),
                     ),
                 )
-
-                const hashArray = Array.from(new Uint8Array(hashBuffer))
 
                 const newAddressId = await tx
                     .insert(address)
@@ -184,9 +201,7 @@ internalRouteUser.post(
                         stateOrRegion,
                         postalCode,
                         country,
-                        hashSha256: hashArray
-                            .map((b) => b.toString(16).padStart(2, '0'))
-                            .join(''),
+                        hashSha256,
                     })
                     .onConflictDoNothing()
                     .returning({ id: address.id })
@@ -219,21 +234,6 @@ internalRouteUser.post(
                 err instanceof Error ? err : undefined,
             )
         }
-    },
-)
-
-internalRouteUser.get(
-    '/user/readMany',
-    isAuthenticated(),
-    // validator('json', async (value, ctx) =>
-    //     honoValidatorCb(value, ctx, objectStorageCreateDownloadLinkInputSchema),
-    // ),
-    async (ctx) => {
-        // const keys = ctx.req.valid('json')
-
-        // const { user, userProfile } = ctx.get('dbSchema')
-
-        return ctx.json({ data: '' }, 200)
     },
 )
 
