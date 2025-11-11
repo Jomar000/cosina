@@ -1,0 +1,88 @@
+import { drizzle } from 'drizzle-orm/postgres-js'
+import { migrate } from 'drizzle-orm/postgres-js/migrator'
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import postgresJs from 'postgres'
+import { parse } from 'smol-toml'
+
+const isNode =
+    typeof process !== 'undefined' &&
+    typeof process.versions !== 'undefined' &&
+    typeof process.versions.node !== 'undefined'
+
+if (!isNode) {
+    throw new Error('Database bootstrapping must be run in NodeJS.')
+}
+
+////
+// Parse wrangler.toml configuration
+////
+
+const wranglerConfigPath = fileURLToPath(
+    new URL('../../../wrangler.toml', import.meta.url),
+)
+
+const wranglerConfig = readFileSync(wranglerConfigPath, 'utf-8')
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const parsed = parse(wranglerConfig) as any
+
+const environment = process.argv[2].toLowerCase() as
+    | 'dev'
+    | 'test'
+    | 'staging'
+    | 'production'
+
+if (
+    ![
+        'dev',
+        'test',
+        'staging',
+        'production',
+    ].includes(environment)
+) {
+    throw new Error(
+        'Invalid environment provided. Valid values are [dev|test|staging|production]',
+    )
+}
+
+const connectionString =
+    environment === 'dev'
+        ? parsed.hyperdrive[0].localConnectionString
+        : parsed.env[environment].hyperdrive[0].localConnectionString
+
+////
+// DB Setup & Migration
+////
+
+const setupClient = postgresJs(connectionString, {
+    database: 'postgres', // Override
+    onnotice: () => {
+        /* EMPTY */
+    },
+})
+
+const migrationClient = postgresJs(connectionString, {
+    onnotice: () => {
+        /* EMPTY */
+    },
+})
+
+console.log(
+    `bootstrap: Creating database "${migrationClient.options.database}" and applying migrations...`,
+)
+
+await setupClient.unsafe(
+    `DROP DATABASE IF EXISTS ${migrationClient.options.database} WITH (FORCE);`,
+)
+
+await setupClient.unsafe(`CREATE DATABASE ${migrationClient.options.database};`)
+
+await migrate(drizzle(migrationClient), {
+    migrationsFolder: './src/db/pg/migrations',
+})
+
+await migrationClient.end()
+await setupClient.end()
+
+console.log('bootstrap: OPERATION COMPLETED. 🚀')
