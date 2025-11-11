@@ -18,8 +18,8 @@
         "deploy:prod": "wrangler deploy --minify --outdir=dist --env=production",
         "migrate:dev": "node ./src/db/pg/bootstrap.ts dev",
         "migrate:test": "node ./src/db/pg/bootstrap.ts test",
-        "migrate:staging": "node ./src/db/pg/bootstrap.ts staging",
-        "migrate:prod": "node ./src/db/pg/bootstrap.ts production",
+        "migrate:staging": "drizzle-kit migrate --config=drizzle-staging.config.ts",
+        "migrate:prod": "drizzle-kit migrate --config=drizzle-production.config.ts",
         "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging",
         "secret:prod": "wrangler secret bulk .dev.vars.production --env=production"
     },

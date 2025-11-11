@@ -14,6 +14,19 @@ if (!isNode) {
     throw new Error('Database bootstrapping must be run in NodeJS.')
 }
 
+const environment = process.argv[2].toLowerCase() as 'dev' | 'test'
+
+// This bootstrapper is purely for DEV & TEST environments
+// Use the drizzle-kit CLI for processing STAGING & PRODUCTION environments
+if (
+    ![
+        'dev',
+        'test',
+    ].includes(environment)
+) {
+    throw new Error('Invalid environment provided. Valid values are [dev|test]')
+}
+
 ////
 // Parse wrangler.toml configuration
 ////
@@ -27,29 +40,10 @@ const wranglerConfig = readFileSync(wranglerConfigPath, 'utf-8')
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parsed = parse(wranglerConfig) as any
 
-const environment = process.argv[2].toLowerCase() as
-    | 'dev'
-    | 'test'
-    | 'staging'
-    | 'production'
-
-if (
-    ![
-        'dev',
-        'test',
-        'staging',
-        'production',
-    ].includes(environment)
-) {
-    throw new Error(
-        'Invalid environment provided. Valid values are [dev|test|staging|production]',
-    )
-}
-
 const connectionString =
     environment === 'dev'
         ? parsed.hyperdrive[0].localConnectionString
-        : parsed.env[environment].hyperdrive[0].localConnectionString
+        : parsed.env['test'].hyperdrive[0].localConnectionString
 
 ////
 // DB Setup & Migration
