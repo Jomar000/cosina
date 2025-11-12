@@ -34,6 +34,10 @@ export default defineConfig(
                 'error',
                 { allowShortCircuit: true, allowTernary: true },
             ],
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                { ignoreRestSiblings: true },
+            ],
             eqeqeq: [
                 'error',
                 'always',

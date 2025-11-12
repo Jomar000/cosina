@@ -1,6 +1,18 @@
 import { z } from 'zod'
 
-import { baseAddressInputSchema, textField } from '../shared.js'
+import {
+    baseAddressInputSchema,
+    readManyBaseInputSchema,
+    textField,
+} from '../shared.js'
+
+export const userProfileReadInputSchema = z.object({
+    userId: textField({ fieldName: 'User ID' }),
+})
+
+export const userProfileReadManyInputSchema = readManyBaseInputSchema.extend({
+    userId: textField({ fieldName: 'User ID' }),
+})
 
 export const userProfileUpdateInputSchema = z.object({
     userId: textField({ fieldName: 'User ID' }),

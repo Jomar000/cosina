@@ -1,10 +1,12 @@
 import {
     userProfileAddressUpdateInputSchema,
+    userProfileReadInputSchema,
+    userProfileReadManyInputSchema,
     userProfileUpdateInputSchema,
 } from '@hyperion/validator/internal/user'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { bytesToHex } from '@noble/hashes/utils.js'
-import { eq } from 'drizzle-orm'
+import { asc, desc, eq, getTableColumns } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 
@@ -39,15 +41,36 @@ internalRouteUser.post(
 internalRouteUser.get(
     '/user/profile/read',
     isAuthenticated(),
-    // validator('json', async (value, ctx) =>
-    //     honoValidatorCb(value, ctx, objectStorageCreateDownloadLinkInputSchema),
-    // ),
+    validator('query', async (value, ctx) =>
+        honoValidatorCb(value, ctx, userProfileReadInputSchema),
+    ),
     async (ctx) => {
-        // const keys = ctx.req.valid('json')
+        const { userId } = ctx.req.valid('query')
 
-        // const { user, userProfile } = ctx.get('dbSchema')
+        const { userProfile } = ctx.get('dbSchema')
 
-        return ctx.json({ data: '' }, 200)
+        if (!ctx.get('isPrivilegedRole') && ctx.get('user')!.id !== userId) {
+            return ctx.json(
+                {
+                    error: {
+                        code: 'FORBIDDEN',
+                        message: 'You are not allowed to access this resource.',
+                    },
+                },
+                403,
+            )
+        }
+
+        const { createdAt, updatedAt, ...selectedColumns } =
+            getTableColumns(userProfile)
+
+        const data = await ctx
+            .get('dbClient')
+            .select(selectedColumns)
+            .from(userProfile)
+            .where(eq(userProfile.userId, userId))
+
+        return ctx.json({ data }, 200)
     },
 )
 
@@ -56,15 +79,49 @@ internalRouteUser.get(
     isAuthorized({
         admin: ['ANY'],
     }),
-    // validator('json', async (value, ctx) =>
-    //     honoValidatorCb(value, ctx, objectStorageCreateDownloadLinkInputSchema),
-    // ),
+    validator('query', async (value, ctx) =>
+        honoValidatorCb(value, ctx, userProfileReadManyInputSchema),
+    ),
     async (ctx) => {
-        // const keys = ctx.req.valid('json')
+        const { userId, limit, offset, sortOrder } = ctx.req.valid('query')
 
-        // const { user, userProfile } = ctx.get('dbSchema')
+        const { userProfile } = ctx.get('dbSchema')
 
-        return ctx.json({ data: '' }, 200)
+        const searchCondition = eq(userProfile.userId, userId)
+
+        const count = await ctx
+            .get('dbClient')
+            .$count(userProfile, searchCondition)
+
+        const { createdAt, updatedAt, ...selectedColumns } =
+            getTableColumns(userProfile)
+
+        const subquery = ctx
+            .get('dbClient')
+            .select({ userId: userProfile.userId })
+            .from(userProfile)
+            .where(searchCondition)
+            .limit(limit)
+            .offset(offset)
+            .orderBy(
+                sortOrder === 'asc'
+                    ? asc(userProfile.userId)
+                    : desc(userProfile.userId),
+            )
+            .as('subquery')
+
+        const data = await ctx
+            .get('dbClient')
+            .select(selectedColumns)
+            .from(userProfile)
+            .innerJoin(subquery, eq(subquery.userId, userProfile.userId))
+            .orderBy(
+                sortOrder === 'asc'
+                    ? asc(userProfile.userId)
+                    : desc(userProfile.userId),
+            )
+
+        return ctx.json({ limit, offset, count, data }, 200)
     },
 )
 
@@ -131,8 +188,8 @@ internalRouteUser.post(
             throw new AppError(
                 {
                     status: 500,
-                    code: 'ADDRESS_UPDATE_FAILED',
-                    message: 'Address update failed.',
+                    code: 'PROFILE_UPDATE_FAILED',
+                    message: 'Profile update failed.',
                 },
                 err instanceof Error ? err : undefined,
             )
