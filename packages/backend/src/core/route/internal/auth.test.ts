@@ -179,7 +179,7 @@ describe('Auth Endpoint', () => {
                     'content-type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: 'superadministrator@localhost.dev',
+                    email: 'superadministrator@hyperion.app',
                     password: 'P@ssw0rd1234',
                 }),
             },
@@ -203,7 +203,7 @@ describe('Auth Endpoint', () => {
                     'content-type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: 'superadministrator@localhost.dev',
+                    email: 'superadministrator@hyperion.app',
                     password: 'P@ssw0rd1234',
                 }),
             },
@@ -229,7 +229,7 @@ describe('Auth Endpoint', () => {
                     'content-type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: 'superadministrator@localhost.dev',
+                    email: 'superadministrator@hyperion.app',
                     password: 'P@ssw0rd1234',
                 }),
             },
@@ -278,7 +278,7 @@ describe('Auth Endpoint', () => {
                     'content-type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: 'superadministrator@localhost.dev',
+                    email: 'superadministrator@hyperion.app',
                     password: 'INVALID',
                 }),
             },
@@ -302,7 +302,7 @@ describe('Auth Endpoint', () => {
                     'content-type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: 'locked@localhost.dev',
+                    email: 'locked@hyperion.app',
                     password: 'P@ssw0rd1234',
                 }),
             },
