@@ -208,6 +208,18 @@ export const userAttribute = pgTable(
     {
         userId: text('user_id').primaryKey(),
         isLocked: boolean('is_locked').default(false).notNull(),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
     },
     (t) => [
         index('nhsl7a2vq0j4_index').on(t.userId),
