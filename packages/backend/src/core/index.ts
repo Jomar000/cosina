@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { requestId } from 'hono/request-id'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
+import { v7 as uuidv7 } from 'uuid'
 
 import { AppError } from '../errors.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
@@ -12,7 +13,12 @@ import v1Route from './route/v1/_index.js'
 const app = new Hono<THonoInstance>()
 
 // Middleware
-app.use(requestId({ headerName: '' }))
+app.use(
+    requestId({
+        headerName: '',
+        generator: () => uuidv7(),
+    }),
+)
 app.use(async (ctx, next) => {
     if (ctx.env.STATUS !== 'up') {
         return ctx.json(

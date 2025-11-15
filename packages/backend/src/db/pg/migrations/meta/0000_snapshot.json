@@ -1,5 +1,5 @@
 {
-    "id": "e4a1df04-b9d5-48b1-b015-82294d7de1c0",
+    "id": "722a025c-f403-41a9-8c84-18959b5e3123",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "7",
     "dialect": "postgresql",
@@ -157,26 +157,32 @@
                         "cycle": false
                     }
                 },
-                "address_line_1": {
-                    "name": "address_line_1",
+                "public_id": {
+                    "name": "public_id",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "line_1": {
+                    "name": "line_1",
                     "type": "text",
                     "primaryKey": false,
                     "notNull": true
                 },
-                "address_line_2": {
-                    "name": "address_line_2",
+                "line_2": {
+                    "name": "line_2",
                     "type": "text",
                     "primaryKey": false,
                     "notNull": false
                 },
-                "city": {
-                    "name": "city",
+                "city_municipality": {
+                    "name": "city_municipality",
                     "type": "text",
                     "primaryKey": false,
                     "notNull": true
                 },
-                "state_or_region": {
-                    "name": "state_or_region",
+                "province_state_region": {
+                    "name": "province_state_region",
                     "type": "text",
                     "primaryKey": false,
                     "notNull": true
@@ -187,17 +193,23 @@
                     "primaryKey": false,
                     "notNull": true
                 },
-                "country": {
-                    "name": "country",
+                "country_code": {
+                    "name": "country_code",
                     "type": "text",
                     "primaryKey": false,
                     "notNull": true
                 },
-                "hash_sha256": {
-                    "name": "hash_sha256",
-                    "type": "text",
+                "latitude": {
+                    "name": "latitude",
+                    "type": "numeric",
                     "primaryKey": false,
-                    "notNull": true
+                    "notNull": false
+                },
+                "longitude": {
+                    "name": "longitude",
+                    "type": "numeric",
+                    "primaryKey": false,
+                    "notNull": false
                 },
                 "created_at": {
                     "name": "created_at",
@@ -218,11 +230,11 @@
             "foreignKeys": {},
             "compositePrimaryKeys": {},
             "uniqueConstraints": {
-                "md0u1710gkv4_unique": {
-                    "name": "md0u1710gkv4_unique",
+                "c2nhrro7q3w6_unique": {
+                    "name": "c2nhrro7q3w6_unique",
                     "nullsNotDistinct": false,
                     "columns": [
-                        "hash_sha256"
+                        "public_id"
                     ]
                 }
             },
@@ -251,32 +263,26 @@
                         "cycle": false
                     }
                 },
+                "public_id": {
+                    "name": "public_id",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "organization_id": {
+                    "name": "organization_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
                 "user_id": {
                     "name": "user_id",
                     "type": "text",
                     "primaryKey": false,
                     "notNull": true
                 },
-                "role_id": {
-                    "name": "role_id",
-                    "type": "smallint",
-                    "primaryKey": false,
-                    "notNull": true
-                },
                 "component": {
                     "name": "component",
-                    "type": "text",
-                    "primaryKey": false,
-                    "notNull": true
-                },
-                "endpoint": {
-                    "name": "endpoint",
-                    "type": "text",
-                    "primaryKey": false,
-                    "notNull": true
-                },
-                "method": {
-                    "name": "method",
                     "type": "text",
                     "primaryKey": false,
                     "notNull": true
@@ -305,9 +311,15 @@
                     "primaryKey": false,
                     "notNull": false
                 },
-                "record_data": {
-                    "name": "record_data",
-                    "type": "text",
+                "record_data_old": {
+                    "name": "record_data_old",
+                    "type": "jsonb",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "record_data_new": {
+                    "name": "record_data_new",
+                    "type": "jsonb",
                     "primaryKey": false,
                     "notNull": false
                 },
@@ -332,6 +344,21 @@
                 }
             },
             "indexes": {
+                "xhbjm31r4h6s_index": {
+                    "name": "xhbjm31r4h6s_index",
+                    "columns": [
+                        {
+                            "expression": "organization_id",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                },
                 "kg5nldbccqqf_index": {
                     "name": "kg5nldbccqqf_index",
                     "columns": [
@@ -346,24 +373,22 @@
                     "concurrently": false,
                     "method": "btree",
                     "with": {}
-                },
-                "hbig3rsx1v8v_index": {
-                    "name": "hbig3rsx1v8v_index",
-                    "columns": [
-                        {
-                            "expression": "role_id",
-                            "isExpression": false,
-                            "asc": true,
-                            "nulls": "last"
-                        }
-                    ],
-                    "isUnique": false,
-                    "concurrently": false,
-                    "method": "btree",
-                    "with": {}
                 }
             },
             "foreignKeys": {
+                "xhbjm31r4h6s_fkey": {
+                    "name": "xhbjm31r4h6s_fkey",
+                    "tableFrom": "audit_trail",
+                    "tableTo": "organization",
+                    "columnsFrom": [
+                        "organization_id"
+                    ],
+                    "columnsTo": [
+                        "id"
+                    ],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                },
                 "kg5nldbccqqf_fkey": {
                     "name": "kg5nldbccqqf_fkey",
                     "tableFrom": "audit_trail",
@@ -376,23 +401,18 @@
                     ],
                     "onDelete": "no action",
                     "onUpdate": "no action"
-                },
-                "hbig3rsx1v8v_fkey": {
-                    "name": "hbig3rsx1v8v_fkey",
-                    "tableFrom": "audit_trail",
-                    "tableTo": "role",
-                    "columnsFrom": [
-                        "role_id"
-                    ],
-                    "columnsTo": [
-                        "id"
-                    ],
-                    "onDelete": "no action",
-                    "onUpdate": "no action"
                 }
             },
             "compositePrimaryKeys": {},
-            "uniqueConstraints": {},
+            "uniqueConstraints": {
+                "oxbb5xf5czye_unique": {
+                    "name": "oxbb5xf5czye_unique",
+                    "nullsNotDistinct": false,
+                    "columns": [
+                        "public_id"
+                    ]
+                }
+            },
             "policies": {},
             "checkConstraints": {},
             "isRLSEnabled": false

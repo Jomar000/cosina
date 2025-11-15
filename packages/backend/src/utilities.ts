@@ -43,7 +43,7 @@ export const cfTurnstileVerifier = async (
 
         if (
             (typeof outcome.success === 'boolean' && outcome.success) ||
-            ctx.env.ENVIRONMENT === 'development'
+            ctx.env.ENVIRONMENT !== 'production'
         ) {
             return true
         }
@@ -58,7 +58,7 @@ export const cfTurnstileVerifier = async (
  * Audit Trail Logger
  *
  * @description
- * Helper utility for logging activities.
+ * Utility for logging activities.
  */
 export const auditTrailLogger = async (
     ctx: Context<THonoInstance>,
@@ -69,7 +69,7 @@ export const auditTrailLogger = async (
         Partial<
             Pick<
                 typeof ctx.var.dbSchema.auditTrail.$inferInsert,
-                'userId' | 'roleId' | 'recordTable' | 'recordId' | 'recordData'
+                'recordTable' | 'recordId' | 'recordDataOld' | 'recordDataNew'
             >
         >,
 ) => {
@@ -79,17 +79,15 @@ export const auditTrailLogger = async (
         .get('dbClient')
         .insert(auditTrail)
         .values({
-            userId: data.userId || ctx.get('user')?.id || 'N/A',
-            // roleId: data.roleId ?? ctx.get('user')?.roleId ?? 0, // TODO: Once custom auth flow is good
-            roleId: data.roleId ?? 0,
+            organizationId: ctx.get('session')?.activeOrganizationId || 'N/A',
+            userId: ctx.get('user')?.id || 'N/A',
             component: data.component,
-            endpoint: ctx.req.path,
-            method: ctx.req.method,
             action: data.action,
             description: data.description,
             recordTable: data.recordTable,
             recordId: data.recordId,
-            recordData: data.recordData,
+            recordDataOld: data.recordDataOld,
+            recordDataNew: data.recordDataNew,
             ipAddress: ctx.get('ipAddress'),
             userAgent: ctx.get('userAgent'),
         })

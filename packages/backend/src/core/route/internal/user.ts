@@ -4,8 +4,6 @@ import {
     userProfileReadManyInputSchema,
     userProfileUpdateInputSchema,
 } from '@hyperion/validator/internal/user'
-import { sha256 } from '@noble/hashes/sha2.js'
-import { bytesToHex } from '@noble/hashes/utils.js'
 import { asc, desc, eq, getTableColumns } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'
@@ -224,12 +222,12 @@ internalRouteUser.post(
     async (ctx) => {
         const {
             userId,
-            addressLine1,
-            addressLine2,
-            city,
-            stateOrRegion,
+            line1,
+            line2,
+            cityMunicipality,
+            provinceStateRegion,
             postalCode,
-            country,
+            countryCode,
         } = ctx.req.valid('json')
 
         const { address, userProfile } = ctx.get('dbSchema')
@@ -248,49 +246,53 @@ internalRouteUser.post(
 
         try {
             const data = await ctx.get('dbClient').transaction(async (tx) => {
-                const hashSha256 = bytesToHex(
-                    sha256(
-                        new TextEncoder().encode(
-                            [
-                                addressLine1,
-                                addressLine2,
-                                city,
-                                stateOrRegion,
-                                postalCode,
-                                country,
-                            ].join('|'),
-                        ),
-                    ),
-                )
+                const existingAddressId = (
+                    await tx
+                        .select({ addressId: userProfile.addressId })
+                        .from(userProfile)
+                        .where(eq(userProfile.userId, userId))
+                )[0]
 
-                const newAddressId = await tx
-                    .insert(address)
-                    .values({
-                        addressLine1,
-                        addressLine2,
-                        city,
-                        stateOrRegion,
-                        postalCode,
-                        country,
-                        hashSha256,
-                    })
-                    .onConflictDoNothing()
-                    .returning({ id: address.id })
+                if (existingAddressId?.addressId) {
+                    await tx
+                        .update(address)
+                        .set({
+                            line1,
+                            line2,
+                            cityMunicipality,
+                            provinceStateRegion,
+                            postalCode,
+                            countryCode,
+                        })
+                        .where(eq(address.id, existingAddressId.addressId))
+                } else {
+                    const newAddressId = await tx
+                        .insert(address)
+                        .values({
+                            line1,
+                            line2,
+                            cityMunicipality,
+                            provinceStateRegion,
+                            postalCode,
+                            countryCode,
+                        })
+                        .returning({ id: address.id })
 
-                await tx
-                    .update(userProfile)
-                    .set({
-                        addressId: newAddressId[0].id,
-                    })
-                    .where(eq(userProfile.userId, userId))
+                    await tx
+                        .update(userProfile)
+                        .set({
+                            addressId: newAddressId[0].id,
+                        })
+                        .where(eq(userProfile.userId, userId))
+                }
 
                 return {
-                    addressLine1,
-                    addressLine2,
-                    city,
-                    stateOrRegion,
+                    line1,
+                    line2,
+                    cityMunicipality,
+                    provinceStateRegion,
                     postalCode,
-                    country,
+                    countryCode,
                 }
             })
 

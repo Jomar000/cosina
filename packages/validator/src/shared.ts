@@ -272,12 +272,12 @@ export const baseOutputSchema = <Data extends z.ZodType = z.ZodType>(
     ])
 
 export const baseAddressInputSchema = z.object({
-    addressLine1: textField({ fieldName: 'Address Line 1' }).uppercase(),
-    addressLine2: textField({ fieldName: 'Address Line 2' })
-        .uppercase()
-        .optional(),
-    city: textField({ fieldName: 'City' }).uppercase(),
-    stateOrRegion: textField({ fieldName: 'State/Region' }).uppercase(),
+    line1: textField({ fieldName: 'Address Line 1' }).uppercase(),
+    line2: textField({ fieldName: 'Address Line 2' }).uppercase().optional(),
+    cityMunicipality: textField({ fieldName: 'City/Municipality' }).uppercase(),
+    provinceStateRegion: textField({
+        fieldName: 'Province/State/Region',
+    }).uppercase(),
     postalCode: textField({ fieldName: 'Postal Code' }).uppercase(),
-    country: textField({ fieldName: 'Country' }).uppercase(),
+    countryCode: textField({ fieldName: 'Country Code' }).uppercase(),
 })

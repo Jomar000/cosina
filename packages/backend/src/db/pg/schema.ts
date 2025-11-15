@@ -6,13 +6,17 @@ import {
     foreignKey,
     index,
     integer,
+    jsonb,
+    numeric,
     pgEnum,
     pgTable,
     smallint,
     text,
     timestamp,
     unique,
+    uuid,
 } from 'drizzle-orm/pg-core'
+import { v7 as uuidv7 } from 'uuid'
 
 ///////////
 // Enums //
@@ -31,13 +35,18 @@ export const address = pgTable('address', {
     id: bigint('id', { mode: 'number' })
         .generatedByDefaultAsIdentity()
         .primaryKey(),
-    addressLine1: text('address_line_1').notNull(),
-    addressLine2: text('address_line_2'),
-    city: text('city').notNull(),
-    stateOrRegion: text('state_or_region').notNull(),
+    publicId: uuid('public_id')
+        .unique('c2nhrro7q3w6_unique')
+        .notNull()
+        .$defaultFn(() => uuidv7()),
+    line1: text('line_1').notNull(),
+    line2: text('line_2'),
+    cityMunicipality: text('city_municipality').notNull(),
+    provinceStateRegion: text('province_state_region').notNull(),
     postalCode: text('postal_code').notNull(),
-    country: text('country').notNull(),
-    hashSha256: text('hash_sha256').unique('md0u1710gkv4_unique').notNull(),
+    countryCode: text('country_code').notNull(),
+    latitude: numeric('latitude'),
+    longitude: numeric('longitude'),
     createdAt: timestamp('created_at', {
         withTimezone: true,
         mode: 'date',
@@ -58,16 +67,19 @@ export const auditTrail = pgTable(
         id: bigint('id', { mode: 'number' })
             .generatedByDefaultAsIdentity()
             .primaryKey(),
+        publicId: uuid('public_id')
+            .unique('oxbb5xf5czye_unique')
+            .notNull()
+            .$defaultFn(() => uuidv7()),
+        organizationId: text('organization_id').notNull(),
         userId: text('user_id').notNull(),
-        roleId: smallint('role_id').notNull(),
         component: text('component').notNull(),
-        endpoint: text('endpoint').notNull(),
-        method: text('method').notNull(),
         action: text('action').notNull(),
         description: text('description').notNull(),
         recordTable: text('record_table'),
         recordId: text('record_id'),
-        recordData: text('record_data'),
+        recordDataOld: jsonb('record_data_old'),
+        recordDataNew: jsonb('record_data_new'),
         ipAddress: text('ip_address'),
         userAgent: text('user_agent'),
         loggedAt: timestamp('logged_at', {
@@ -78,17 +90,19 @@ export const auditTrail = pgTable(
             .defaultNow(),
     },
     (t) => [
+        index('xhbjm31r4h6s_index').on(t.organizationId),
+        foreignKey({
+            name: 'xhbjm31r4h6s_fkey',
+            columns: [t.organizationId],
+            foreignColumns: [organization.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
         index('kg5nldbccqqf_index').on(t.userId),
         foreignKey({
             name: 'kg5nldbccqqf_fkey',
             columns: [t.userId],
             foreignColumns: [user.id],
-        }),
-        index('hbig3rsx1v8v_index').on(t.roleId),
-        foreignKey({
-            name: 'hbig3rsx1v8v_fkey',
-            columns: [t.roleId],
-            foreignColumns: [role.id],
         }),
     ],
 )
