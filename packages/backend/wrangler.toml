@@ -1,6 +1,6 @@
 name = "hyperion-backend"
 main = "src/core/index.ts"
-compatibility_date = "2025-09-15"
+compatibility_date = "2025-11-09"
 compatibility_flags = ['nodejs_compat']
 
 [observability]
@@ -53,7 +53,7 @@ class_name = "WebSocketServer"
 
 [[r2_buckets]]
 binding = 'HYPERION_R2'
-bucket_name = '00000000000000000000000000000000'
+bucket_name = 'hyperion-dev'
 
 ########
 # TEST #
@@ -81,11 +81,11 @@ SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 
 [[env.test.kv_namespaces]]
 binding = "HYPERION_KV"
-id = "00000000000000000000000000000000"
+id = "00000000000000000000000000000001"
 
 [[env.test.hyperdrive]]
 binding = "HYPERION_HD"
-id = "00000000000000000000000000000000"
+id = "00000000000000000000000000000001"
 localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion_test"
 
 [[env.test.durable_objects.bindings]]
@@ -94,7 +94,7 @@ class_name = "WebSocketServer"
 
 [[env.test.r2_buckets]]
 binding = 'HYPERION_R2'
-bucket_name = '00000000000000000000000000000000'
+bucket_name = 'hyperion-test'
 
 ###########
 # STAGING #
@@ -122,11 +122,11 @@ SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 
 [[env.staging.kv_namespaces]]
 binding = "HYPERION_KV"
-id = "00000000000000000000000000000000"
+id = "00000000000000000000000000000002"
 
 [[env.staging.hyperdrive]]
 binding = "HYPERION_HD"
-id = "00000000000000000000000000000000"
+id = "00000000000000000000000000000002"
 
 [[env.staging.durable_objects.bindings]]
 name = "HYPERION_DO_WSS"
@@ -134,7 +134,7 @@ class_name = "WebSocketServer"
 
 [[env.staging.r2_buckets]]
 binding = 'HYPERION_R2'
-bucket_name = '00000000000000000000000000000000'
+bucket_name = 'hyperion-staging'
 
 ##############
 # PRODUCTION #
@@ -162,11 +162,11 @@ SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 
 [[env.production.kv_namespaces]]
 binding = "HYPERION_KV"
-id = "00000000000000000000000000000000"
+id = "00000000000000000000000000000003"
 
 [[env.production.hyperdrive]]
 binding = "HYPERION_HD"
-id = "00000000000000000000000000000000"
+id = "00000000000000000000000000000003"
 
 [[env.production.durable_objects.bindings]]
 name = "HYPERION_DO_WSS"
@@ -174,4 +174,4 @@ class_name = "WebSocketServer"
 
 [[env.production.r2_buckets]]
 binding = 'HYPERION_R2'
-bucket_name = '00000000000000000000000000000000'
+bucket_name = 'hyperion-production'

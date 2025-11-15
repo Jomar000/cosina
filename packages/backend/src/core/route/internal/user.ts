@@ -61,16 +61,27 @@ internalRouteUser.get(
             )
         }
 
-        const { createdAt, updatedAt, ...selectedColumns } =
-            getTableColumns(userProfile)
+        try {
+            const { createdAt, updatedAt, ...selectedColumns } =
+                getTableColumns(userProfile)
 
-        const data = await ctx
-            .get('dbClient')
-            .select(selectedColumns)
-            .from(userProfile)
-            .where(eq(userProfile.userId, userId))
+            const data = await ctx
+                .get('dbClient')
+                .select(selectedColumns)
+                .from(userProfile)
+                .where(eq(userProfile.userId, userId))
 
-        return ctx.json({ data }, 200)
+            return ctx.json({ data }, 200)
+        } catch (err) {
+            throw new AppError(
+                {
+                    status: 500,
+                    code: 'PROFILE_LIST_RETRIEVAL_FAILED',
+                    message: 'Profile list retrieval failed.',
+                },
+                err instanceof Error ? err : undefined,
+            )
+        }
     },
 )
 
@@ -87,41 +98,52 @@ internalRouteUser.get(
 
         const { userProfile } = ctx.get('dbSchema')
 
-        const searchCondition = eq(userProfile.userId, userId)
+        try {
+            const searchCondition = eq(userProfile.userId, userId)
 
-        const count = await ctx
-            .get('dbClient')
-            .$count(userProfile, searchCondition)
+            const count = await ctx
+                .get('dbClient')
+                .$count(userProfile, searchCondition)
 
-        const { createdAt, updatedAt, ...selectedColumns } =
-            getTableColumns(userProfile)
+            const { createdAt, updatedAt, ...selectedColumns } =
+                getTableColumns(userProfile)
 
-        const subquery = ctx
-            .get('dbClient')
-            .select({ userId: userProfile.userId })
-            .from(userProfile)
-            .where(searchCondition)
-            .limit(limit)
-            .offset(offset)
-            .orderBy(
-                sortOrder === 'asc'
-                    ? asc(userProfile.userId)
-                    : desc(userProfile.userId),
+            const subquery = ctx
+                .get('dbClient')
+                .select({ userId: userProfile.userId })
+                .from(userProfile)
+                .where(searchCondition)
+                .limit(limit)
+                .offset(offset)
+                .orderBy(
+                    sortOrder === 'asc'
+                        ? asc(userProfile.userId)
+                        : desc(userProfile.userId),
+                )
+                .as('subquery')
+
+            const data = await ctx
+                .get('dbClient')
+                .select(selectedColumns)
+                .from(userProfile)
+                .innerJoin(subquery, eq(subquery.userId, userProfile.userId))
+                .orderBy(
+                    sortOrder === 'asc'
+                        ? asc(userProfile.userId)
+                        : desc(userProfile.userId),
+                )
+
+            return ctx.json({ limit, offset, count, data }, 200)
+        } catch (err) {
+            throw new AppError(
+                {
+                    status: 500,
+                    code: 'PROFILE_LIST_RETRIEVAL_FAILED',
+                    message: 'Profile list retrieval failed.',
+                },
+                err instanceof Error ? err : undefined,
             )
-            .as('subquery')
-
-        const data = await ctx
-            .get('dbClient')
-            .select(selectedColumns)
-            .from(userProfile)
-            .innerJoin(subquery, eq(subquery.userId, userProfile.userId))
-            .orderBy(
-                sortOrder === 'asc'
-                    ? asc(userProfile.userId)
-                    : desc(userProfile.userId),
-            )
-
-        return ctx.json({ limit, offset, count, data }, 200)
+        }
     },
 )
 
@@ -144,23 +166,19 @@ internalRouteUser.post(
 
         const { userProfile } = ctx.get('dbSchema')
 
-        try {
-            if (
-                !ctx.get('isPrivilegedRole') &&
-                ctx.get('user')!.id !== userId
-            ) {
-                return ctx.json(
-                    {
-                        error: {
-                            code: 'FORBIDDEN',
-                            message:
-                                'You are not allowed to access this resource.',
-                        },
+        if (!ctx.get('isPrivilegedRole') && ctx.get('user')!.id !== userId) {
+            return ctx.json(
+                {
+                    error: {
+                        code: 'FORBIDDEN',
+                        message: 'You are not allowed to access this resource.',
                     },
-                    403,
-                )
-            }
+                },
+                403,
+            )
+        }
 
+        try {
             const data = await ctx
                 .get('dbClient')
                 .update(userProfile)
@@ -216,23 +234,19 @@ internalRouteUser.post(
 
         const { address, userProfile } = ctx.get('dbSchema')
 
-        try {
-            if (
-                !ctx.get('isPrivilegedRole') &&
-                ctx.get('user')!.id !== userId
-            ) {
-                return ctx.json(
-                    {
-                        error: {
-                            code: 'FORBIDDEN',
-                            message:
-                                'You are not allowed to access this resource.',
-                        },
+        if (!ctx.get('isPrivilegedRole') && ctx.get('user')!.id !== userId) {
+            return ctx.json(
+                {
+                    error: {
+                        code: 'FORBIDDEN',
+                        message: 'You are not allowed to access this resource.',
                     },
-                    403,
-                )
-            }
+                },
+                403,
+            )
+        }
 
+        try {
             const data = await ctx.get('dbClient').transaction(async (tx) => {
                 const hashSha256 = bytesToHex(
                     sha256(

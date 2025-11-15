@@ -24,18 +24,19 @@ Thumbs.db
 # Backend #
 ###########
 
-drizzle-*.config.ts
+/packages/backend/coverage
+/packages/backend/drizzle-*.config.ts
 
 ############
 # Frontend #
 ############
 
-test-results
+/packages/frontend/test-results
 
 # Output
-.svelte-kit
-build
+/packages/frontend/.svelte-kit
+/packages/frontend/build
 
 # Vite
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
+/packages/frontend/vite.config.js.timestamp-*
+/packages/frontend/vite.config.ts.timestamp-*
