@@ -43,7 +43,7 @@ internalRouteObjectStorage.post(
                 eq(uploadAttachment.objectStorageId, objectStorage.id),
             )
             .innerJoin(upload, eq(upload.id, uploadAttachment.uploadId))
-            .where(inArray(objectStorage.id, providedKeys))
+            .where(inArray(upload.id, providedKeys))
 
         const signedUrls: {
             key: string
@@ -54,7 +54,7 @@ internalRouteObjectStorage.post(
         // Non-existent Keys
         for (const key of providedKeys) {
             const isObjectFound = objectData
-                .map(({ objectStorage }) => objectStorage.id)
+                .map(({ upload }) => upload.id)
                 .includes(key)
 
             if (!isObjectFound) {
