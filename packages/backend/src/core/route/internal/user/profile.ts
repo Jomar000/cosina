@@ -4,7 +4,14 @@ import {
     userProfileReadManyInputSchema,
     userProfileUpdateInputSchema,
 } from '@hyperion/validator/internal/user'
-import { asc, desc, eq, getTableColumns } from 'drizzle-orm'
+import {
+    and,
+    asc,
+    count as countFn,
+    desc,
+    eq,
+    getTableColumns,
+} from 'drizzle-orm'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 
@@ -25,7 +32,7 @@ profileRoute.get(
     async (ctx) => {
         const { userId } = ctx.req.valid('query')
 
-        const { userProfile } = ctx.get('dbSchema')
+        const { member, userProfile } = ctx.get('dbSchema')
 
         if (!ctx.get('isPrivilegedRole') && ctx.get('user')!.id !== userId) {
             return ctx.json(
@@ -40,6 +47,14 @@ profileRoute.get(
         }
 
         try {
+            const searchCondition = and(
+                eq(
+                    member.organizationId,
+                    ctx.get('session')!.activeOrganizationId!,
+                ),
+                eq(userProfile.userId, userId),
+            )
+
             const { createdAt, updatedAt, ...selectedColumns } =
                 getTableColumns(userProfile)
 
@@ -47,7 +62,8 @@ profileRoute.get(
                 .get('dbClient')
                 .select(selectedColumns)
                 .from(userProfile)
-                .where(eq(userProfile.userId, userId))
+                .innerJoin(member, eq(member.userId, userProfile.userId))
+                .where(searchCondition)
 
             return ctx.json({ data }, 200)
         } catch (err) {
@@ -74,15 +90,22 @@ profileRoute.get(
     async (ctx) => {
         const { limit, offset, sortOrder } = ctx.req.valid('query')
 
-        const { userProfile } = ctx.get('dbSchema')
+        const { member, userProfile } = ctx.get('dbSchema')
 
         try {
-            // const searchCondition = eq()
-
-            const count = await ctx.get('dbClient').$count(
-                userProfile,
-                // searchCondition
+            const searchCondition = eq(
+                member.organizationId,
+                ctx.get('session')!.activeOrganizationId!,
             )
+
+            const count = (
+                await ctx
+                    .get('dbClient')
+                    .select({ count: countFn(userProfile.userId) })
+                    .from(userProfile)
+                    .innerJoin(member, eq(member.userId, userProfile.userId))
+                    .where(searchCondition)
+            )[0].count
 
             const { createdAt, updatedAt, ...selectedColumns } =
                 getTableColumns(userProfile)
@@ -91,7 +114,8 @@ profileRoute.get(
                 .get('dbClient')
                 .select({ userId: userProfile.userId })
                 .from(userProfile)
-                // .where(searchCondition)
+                .innerJoin(member, eq(member.userId, userProfile.userId))
+                .where(searchCondition)
                 .limit(limit)
                 .offset(offset)
                 .orderBy(
@@ -143,7 +167,7 @@ profileRoute.post(
             backupPhoneNumber,
         } = ctx.req.valid('json')
 
-        const { userProfile } = ctx.get('dbSchema')
+        const { member, userProfile } = ctx.get('dbSchema')
 
         if (!ctx.get('isPrivilegedRole') && ctx.get('user')!.id !== userId) {
             return ctx.json(
@@ -154,6 +178,35 @@ profileRoute.post(
                     },
                 },
                 403,
+            )
+        }
+
+        const searchCondition = and(
+            eq(
+                member.organizationId,
+                ctx.get('session')!.activeOrganizationId!,
+            ),
+            eq(userProfile.userId, userId),
+        )
+
+        const count = (
+            await ctx
+                .get('dbClient')
+                .select({ count: countFn(userProfile.userId) })
+                .from(userProfile)
+                .innerJoin(member, eq(member.userId, userProfile.userId))
+                .where(searchCondition)
+        )[0].count
+
+        if (count === 0) {
+            return ctx.json(
+                {
+                    error: {
+                        code: 'BAD_REQUEST',
+                        message: 'User ID not found, nothing to update.',
+                    },
+                },
+                400,
             )
         }
 
@@ -169,6 +222,7 @@ profileRoute.post(
                     gender,
                     backupPhoneNumber,
                 })
+                .from(member)
                 .where(eq(userProfile.userId, userId))
                 .returning({
                     firstName: userProfile.firstName,
@@ -211,7 +265,7 @@ profileRoute.post(
             countryCode,
         } = ctx.req.valid('json')
 
-        const { address, userProfile } = ctx.get('dbSchema')
+        const { address, member, userProfile } = ctx.get('dbSchema')
 
         if (!ctx.get('isPrivilegedRole') && ctx.get('user')!.id !== userId) {
             return ctx.json(
@@ -222,6 +276,35 @@ profileRoute.post(
                     },
                 },
                 403,
+            )
+        }
+
+        const searchCondition = and(
+            eq(
+                member.organizationId,
+                ctx.get('session')!.activeOrganizationId!,
+            ),
+            eq(userProfile.userId, userId),
+        )
+
+        const count = (
+            await ctx
+                .get('dbClient')
+                .select({ count: countFn(userProfile.userId) })
+                .from(userProfile)
+                .innerJoin(member, eq(member.userId, userProfile.userId))
+                .where(searchCondition)
+        )[0].count
+
+        if (count === 0) {
+            return ctx.json(
+                {
+                    error: {
+                        code: 'BAD_REQUEST',
+                        message: 'User ID not found, nothing to update.',
+                    },
+                },
+                400,
             )
         }
 
