@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 
 import { corsHandler } from '../../middleware/corsHandler.js'
 
-const baseRoute = new Hono<THonoInstance>()
+export const baseRoute = new Hono<THonoInstance>()
 
 // Middleware
 baseRoute.use(corsHandler('default'))

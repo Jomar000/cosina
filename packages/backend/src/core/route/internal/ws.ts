@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 
-const internalRouteWs = new Hono<THonoInstance>()
+export const wsRoute = new Hono<THonoInstance>()
 
-internalRouteWs.get('/:channel', async (ctx) => {
+wsRoute.get('/:channel', async (ctx) => {
     const authData = await ctx.get('auth').api.getSession({
         headers: ctx.req.raw.headers,
     })
@@ -33,4 +33,4 @@ internalRouteWs.get('/:channel', async (ctx) => {
     return stub.fetch(ctx.req.raw)
 })
 
-export default internalRouteWs
+export default wsRoute

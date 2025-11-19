@@ -8,36 +8,16 @@ import { asc, desc, eq, getTableColumns } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 
-import { AppError } from '../../../errors.js'
-import { honoValidatorCb } from '../../../utilities.js'
-import { isAuthenticated } from '../../middleware/isAuthenticated.js'
-import { isAuthorized } from '../../middleware/isAuthorized.js'
+import { AppError } from '../../../../errors.js'
+import { honoValidatorCb } from '../../../../utilities.js'
+import { isAuthenticated } from '../../../middleware/isAuthenticated.js'
+import { isAuthorized } from '../../../middleware/isAuthorized.js'
 
-const internalRouteUser = new Hono<THonoInstance>()
+export const profileRoute = new Hono<THonoInstance>()
 
-internalRouteUser.post(
-    '/user/password/override',
-    isAuthorized({
-        admin: ['ANY'],
-    }),
-    // validator('json', async (value, ctx) =>
-    //     honoValidatorCb(value, ctx, objectStorageCreateDownloadLinkInputSchema),
-    // ),
-    async (ctx) => {
-        /**
-         * For Administrators
-         * Override the current user's password and set a new one
-         */
-
-        // const keys = ctx.req.valid('json')
-        // const { user, userProfile } = ctx.get('dbSchema')
-
-        return ctx.json({ data: '' }, 200)
-    },
-)
-
-internalRouteUser.get(
-    '/user/profile/read',
+// Routes
+profileRoute.get(
+    '/read',
     isAuthenticated(),
     validator('query', async (value, ctx) =>
         honoValidatorCb(value, ctx, userProfileReadInputSchema),
@@ -74,8 +54,8 @@ internalRouteUser.get(
             throw new AppError(
                 {
                     status: 500,
-                    code: 'PROFILE_LIST_RETRIEVAL_FAILED',
-                    message: 'Profile list retrieval failed.',
+                    code: 'PROFILE_RETRIEVAL_FAILED',
+                    message: 'Profile retrieval failed.',
                 },
                 err instanceof Error ? err : undefined,
             )
@@ -83,8 +63,8 @@ internalRouteUser.get(
     },
 )
 
-internalRouteUser.get(
-    '/user/profile/readMany',
+profileRoute.get(
+    '/readMany',
     isAuthorized({
         admin: ['ANY'],
     }),
@@ -92,16 +72,17 @@ internalRouteUser.get(
         honoValidatorCb(value, ctx, userProfileReadManyInputSchema),
     ),
     async (ctx) => {
-        const { userId, limit, offset, sortOrder } = ctx.req.valid('query')
+        const { limit, offset, sortOrder } = ctx.req.valid('query')
 
         const { userProfile } = ctx.get('dbSchema')
 
         try {
-            const searchCondition = eq(userProfile.userId, userId)
+            // const searchCondition = eq()
 
-            const count = await ctx
-                .get('dbClient')
-                .$count(userProfile, searchCondition)
+            const count = await ctx.get('dbClient').$count(
+                userProfile,
+                // searchCondition
+            )
 
             const { createdAt, updatedAt, ...selectedColumns } =
                 getTableColumns(userProfile)
@@ -110,7 +91,7 @@ internalRouteUser.get(
                 .get('dbClient')
                 .select({ userId: userProfile.userId })
                 .from(userProfile)
-                .where(searchCondition)
+                // .where(searchCondition)
                 .limit(limit)
                 .offset(offset)
                 .orderBy(
@@ -145,8 +126,8 @@ internalRouteUser.get(
     },
 )
 
-internalRouteUser.post(
-    '/user/profile/update',
+profileRoute.post(
+    '/update',
     isAuthenticated(),
     validator('json', async (value, ctx) =>
         honoValidatorCb(value, ctx, userProfileUpdateInputSchema),
@@ -213,8 +194,8 @@ internalRouteUser.post(
     },
 )
 
-internalRouteUser.post(
-    '/user/profile/update/address',
+profileRoute.post(
+    '/update/address',
     isAuthenticated(),
     validator('json', async (value, ctx) =>
         honoValidatorCb(value, ctx, userProfileAddressUpdateInputSchema),
@@ -310,4 +291,4 @@ internalRouteUser.post(
     },
 )
 
-export default internalRouteUser
+export default profileRoute

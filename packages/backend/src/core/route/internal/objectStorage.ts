@@ -9,9 +9,10 @@ import { validator } from 'hono/validator'
 import { honoValidatorCb, nanoidCustom } from '../../../utilities.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 
-const internalRouteObjectStorage = new Hono<THonoInstance>()
+export const objectStorageRoute = new Hono<THonoInstance>()
 
-internalRouteObjectStorage.post(
+// Routes
+objectStorageRoute.post(
     '/create/downloadLink',
     isAuthenticated(),
     validator('json', async (value, ctx) =>
@@ -110,7 +111,7 @@ internalRouteObjectStorage.post(
     },
 )
 
-internalRouteObjectStorage.post(
+objectStorageRoute.post(
     '/create/uploadLink',
     isAuthenticated(),
     validator('json', async (value, ctx) =>
@@ -275,4 +276,4 @@ internalRouteObjectStorage.post(
     },
 )
 
-export default internalRouteObjectStorage
+export default objectStorageRoute

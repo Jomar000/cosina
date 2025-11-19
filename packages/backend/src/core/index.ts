@@ -6,9 +6,9 @@ import { v7 as uuidv7 } from 'uuid'
 import { AppError } from '../errors.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
 import { csrfHandler } from './middleware/csrfHandler.js'
-import baseRoute from './route/base/_index.js'
-import internalRoute from './route/internal/_index.js'
-import v1Route from './route/v1/_index.js'
+import { baseRoute } from './route/base/_index.js'
+import { internalRoute } from './route/internal/_index.js'
+import { v1Route } from './route/v1/_index.js'
 
 const app = new Hono<THonoInstance>()
 

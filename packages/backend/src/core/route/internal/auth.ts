@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 
-const internalRouteAuth = new Hono<THonoInstance>()
+export const authRoute = new Hono<THonoInstance>()
 
-internalRouteAuth.on(
+authRoute.on(
     [
         'GET',
         'POST',
@@ -11,4 +11,4 @@ internalRouteAuth.on(
     (ctx) => ctx.get('auth').handler(ctx.req.raw),
 )
 
-export default internalRouteAuth
+export default authRoute
