@@ -346,11 +346,20 @@ export const auth = async (opts: {
         secondaryStorage: {
             get: async (key) => await kv.get(key),
             set: async (key, value, ttl) => {
-                ttl
-                    ? await kv.put(key, value, {
-                          expirationTtl: ttl,
-                      })
-                    : await kv.put(key, value)
+                if (ttl) {
+                    /**
+                     * @description
+                     * Added this logic as Workers KV only supports a minimum of 60 seconds for TTL.
+                     *
+                     * @link
+                     * https://github.com/better-auth/better-auth/issues/5452
+                     */
+                    await kv.put(key, value, {
+                        expirationTtl: ttl >= 60 ? ttl : 60,
+                    })
+                } else {
+                    await kv.put(key, value)
+                }
             },
             delete: async (key) => await kv.delete(key),
         },
