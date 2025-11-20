@@ -12,7 +12,6 @@ Content-Security-Policy
 **Header Value (Convert to single line)**
 ```
 frame-ancestors 'none';
-sandbox allow-same-origin allow-scripts;
 upgrade-insecure-requests;
 ```
 

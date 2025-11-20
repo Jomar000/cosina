@@ -18,8 +18,8 @@
         "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
         "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
         "test:e2e": "playwright test",
-        "deploy:staging": "vite build --mode=staging && wrangler deploy --outdir=dist --env=staging",
-        "deploy:prod": "vite build --mode=production && wrangler deploy --outdir=dist --env=production"
+        "deploy:staging": "vite build --mode=staging && wrangler deploy --outdir=dist --env=staging --config=wrangler-staging.toml",
+        "deploy:prod": "vite build --mode=production && wrangler deploy --outdir=dist --env=production --config=wrangler-production.toml"
     },
     "devDependencies": {
         "@hyperion/validator": "workspace:*",
