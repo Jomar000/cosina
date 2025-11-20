@@ -31,6 +31,7 @@ const config = {
                 'base-uri': ['self'],
                 'connect-src': [
                     'self',
+                    `https://${env.PUBLIC_CF_ACCOUNT_ID}.r2.cloudflarestorage.com/`,
                     `${env.PUBLIC_API_URL}/`,
                 ],
                 'default-src': ['self'],
@@ -40,9 +41,19 @@ const config = {
                     'self',
                     'https://challenges.cloudflare.com/',
                 ],
-                'img-src': ['*'],
+                'img-src': [
+                    'blob:',
+                    'data:',
+                    'mediastream:',
+                    '*',
+                ],
                 'manifest-src': ['self'],
-                'media-src': ['*'],
+                'media-src': [
+                    'blob:',
+                    'data:',
+                    'mediastream:',
+                    '*',
+                ],
                 'object-src': ['none'],
                 'script-src': [
                     'self',
