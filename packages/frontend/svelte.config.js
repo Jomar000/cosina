@@ -1,5 +1,8 @@
 import adapter from '@sveltejs/adapter-static'
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
+import { loadEnv } from 'vite'
+
+const env = loadEnv(process.env.NODE_ENV ?? '', process.cwd(), '')
 
 /**
  * @type {import('@sveltejs/kit').Config}
@@ -19,8 +22,40 @@ const config = {
         prerender: {
             handleHttpError: 'warn',
         },
+        csp: {
+            mode: 'hash',
+            directives: {
+                'base-uri': ['self'],
+                'connect-src': [
+                    'self',
+                    `${env.PUBLIC_API_URL}/`,
+                ],
+                'default-src': ['self'],
+                'font-src': ['self'],
+                'form-action': ['self'],
+                'frame-src': [
+                    'self',
+                    'https://challenges.cloudflare.com/',
+                ],
+                'img-src': ['self'],
+                'manifest-src': ['self'],
+                'media-src': ['self'],
+                'object-src': ['none'],
+                'script-src': [
+                    'self',
+                    'https://challenges.cloudflare.com/',
+                ],
+                'style-src': [
+                    'self',
+                    'unsafe-inline',
+                ],
+                'worker-src': [
+                    'self',
+                    'blob:',
+                ],
+            },
+        },
     },
-
     compilerOptions: {
         hmr: process.env.NODE_ENV === 'development',
         modernAst: true,
