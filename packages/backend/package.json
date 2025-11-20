@@ -14,14 +14,14 @@
         "dev": "wrangler dev",
         "build": "wrangler deploy --outdir=dist --dry-run --env=",
         "test": "pnpm run migrate:test && vitest --run",
-        "deploy:staging": "wrangler deploy --minify --outdir=dist --env=staging",
-        "deploy:prod": "wrangler deploy --minify --outdir=dist --env=production",
+        "deploy:staging": "wrangler deploy --minify --outdir=dist --env=staging --config=wrangler-staging.toml",
+        "deploy:prod": "wrangler deploy --minify --outdir=dist --env=production --config=wrangler-production.toml",
         "migrate:dev": "node ./src/db/pg/bootstrap.ts dev",
         "migrate:test": "node ./src/db/pg/bootstrap.ts test",
         "migrate:staging": "drizzle-kit migrate --config=drizzle-staging.config.ts",
         "migrate:prod": "drizzle-kit migrate --config=drizzle-production.config.ts",
-        "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging",
-        "secret:prod": "wrangler secret bulk .dev.vars.production --env=production"
+        "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging --config=wrangler-staging.toml",
+        "secret:prod": "wrangler secret bulk .dev.vars.production --env=production --config=wrangler-production.toml"
     },
     "dependencies": {
         "@hyperion/validator": "workspace:*",
@@ -43,7 +43,7 @@
         "@vitest/snapshot": "^3.2.4",
         "drizzle-kit": "^0.31.7",
         "smol-toml": "^1.5.2",
-        "vite": "^7.2.2",
+        "vite": "^7.2.4",
         "vitest": "^3.2.4"
     }
 }

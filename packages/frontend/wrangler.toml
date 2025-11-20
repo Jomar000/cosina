@@ -13,9 +13,15 @@ mode = "smart"
 ###########
 
 [env.staging]
+workers_dev = false
+preview_urls = false
+route = { custom_domain = true, pattern = "" }
 
 ##############
 # PRODUCTION #
 ##############
 
 [env.production]
+workers_dev = false
+preview_urls = false
+route = { custom_domain = true, pattern = "" }

@@ -7,7 +7,7 @@ compatibility_flags = ['nodejs_compat']
 enabled = true
 
 [limits]
-cpu_ms = 100
+cpu_ms = 1000
 
 [placement]
 mode = "smart"

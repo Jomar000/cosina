@@ -2,7 +2,10 @@ import adapter from '@sveltejs/adapter-static'
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 import { loadEnv } from 'vite'
 
-const env = loadEnv(process.env.NODE_ENV ?? '', process.cwd(), '')
+const mode =
+    process.argv.find((arg) => arg.startsWith('--mode='))?.split('=')[1] || ''
+
+const env = loadEnv(mode, process.cwd(), '')
 
 /**
  * @type {import('@sveltejs/kit').Config}
@@ -31,19 +34,20 @@ const config = {
                     `${env.PUBLIC_API_URL}/`,
                 ],
                 'default-src': ['self'],
-                'font-src': ['self'],
+                'font-src': ['*'],
                 'form-action': ['self'],
                 'frame-src': [
                     'self',
                     'https://challenges.cloudflare.com/',
                 ],
-                'img-src': ['self'],
+                'img-src': ['*'],
                 'manifest-src': ['self'],
-                'media-src': ['self'],
+                'media-src': ['*'],
                 'object-src': ['none'],
                 'script-src': [
                     'self',
                     'https://challenges.cloudflare.com/',
+                    'https://static.cloudflareinsights.com/',
                 ],
                 'style-src': [
                     'self',
