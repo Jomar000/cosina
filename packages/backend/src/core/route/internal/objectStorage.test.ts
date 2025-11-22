@@ -1,6 +1,6 @@
 // import type { authSignInOutputSchema } from '@hyperion/validator/internal/auth'
 // import type {
-//     objectStorageCreateDownloadLinkOutputSchema,
+//     objectStorageDownloadLinkCreateOutputSchema,
 //     objectStorageCreateUploadLinkOutputSchema,
 // } from '@hyperion/validator/internal/objectStorage'
 // import { env } from 'cloudflare:test'
@@ -20,12 +20,12 @@ import {
 // >
 
 // type TCreateDownloadLinkDataOutput = Extract<
-//     z.output<typeof objectStorageCreateDownloadLinkOutputSchema>,
+//     z.output<typeof objectStorageDownloadLinkCreateOutputSchema>,
 //     { data: unknown }
 // >
 
 // type TCreateDownloadLinkErrorOutput = Extract<
-//     z.output<typeof objectStorageCreateDownloadLinkOutputSchema>,
+//     z.output<typeof objectStorageDownloadLinkCreateOutputSchema>,
 //     { error: unknown }
 // >
 

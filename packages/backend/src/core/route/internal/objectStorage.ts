@@ -1,10 +1,11 @@
 import {
-    objectStorageCreateDownloadLinkInputSchema,
     objectStorageCreateUploadLinkInputSchema,
-    objectStorageUploadAttachmentAddInputSchema,
+    objectStorageDownloadLinkCreateInputSchema,
+    objectStorageUploadAttachmentCreateInputSchema,
+    objectStorageUploadAttachmentCommitInputSchema,
 } from '@hyperion/validator/internal/objectStorage'
 import { hexToBytes } from '@noble/hashes/utils.js'
-import { eq, inArray } from 'drizzle-orm'
+import { eq, inArray, notInArray } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { encodeBase64 } from 'hono/utils/encode'
 import { validator } from 'hono/validator'
@@ -17,10 +18,10 @@ export const objectStorageRoute = new Hono<THonoInstance>()
 
 // Routes
 objectStorageRoute.post(
-    '/create/downloadLink',
+    '/download/link/create',
     isAuthenticated(),
     validator('json', async (value, ctx) =>
-        honoValidatorCb(value, ctx, objectStorageCreateDownloadLinkInputSchema),
+        honoValidatorCb(value, ctx, objectStorageDownloadLinkCreateInputSchema),
     ),
     async (ctx) => {
         const keys = ctx.req.valid('json')
@@ -115,7 +116,7 @@ objectStorageRoute.post(
     },
 )
 
-objectStorageRoute.get('/upload/id/create', isAuthenticated(), async (ctx) => {
+objectStorageRoute.get('/upload/create', isAuthenticated(), async (ctx) => {
     const { upload } = ctx.get('dbSchema')
 
     try {
@@ -148,13 +149,63 @@ objectStorageRoute.get('/upload/id/create', isAuthenticated(), async (ctx) => {
 })
 
 objectStorageRoute.post(
-    '/upload/attachment/add',
+    '/upload/commit',
     isAuthenticated(),
     validator('json', async (value, ctx) =>
         honoValidatorCb(
             value,
             ctx,
-            objectStorageUploadAttachmentAddInputSchema,
+            objectStorageUploadAttachmentCommitInputSchema,
+        ),
+    ),
+    async (ctx) => {
+        const { attachments, uploadId } = ctx.req.valid('json')
+
+        const { objectStorage, upload } = ctx.get('dbSchema')
+
+        // Check if provided uploadId is valid
+        const uploadData = await ctx
+            .get('dbClient')
+            .select({ id: upload.id })
+            .from(upload)
+            .where(eq(upload.id, uploadId))
+
+        if (!uploadData[0]) {
+            return ctx.json(
+                {
+                    error: {
+                        code: 'BAD_REQUEST',
+                        message: 'Upload ID not found.',
+                    },
+                },
+                400,
+            )
+        }
+
+        const attachmentsToCommit = attachments.map(({ id }) => id)
+
+        await ctx
+            .get('dbClient')
+            .delete(objectStorage)
+            .where(notInArray(objectStorage.id, attachmentsToCommit))
+
+        return ctx.json(
+            {
+                data: { uploadId, attachments },
+            },
+            200,
+        )
+    },
+)
+
+objectStorageRoute.post(
+    '/upload/attachment/create',
+    isAuthenticated(),
+    validator('json', async (value, ctx) =>
+        honoValidatorCb(
+            value,
+            ctx,
+            objectStorageUploadAttachmentCreateInputSchema,
         ),
     ),
     async (ctx) => {
@@ -324,6 +375,57 @@ objectStorageRoute.post(
                 err instanceof Error ? err : undefined,
             )
         }
+    },
+)
+
+objectStorageRoute.post(
+    '/upload/attachment/commit',
+    isAuthenticated(),
+    validator('json', async (value, ctx) =>
+        honoValidatorCb(
+            value,
+            ctx,
+            objectStorageUploadAttachmentCommitInputSchema,
+        ),
+    ),
+    async (ctx) => {
+        const { attachments, uploadId } = ctx.req.valid('json')
+
+        const { objectStorage, upload } = ctx.get('dbSchema')
+
+        // Check if provided uploadId is valid
+        const uploadData = await ctx
+            .get('dbClient')
+            .select({ id: upload.id })
+            .from(upload)
+            .where(eq(upload.id, uploadId))
+
+        if (!uploadData[0]) {
+            return ctx.json(
+                {
+                    error: {
+                        code: 'BAD_REQUEST',
+                        message: 'Upload ID not found.',
+                    },
+                },
+                400,
+            )
+        }
+
+        const attachmentsToCommit = attachments.map(({ id }) => id)
+
+        await ctx
+            .get('dbClient')
+            .update(objectStorage)
+            .set({ isUploaded: true })
+            .where(inArray(objectStorage.id, attachmentsToCommit))
+
+        return ctx.json(
+            {
+                data: { uploadId, attachments },
+            },
+            200,
+        )
     },
 )
 

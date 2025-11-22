@@ -7,7 +7,7 @@ import {
     textField,
 } from '../shared.js'
 
-export const objectStorageCreateDownloadLinkInputSchema = z
+export const objectStorageDownloadLinkCreateInputSchema = z
     .array(
         z.object({
             key: textField({ fieldName: 'Key', min: 12 }),
@@ -37,7 +37,7 @@ export const objectStorageCreateDownloadLinkInputSchema = z
         }
     })
 
-export const objectStorageCreateDownloadLinkOutputSchema = baseOutputSchema(
+export const objectStorageDownloadLinkCreateOutputSchema = baseOutputSchema(
     z.array(
         z.discriminatedUnion('status', [
             z.object({
@@ -137,7 +137,7 @@ export const objectStorageCreateUploadLinkOutputSchema = baseOutputSchema(
     }),
 )
 
-export const objectStorageUploadAttachmentAddInputSchema = z.object({
+export const objectStorageUploadAttachmentCreateInputSchema = z.object({
     uploadId: textField({ fieldName: 'Upload ID', min: 16 }).regex(
         /^[a-zA-Z0-9]+$/,
         { error: 'Upload ID must be alphanumeric characters only.' },
@@ -199,4 +199,23 @@ export const objectStorageUploadAttachmentAddInputSchema = z.object({
                 }
             }
         }),
+})
+
+export const objectStorageUploadAttachmentCommitInputSchema = z.object({
+    uploadId: textField({ fieldName: 'Upload ID', min: 16 }).regex(
+        /^[a-zA-Z0-9]+$/,
+        { error: 'Upload ID must be alphanumeric characters only.' },
+    ),
+    attachments: z
+        .array(
+            z.object({
+                id: textField({ fieldName: 'Attachment ID', min: 32 }).regex(
+                    /^[a-zA-Z0-9]+$/,
+                    {
+                        error: 'Attachment ID must be alphanumeric characters only.',
+                    },
+                ),
+            }),
+        )
+        .min(1, { error: 'At least one attachment must be provided.' }),
 })

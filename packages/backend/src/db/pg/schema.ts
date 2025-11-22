@@ -114,6 +114,7 @@ export const objectStorage = pgTable('object_storage', {
     hashSha256: text('hash_sha256').unique('ectz8nfqt8mj_unique').notNull(),
     isPublic: boolean('is_public').notNull().default(false),
     isDeleted: boolean('is_deleted').notNull().default(false),
+    isUploaded: boolean('is_uploaded').notNull().default(false),
     createdAt: timestamp('created_at', {
         withTimezone: true,
         mode: 'date',
@@ -146,7 +147,7 @@ export const objectStorageAcl = pgTable(
             columns: [t.objectStorageId],
             foreignColumns: [objectStorage.id],
         })
-            .onDelete('no action')
+            .onDelete('cascade')
             .onUpdate('no action'),
         index('68ghia6fpgvj_index').on(t.userId),
         foreignKey({
@@ -211,7 +212,7 @@ export const uploadAttachment = pgTable(
             columns: [t.objectStorageId],
             foreignColumns: [objectStorage.id],
         })
-            .onDelete('no action')
+            .onDelete('cascade')
             .onUpdate('no action'),
         unique('23aso68ioiyj_unique').on(t.uploadId, t.objectStorageId),
     ],

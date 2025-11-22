@@ -1,5 +1,5 @@
 {
-    "id": "722a025c-f403-41a9-8c84-18959b5e3123",
+    "id": "08a65465-c60e-4107-a7f1-f76e9ce8fa09",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "7",
     "dialect": "postgresql",
@@ -760,6 +760,13 @@
                     "notNull": true,
                     "default": false
                 },
+                "is_uploaded": {
+                    "name": "is_uploaded",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
                 "created_at": {
                     "name": "created_at",
                     "type": "timestamp with time zone",
@@ -858,7 +865,7 @@
                     "columnsTo": [
                         "id"
                     ],
-                    "onDelete": "no action",
+                    "onDelete": "cascade",
                     "onUpdate": "no action"
                 },
                 "68ghia6fpgvj_fkey": {
@@ -1395,7 +1402,7 @@
                     "columnsTo": [
                         "id"
                     ],
-                    "onDelete": "no action",
+                    "onDelete": "cascade",
                     "onUpdate": "no action"
                 }
             },
