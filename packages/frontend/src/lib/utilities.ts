@@ -1,7 +1,7 @@
 import type { objectStorageCreateUploadLinkOutputSchema } from '@hyperion/validator/internal/objectStorage'
 import type { baseOutputSchema } from '@hyperion/validator/shared'
 import { fileTypeFromBuffer } from 'file-type'
-import ky from 'ky'
+import ky, { type Options } from 'ky'
 import { customAlphabet } from 'nanoid'
 import PQueue from 'p-queue'
 import type { z } from 'zod'
@@ -76,7 +76,7 @@ export const apiClient = async <
     T extends z.output<ReturnType<typeof baseOutputSchema>>,
 >(
     path: string,
-    init?: RequestInit,
+    init?: Options,
 ) => {
     return ky<T>(path, {
         ...init,

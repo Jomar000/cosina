@@ -3,6 +3,7 @@ import {
     objectStorageDownloadLinkCreateInputSchema,
     objectStorageUploadAttachmentCommitInputSchema,
     objectStorageUploadAttachmentCreateInputSchema,
+    objectStorageUploadCommitInputSchema,
 } from '@hyperion/validator/internal/objectStorage'
 import { hexToBytes } from '@noble/hashes/utils.js'
 import { eq, inArray, notInArray } from 'drizzle-orm'
@@ -152,11 +153,7 @@ objectStorageRoute.post(
     '/upload/commit',
     isAuthenticated(),
     validator('json', async (value, ctx) =>
-        honoValidatorCb(
-            value,
-            ctx,
-            objectStorageUploadAttachmentCommitInputSchema,
-        ),
+        honoValidatorCb(value, ctx, objectStorageUploadCommitInputSchema),
     ),
     async (ctx) => {
         const { attachments, uploadId } = ctx.req.valid('json')
@@ -182,12 +179,10 @@ objectStorageRoute.post(
             )
         }
 
-        const attachmentsToCommit = attachments.map(({ id }) => id)
-
         await ctx
             .get('dbClient')
             .delete(objectStorage)
-            .where(notInArray(objectStorage.id, attachmentsToCommit))
+            .where(notInArray(objectStorage.id, attachments))
 
         return ctx.json(
             {
@@ -249,8 +244,7 @@ objectStorageRoute.post(
         }
 
         const signedUrls: {
-            objectStorageId: string
-            hash: string
+            id: string
             encodedHash: string | null
             signedUrl: string | null
             status: 200 | 409
@@ -287,8 +281,7 @@ objectStorageRoute.post(
                 })
 
                 signedUrls.push({
-                    objectStorageId,
-                    hash: attachment.hashSha256,
+                    id: objectStorageId,
                     encodedHash: null,
                     signedUrl: null,
                     status: 409,
@@ -315,8 +308,7 @@ objectStorageRoute.post(
                 })
 
                 signedUrls.push({
-                    objectStorageId: attachment.id,
-                    hash: attachment.hashSha256,
+                    id: attachment.id,
                     encodedHash: hashBase64,
                     signedUrl: (
                         await ctx
@@ -412,13 +404,11 @@ objectStorageRoute.post(
             )
         }
 
-        const attachmentsToCommit = attachments.map(({ id }) => id)
-
         await ctx
             .get('dbClient')
             .update(objectStorage)
             .set({ isUploaded: true })
-            .where(inArray(objectStorage.id, attachmentsToCommit))
+            .where(inArray(objectStorage.id, attachments))
 
         return ctx.json(
             {

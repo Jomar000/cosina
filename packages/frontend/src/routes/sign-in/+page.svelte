@@ -52,6 +52,7 @@
             <a
                 href="##"
                 class="flex items-center gap-2 self-center font-medium"
+                tabindex={-1}
             >
                 <div
                     class="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground"

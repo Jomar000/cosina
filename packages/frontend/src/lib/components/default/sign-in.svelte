@@ -306,7 +306,7 @@
                                     <a
                                         href="##"
                                         class="ml-auto text-sm underline-offset-4 hover:underline"
-                                        tabindex="-1"
+                                        tabindex={-1}
                                     >
                                         Forgot your password?
                                     </a>
@@ -382,7 +382,7 @@
                                 <FieldDescription class="text-center">
                                     Don't have an account? <a
                                         href="##"
-                                        tabindex="-1">Sign-up</a
+                                        tabindex={-1}>Sign-up</a
                                     >
                                 </FieldDescription>
                             </Field>
@@ -395,12 +395,12 @@
     <FieldDescription class="px-6 text-center">
         By clicking continue, you agree to our <a
             href="##"
-            tabindex="-1">Terms of Service</a
+            tabindex={-1}>Terms of Service</a
         >
         and
         <a
             href="##"
-            tabindex="-1">Privacy Policy</a
+            tabindex={-1}>Privacy Policy</a
         >.
     </FieldDescription>
 </div>
