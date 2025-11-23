@@ -166,6 +166,7 @@ export const upload = pgTable(
     {
         id: text('id').primaryKey(),
         userId: text('user_id').notNull(),
+        isCommitted: boolean('is_committed').notNull().default(false),
         createdAt: timestamp('created_at', {
             withTimezone: true,
             mode: 'date',

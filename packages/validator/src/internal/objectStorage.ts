@@ -7,41 +7,18 @@ import {
     textField,
 } from '../shared.js'
 
-export const objectStorageDownloadLinkCreateInputSchema = z
-    .array(
-        z.object({
-            key: textField({ fieldName: 'Key', min: 12 }),
-        }),
-    )
-    .min(1, { error: 'At least one object key must be provided.' })
-    .check((ctx) => {
-        if (ctx.value.length > 1) {
-            const allKeys = ctx.value.map(({ key }) => key)
-            const duplicateKeys = Array.from(
-                new Set(
-                    // If the current value being filtered is found
-                    // in a different index, it is a duplicate :D
-                    allKeys.filter(
-                        (hash, index) => allKeys.indexOf(hash) !== index,
-                    ),
-                ),
-            )
-
-            if (duplicateKeys.length > 0) {
-                ctx.issues.push({
-                    code: 'custom',
-                    message: `Duplicate object keys detected. [${duplicateKeys.toString()}]`,
-                    input: duplicateKeys,
-                })
-            }
-        }
-    })
+export const objectStorageDownloadLinkCreateInputSchema = z.object({
+    uploadId: textField({ fieldName: 'Upload ID', min: 16 }).regex(
+        /^[a-zA-Z0-9]+$/,
+        { error: 'Upload ID must be alphanumeric characters only.' },
+    ),
+})
 
 export const objectStorageDownloadLinkCreateOutputSchema = baseOutputSchema(
     z.array(
         z.discriminatedUnion('status', [
             z.object({
-                key: z.string(),
+                objectStorageId: z.string(),
                 encodedHash: z.string(),
                 signedUrl: z.string(),
                 status: z.literal(200),

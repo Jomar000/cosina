@@ -6,7 +6,7 @@ import {
     objectStorageUploadCommitInputSchema,
 } from '@hyperion/validator/internal/objectStorage'
 import { hexToBytes } from '@noble/hashes/utils.js'
-import { eq, inArray, notInArray } from 'drizzle-orm'
+import { and, eq, inArray, notInArray } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { encodeBase64 } from 'hono/utils/encode'
 import { validator } from 'hono/validator'
@@ -25,14 +25,12 @@ objectStorageRoute.post(
         honoValidatorCb(value, ctx, objectStorageDownloadLinkCreateInputSchema),
     ),
     async (ctx) => {
-        const keys = ctx.req.valid('json')
+        const { uploadId } = ctx.req.valid('json')
 
         const { objectStorage, objectStorageAcl, upload, uploadAttachment } =
             ctx.get('dbSchema')
 
-        const providedKeys = keys.map(({ key }) => key)
-
-        const objectData = await ctx
+        const linkedObjects = await ctx
             .get('dbClient')
             .select({
                 objectStorage,
@@ -50,36 +48,32 @@ objectStorageRoute.post(
                 eq(uploadAttachment.objectStorageId, objectStorage.id),
             )
             .innerJoin(upload, eq(upload.id, uploadAttachment.uploadId))
-            .where(inArray(upload.id, providedKeys))
+            .where(eq(upload.id, uploadId))
 
-        const signedUrls: {
-            key: string
-            signedUrl: string | null
-            status: 200 | 403 | 404
-        }[] = []
-
-        // Non-existent Keys
-        for (const key of providedKeys) {
-            const isObjectFound = objectData
-                .map(({ upload }) => upload.id)
-                .includes(key)
-
-            if (!isObjectFound) {
-                signedUrls.push({
-                    key: key,
-                    signedUrl: null,
-                    status: 404,
-                })
-            }
+        if (linkedObjects.length === 0) {
+            return ctx.json(
+                {
+                    error: {
+                        code: 'BAD_REQUEST',
+                        message: 'Upload ID not found.',
+                    },
+                },
+                400,
+            )
         }
 
-        // Existent Keys
-        for (const obj of objectData) {
-            const isPublicObject = obj.objectStorage.isPublic
+        const signedUrls: {
+            objectStorageId: string
+            signedUrl: string | null
+            status: 200 | 403
+        }[] = []
+
+        for (const { objectStorage, objectStorageAcl } of linkedObjects) {
+            const isPublicObject = objectStorage.isPublic
 
             const hasObjectPermission =
-                obj.objectStorageAcl.userId === ctx.get('user')!.id &&
-                Boolean(obj.objectStorageAcl.mode & 1)
+                objectStorageAcl.userId === ctx.get('user')!.id &&
+                Boolean(objectStorageAcl.mode & 1)
 
             if (
                 ctx.get('isPrivilegedRole') ||
@@ -87,12 +81,12 @@ objectStorageRoute.post(
                 hasObjectPermission
             ) {
                 signedUrls.push({
-                    key: obj.objectStorage.id,
+                    objectStorageId: objectStorage.id,
                     signedUrl: (
                         await ctx
                             .get('aws4FetchClient')
                             .sign(
-                                `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET}/${obj.objectStorage.id}?X-Amz-Expires=${300}`,
+                                `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET}/${objectStorage.id}?X-Amz-Expires=${300}`,
                                 {
                                     method: 'GET',
                                     aws: {
@@ -106,7 +100,7 @@ objectStorageRoute.post(
                 })
             } else {
                 signedUrls.push({
-                    key: obj.objectStorage.id,
+                    objectStorageId: objectStorage.id,
                     signedUrl: null,
                     status: 403,
                 })
@@ -158,35 +152,65 @@ objectStorageRoute.post(
     async (ctx) => {
         const { attachments, uploadId } = ctx.req.valid('json')
 
-        const { objectStorage, upload } = ctx.get('dbSchema')
+        const { objectStorage, upload, uploadAttachment } = ctx.get('dbSchema')
 
-        // Check if provided uploadId is valid
         const uploadData = await ctx
             .get('dbClient')
             .select({ id: upload.id })
             .from(upload)
-            .where(eq(upload.id, uploadId))
+            .where(and(eq(upload.id, uploadId), eq(upload.isCommitted, false)))
 
         if (!uploadData[0]) {
             return ctx.json(
                 {
                     error: {
                         code: 'BAD_REQUEST',
-                        message: 'Upload ID not found.',
+                        message: 'Upload ID not found or is already committed.',
                     },
                 },
                 400,
             )
         }
 
-        await ctx
-            .get('dbClient')
-            .delete(objectStorage)
-            .where(notInArray(objectStorage.id, attachments))
+        const attachmentsToPurge = (
+            await ctx
+                .get('dbClient')
+                .select({ id: objectStorage.id })
+                .from(upload)
+                .innerJoin(
+                    uploadAttachment,
+                    eq(upload.id, uploadAttachment.uploadId),
+                )
+                .innerJoin(
+                    objectStorage,
+                    eq(objectStorage.id, uploadAttachment.objectStorageId),
+                )
+                .where(
+                    and(
+                        eq(upload.id, uploadId),
+                        eq(upload.isCommitted, false),
+                        notInArray(objectStorage.id, attachments),
+                    ),
+                )
+        ).map(({ id }) => id)
+
+        await ctx.get('dbClient').transaction(async (tx) => {
+            await tx
+                .delete(objectStorage)
+                .where(inArray(objectStorage.id, attachmentsToPurge))
+
+            await tx
+                .update(upload)
+                .set({ isCommitted: true })
+                .where(eq(upload.id, uploadId))
+        })
 
         return ctx.json(
             {
-                data: { uploadId, attachments },
+                data: {
+                    uploadId,
+                    attachments: attachmentsToPurge,
+                },
             },
             200,
         )
@@ -224,19 +248,18 @@ objectStorageRoute.post(
             'uploadId' | 'objectStorageId'
         >[] = []
 
-        // Check if provided uploadId is valid
         const uploadData = await ctx
             .get('dbClient')
             .select({ id: upload.id })
             .from(upload)
-            .where(eq(upload.id, uploadId))
+            .where(and(eq(upload.id, uploadId), eq(upload.isCommitted, false)))
 
         if (!uploadData[0]) {
             return ctx.json(
                 {
                     error: {
                         code: 'BAD_REQUEST',
-                        message: 'Upload ID not found.',
+                        message: 'Upload ID not found or is already committed.',
                     },
                 },
                 400,
@@ -383,36 +406,59 @@ objectStorageRoute.post(
     async (ctx) => {
         const { attachments, uploadId } = ctx.req.valid('json')
 
-        const { objectStorage, upload } = ctx.get('dbSchema')
+        const { objectStorage, upload, uploadAttachment } = ctx.get('dbSchema')
 
-        // Check if provided uploadId is valid
         const uploadData = await ctx
             .get('dbClient')
             .select({ id: upload.id })
             .from(upload)
-            .where(eq(upload.id, uploadId))
+            .where(and(eq(upload.id, uploadId), eq(upload.isCommitted, false)))
 
         if (!uploadData[0]) {
             return ctx.json(
                 {
                     error: {
                         code: 'BAD_REQUEST',
-                        message: 'Upload ID not found.',
+                        message: 'Upload ID not found or is already committed.',
                     },
                 },
                 400,
             )
         }
 
+        const attachmentsToCommit = (
+            await ctx
+                .get('dbClient')
+                .select({ id: objectStorage.id })
+                .from(upload)
+                .innerJoin(
+                    uploadAttachment,
+                    eq(upload.id, uploadAttachment.uploadId),
+                )
+                .innerJoin(
+                    objectStorage,
+                    eq(objectStorage.id, uploadAttachment.objectStorageId),
+                )
+                .where(
+                    and(
+                        eq(upload.id, uploadId),
+                        inArray(objectStorage.id, attachments),
+                    ),
+                )
+        ).map(({ id }) => id)
+
         await ctx
             .get('dbClient')
             .update(objectStorage)
             .set({ isUploaded: true })
-            .where(inArray(objectStorage.id, attachments))
+            .where(inArray(objectStorage.id, attachmentsToCommit))
 
         return ctx.json(
             {
-                data: { uploadId, attachments },
+                data: {
+                    uploadId,
+                    attachments: attachmentsToCommit,
+                },
             },
             200,
         )
