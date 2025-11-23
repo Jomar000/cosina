@@ -249,16 +249,16 @@ importers:
 
 packages:
 
-  '@augment-vir/assert@31.51.1':
-    resolution: {integrity: sha512-N6/7SokwxedFCAL5xm+IU4ekXBmQ2C2mjPnZ81SAtYUJhn0y52WjGzFyoKIQI25tludcHiwt0aRGsGCkgGIZGw==}
+  '@augment-vir/assert@31.52.0':
+    resolution: {integrity: sha512-OQ06XM/mAcwvy3ct1MlnxkqmWPwi8jNtQloq5QsHOJxAV8LiiQSBFavGQP/OaPSBR/UXDqFIyANgKarDSMOkfw==}
     engines: {node: '>=22'}
 
-  '@augment-vir/common@31.51.1':
-    resolution: {integrity: sha512-lem5Pwzht7oHwCwwe4hSxUjoChdjW6PVI5xHSZoiUpgygrQAbEjMEribR+6qyB42oRaihDjpbden/c/KuLdkGg==}
+  '@augment-vir/common@31.52.0':
+    resolution: {integrity: sha512-dDRpDityxaM1A08ogAPYRDlMNJKDyINgmV2yiBtBMOMJV5hTSEDiZsUJuJdcQMkL0JS1CV0441rBc+hRqxUx5g==}
     engines: {node: '>=22'}
 
-  '@augment-vir/core@31.51.1':
-    resolution: {integrity: sha512-o/eQVXILuRit+tF/Ll0+xbef+jT9WnP84fTrVgO9iZ0GT3ngprM3gepxImrr0pI5vFidiLIhfTxhl+kHHtpYpg==}
+  '@augment-vir/core@31.52.0':
+    resolution: {integrity: sha512-08nCdUwafJVFsx9ku5EN5hO2/OX0cqrsIFk5xeJYVaxwMi9xPFitJLdm8tXaRAOc/K2MEW6eN7zqeHQVHY1FJA==}
     engines: {node: '>=22'}
 
   '@babel/code-frame@7.27.1':
@@ -1612,8 +1612,8 @@ packages:
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
-  baseline-browser-mapping@2.8.30:
-    resolution: {integrity: sha512-aTUKW4ptQhS64+v2d6IkPzymEzzhw+G0bA1g3uBRV3+ntkH+svttKseW5IOR4Ed6NUVKqnY7qT3dKvzQ7io4AA==}
+  baseline-browser-mapping@2.8.31:
+    resolution: {integrity: sha512-a28v2eWrrRWPpJSzxc+mKwm0ZtVx/G8SepdQZDArnXYU/XS+IF6mp8aB/4E+hH1tyGCoDo3KlUCdlSxGDsRkAw==}
     hasBin: true
 
   better-auth@1.4.1:
@@ -3527,18 +3527,18 @@ packages:
 
 snapshots:
 
-  '@augment-vir/assert@31.51.1':
+  '@augment-vir/assert@31.52.0':
     dependencies:
-      '@augment-vir/core': 31.51.1
+      '@augment-vir/core': 31.52.0
       '@date-vir/duration': 8.0.0
       deep-eql: 5.0.2
       expect-type: 1.2.2
       type-fest: 5.2.0
 
-  '@augment-vir/common@31.51.1':
+  '@augment-vir/common@31.52.0':
     dependencies:
-      '@augment-vir/assert': 31.51.1
-      '@augment-vir/core': 31.51.1
+      '@augment-vir/assert': 31.52.0
+      '@augment-vir/core': 31.52.0
       '@date-vir/duration': 8.0.0
       ansi-styles: 6.2.3
       deepcopy-esm: 2.1.1
@@ -3546,7 +3546,7 @@ snapshots:
       type-fest: 5.2.0
       typed-event-target: 4.1.0
 
-  '@augment-vir/core@31.51.1':
+  '@augment-vir/core@31.52.0':
     dependencies:
       '@date-vir/duration': 8.0.0
       browser-or-node: 3.0.0
@@ -4891,7 +4891,7 @@ snapshots:
   base64-js@1.5.1:
     optional: true
 
-  baseline-browser-mapping@2.8.30: {}
+  baseline-browser-mapping@2.8.31: {}
 
   better-auth@1.4.1(@sveltejs/kit@2.49.0(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.14)(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.6)(yaml@2.8.1)))(svelte@5.43.14)(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.6)(yaml@2.8.1)))(svelte@5.43.14):
     dependencies:
@@ -4975,7 +4975,7 @@ snapshots:
 
   browserslist@4.28.0:
     dependencies:
-      baseline-browser-mapping: 2.8.30
+      baseline-browser-mapping: 2.8.31
       caniuse-lite: 1.0.30001756
       electron-to-chromium: 1.5.259
       node-releases: 2.0.27
@@ -5921,7 +5921,7 @@ snapshots:
 
   prettier-plugin-multiline-arrays@4.0.3(prettier@3.6.2):
     dependencies:
-      '@augment-vir/common': 31.51.1
+      '@augment-vir/common': 31.52.0
       prettier: 3.6.2
       proxy-vir: 2.0.1
 
@@ -5943,8 +5943,8 @@ snapshots:
 
   proxy-vir@2.0.1:
     dependencies:
-      '@augment-vir/assert': 31.51.1
-      '@augment-vir/common': 31.51.1
+      '@augment-vir/assert': 31.52.0
+      '@augment-vir/common': 31.52.0
 
   pump@3.0.3:
     dependencies:
@@ -6402,9 +6402,9 @@ snapshots:
 
   typed-event-target@4.1.0:
     dependencies:
-      '@augment-vir/assert': 31.51.1
-      '@augment-vir/common': 31.51.1
-      '@augment-vir/core': 31.51.1
+      '@augment-vir/assert': 31.52.0
+      '@augment-vir/common': 31.52.0
+      '@augment-vir/core': 31.52.0
 
   typescript-eslint@8.47.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
     dependencies:

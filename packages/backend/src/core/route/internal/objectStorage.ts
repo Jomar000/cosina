@@ -48,7 +48,12 @@ objectStorageRoute.post(
                 eq(uploadAttachment.objectStorageId, objectStorage.id),
             )
             .innerJoin(upload, eq(upload.id, uploadAttachment.uploadId))
-            .where(eq(upload.id, uploadId))
+            .where(
+                and(
+                    eq(upload.id, uploadId),
+                    eq(objectStorage.isDeleted, false),
+                ),
+            )
 
         if (linkedObjects.length === 0) {
             return ctx.json(
@@ -129,7 +134,7 @@ objectStorageRoute.get('/upload/create', isAuthenticated(), async (ctx) => {
             {
                 data: { uploadId },
             },
-            200,
+            201,
         )
     } catch (err) {
         throw new AppError(
@@ -194,22 +199,43 @@ objectStorageRoute.post(
                 )
         ).map(({ id }) => id)
 
-        await ctx.get('dbClient').transaction(async (tx) => {
-            await tx
-                .delete(objectStorage)
-                .where(inArray(objectStorage.id, attachmentsToPurge))
+        const committedAttachments = await ctx
+            .get('dbClient')
+            .transaction(async (tx) => {
+                await tx
+                    .update(objectStorage)
+                    .set({ isDeleted: true })
+                    .where(inArray(objectStorage.id, attachmentsToPurge))
 
-            await tx
-                .update(upload)
-                .set({ isCommitted: true })
-                .where(eq(upload.id, uploadId))
-        })
+                await tx
+                    .update(upload)
+                    .set({ isCommitted: true })
+                    .where(eq(upload.id, uploadId))
+
+                return await tx
+                    .select({ id: objectStorage.id })
+                    .from(upload)
+                    .innerJoin(
+                        uploadAttachment,
+                        eq(upload.id, uploadAttachment.uploadId),
+                    )
+                    .innerJoin(
+                        objectStorage,
+                        eq(objectStorage.id, uploadAttachment.objectStorageId),
+                    )
+                    .where(
+                        and(
+                            eq(upload.id, uploadId),
+                            eq(objectStorage.isDeleted, false),
+                        ),
+                    )
+            })
 
         return ctx.json(
             {
                 data: {
                     uploadId,
-                    attachments: attachmentsToPurge,
+                    attachments: committedAttachments.map(({ id }) => id),
                 },
             },
             200,
@@ -268,30 +294,48 @@ objectStorageRoute.post(
 
         const signedUrls: {
             id: string
+            hashSha256: string
             encodedHash: string | null
             signedUrl: string | null
-            status: 200 | 409
+            status: 201 | 409
         }[] = []
 
-        // Existing SHA-256 hash check
         const hashesToCheck = attachments.map(({ hashSha256 }) => hashSha256)
 
-        const existingObjects = await ctx
-            .get('dbClient')
-            .select({
-                id: objectStorage.id,
-                hashSha256: objectStorage.hashSha256,
-            })
-            .from(objectStorage)
-            .where(inArray(objectStorage.hashSha256, hashesToCheck))
+        const [
+            existingObjects,
+            deletedObjects,
+        ] = await Promise.all([
+            ctx
+                .get('dbClient')
+                .select({
+                    id: objectStorage.id,
+                    hashSha256: objectStorage.hashSha256,
+                })
+                .from(objectStorage)
+                .where(inArray(objectStorage.hashSha256, hashesToCheck)),
+            ctx
+                .get('dbClient')
+                .select({
+                    id: objectStorage.id,
+                    hashSha256: objectStorage.hashSha256,
+                })
+                .from(objectStorage)
+                .where(
+                    and(
+                        inArray(objectStorage.hashSha256, hashesToCheck),
+                        eq(objectStorage.isDeleted, true),
+                    ),
+                ),
+        ])
 
-        const existingHashes = existingObjects.map(
+        const existingObjectsHash = existingObjects.map(
             ({ hashSha256 }) => hashSha256,
         )
 
         // Generate pre-signed upload URLs
         for (const attachment of attachments) {
-            if (existingHashes.includes(attachment.hashSha256)) {
+            if (existingObjectsHash.includes(attachment.hashSha256)) {
                 const objectStorageId = existingObjects.filter(
                     ({ hashSha256 }) => hashSha256 === attachment.hashSha256,
                 )[0].id
@@ -305,6 +349,7 @@ objectStorageRoute.post(
 
                 signedUrls.push({
                     id: objectStorageId,
+                    hashSha256: attachment.hashSha256,
                     encodedHash: null,
                     signedUrl: null,
                     status: 409,
@@ -332,6 +377,7 @@ objectStorageRoute.post(
 
                 signedUrls.push({
                     id: attachment.id,
+                    hashSha256: attachment.hashSha256,
                     encodedHash: hashBase64,
                     signedUrl: (
                         await ctx
@@ -351,15 +397,27 @@ objectStorageRoute.post(
                                 },
                             )
                     ).url,
-                    status: 200,
+                    status: 201,
                 })
             }
         }
 
         try {
             await ctx.get('dbClient').transaction(async (tx) => {
+                if (deletedObjects.length > 0) {
+                    // When an object was previously marked deleted, unset the isDeleted flag
+                    await tx
+                        .update(objectStorage)
+                        .set({ isDeleted: false })
+                        .where(
+                            inArray(
+                                objectStorage.id,
+                                deletedObjects.map(({ id }) => id),
+                            ),
+                        )
+                }
+
                 if (objectStorageData.length > 0) {
-                    // Must throw an error if there is a duplicate Object ID
                     await tx.insert(objectStorage).values(objectStorageData)
                 }
 
