@@ -1,5 +1,5 @@
 {
-    "id": "37c67d0b-1707-49af-bf0f-e3412c3658d9",
+    "id": "68a877c0-5aa9-43b3-8845-9fe07bbab102",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "7",
     "dialect": "postgresql",
@@ -748,13 +748,6 @@
                 },
                 "is_public": {
                     "name": "is_public",
-                    "type": "boolean",
-                    "primaryKey": false,
-                    "notNull": true,
-                    "default": false
-                },
-                "is_deleted": {
-                    "name": "is_deleted",
                     "type": "boolean",
                     "primaryKey": false,
                     "notNull": true,

@@ -113,7 +113,6 @@ export const objectStorage = pgTable('object_storage', {
     mimeType: text('mime_type'),
     hashSha256: text('hash_sha256').unique('ectz8nfqt8mj_unique').notNull(),
     isPublic: boolean('is_public').notNull().default(false),
-    isDeleted: boolean('is_deleted').notNull().default(false),
     isUploaded: boolean('is_uploaded').notNull().default(false),
     createdAt: timestamp('created_at', {
         withTimezone: true,

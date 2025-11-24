@@ -195,5 +195,20 @@ export const objectStorageUploadAttachmentCommitInputSchema = z.object({
         .min(1, { error: 'At least one attachment must be provided.' }),
 })
 
-export const objectStorageUploadCommitInputSchema =
-    objectStorageUploadAttachmentCommitInputSchema
+export const objectStorageUploadCommitInputSchema = z.object({
+    uploadId: textField({ fieldName: 'Upload ID', min: 16 }).regex(
+        /^[a-zA-Z0-9]+$/,
+        { error: 'Upload ID must be alphanumeric characters only.' },
+    ),
+    attachments: z
+        .array(
+            textField({ fieldName: 'Attachment ID', min: 32 }).regex(
+                /^[a-zA-Z0-9]+$/,
+                {
+                    error: 'Attachment ID must be alphanumeric characters only.',
+                },
+            ),
+        )
+        .optional()
+        .default([]),
+})

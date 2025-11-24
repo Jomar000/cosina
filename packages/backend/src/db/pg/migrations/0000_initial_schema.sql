@@ -78,7 +78,6 @@ CREATE TABLE "object_storage" (
 	"mime_type" text,
 	"hash_sha256" text NOT NULL,
 	"is_public" boolean DEFAULT false NOT NULL,
-	"is_deleted" boolean DEFAULT false NOT NULL,
 	"is_uploaded" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
