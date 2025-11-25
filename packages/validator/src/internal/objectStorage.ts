@@ -21,7 +21,7 @@ export const objectStorageDownloadLinkCreateOutputSchema = baseOutputSchema(
                 objectStorageId: z.string(),
                 encodedHash: z.string(),
                 signedUrl: z.string(),
-                status: z.literal(200),
+                status: z.literal(201),
             }),
             z.object({
                 key: z.string(),
@@ -100,7 +100,7 @@ export const objectStorageCreateUploadLinkOutputSchema = baseOutputSchema(
                     hash: z.string(),
                     encodedHash: z.string(),
                     signedUrl: z.string(),
-                    status: z.literal(200),
+                    status: z.literal(201),
                 }),
                 z.object({
                     key: z.string(),

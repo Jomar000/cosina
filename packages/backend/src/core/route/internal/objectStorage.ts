@@ -23,7 +23,6 @@ objectStorageRoute.use(isAuthenticated())
 // Routes
 objectStorageRoute.post(
     '/download/link/create',
-    isAuthenticated(),
     validator('json', async (value, ctx) =>
         honoValidatorCb(value, ctx, objectStorageDownloadLinkCreateInputSchema),
     ),
@@ -68,7 +67,7 @@ objectStorageRoute.post(
         const signedUrls: {
             objectStorageId: string
             signedUrl: string | null
-            status: 200 | 403
+            status: 201 | 403
         }[] = []
 
         for (const { objectStorage, objectStorageAcl } of linkedObjects) {
@@ -99,7 +98,7 @@ objectStorageRoute.post(
                                 },
                             )
                     ).url,
-                    status: 200,
+                    status: 201,
                 })
             } else {
                 signedUrls.push({
