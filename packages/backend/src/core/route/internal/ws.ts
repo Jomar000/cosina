@@ -1,16 +1,14 @@
 import { Hono } from 'hono'
 
+import { isAuthenticated } from '../../middleware/isAuthenticated.js'
+
 export const wsRoute = new Hono<THonoInstance>()
 
+// Middleware
+wsRoute.use(isAuthenticated())
+
+// Routes
 wsRoute.get('/:channel', async (ctx) => {
-    const authData = await ctx.get('auth').api.getSession({
-        headers: ctx.req.raw.headers,
-    })
-
-    if (!authData) {
-        return ctx.text('You are not allowed to access this resource.', 401)
-    }
-
     const channel = ctx.req.param('channel')
 
     if (channel.length < 1 || channel.length > 32) {

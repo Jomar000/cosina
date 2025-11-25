@@ -1,164 +1,59 @@
 import {
     userProfileAddressUpdateInputSchema,
-    userProfileReadInputSchema,
-    userProfileReadManyInputSchema,
     userProfileUpdateInputSchema,
 } from '@hyperion/validator/internal/user'
-import {
-    and,
-    asc,
-    count as countFn,
-    desc,
-    eq,
-    getTableColumns,
-} from 'drizzle-orm'
+import { and, eq, getTableColumns } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 
 import { AppError } from '../../../../errors.js'
 import { honoValidatorCb } from '../../../../utilities.js'
-import { isAuthenticated } from '../../../middleware/isAuthenticated.js'
-import { isAuthorized } from '../../../middleware/isAuthorized.js'
 
 export const profileRoute = new Hono<THonoInstance>()
 
 // Routes
-profileRoute.get(
-    '/read',
-    isAuthenticated(),
-    validator('query', async (value, ctx) =>
-        honoValidatorCb(value, ctx, userProfileReadInputSchema),
-    ),
-    async (ctx) => {
-        const { userId } = ctx.req.valid('query')
+profileRoute.get('/read', async (ctx) => {
+    const { member, userProfile } = ctx.get('dbSchema')
 
-        const { member, userProfile } = ctx.get('dbSchema')
-
-        if (!ctx.get('isPrivilegedRole') && ctx.get('user')!.id !== userId) {
-            return ctx.json(
-                {
-                    error: {
-                        code: 'FORBIDDEN',
-                        message: 'You are not allowed to access this resource.',
-                    },
-                },
-                403,
-            )
-        }
-
-        try {
-            const searchCondition = and(
-                eq(
-                    member.organizationId,
-                    ctx.get('session')!.activeOrganizationId!,
-                ),
-                eq(userProfile.userId, userId),
-            )
-
-            const { createdAt, updatedAt, ...selectedColumns } =
-                getTableColumns(userProfile)
-
-            const data = await ctx
-                .get('dbClient')
-                .select(selectedColumns)
-                .from(userProfile)
-                .innerJoin(member, eq(member.userId, userProfile.userId))
-                .where(searchCondition)
-
-            return ctx.json({ data }, 200)
-        } catch (err) {
-            throw new AppError(
-                {
-                    status: 500,
-                    code: 'PROFILE_RETRIEVAL_FAILED',
-                    message: 'Profile retrieval failed.',
-                },
-                err instanceof Error ? err : undefined,
-            )
-        }
-    },
-)
-
-profileRoute.get(
-    '/readMany',
-    isAuthorized({
-        admin: ['ANY'],
-    }),
-    validator('query', async (value, ctx) =>
-        honoValidatorCb(value, ctx, userProfileReadManyInputSchema),
-    ),
-    async (ctx) => {
-        const { limit, offset, sortOrder } = ctx.req.valid('query')
-
-        const { member, userProfile } = ctx.get('dbSchema')
-
-        try {
-            const searchCondition = eq(
+    try {
+        const searchCondition = and(
+            eq(
                 member.organizationId,
                 ctx.get('session')!.activeOrganizationId!,
-            )
+            ),
+            eq(userProfile.userId, ctx.get('user')!.id),
+        )
 
-            const count = (
-                await ctx
-                    .get('dbClient')
-                    .select({ count: countFn(userProfile.userId) })
-                    .from(userProfile)
-                    .innerJoin(member, eq(member.userId, userProfile.userId))
-                    .where(searchCondition)
-            )[0].count
+        const { createdAt, updatedAt, ...selectedColumns } =
+            getTableColumns(userProfile)
 
-            const { createdAt, updatedAt, ...selectedColumns } =
-                getTableColumns(userProfile)
+        const data = await ctx
+            .get('dbClient')
+            .select(selectedColumns)
+            .from(userProfile)
+            .innerJoin(member, eq(member.userId, userProfile.userId))
+            .where(searchCondition)
 
-            const subquery = ctx
-                .get('dbClient')
-                .select({ userId: userProfile.userId })
-                .from(userProfile)
-                .innerJoin(member, eq(member.userId, userProfile.userId))
-                .where(searchCondition)
-                .limit(limit)
-                .offset(offset)
-                .orderBy(
-                    sortOrder === 'asc'
-                        ? asc(userProfile.userId)
-                        : desc(userProfile.userId),
-                )
-                .as('subquery')
-
-            const data = await ctx
-                .get('dbClient')
-                .select(selectedColumns)
-                .from(userProfile)
-                .innerJoin(subquery, eq(subquery.userId, userProfile.userId))
-                .orderBy(
-                    sortOrder === 'asc'
-                        ? asc(userProfile.userId)
-                        : desc(userProfile.userId),
-                )
-
-            return ctx.json({ limit, offset, count, data }, 200)
-        } catch (err) {
-            throw new AppError(
-                {
-                    status: 500,
-                    code: 'PROFILE_LIST_RETRIEVAL_FAILED',
-                    message: 'Profile list retrieval failed.',
-                },
-                err instanceof Error ? err : undefined,
-            )
-        }
-    },
-)
+        return ctx.json({ data }, 200)
+    } catch (err) {
+        throw new AppError(
+            {
+                status: 500,
+                code: 'PROFILE_RETRIEVAL_FAILED',
+                message: 'Profile retrieval failed.',
+            },
+            err instanceof Error ? err : undefined,
+        )
+    }
+})
 
 profileRoute.post(
     '/update',
-    isAuthenticated(),
     validator('json', async (value, ctx) =>
         honoValidatorCb(value, ctx, userProfileUpdateInputSchema),
     ),
     async (ctx) => {
         const {
-            userId,
             firstName,
             middleName,
             lastName,
@@ -168,47 +63,6 @@ profileRoute.post(
         } = ctx.req.valid('json')
 
         const { member, userProfile } = ctx.get('dbSchema')
-
-        if (!ctx.get('isPrivilegedRole') && ctx.get('user')!.id !== userId) {
-            return ctx.json(
-                {
-                    error: {
-                        code: 'FORBIDDEN',
-                        message: 'You are not allowed to access this resource.',
-                    },
-                },
-                403,
-            )
-        }
-
-        const searchCondition = and(
-            eq(
-                member.organizationId,
-                ctx.get('session')!.activeOrganizationId!,
-            ),
-            eq(userProfile.userId, userId),
-        )
-
-        const count = (
-            await ctx
-                .get('dbClient')
-                .select({ count: countFn(userProfile.userId) })
-                .from(userProfile)
-                .innerJoin(member, eq(member.userId, userProfile.userId))
-                .where(searchCondition)
-        )[0].count
-
-        if (count === 0) {
-            return ctx.json(
-                {
-                    error: {
-                        code: 'BAD_REQUEST',
-                        message: 'User ID not found, nothing to update.',
-                    },
-                },
-                400,
-            )
-        }
 
         try {
             const data = await ctx
@@ -223,7 +77,7 @@ profileRoute.post(
                     backupPhoneNumber,
                 })
                 .from(member)
-                .where(eq(userProfile.userId, userId))
+                .where(eq(userProfile.userId, ctx.get('user')!.id))
                 .returning({
                     firstName: userProfile.firstName,
                     middleName: userProfile.middleName,
@@ -250,13 +104,11 @@ profileRoute.post(
 
 profileRoute.post(
     '/update/address',
-    isAuthenticated(),
     validator('json', async (value, ctx) =>
         honoValidatorCb(value, ctx, userProfileAddressUpdateInputSchema),
     ),
     async (ctx) => {
         const {
-            userId,
             line1,
             line2,
             cityMunicipality,
@@ -265,48 +117,7 @@ profileRoute.post(
             countryCode,
         } = ctx.req.valid('json')
 
-        const { address, member, userProfile } = ctx.get('dbSchema')
-
-        if (!ctx.get('isPrivilegedRole') && ctx.get('user')!.id !== userId) {
-            return ctx.json(
-                {
-                    error: {
-                        code: 'FORBIDDEN',
-                        message: 'You are not allowed to access this resource.',
-                    },
-                },
-                403,
-            )
-        }
-
-        const searchCondition = and(
-            eq(
-                member.organizationId,
-                ctx.get('session')!.activeOrganizationId!,
-            ),
-            eq(userProfile.userId, userId),
-        )
-
-        const count = (
-            await ctx
-                .get('dbClient')
-                .select({ count: countFn(userProfile.userId) })
-                .from(userProfile)
-                .innerJoin(member, eq(member.userId, userProfile.userId))
-                .where(searchCondition)
-        )[0].count
-
-        if (count === 0) {
-            return ctx.json(
-                {
-                    error: {
-                        code: 'BAD_REQUEST',
-                        message: 'User ID not found, nothing to update.',
-                    },
-                },
-                400,
-            )
-        }
+        const { address, userProfile } = ctx.get('dbSchema')
 
         try {
             const data = await ctx.get('dbClient').transaction(async (tx) => {
@@ -314,7 +125,7 @@ profileRoute.post(
                     await tx
                         .select({ addressId: userProfile.addressId })
                         .from(userProfile)
-                        .where(eq(userProfile.userId, userId))
+                        .where(eq(userProfile.userId, ctx.get('user')!.id))
                 )[0]
 
                 if (existingAddressId?.addressId) {
@@ -347,7 +158,7 @@ profileRoute.post(
                         .set({
                             addressId: newAddressId[0].id,
                         })
-                        .where(eq(userProfile.userId, userId))
+                        .where(eq(userProfile.userId, ctx.get('user')!.id))
                 }
 
                 return {

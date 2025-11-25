@@ -17,6 +17,9 @@ import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 
 export const objectStorageRoute = new Hono<THonoInstance>()
 
+// Middleware
+objectStorageRoute.use(isAuthenticated())
+
 // Routes
 objectStorageRoute.post(
     '/download/link/create',
@@ -111,7 +114,7 @@ objectStorageRoute.post(
     },
 )
 
-objectStorageRoute.get('/upload/create', isAuthenticated(), async (ctx) => {
+objectStorageRoute.get('/upload/create', async (ctx) => {
     const { upload } = ctx.get('dbSchema')
 
     try {
@@ -145,7 +148,6 @@ objectStorageRoute.get('/upload/create', isAuthenticated(), async (ctx) => {
 
 objectStorageRoute.post(
     '/upload/commit',
-    isAuthenticated(),
     validator('json', async (value, ctx) =>
         honoValidatorCb(value, ctx, objectStorageUploadCommitInputSchema),
     ),
@@ -242,7 +244,6 @@ objectStorageRoute.post(
 
 objectStorageRoute.post(
     '/upload/attachment/create',
-    isAuthenticated(),
     validator('json', async (value, ctx) =>
         honoValidatorCb(
             value,
@@ -419,7 +420,6 @@ objectStorageRoute.post(
 
 objectStorageRoute.post(
     '/upload/attachment/commit',
-    isAuthenticated(),
     validator('json', async (value, ctx) =>
         honoValidatorCb(
             value,
@@ -491,7 +491,6 @@ objectStorageRoute.post(
 
 objectStorageRoute.post(
     '/create/uploadLink',
-    isAuthenticated(),
     validator('json', async (value, ctx) =>
         honoValidatorCb(value, ctx, objectStorageCreateUploadLinkInputSchema),
     ),

@@ -1,14 +1,12 @@
 import { Hono } from 'hono'
 
-import { isAuthenticated } from '../../../middleware/isAuthenticated.js'
+import { passwordRoute } from './password.js'
 import { profileRoute } from './profile.js'
 
 export const userRoute = new Hono<THonoInstance>()
 
-// Middleware
-userRoute.use(isAuthenticated())
-
 // Routes
+userRoute.route('/password', passwordRoute)
 userRoute.route('/profile', profileRoute)
 
 export default userRoute
