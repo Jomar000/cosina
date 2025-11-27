@@ -35,4 +35,4 @@ export const updateInputSchema = z.object({
         .uppercase(),
 })
 
-export const addressUpdateInputSchema = base.addressInputSchema
+export const updateAddressInputSchema = base.addressInputSchema

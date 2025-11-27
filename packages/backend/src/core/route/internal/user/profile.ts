@@ -102,7 +102,7 @@ profileRoute.post(
 profileRoute.post(
     '/update/address',
     validator('json', async (value, ctx) =>
-        honoValidatorCb(value, ctx, profile.addressUpdateInputSchema),
+        honoValidatorCb(value, ctx, profile.updateAddressInputSchema),
     ),
     async (ctx) => {
         const {

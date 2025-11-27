@@ -1,4 +1,4 @@
-import { user } from '@hyperion/validator/internal/admin'
+import { profile } from '@hyperion/validator/internal/admin/user'
 import {
     and,
     asc,
@@ -19,7 +19,7 @@ export const profileRoute = new Hono<THonoInstance>()
 profileRoute.get(
     '/read',
     validator('query', async (value, ctx) =>
-        honoValidatorCb(value, ctx, user.profile.readInputSchema),
+        honoValidatorCb(value, ctx, profile.readInputSchema),
     ),
     async (ctx) => {
         const { userId } = ctx.req.valid('query')
@@ -62,7 +62,7 @@ profileRoute.get(
 profileRoute.get(
     '/readMany',
     validator('query', async (value, ctx) =>
-        honoValidatorCb(value, ctx, user.profile.readManyInputSchema),
+        honoValidatorCb(value, ctx, profile.readManyInputSchema),
     ),
     async (ctx) => {
         const { limit, offset, sortOrder } = ctx.req.valid('query')
@@ -130,7 +130,7 @@ profileRoute.get(
 profileRoute.post(
     '/update',
     validator('json', async (value, ctx) =>
-        honoValidatorCb(value, ctx, user.profile.updateInputSchema),
+        honoValidatorCb(value, ctx, profile.updateInputSchema),
     ),
     async (ctx) => {
         const {
@@ -215,7 +215,7 @@ profileRoute.post(
 profileRoute.post(
     '/update/address',
     validator('json', async (value, ctx) =>
-        honoValidatorCb(value, ctx, user.profile.addressUpdateInputSchema),
+        honoValidatorCb(value, ctx, profile.updateAddressInputSchema),
     ),
     async (ctx) => {
         const {

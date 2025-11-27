@@ -24,7 +24,7 @@
     "devDependencies": {
         "@hyperion/validator": "workspace:*",
         "@internationalized/date": "^3.10.0",
-        "@lucide/svelte": "^0.554.0",
+        "@lucide/svelte": "^0.555.0",
         "@playwright/test": "^1.57.0",
         "@sveltejs/adapter-static": "^3.0.10",
         "@sveltejs/kit": "^2.49.0",

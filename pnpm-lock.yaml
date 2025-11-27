@@ -42,7 +42,7 @@ importers:
         specifier: ^9.1.7
         version: 9.1.7
       prettier:
-        specifier: ^3.6.2
+        specifier: 3.6.2
         version: 3.6.2
       prettier-plugin-multiline-arrays:
         specifier: ^4.0.3
@@ -133,8 +133,8 @@ importers:
         specifier: ^3.10.0
         version: 3.10.0
       '@lucide/svelte':
-        specifier: ^0.554.0
-        version: 0.554.0(svelte@5.45.2)
+        specifier: ^0.555.0
+        version: 0.555.0(svelte@5.45.2)
       '@playwright/test':
         specifier: ^1.57.0
         version: 1.57.0
@@ -996,8 +996,8 @@ packages:
   '@libsql/core@0.14.0':
     resolution: {integrity: sha512-nhbuXf7GP3PSZgdCY2Ecj8vz187ptHlZQ0VRc751oB2C1W8jQUXKKklvt7t1LJiUTQBVJuadF628eUk+3cRi4Q==}
 
-  '@lucide/svelte@0.554.0':
-    resolution: {integrity: sha512-CM6wLEH8uk3WBpC42t8R0hF7SlQrsYEL6qGuXdB99xKZwKglpWmX5XgYu7FIYOCBYOyC1rm4dNhIe6uF9pOXqw==}
+  '@lucide/svelte@0.555.0':
+    resolution: {integrity: sha512-aqTOMjBjf/HNwrhggRdb83T0QslZdpJTyTwr/chtXTGw7u4Hcu4zQb/5uA+csF0KKawKWVnsNI1MdHEHeEXTcQ==}
     peerDependencies:
       svelte: ^5
 
@@ -4266,7 +4266,7 @@ snapshots:
       js-base64: 3.7.8
     optional: true
 
-  '@lucide/svelte@0.554.0(svelte@5.45.2)':
+  '@lucide/svelte@0.555.0(svelte@5.45.2)':
     dependencies:
       svelte: 5.45.2
 

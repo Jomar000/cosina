@@ -13,6 +13,6 @@ export const updateInputSchema = profile.updateInputSchema.extend({
     userId: field.vText({ fieldName: 'User ID' }),
 })
 
-export const addressUpdateInputSchema = base.addressInputSchema.extend({
+export const updateAddressInputSchema = base.addressInputSchema.extend({
     userId: field.vText({ fieldName: 'User ID' }),
 })
