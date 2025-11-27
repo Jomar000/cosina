@@ -19,25 +19,7 @@
         "zod": "^4.1.13"
     },
     "exports": {
-        "./shared": {
-            "types": "./dist/shared.d.ts",
-            "default": "./dist/shared.js"
-        },
-        "./internal/admin/user": {
-            "types": "./dist/internal/admin/user.d.ts",
-            "default": "./dist/internal/admin/user.js"
-        },
-        "./internal/auth": {
-            "types": "./dist/internal/auth.d.ts",
-            "default": "./dist/internal/auth.js"
-        },
-        "./internal/objectStorage": {
-            "types": "./dist/internal/objectStorage.d.ts",
-            "default": "./dist/internal/objectStorage.js"
-        },
-        "./internal/user": {
-            "types": "./dist/internal/user.d.ts",
-            "default": "./dist/internal/user.js"
-        }
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
     }
 }
