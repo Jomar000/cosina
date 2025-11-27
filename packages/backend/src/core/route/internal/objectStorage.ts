@@ -1,9 +1,9 @@
 import {
-    objectStorageCreateUploadLinkInputSchema,
-    objectStorageDownloadLinkCreateInputSchema,
-    objectStorageUploadAttachmentCommitInputSchema,
-    objectStorageUploadAttachmentCreateInputSchema,
-    objectStorageUploadCommitInputSchema,
+    createUploadLinkInputSchema,
+    downloadLinkCreateInputSchema,
+    uploadAttachmentCommitInputSchema,
+    uploadAttachmentCreateInputSchema,
+    uploadCommitInputSchema,
 } from '@hyperion/validator/internal/objectStorage'
 import { hexToBytes } from '@noble/hashes/utils.js'
 import { and, eq, inArray, notInArray } from 'drizzle-orm'
@@ -24,7 +24,7 @@ objectStorageRoute.use(isAuthenticated())
 objectStorageRoute.post(
     '/download/link/create',
     validator('json', async (value, ctx) =>
-        honoValidatorCb(value, ctx, objectStorageDownloadLinkCreateInputSchema),
+        honoValidatorCb(value, ctx, downloadLinkCreateInputSchema),
     ),
     async (ctx) => {
         const { uploadId } = ctx.req.valid('json')
@@ -148,7 +148,7 @@ objectStorageRoute.get('/upload/create', async (ctx) => {
 objectStorageRoute.post(
     '/upload/commit',
     validator('json', async (value, ctx) =>
-        honoValidatorCb(value, ctx, objectStorageUploadCommitInputSchema),
+        honoValidatorCb(value, ctx, uploadCommitInputSchema),
     ),
     async (ctx) => {
         const { attachments, uploadId } = ctx.req.valid('json')
@@ -244,11 +244,7 @@ objectStorageRoute.post(
 objectStorageRoute.post(
     '/upload/attachment/create',
     validator('json', async (value, ctx) =>
-        honoValidatorCb(
-            value,
-            ctx,
-            objectStorageUploadAttachmentCreateInputSchema,
-        ),
+        honoValidatorCb(value, ctx, uploadAttachmentCreateInputSchema),
     ),
     async (ctx) => {
         const { attachments, uploadId } = ctx.req.valid('json')
@@ -420,11 +416,7 @@ objectStorageRoute.post(
 objectStorageRoute.post(
     '/upload/attachment/commit',
     validator('json', async (value, ctx) =>
-        honoValidatorCb(
-            value,
-            ctx,
-            objectStorageUploadAttachmentCommitInputSchema,
-        ),
+        honoValidatorCb(value, ctx, uploadAttachmentCommitInputSchema),
     ),
     async (ctx) => {
         const { attachments, uploadId } = ctx.req.valid('json')
@@ -491,7 +483,7 @@ objectStorageRoute.post(
 objectStorageRoute.post(
     '/create/uploadLink',
     validator('json', async (value, ctx) =>
-        honoValidatorCb(value, ctx, objectStorageCreateUploadLinkInputSchema),
+        honoValidatorCb(value, ctx, createUploadLinkInputSchema),
     ),
     async (ctx) => {
         const objectData = ctx.req.valid('json')

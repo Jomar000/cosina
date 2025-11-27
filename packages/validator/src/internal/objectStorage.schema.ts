@@ -1,20 +1,16 @@
 import { z } from 'zod'
 
-import {
-    baseOutputSchema,
-    booleanField,
-    numericField,
-    textField,
-} from '../shared.js'
+import { base, field } from '../shared/index.js'
 
-export const objectStorageDownloadLinkCreateInputSchema = z.object({
-    uploadId: textField({ fieldName: 'Upload ID', min: 16 }).regex(
-        /^[a-zA-Z0-9]+$/,
-        { error: 'Upload ID must be alphanumeric characters only.' },
-    ),
+export const downloadLinkCreateInputSchema = z.object({
+    uploadId: field
+        .vText({ fieldName: 'Upload ID', min: 16 })
+        .regex(/^[a-zA-Z0-9]+$/, {
+            error: 'Upload ID must be alphanumeric characters only.',
+        }),
 })
 
-export const objectStorageDownloadLinkCreateOutputSchema = baseOutputSchema(
+export const downloadLinkCreateOutputSchema = base.outputSchema(
     z.array(
         z.discriminatedUnion('status', [
             z.object({
@@ -39,16 +35,21 @@ export const objectStorageDownloadLinkCreateOutputSchema = baseOutputSchema(
     ),
 )
 
-export const objectStorageCreateUploadLinkInputSchema = z
+/**
+ * @deprecated
+ */
+export const createUploadLinkInputSchema = z
     .array(
         z.object({
-            size: numericField({ fieldName: 'Size', max: 10485760 }),
-            mimeType: textField({ fieldName: 'MIME Type', min: 8 })
+            size: field.vNumeric({ fieldName: 'Size', max: 10485760 }),
+            mimeType: field
+                .vText({ fieldName: 'MIME Type', min: 8 })
                 .lowercase()
                 .optional(),
-            hashSha256: textField({
-                fieldName: 'SHA-256 hash',
-            })
+            hashSha256: field
+                .vText({
+                    fieldName: 'SHA-256 hash',
+                })
                 .lowercase()
                 .check((ctx) => {
                     if (
@@ -62,7 +63,7 @@ export const objectStorageCreateUploadLinkInputSchema = z
                         })
                     }
                 }),
-            isPublic: booleanField('isPublic Flag').optional().default(false),
+            isPublic: field.vBoolean('isPublic Flag').optional().default(false),
         }),
     )
     .min(1, { error: 'At least one object metadata must be provided.' })
@@ -90,7 +91,10 @@ export const objectStorageCreateUploadLinkInputSchema = z
         }
     })
 
-export const objectStorageCreateUploadLinkOutputSchema = baseOutputSchema(
+/**
+ * @deprecated
+ */
+export const createUploadLinkOutputSchema = base.outputSchema(
     z.object({
         uploadId: z.string(),
         signedUrls: z.array(
@@ -114,27 +118,29 @@ export const objectStorageCreateUploadLinkOutputSchema = baseOutputSchema(
     }),
 )
 
-export const objectStorageUploadAttachmentCreateInputSchema = z.object({
-    uploadId: textField({ fieldName: 'Upload ID', min: 16 }).regex(
-        /^[a-zA-Z0-9]+$/,
-        { error: 'Upload ID must be alphanumeric characters only.' },
-    ),
+export const uploadAttachmentCreateInputSchema = z.object({
+    uploadId: field
+        .vText({ fieldName: 'Upload ID', min: 16 })
+        .regex(/^[a-zA-Z0-9]+$/, {
+            error: 'Upload ID must be alphanumeric characters only.',
+        }),
     attachments: z
         .array(
             z.object({
-                id: textField({ fieldName: 'Attachment ID', min: 32 }).regex(
-                    /^[a-zA-Z0-9]+$/,
-                    {
+                id: field
+                    .vText({ fieldName: 'Attachment ID', min: 32 })
+                    .regex(/^[a-zA-Z0-9]+$/, {
                         error: 'Attachment ID must be alphanumeric characters only.',
-                    },
-                ),
-                size: numericField({ fieldName: 'Size', max: 10485760 }),
-                mimeType: textField({ fieldName: 'MIME Type', min: 8 })
+                    }),
+                size: field.vNumeric({ fieldName: 'Size', max: 10485760 }),
+                mimeType: field
+                    .vText({ fieldName: 'MIME Type', min: 8 })
                     .lowercase()
                     .optional(),
-                hashSha256: textField({
-                    fieldName: 'SHA-256 hash',
-                })
+                hashSha256: field
+                    .vText({
+                        fieldName: 'SHA-256 hash',
+                    })
                     .lowercase()
                     .check((ctx) => {
                         if (
@@ -148,7 +154,8 @@ export const objectStorageUploadAttachmentCreateInputSchema = z.object({
                             })
                         }
                     }),
-                isPublic: booleanField('isPublic Flag')
+                isPublic: field
+                    .vBoolean('isPublic Flag')
                     .optional()
                     .default(false),
             }),
@@ -178,36 +185,36 @@ export const objectStorageUploadAttachmentCreateInputSchema = z.object({
         }),
 })
 
-export const objectStorageUploadAttachmentCommitInputSchema = z.object({
-    uploadId: textField({ fieldName: 'Upload ID', min: 16 }).regex(
-        /^[a-zA-Z0-9]+$/,
-        { error: 'Upload ID must be alphanumeric characters only.' },
-    ),
+export const uploadAttachmentCommitInputSchema = z.object({
+    uploadId: field
+        .vText({ fieldName: 'Upload ID', min: 16 })
+        .regex(/^[a-zA-Z0-9]+$/, {
+            error: 'Upload ID must be alphanumeric characters only.',
+        }),
     attachments: z
         .array(
-            textField({ fieldName: 'Attachment ID', min: 32 }).regex(
-                /^[a-zA-Z0-9]+$/,
-                {
+            field
+                .vText({ fieldName: 'Attachment ID', min: 32 })
+                .regex(/^[a-zA-Z0-9]+$/, {
                     error: 'Attachment ID must be alphanumeric characters only.',
-                },
-            ),
+                }),
         )
         .min(1, { error: 'At least one attachment must be provided.' }),
 })
 
-export const objectStorageUploadCommitInputSchema = z.object({
-    uploadId: textField({ fieldName: 'Upload ID', min: 16 }).regex(
-        /^[a-zA-Z0-9]+$/,
-        { error: 'Upload ID must be alphanumeric characters only.' },
-    ),
+export const uploadCommitInputSchema = z.object({
+    uploadId: field
+        .vText({ fieldName: 'Upload ID', min: 16 })
+        .regex(/^[a-zA-Z0-9]+$/, {
+            error: 'Upload ID must be alphanumeric characters only.',
+        }),
     attachments: z
         .array(
-            textField({ fieldName: 'Attachment ID', min: 32 }).regex(
-                /^[a-zA-Z0-9]+$/,
-                {
+            field
+                .vText({ fieldName: 'Attachment ID', min: 32 })
+                .regex(/^[a-zA-Z0-9]+$/, {
                     error: 'Attachment ID must be alphanumeric characters only.',
-                },
-            ),
+                }),
         )
         .optional()
         .default([]),

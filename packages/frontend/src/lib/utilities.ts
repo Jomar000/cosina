@@ -1,5 +1,4 @@
-import type { objectStorageCreateUploadLinkOutputSchema } from '@hyperion/validator/internal/objectStorage'
-import type { baseOutputSchema } from '@hyperion/validator/shared'
+import type { internal, shared } from '@hyperion/validator'
 import { fileTypeFromBuffer } from 'file-type'
 import ky, { type Options } from 'ky'
 import { customAlphabet } from 'nanoid'
@@ -73,7 +72,7 @@ export const nanoidCustom = customAlphabet(
  * https://github.com/sindresorhus/ky
  */
 export const apiClient = async <
-    T extends z.output<ReturnType<typeof baseOutputSchema>>,
+    T extends z.output<ReturnType<typeof shared.base.outputSchema>>,
 >(
     path: string,
     init?: Options,
@@ -162,7 +161,7 @@ export const objectStorageClient: (
     const statusIndices: TStatusIndices = {}
 
     let presignedUrls: z.output<
-        typeof objectStorageCreateUploadLinkOutputSchema
+        typeof internal.objectStorage.createUploadLinkOutputSchema
     > | null = null
 
     ///
@@ -239,7 +238,9 @@ export const objectStorageClient: (
     try {
         if (dataToSign.length > 0) {
             presignedUrls = await apiClient<
-                z.output<typeof objectStorageCreateUploadLinkOutputSchema>
+                z.output<
+                    typeof internal.objectStorage.createUploadLinkOutputSchema
+                >
             >('internal/objectStorage/create/uploadLink', {
                 method: 'POST',
                 headers: {

@@ -1,7 +1,4 @@
-import {
-    userProfileAddressUpdateInputSchema,
-    userProfileUpdateInputSchema,
-} from '@hyperion/validator/internal/user'
+import { profile } from '@hyperion/validator/internal/user'
 import { and, eq, getTableColumns } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'
@@ -50,7 +47,7 @@ profileRoute.get('/read', async (ctx) => {
 profileRoute.post(
     '/update',
     validator('json', async (value, ctx) =>
-        honoValidatorCb(value, ctx, userProfileUpdateInputSchema),
+        honoValidatorCb(value, ctx, profile.updateInputSchema),
     ),
     async (ctx) => {
         const {
@@ -105,7 +102,7 @@ profileRoute.post(
 profileRoute.post(
     '/update/address',
     validator('json', async (value, ctx) =>
-        honoValidatorCb(value, ctx, userProfileAddressUpdateInputSchema),
+        honoValidatorCb(value, ctx, profile.addressUpdateInputSchema),
     ),
     async (ctx) => {
         const {

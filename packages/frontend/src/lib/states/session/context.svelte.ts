@@ -1,4 +1,4 @@
-import { authSignInOutputSchema } from '@hyperion/validator/internal/auth'
+import { signInOutputSchema } from '@hyperion/validator/internal/auth'
 import { createContext } from 'svelte'
 import { SvelteDate } from 'svelte/reactivity'
 
@@ -32,7 +32,7 @@ export class SessionState {
     /////////////
 
     #parseData: (data: unknown) => TSessionData = (data) =>
-        authSignInOutputSchema.def.options[0].shape.data.parse(data)
+        signInOutputSchema.def.options[0].shape.data.parse(data)
 
     clear = () => {
         this.#session = this.#sessionInitValue

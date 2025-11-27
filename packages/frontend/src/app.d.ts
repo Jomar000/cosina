@@ -1,7 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 
-import type { authSignInOutputSchema } from '@hyperion/validator/internal/auth'
+import type { signInOutputSchema } from '@hyperion/validator/internal/auth'
 import type { Component } from 'svelte'
 import type { z } from 'zod'
 
@@ -29,7 +29,7 @@ declare global {
     }
 
     type TSessionData = z.output<
-        (typeof authSignInOutputSchema.def.options)['0']['shape']['data']
+        (typeof signInOutputSchema.def.options)['0']['shape']['data']
     >
 
     type TCheckRolePermission = (

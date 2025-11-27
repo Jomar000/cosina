@@ -1,7 +1,7 @@
 <!-- https://shadcn-svelte.com/blocks/login#login-03 -->
 
 <script lang="ts">
-    import { authSignInInputSchema } from '@hyperion/validator/internal/auth'
+    import { internal } from '@hyperion/validator'
     import Eye from '@lucide/svelte/icons/eye'
     import EyeOff from '@lucide/svelte/icons/eye-off'
     import { createForm } from '@tanstack/svelte-form'
@@ -55,7 +55,9 @@
         mutationKey: [
             'authSignIn',
         ],
-        mutationFn: async (data: z.input<typeof authSignInInputSchema>) => {
+        mutationFn: async (
+            data: z.input<typeof internal.auth.signInInputSchema>,
+        ) => {
             showCaptchaModal = true
 
             // Wait for DOM update
@@ -169,7 +171,8 @@
             // Make sure form is valid everytime it changes.
             // Error message does not matter, just return a truthy value.
             onChange: ({ value }) => {
-                const { error } = authSignInInputSchema.safeParse(value)
+                const { error } =
+                    internal.auth.signInInputSchema.safeParse(value)
                 return error
             },
         },
@@ -204,7 +207,7 @@
                         validators={{
                             onBlur: ({ value }) => {
                                 const { error } =
-                                    authSignInInputSchema.shape.organizationId.safeParse(
+                                    internal.auth.signInInputSchema.shape.organizationId.safeParse(
                                         value,
                                     )
                                 return error
@@ -246,7 +249,7 @@
                         validators={{
                             onBlur: ({ value }) => {
                                 const { error } =
-                                    authSignInInputSchema.shape.accountId.safeParse(
+                                    internal.auth.signInInputSchema.shape.accountId.safeParse(
                                         value,
                                     )
                                 return error
@@ -287,7 +290,7 @@
                         validators={{
                             onBlur: ({ value }) => {
                                 const { error } =
-                                    authSignInInputSchema.shape.password.safeParse(
+                                    internal.auth.signInInputSchema.shape.password.safeParse(
                                         value,
                                     )
                                 return error

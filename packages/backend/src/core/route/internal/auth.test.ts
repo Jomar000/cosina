@@ -1,4 +1,4 @@
-import type { authSignInOutputSchema } from '@hyperion/validator/internal/auth'
+import type { signInOutputSchema } from '@hyperion/validator/internal/auth'
 import { env } from 'cloudflare:test'
 import { describe, expect, it } from 'vitest'
 import type z from 'zod'
@@ -6,12 +6,12 @@ import type z from 'zod'
 import app from '../../index.js'
 
 type TDataOutput = Extract<
-    z.output<typeof authSignInOutputSchema>,
+    z.output<typeof signInOutputSchema>,
     { data: unknown }
 >
 
 type TErrorOutput = Extract<
-    z.output<typeof authSignInOutputSchema>,
+    z.output<typeof signInOutputSchema>,
     { error: unknown }
 >
 
