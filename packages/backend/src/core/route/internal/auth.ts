@@ -1,9 +1,6 @@
 import { Hono } from 'hono'
 
-export const authRoute = new Hono<THonoInstance>()
-
-// Routes
-authRoute.on(
+export const authRoute = new Hono<THonoInstance>().on(
     [
         'GET',
         'POST',

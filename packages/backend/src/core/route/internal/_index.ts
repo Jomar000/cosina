@@ -9,16 +9,20 @@ import { userRoute } from './user/_index.js'
 import { wsRoute } from './ws.js'
 
 export const internalRoute = new Hono<THonoInstance>()
-
-// Middleware
-internalRoute.use(corsHandler('default'))
-internalRoute.use(initContext())
-
-// Routes
-internalRoute.route('/admin', adminRoute)
-internalRoute.route('/auth', authRoute)
-internalRoute.route('/objectStorage', objectStorageRoute)
-internalRoute.route('/user', userRoute)
-internalRoute.route('/ws', wsRoute)
+    /**
+     * @description
+     * Middleware
+     */
+    .use(corsHandler('default'))
+    .use(initContext())
+    /**
+     * @description
+     * Routes
+     */
+    .route('/admin', adminRoute)
+    .route('/auth', authRoute)
+    .route('/objectStorage', objectStorageRoute)
+    .route('/user', userRoute)
+    .route('/ws', wsRoute)
 
 export default internalRoute

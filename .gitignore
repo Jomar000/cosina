@@ -1,6 +1,6 @@
-########
-# Root #
-########
+##########
+# Global #
+##########
 
 dist
 node_modules
@@ -21,6 +21,9 @@ wrangler-*.toml
 # OS
 .DS_Store
 Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
 
 ###########
 # Backend #
