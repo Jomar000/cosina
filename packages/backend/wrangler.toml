@@ -17,7 +17,7 @@ tag = "v1"
 new_sqlite_classes = ["WebSocketServer"]
 
 [build]
-command = "pnpm tsc --project ./tsconfig.build.json"
+command = "tsc --project ./tsconfig.build.json"
 
 #######
 # DEV #
