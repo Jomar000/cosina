@@ -1,5 +1,7 @@
+import type { AppType } from '@hyperion/backend'
 import type { internal, shared } from '@hyperion/validator'
 import { fileTypeFromBuffer } from 'file-type'
+import { hc } from 'hono/client'
 import ky, { type Options } from 'ky'
 import { customAlphabet } from 'nanoid'
 import PQueue from 'p-queue'
@@ -371,3 +373,15 @@ export const getCookie = (name: string) => {
 
     return cookies[name] ?? null
 }
+
+/**
+ * @description
+ * Hono RPC Client
+ *
+ * @link
+ * https://hono.dev/docs/guides/rpc
+ */
+export const honoClient = hc<AppType>(PUBLIC_API_URL, {
+    init: { credentials: 'include' },
+    fetch: ky,
+})

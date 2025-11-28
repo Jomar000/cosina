@@ -10,7 +10,7 @@
     import Sonner from '$lib/components/shadcn/sonner/sonner.svelte'
     import { AuthProvider } from '$lib/states/auth/index.js'
     import { SessionProvider } from '$lib/states/session/index.js'
-    import { apiClient } from '$lib/utilities.js'
+    import { honoClient } from '$lib/utilities.js'
     import '../app.css'
 
     ////////////////
@@ -38,7 +38,7 @@
             queryKey: [
                 'heartbeat',
             ],
-            queryFn: async () => await apiClient('heartbeat'),
+            queryFn: async () => await honoClient.heartbeat.$get(),
         }),
         () => queryClient,
     )

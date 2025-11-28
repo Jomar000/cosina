@@ -12,10 +12,11 @@
     },
     "scripts": {
         "dev": "wrangler dev",
-        "build": "wrangler deploy --outdir=dist --dry-run --env=",
+        "build": "wrangler deploy --outdir=./dist/$worker --dry-run --env=",
         "test": "pnpm run migrate:test && vitest --run",
-        "deploy:staging": "wrangler deploy --minify --outdir=dist --env=staging --config=wrangler-staging.toml",
-        "deploy:prod": "wrangler deploy --minify --outdir=dist --env=production --config=wrangler-production.toml",
+        "prepare": "pnpm build",
+        "deploy:staging": "wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
+        "deploy:prod": "wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
         "migrate:dev": "node ./src/db/pg/bootstrap.ts dev",
         "migrate:test": "node ./src/db/pg/bootstrap.ts test",
         "migrate:staging": "drizzle-kit migrate --config=drizzle-staging.config.ts",
@@ -45,5 +46,11 @@
         "smol-toml": "^1.5.2",
         "vite": "^7.2.4",
         "vitest": "^3.2.4"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/core/index.d.ts",
+            "default": "./dist/core/index.js"
+        }
     }
 }

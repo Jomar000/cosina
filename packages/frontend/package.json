@@ -22,6 +22,7 @@
         "deploy:prod": "vite build --mode=production && wrangler deploy --outdir=dist --env=production --config=wrangler-production.toml"
     },
     "devDependencies": {
+        "@hyperion/backend": "workspace:*",
         "@hyperion/validator": "workspace:*",
         "@internationalized/date": "^3.10.0",
         "@lucide/svelte": "^0.555.0",
@@ -42,6 +43,7 @@
         "daisyui": "^5.5.5",
         "dayjs": "^1.11.19",
         "file-type": "^21.1.1",
+        "hono": "^4.10.7",
         "ky": "^1.14.0",
         "mode-watcher": "^1.1.0",
         "nanoid": "^5.1.6",

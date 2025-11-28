@@ -126,6 +126,9 @@ importers:
 
   packages/frontend:
     devDependencies:
+      '@hyperion/backend':
+        specifier: workspace:*
+        version: link:../backend
       '@hyperion/validator':
         specifier: workspace:*
         version: link:../validator
@@ -186,6 +189,9 @@ importers:
       file-type:
         specifier: ^21.1.1
         version: 21.1.1
+      hono:
+        specifier: ^4.10.7
+        version: 4.10.7
       ky:
         specifier: ^1.14.0
         version: 1.14.0

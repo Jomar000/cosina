@@ -1,5 +1,5 @@
 name = "hyperion-backend"
-main = "src/core/index.ts"
+main = "dist/core/index.js"
 compatibility_date = "2025-11-09"
 compatibility_flags = ['nodejs_compat']
 
@@ -15,6 +15,9 @@ mode = "smart"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["WebSocketServer"]
+
+[build]
+command = "pnpm tsc --project ./tsconfig.build.json"
 
 #######
 # DEV #

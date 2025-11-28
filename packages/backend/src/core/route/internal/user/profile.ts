@@ -7,6 +7,10 @@ import { AppError } from '../../../../errors.js'
 import { honoValidatorCb } from '../../../../utilities.js'
 
 export const profileRoute = new Hono<THonoInstance>()
+    /**
+     * @description
+     * Routes
+     */
     .get('/read', async (ctx) => {
         const { member, userProfile } = ctx.get('dbSchema')
 
