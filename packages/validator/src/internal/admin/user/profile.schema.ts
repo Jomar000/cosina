@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
-import { base, field } from '../../../shared/index.js'
-import { profile } from '../../user/index.js'
+import * as base from '../../../shared/base.js'
+import * as field from '../../../shared/field.js'
+import * as profile from '../../user/profile.schema.js'
 
 export const readInputSchema = z.object({
     userId: field.vText({ fieldName: 'User ID' }),

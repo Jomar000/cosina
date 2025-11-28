@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
-import { base, field, refinement } from '../shared/index.js'
+import * as base from '../shared/base.js'
+import * as field from '../shared/field.js'
+import * as refinement from '../shared/refinement.js'
 
 export const signInInputSchema = z.object({
     organizationId: field.vText({

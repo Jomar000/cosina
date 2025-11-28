@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import { base, field } from '../../shared/index.js'
+import * as base from '../../shared/base.js'
+import * as field from '../../shared/field.js'
 
 export const updateInputSchema = z.object({
     firstName: field.vText({ fieldName: 'First Name' }).uppercase(),
