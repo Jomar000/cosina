@@ -9,6 +9,7 @@ echo
 # Check if certain files were modified by the merge process
 lockFileChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'pnpm-lock.yaml' || true ) )
 validatorChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/validator/src/' || true ) )
+backendChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/backend/src/' || true ) )
 
 # Re-install dependencies when there are modifications to pnpm lockfile
 if [[ $lockFileChanged != '' ]]; then
@@ -21,7 +22,17 @@ fi
 if [[ $validatorChanged != '' ]]; then
     echo Building validator package...
     pnpm --filter="@hyperion/validator" exec rm -rf dist
+    pnpm --filter="@hyperion/validator" exec rm -rf *.tsbuildinfo
     pnpm --filter="@hyperion/validator" build
+    echo
+fi
+
+# Build backend package
+if [[ $backendChanged != '' ]]; then
+    echo Building backend package...
+    pnpm --filter="@hyperion/backend" exec rm -rf dist
+    pnpm --filter="@hyperion/backend" exec rm -rf *.tsbuildinfo
+    pnpm --filter="@hyperion/backend" build
     echo
 fi
 
