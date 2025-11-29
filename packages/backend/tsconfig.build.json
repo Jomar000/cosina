@@ -1,5 +1,10 @@
 {
     "extends": "./tsconfig.json",
+    "references": [
+        {
+            "path": "../validator/tsconfig.json"
+        }
+    ],
     "exclude": [
         "**/*.test.ts"
     ]

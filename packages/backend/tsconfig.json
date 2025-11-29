@@ -11,5 +11,10 @@
         /* Emit */
         "outDir": "./dist/"
     },
+    "references": [
+        {
+            "path": "../validator/tsconfig.json"
+        }
+    ],
     "include": ["src/**/*"]
 }
