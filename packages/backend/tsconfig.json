@@ -2,7 +2,7 @@
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         /* Modules */
-        "rootDir": "./src/",
+        "rootDir": "./",
         "types": [
             "@cloudflare/vitest-pool-workers",
             "node"
@@ -16,5 +16,8 @@
             "path": "../validator/tsconfig.json"
         }
     ],
-    "include": ["src/**/*"]
+    "include": [
+        "src/**/*",
+        "test/**/*"
+    ]
 }

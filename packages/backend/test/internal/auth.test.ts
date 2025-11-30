@@ -3,7 +3,7 @@ import { env } from 'cloudflare:test'
 import { describe, expect, it } from 'vitest'
 import type z from 'zod'
 
-import app from '../../index.js'
+import app from '../../src/core/index.js'
 
 type TDataOutput = Extract<
     z.output<typeof signInOutputSchema>,
