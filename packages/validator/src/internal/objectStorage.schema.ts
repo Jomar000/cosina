@@ -44,7 +44,7 @@ export const createUploadLinkInputSchema = z
         z.object({
             size: field.vNumeric({ fieldName: 'Size', max: 10485760 }),
             mimeType: field
-                .vText({ fieldName: 'MIME Type', min: 8 })
+                .vText({ fieldName: 'MIME Type', min: 8, max: 128 })
                 .lowercase()
                 .optional(),
             hashSha256: field
@@ -130,7 +130,7 @@ export const uploadAttachmentCreateInputSchema = z.object({
             z.object({
                 size: field.vNumeric({ fieldName: 'Size', max: 10485760 }),
                 mimeType: field
-                    .vText({ fieldName: 'MIME Type', min: 8 })
+                    .vText({ fieldName: 'MIME Type', min: 8, max: 128 })
                     .lowercase()
                     .optional(),
                 hashSha256: field

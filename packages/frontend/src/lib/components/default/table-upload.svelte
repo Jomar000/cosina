@@ -3,24 +3,24 @@
         CircleCheck,
         CircleX,
         CloudUpload,
-        // File,
-        // Loader,
-        MoreVertical,
+        EllipsisVertical,
+        File as FileIcon,
         RefreshCw,
         Trash2,
     } from '@lucide/svelte/icons'
     import { fileTypeFromBuffer } from 'file-type'
+    import ky from 'ky'
+    import PQueue from 'p-queue'
     import { onMount } from 'svelte'
     import { SvelteMap } from 'svelte/reactivity'
 
-    // import * as Avatar from '$lib/components/shadcn/avatar'
+    import * as Avatar from '$lib/components/shadcn/avatar'
     import { Badge } from '$lib/components/shadcn/badge'
     import { Button } from '$lib/components/shadcn/button'
     import * as Card from '$lib/components/shadcn/card'
     import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu'
     import * as Table from '$lib/components/shadcn/table'
     import { getCookie, honoClient } from '$lib/utilities'
-    import ky from 'ky'
 
     ////////////////
     // Properties //
@@ -39,16 +39,17 @@
     ////////////////////
 
     type Metadata = {
-        name: string
-        size: number
+        file: File
         isPublic: boolean
         mimeType: string
         hashSha256: string
         status: 'QUEUED' | 'SUCCESS' | 'FAILED'
     }
 
-    let processed: Metadata[] = $state([])
-    let queue: Metadata[] = $state([])
+    let fileList: Metadata[] = $state([])
+    let addedToList: Metadata[] = $state([])
+
+    const uploadQueue = new PQueue({ concurrency: 3 })
 
     //////////////
     // Handlers //
@@ -56,14 +57,15 @@
 
     const handleFileChange = async (event: Event) => {
         const selectedFiles = (event.target as HTMLInputElement)?.files
-        const lookup: Map<string, globalThis.File> = new SvelteMap()
-        queue = []
+        const lookup: Map<string, File> = new SvelteMap()
+        addedToList = []
 
         if (selectedFiles) {
             /**
              * @description
              * STEP 1: Preprocessing of files to be signed
              */
+
             for (const [
                 _index,
                 file,
@@ -105,8 +107,8 @@
                     .join('')
 
                 if (
-                    processed.find((pf) => pf.hashSha256 === hashSha256) ||
-                    queue.find((qf) => qf.hashSha256 === hashSha256)
+                    fileList.find((pf) => pf.hashSha256 === hashSha256) ||
+                    addedToList.find((qf) => qf.hashSha256 === hashSha256)
                 ) {
                     // Skip duplicate hashes
                     continue
@@ -115,14 +117,13 @@
                 // Used to match Signed URLs
                 lookup.set(hashSha256, file)
 
-                queue = [
-                    ...queue,
+                addedToList = [
+                    ...addedToList,
                     {
-                        size: file.size,
+                        file,
                         hashSha256,
                         isPublic: false,
                         mimeType,
-                        name: file.name,
                         status: 'QUEUED',
                     },
                 ]
@@ -133,17 +134,23 @@
              * STEP 2: Signing Request
              */
 
-            if (queue.length === 0) {
+            if (addedToList.length === 0) {
                 return
             }
+
+            // Update the table
+            fileList = [
+                ...fileList,
+                ...addedToList,
+            ]
 
             const signingResponse =
                 await honoClient.internal.objectStorage.upload.attachment.create.$post(
                     {
                         json: {
                             uploadId,
-                            attachments: queue.map((qf) => ({
-                                size: qf.size as unknown as string, // TODO: Fix vNumeric
+                            attachments: addedToList.map((qf) => ({
+                                size: qf.file.size as unknown as string, // TODO: Fix vNumeric
                                 hashSha256: qf.hashSha256,
                                 isPublic: qf.isPublic,
                                 mimeType: qf.mimeType,
@@ -161,36 +168,62 @@
              * @description
              * STEP 3: Upload
              */
+
             if (signingResponse.ok) {
                 const { data } = await signingResponse.json()
 
                 for (const su of data.signedUrls) {
-                    const currentIndex = queue.findIndex(
-                        (q) => q.hashSha256 === su.hashSha256,
-                    )
+                    const queuedFn = async () => {
+                        const currentIndex = addedToList.findIndex(
+                            (q) => q.hashSha256 === su.hashSha256,
+                        )
 
-                    if (su.status === 409) {
-                        // File already exists, just set status to SUCCESS.
-                        queue[currentIndex].status = 'SUCCESS'
-                    } else {
-                        await ky(su.signedUrl!, {
-                            method: 'PUT',
-                            headers: {
-                                'x-amz-checksum-sha256': su.encodedHash!,
-                            },
-                            body: lookup.get(su.hashSha256)!,
-                        })
+                        if (su.status === 409) {
+                            // File already exists, just set status to SUCCESS.
+                            addedToList[currentIndex].status = 'SUCCESS'
+                        } else {
+                            try {
+                                // Upload the file.
+                                await ky(su.signedUrl!, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'x-amz-checksum-sha256':
+                                            su.encodedHash!,
+                                    },
+                                    body: lookup.get(su.hashSha256)!,
+                                })
 
-                        // Commit the uploaded file here.
+                                // Report back that file is successfully uploaded.
+                                const commitResponse =
+                                    await honoClient.internal.objectStorage.upload.attachment.commit.$post(
+                                        {
+                                            json: {
+                                                uploadId,
+                                                attachments: [su.id],
+                                            },
+                                        },
+                                        {
+                                            headers: {
+                                                'x-csrf-token':
+                                                    getCookie('csrf_token') ??
+                                                    '',
+                                            },
+                                        },
+                                    )
 
-                        queue[currentIndex].status = 'SUCCESS'
+                                if (commitResponse.ok) {
+                                    addedToList[currentIndex].status = 'SUCCESS'
+                                }
+                            } catch {
+                                addedToList[currentIndex].status = 'FAILED'
+                            }
+                        }
                     }
+
+                    uploadQueue.add(queuedFn).catch(() => {})
                 }
 
-                processed = [
-                    ...processed,
-                    ...queue,
-                ]
+                await uploadQueue.onIdle()
             }
         }
     }
@@ -239,7 +272,7 @@
             <Table.Root>
                 <Table.Header>
                     <Table.Row>
-                        <!-- <Table.Head class="w-20">Preview</Table.Head> -->
+                        <Table.Head class="w-20">Preview</Table.Head>
                         <Table.Head>Filename</Table.Head>
                         <Table.Head class="w-[120px]">Size</Table.Head>
                         <Table.Head class="w-[150px]">Status</Table.Head>
@@ -249,30 +282,31 @@
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                    {#each processed as p, i (i)}
+                    {#each fileList as p, i (i)}
                         <Table.Row>
-                            <!-- <Table.Cell>
+                            <Table.Cell>
                                 <Avatar.Root class="h-10 w-10 rounded-md">
-                                    {#if file.type === 'image'}
+                                    {#if p.mimeType.startsWith('image/')}
                                         <Avatar.Image
-                                            src={file.source}
-                                            alt={file.name}
+                                            src={URL.createObjectURL(p.file)}
+                                            alt={p.file.name}
                                             class="rounded-md object-cover"
                                         />
                                     {/if}
                                     <Avatar.Fallback
                                         class="rounded-md bg-muted"
                                     >
-                                        <File
+                                        <FileIcon
                                             class="h-5 w-5 text-muted-foreground"
                                         />
                                     </Avatar.Fallback>
                                 </Avatar.Root>
-                            </Table.Cell> -->
-                            <Table.Cell class="font-medium">{p.name}</Table.Cell
+                            </Table.Cell>
+                            <Table.Cell class="font-medium"
+                                >{p.file.name}</Table.Cell
                             >
                             <Table.Cell class="text-muted-foreground"
-                                >{p.size}</Table.Cell
+                                >{p.file.size}</Table.Cell
                             >
                             <Table.Cell>
                                 {#if p.status === 'SUCCESS'}
@@ -301,7 +335,7 @@
                                             variant="ghost"
                                             size="icon"
                                         >
-                                            <MoreVertical class="h-4 w-4" />
+                                            <EllipsisVertical class="h-4 w-4" />
                                         </Button>
                                     </DropdownMenu.Trigger>
                                     <DropdownMenu.Content>
