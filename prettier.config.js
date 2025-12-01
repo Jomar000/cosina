@@ -23,7 +23,7 @@ const pluginMultilineArraysConfig = {
     multilineArraysWrapThreshold: 1,
 }
 
-// prettier-plugin-multiline-arrays Options
+// prettier-plugin-tailwindcss Options
 // https://github.com/tailwindlabs/prettier-plugin-tailwindcss?tab=readme-ov-file#options
 
 const pluginTailwindCssConfig = {

@@ -19,6 +19,10 @@ new_sqlite_classes = ["WebSocketServer"]
 [build]
 # Used only to generate build artifacts used in project references
 command = "tsc --build ./tsconfig.build.json"
+watch_dir = [
+    "./src/",
+    "../validator/src/",
+]
 
 #######
 # DEV #

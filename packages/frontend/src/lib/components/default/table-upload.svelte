@@ -1,13 +1,11 @@
 <script lang="ts">
-    import {
-        CircleCheck,
-        CircleX,
-        CloudUpload,
-        EllipsisVertical,
-        File as FileIcon,
-        RefreshCw,
-        Trash2,
-    } from '@lucide/svelte/icons'
+    import CircleCheck from '@lucide/svelte/icons/circle-check'
+    import CircleX from '@lucide/svelte/icons/circle-x'
+    import CloudUpload from '@lucide/svelte/icons/cloud-upload'
+    import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical'
+    import FileIcon from '@lucide/svelte/icons/file'
+    import RefreshCw from '@lucide/svelte/icons/refresh-cw'
+    import Trash2 from '@lucide/svelte/icons/trash-2'
     import { fileTypeFromBuffer } from 'file-type'
     import ky from 'ky'
     import PQueue from 'p-queue'
@@ -55,9 +53,9 @@
     // Handlers //
     //////////////
 
-    const handleFileChange = async (event: Event) => {
+    const handleFileInputChange = async (event: Event) => {
         const selectedFiles = (event.target as HTMLInputElement)?.files
-        const lookup: Map<string, File> = new SvelteMap()
+        const hashLookup: Map<string, File> = new SvelteMap()
         addedToList = []
 
         if (selectedFiles) {
@@ -115,7 +113,7 @@
                 }
 
                 // Used to match Signed URLs
-                lookup.set(hashSha256, file)
+                hashLookup.set(hashSha256, file)
 
                 addedToList = [
                     ...addedToList,
@@ -149,11 +147,11 @@
                     {
                         json: {
                             uploadId,
-                            attachments: addedToList.map((qf) => ({
-                                size: qf.file.size as unknown as string, // TODO: Fix vNumeric
-                                hashSha256: qf.hashSha256,
-                                isPublic: qf.isPublic,
-                                mimeType: qf.mimeType,
+                            attachments: addedToList.map((atl) => ({
+                                size: atl.file.size as unknown as string, // TODO: Fix vNumeric
+                                hashSha256: atl.hashSha256,
+                                isPublic: atl.isPublic,
+                                mimeType: atl.mimeType,
                             })),
                         },
                     },
@@ -174,13 +172,13 @@
 
                 for (const su of data.signedUrls) {
                     const queuedFn = async () => {
-                        const currentIndex = addedToList.findIndex(
+                        const hashIndex = addedToList.findIndex(
                             (q) => q.hashSha256 === su.hashSha256,
                         )
 
                         if (su.status === 409) {
                             // File already exists, just set status to SUCCESS.
-                            addedToList[currentIndex].status = 'SUCCESS'
+                            addedToList[hashIndex].status = 'SUCCESS'
                         } else {
                             try {
                                 // Upload the file.
@@ -190,7 +188,7 @@
                                         'x-amz-checksum-sha256':
                                             su.encodedHash!,
                                     },
-                                    body: lookup.get(su.hashSha256)!,
+                                    body: hashLookup.get(su.hashSha256)!,
                                 })
 
                                 // Report back that file is successfully uploaded.
@@ -212,10 +210,10 @@
                                     )
 
                                 if (commitResponse.ok) {
-                                    addedToList[currentIndex].status = 'SUCCESS'
+                                    addedToList[hashIndex].status = 'SUCCESS'
                                 }
                             } catch {
-                                addedToList[currentIndex].status = 'FAILED'
+                                addedToList[hashIndex].status = 'FAILED'
                             }
                         }
                     }
@@ -255,7 +253,13 @@
                 >
             </div>
             <div class="flex items-center gap-x-4">
-                <Button variant="outline">
+                <Button
+                    disabled={fileList.length === 0}
+                    onclick={() => {
+                        fileList = []
+                    }}
+                    variant="outline"
+                >
                     <Trash2 class="mr-2 h-4 w-4" />
                     Clear All</Button
                 >
@@ -317,15 +321,15 @@
                                         <CircleCheck
                                             class="mr-1.5 h-3.5 w-3.5"
                                         />
-                                        Success
+                                        SUCCESS
                                     </Badge>
                                 {:else if p.status === 'FAILED'}
                                     <Badge variant="destructive">
                                         <CircleX class="mr-1.5 h-3.5 w-3.5" />
-                                        Error
+                                        FAILED
                                     </Badge>
                                 {:else}
-                                    <Badge variant="outline">Pending</Badge>
+                                    <Badge variant="outline">QUEUED</Badge>
                                 {/if}
                             </Table.Cell>
                             <Table.Cell class="text-right">
@@ -362,7 +366,7 @@
                 class="hidden"
                 id="fileInput"
                 multiple
-                onchange={handleFileChange}
+                onchange={handleFileInputChange}
                 type="file"
             />
         </Card.Content>
