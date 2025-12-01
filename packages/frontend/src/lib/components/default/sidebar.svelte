@@ -6,7 +6,7 @@
     import GalleryVerticalEndIcon from '@lucide/svelte/icons/gallery-vertical-end'
     import { type Component, type ComponentProps } from 'svelte'
 
-    import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
+    import * as Sidebar from '$lib/components/shadcn/sidebar'
     import type { SessionState } from '$lib/states/session/context.svelte'
     import NavMain from './sidebar-nav-main.svelte'
     // import NavProjects from './sidebar-nav-projects.svelte'

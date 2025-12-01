@@ -1,7 +1,7 @@
 <script lang="ts">
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
-    import { IMG_default } from '$lib/assets/image/_index.js'
-    import * as Dialog from '$lib/components/shadcn/dialog/index.js'
+    import { IMG_default } from '$lib/assets/image/_index'
+    import * as Dialog from '$lib/components/shadcn/dialog'
 
     ////////////////
     // Properties //

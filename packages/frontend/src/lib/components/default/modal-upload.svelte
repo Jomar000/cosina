@@ -4,11 +4,11 @@
     import Trash2Icon from '@lucide/svelte/icons/trash-2'
 
     import Badge from '$lib/components/shadcn/badge/badge.svelte'
-    import { Button } from '$lib/components/shadcn/button/index.js'
-    import * as Dialog from '$lib/components/shadcn/dialog/index.js'
-    import { Switch } from '$lib/components/shadcn/switch/index.js'
-    import * as Tooltip from '$lib/components/shadcn/tooltip/index.js'
-    import { nanoidCustom, objectStorageClient } from '$lib/utilities.js'
+    import { Button } from '$lib/components/shadcn/button'
+    import * as Dialog from '$lib/components/shadcn/dialog'
+    import { Switch } from '$lib/components/shadcn/switch'
+    import * as Tooltip from '$lib/components/shadcn/tooltip'
+    import { nanoidCustom, objectStorageClient } from '$lib/utilities'
 
     ////////////////
     // Properties //

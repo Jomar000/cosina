@@ -13,20 +13,20 @@
 
     import { goto } from '$app/navigation'
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
-    import { Button } from '$lib/components/shadcn/button/index.js'
-    import * as Card from '$lib/components/shadcn/card/index.js'
+    import { Button } from '$lib/components/shadcn/button'
+    import * as Card from '$lib/components/shadcn/card'
     import {
         Field,
         FieldDescription,
         FieldError,
         FieldGroup,
         FieldLabel,
-    } from '$lib/components/shadcn/field/index.js'
-    import { Input } from '$lib/components/shadcn/input/index.js'
-    import { cn } from '$lib/shadcn.js'
+    } from '$lib/components/shadcn/field'
+    import { Input } from '$lib/components/shadcn/input'
+    import { cn } from '$lib/shadcn'
     import type { AuthState } from '$lib/states/auth/context.svelte'
     import type { SessionState } from '$lib/states/session/context.svelte'
-    import { getCookie } from '$lib/utilities.js'
+    import { getCookie } from '$lib/utilities'
 
     ////////////////
     // Properties //

@@ -8,9 +8,9 @@
 
     import LoadingScreen from '$lib/components/default/loading-screen.svelte'
     import Sonner from '$lib/components/shadcn/sonner/sonner.svelte'
-    import { AuthProvider } from '$lib/states/auth/index.js'
-    import { SessionProvider } from '$lib/states/session/index.js'
-    import { honoClient } from '$lib/utilities.js'
+    import { AuthProvider } from '$lib/states/auth'
+    import { SessionProvider } from '$lib/states/session'
+    import { honoClient } from '$lib/utilities'
     import '../app.css'
 
     ////////////////

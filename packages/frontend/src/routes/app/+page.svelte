@@ -5,9 +5,9 @@
 
     import { goto } from '$app/navigation'
     import Button from '$lib/components/shadcn/button/button.svelte'
-    import * as Card from '$lib/components/shadcn/card/index.js'
-    import * as Select from '$lib/components/shadcn/select/index.js'
-    import { useSessionContext } from '$lib/states/session/index.js'
+    import * as Card from '$lib/components/shadcn/card'
+    import * as Select from '$lib/components/shadcn/select'
+    import { useSessionContext } from '$lib/states/session'
 
     //////////////
     // Contexts //

@@ -4,7 +4,7 @@ import { createAccessControl } from 'better-auth/plugins/access'
 import { createContext } from 'svelte'
 
 import { PUBLIC_API_URL } from '$env/static/public'
-import type { SessionState } from '../session/context.svelte.js'
+import type { SessionState } from '../session/context.svelte'
 
 export class AuthState {
     ////////////

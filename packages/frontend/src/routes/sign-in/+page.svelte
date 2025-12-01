@@ -6,8 +6,8 @@
     import { PUBLIC_NAME } from '$env/static/public'
     import CaptchaModal from '$lib/components/default/modal-captcha.svelte'
     import SignInForm from '$lib/components/default/sign-in.svelte'
-    import { useAuthContext } from '$lib/states/auth/index.js'
-    import { useSessionContext } from '$lib/states/session/index.js'
+    import { useAuthContext } from '$lib/states/auth'
+    import { useSessionContext } from '$lib/states/session'
 
     //////////////
     // Contexts //

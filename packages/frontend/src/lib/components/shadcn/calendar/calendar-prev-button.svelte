@@ -4,7 +4,7 @@
     import {
         buttonVariants,
         type ButtonVariant,
-    } from '$lib/components/shadcn/button/index.js'
+    } from '$lib/components/shadcn/button'
     import { cn } from '$lib/shadcn.js'
 
     let {

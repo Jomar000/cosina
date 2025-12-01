@@ -1,2 +1,2 @@
-export { useAuthContext, setAuthContext } from './context.svelte.js'
+export { useAuthContext, setAuthContext } from './context.svelte'
 export { default as AuthProvider } from './provider.svelte'

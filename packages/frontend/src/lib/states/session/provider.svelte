@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SessionState, setSessionContext } from './context.svelte.js'
+    import { SessionState, setSessionContext } from './context.svelte'
 
     ////////////////
     // Properties //

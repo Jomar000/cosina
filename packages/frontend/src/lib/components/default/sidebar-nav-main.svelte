@@ -3,8 +3,8 @@
     import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
     import type { Component } from 'svelte'
 
-    import * as Collapsible from '$lib/components/shadcn/collapsible/index.js'
-    import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
+    import * as Collapsible from '$lib/components/shadcn/collapsible'
+    import * as Sidebar from '$lib/components/shadcn/sidebar'
 
     let {
         items,

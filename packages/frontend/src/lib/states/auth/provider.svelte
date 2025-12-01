@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { useSessionContext } from '../session/context.svelte.js'
-    import { AuthState, setAuthContext } from './context.svelte.js'
+    import { useSessionContext } from '../session/context.svelte'
+    import { AuthState, setAuthContext } from './context.svelte'
 
     ////////////////
     // Properties //

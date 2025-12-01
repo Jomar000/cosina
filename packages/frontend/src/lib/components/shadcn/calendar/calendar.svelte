@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Calendar as CalendarPrimitive } from 'bits-ui'
-    import * as Calendar from './index.js'
+    import * as Calendar from '.'
     import { cn, type WithoutChildrenOrChild } from '$lib/shadcn.js'
     import type { ButtonVariant } from '../button/button.svelte'
     import { isEqualMonth, type DateValue } from '@internationalized/date'

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js'
-    import { useSidebar } from '$lib/components/shadcn/sidebar/context.svelte.js'
-    import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
+    import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu'
+    import { useSidebar } from '$lib/components/shadcn/sidebar/context.svelte'
+    import * as Sidebar from '$lib/components/shadcn/sidebar'
     import EllipsisIcon from '@lucide/svelte/icons/ellipsis'
     import FolderIcon from '@lucide/svelte/icons/folder'
     import ForwardIcon from '@lucide/svelte/icons/forward'

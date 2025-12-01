@@ -7,10 +7,10 @@
     import SparklesIcon from '@lucide/svelte/icons/sparkles'
     import { getContext } from 'svelte'
 
-    import * as Avatar from '$lib/components/shadcn/avatar/index.js'
-    import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js'
-    import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
-    import { useSidebar } from '$lib/components/shadcn/sidebar/index.js'
+    import * as Avatar from '$lib/components/shadcn/avatar'
+    import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu'
+    import * as Sidebar from '$lib/components/shadcn/sidebar'
+    import { useSidebar } from '$lib/components/shadcn/sidebar'
 
     // let { user }: { user: { name: string; email: string; avatar: string } } =
     //     $props()

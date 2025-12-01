@@ -5,8 +5,8 @@
 
     import { goto } from '$app/navigation'
     import AppSidebar from '$lib/components/default/sidebar.svelte'
-    import * as Sidebar from '$lib/components/shadcn/sidebar/index.js'
-    import { useSessionContext } from '$lib/states/session/index.js'
+    import * as Sidebar from '$lib/components/shadcn/sidebar'
+    import { useSessionContext } from '$lib/states/session'
 
     ////////////////
     // Properties //

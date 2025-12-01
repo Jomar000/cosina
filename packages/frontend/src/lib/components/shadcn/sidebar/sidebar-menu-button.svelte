@@ -34,7 +34,7 @@
 </script>
 
 <script lang="ts">
-    import * as Tooltip from '$lib/components/shadcn/tooltip/index.js'
+    import * as Tooltip from '$lib/components/shadcn/tooltip'
     import {
         cn,
         type WithElementRef,

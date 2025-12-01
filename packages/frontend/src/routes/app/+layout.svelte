@@ -2,9 +2,9 @@
     import { onMount, setContext } from 'svelte'
 
     import { goto } from '$app/navigation'
-    import { useAuthContext } from '$lib/states/auth/index.js'
-    import { useSessionContext } from '$lib/states/session/index.js'
-    import { getCookie } from '$lib/utilities.js'
+    import { useAuthContext } from '$lib/states/auth'
+    import { useSessionContext } from '$lib/states/session'
+    import { getCookie } from '$lib/utilities'
 
     ////////////////
     // Properties //
