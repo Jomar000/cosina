@@ -316,23 +316,50 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 ({ hashSha256 }) => hashSha256,
             )
 
-            const existingObjects = await ctx
-                .get('dbClient')
-                .select({
-                    id: objectStorage.id,
-                    hashSha256: objectStorage.hashSha256,
-                })
-                .from(objectStorage)
-                .where(inArray(objectStorage.hashSha256, hashesToCheck))
+            const [
+                uploadedObjects,
+                nonUploadedObjects,
+            ] = await Promise.all([
+                ctx
+                    .get('dbClient')
+                    .select({
+                        id: objectStorage.id,
+                        hashSha256: objectStorage.hashSha256,
+                    })
+                    .from(objectStorage)
+                    .where(
+                        and(
+                            eq(objectStorage.isUploaded, true),
+                            inArray(objectStorage.hashSha256, hashesToCheck),
+                        ),
+                    ),
+                ctx
+                    .get('dbClient')
+                    .select({
+                        id: objectStorage.id,
+                        hashSha256: objectStorage.hashSha256,
+                    })
+                    .from(objectStorage)
+                    .where(
+                        and(
+                            eq(objectStorage.isUploaded, false),
+                            inArray(objectStorage.hashSha256, hashesToCheck),
+                        ),
+                    ),
+            ])
 
-            const existingObjectsHash = existingObjects.map(
+            const uploadedObjectsHash = uploadedObjects.map(
+                ({ hashSha256 }) => hashSha256,
+            )
+
+            const nonUploadedObjectsHash = nonUploadedObjects.map(
                 ({ hashSha256 }) => hashSha256,
             )
 
             // Generate pre-signed upload URLs
             for (const attachment of attachments) {
-                if (existingObjectsHash.includes(attachment.hashSha256)) {
-                    const objectStorageId = existingObjects.filter(
+                if (uploadedObjectsHash.includes(attachment.hashSha256)) {
+                    const objectStorageId = uploadedObjects.filter(
                         ({ hashSha256 }) =>
                             hashSha256 === attachment.hashSha256,
                     )[0].id
@@ -352,35 +379,48 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                         status: 409,
                     })
                 } else {
+                    let objectStorageId = nanoidCustom(32)
+
+                    // Object is already present but not yet marked uploaded. Reuse existing object.
+                    if (
+                        nonUploadedObjectsHash.includes(attachment.hashSha256)
+                    ) {
+                        objectStorageId = nonUploadedObjects.filter(
+                            ({ hashSha256 }) =>
+                                hashSha256 === attachment.hashSha256,
+                        )[0].id
+                    } else {
+                        objectStorageData.push({
+                            id: objectStorageId,
+                            ...attachment,
+                            size: Number(attachment.size),
+                        })
+                    }
+
+                    uploadAttachmentData.push({
+                        uploadId,
+                        objectStorageId,
+                    })
+
+                    objectStorageAclData.push({
+                        userId: ctx.get('user')!.id,
+                        objectStorageId,
+                    })
+
                     // Encode SHA-256 hash to Base64
                     const hashBase64 = encodeBase64(
                         hexToBytes(attachment.hashSha256).buffer,
                     )
 
-                    objectStorageData.push({
-                        ...attachment,
-                        size: Number(attachment.size),
-                    })
-
-                    uploadAttachmentData.push({
-                        uploadId,
-                        objectStorageId: attachment.id,
-                    })
-
-                    objectStorageAclData.push({
-                        userId: ctx.get('user')!.id,
-                        objectStorageId: attachment.id,
-                    })
-
                     signedUrls.push({
-                        id: attachment.id,
+                        id: objectStorageId,
                         hashSha256: attachment.hashSha256,
                         encodedHash: hashBase64,
                         signedUrl: (
                             await ctx
                                 .get('aws4FetchClient')
                                 .sign(
-                                    `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET}/${attachment.id}?X-Amz-Expires=${300}`,
+                                    `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET}/${objectStorageId}?X-Amz-Expires=${300}`,
                                     {
                                         method: 'PUT',
                                         headers: {

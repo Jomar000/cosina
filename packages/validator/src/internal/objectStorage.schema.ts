@@ -128,11 +128,6 @@ export const uploadAttachmentCreateInputSchema = z.object({
     attachments: z
         .array(
             z.object({
-                id: field
-                    .vText({ fieldName: 'Attachment ID', min: 32 })
-                    .regex(/^[a-zA-Z0-9]+$/, {
-                        error: 'Attachment ID must be alphanumeric characters only.',
-                    }),
                 size: field.vNumeric({ fieldName: 'Size', max: 10485760 }),
                 mimeType: field
                     .vText({ fieldName: 'MIME Type', min: 8 })
