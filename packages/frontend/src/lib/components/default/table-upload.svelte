@@ -26,9 +26,11 @@
 
     let {
         allowedMimeTypes = [],
+        maxItems = 10,
         uploadId = $bindable(''),
     }: {
         allowedMimeTypes?: string[]
+        maxItems?: number
         uploadId?: string
     } = $props()
 
@@ -54,11 +56,23 @@
     //////////////
 
     const handleFileInputChange = async (event: Event) => {
+        if (fileList.length >= maxItems) {
+            // TODO: Add alert banner or modal here.
+            alert('Maximum of 10 files only.')
+            return
+        }
+
         const selectedFiles = (event.target as HTMLInputElement)?.files
         const hashLookup: Map<string, File> = new SvelteMap()
         addedToList = []
 
         if (selectedFiles) {
+            if (selectedFiles.length > maxItems) {
+                // TODO: Add alert banner or modal here.
+                alert('Maximum of 10 files only.')
+                return
+            }
+
             /**
              * @description
              * STEP 1: Preprocessing of files to be signed
