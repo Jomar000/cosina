@@ -52,22 +52,31 @@ export const vNumeric = ({
     max?: number
 }) =>
     z
-        .number({
-            error: message
-                ? message.replace('%f', fieldName)
-                : `${fieldName} must be a numeric value.`,
-        })
-        .min(min, `${fieldName} must be greater than or equal to ${min}.`)
-        .max(max, `${fieldName} must be less than or equal to ${max}.`)
-        .check((ctx) => {
-            if (isNaN(Number(ctx.value))) {
-                ctx.issues.push({
-                    code: 'custom',
-                    message: `${fieldName} is not a valid numeric value.`,
-                    input: ctx.value,
+        .union(
+            [
+                z.string(),
+                z.number(),
+            ],
+            {
+                error: message
+                    ? message.replace('%f', fieldName)
+                    : `${fieldName} must be a string or a number.`,
+            },
+        )
+        .transform((field) => Number(field))
+        .pipe(
+            z
+                .number({
+                    error: message
+                        ? message.replace('%f', fieldName)
+                        : `${fieldName} must be a valid numeric string or numeric value.`,
                 })
-            }
-        })
+                .min(
+                    min,
+                    `${fieldName} must be greater than or equal to ${min}.`,
+                )
+                .max(max, `${fieldName} must be less than or equal to ${max}.`),
+        )
         .transform((field) => `${field}`)
 
 export const vText = ({

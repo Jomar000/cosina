@@ -72,6 +72,8 @@ export const nanoidCustom = customAlphabet(
  *
  * @link
  * https://github.com/sindresorhus/ky
+ *
+ * @deprecated
  */
 export const apiClient = async <
     T extends z.output<ReturnType<typeof shared.base.outputSchema>>,
@@ -99,6 +101,40 @@ export const stripEmptyProps = <T = unknown>(obj: Record<string, unknown>) => {
 }
 
 /**
+ * @deprecated
+ */
+type TDataToSign = {
+    index: number
+    name: string
+    size: number
+    mimeType: string
+    hashSha256: string
+    isPublic: boolean
+}
+
+/**
+ * @deprecated
+ */
+type TFileToUrlMap =
+    | {
+          key: string
+          encodedHash: string
+          signedUrl: string
+          status: 200
+      }
+    | {
+          key: string
+          encodedHash: null
+          signedUrl: null
+          status: 409
+      }
+
+/**
+ * @deprecated
+ */
+type TStatusIndices = Record<string, string>
+
+/**
  * Object Storage Client
  *
  * @description
@@ -116,33 +152,9 @@ export const stripEmptyProps = <T = unknown>(obj: Record<string, unknown>) => {
  * The Object IDs of the files if upload succeeded.
  * If a duplicate is found, will return the Object ID of the existing object.
  * When upload fails, undefined will be returned.
+ *
+ * @deprecated
  */
-
-type TDataToSign = {
-    index: number
-    name: string
-    size: number
-    mimeType: string
-    hashSha256: string
-    isPublic: boolean
-}
-
-type TFileToUrlMap =
-    | {
-          key: string
-          encodedHash: string
-          signedUrl: string
-          status: 200
-      }
-    | {
-          key: string
-          encodedHash: null
-          signedUrl: null
-          status: 409
-      }
-
-type TStatusIndices = Record<string, string>
-
 export const objectStorageClient: (
     files: {
         file: File
@@ -385,3 +397,31 @@ export const honoClient = hc<AppType>(PUBLIC_API_URL, {
     init: { credentials: 'include' },
     fetch: ky,
 })
+
+/**
+ * @description
+ * Format bytes to a more readable notation
+ */
+export const formatBytes = (bytes: number, decimals = 2) => {
+    if (!+bytes) {
+        return '0 bytes'
+    }
+
+    const b = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = [
+        'bytes',
+        'KiB',
+        'MiB',
+        'GiB',
+        'TiB',
+        'PiB',
+        'EiB',
+        'ZiB',
+        'YiB',
+    ]
+
+    const i = Math.floor(Math.log(bytes) / Math.log(b))
+
+    return `${parseFloat((bytes / Math.pow(b, i)).toFixed(dm))} ${sizes[i]}`
+}

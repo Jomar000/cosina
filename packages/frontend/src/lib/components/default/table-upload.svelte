@@ -18,7 +18,7 @@
     import * as Card from '$lib/components/shadcn/card'
     import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu'
     import * as Table from '$lib/components/shadcn/table'
-    import { getCookie, honoClient } from '$lib/utilities'
+    import { formatBytes, getCookie, honoClient } from '$lib/utilities'
 
     ////////////////
     // Properties //
@@ -148,7 +148,7 @@
                         json: {
                             uploadId,
                             attachments: addedToList.map((atl) => ({
-                                size: atl.file.size as unknown as string, // TODO: Fix vNumeric
+                                size: atl.file.size as unknown as string,
                                 hashSha256: atl.hashSha256,
                                 isPublic: atl.isPublic,
                                 mimeType: atl.mimeType,
@@ -310,7 +310,7 @@
                                 >{p.file.name}</Table.Cell
                             >
                             <Table.Cell class="text-muted-foreground"
-                                >{p.file.size}</Table.Cell
+                                >{formatBytes(p.file.size)}</Table.Cell
                             >
                             <Table.Cell>
                                 {#if p.status === 'SUCCESS'}
@@ -351,7 +351,15 @@
                                                 Retry
                                             </DropdownMenu.Item>
                                         {/if}
-                                        <DropdownMenu.Item>
+                                        <DropdownMenu.Item
+                                            onclick={() => {
+                                                fileList = fileList.filter(
+                                                    (fl) =>
+                                                        fl.hashSha256 !==
+                                                        p.hashSha256,
+                                                )
+                                            }}
+                                        >
                                             <Trash2 class="mr-2 h-4 w-4" />
                                             Delete
                                         </DropdownMenu.Item>
