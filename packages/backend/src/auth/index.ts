@@ -46,7 +46,7 @@ export const auth = async (opts: {
     }
 
     const scryptOpts = {
-        N: 2 ** 14,
+        N: 2 ** 15,
         r: 8,
         p: 1,
         dkLen: 64,

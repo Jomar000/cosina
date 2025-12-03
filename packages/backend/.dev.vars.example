@@ -2,7 +2,7 @@
 # Better Auth #
 ###############
 
-BETTER_AUTH_SECRET="better-auth-secret-123456789"
+BETTER_AUTH_SECRET="better-auth-secret-12345678901234567890"
 
 ##############
 # CloudFlare #
