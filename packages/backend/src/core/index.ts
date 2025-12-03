@@ -4,6 +4,7 @@ import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { v7 as uuidv7 } from 'uuid'
 
 import { AppError } from '../errors.js'
+import { apiResponseErrorWrapper } from '../utilities.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
 import { csrfHandler } from './middleware/csrfHandler.js'
 import { baseRoute } from './route/base/_index.js'
@@ -28,7 +29,7 @@ export const app = new Hono<THonoInstance>()
         })
 
         let code = 'INTERNAL_SERVER_ERROR'
-        let message = `ERROR: ${ctx.get('requestId')}`
+        let message = 'An unknown error occurred, please try again later.'
         let status: ContentfulStatusCode = 500
 
         if (err instanceof AppError) {
@@ -37,16 +38,7 @@ export const app = new Hono<THonoInstance>()
             status = err.status
         }
 
-        return ctx.json(
-            {
-                error: {
-                    requestId: ctx.get('requestId'),
-                    code,
-                    message,
-                },
-            },
-            status,
-        )
+        return apiResponseErrorWrapper(ctx, { message, code, status })
     })
     /**
      * @description

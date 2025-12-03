@@ -1,7 +1,8 @@
-import type { TApiResponseError } from '@hyperion/validator'
+import type { TApiResponse, TApiResponseError } from '@hyperion/validator'
 import type { Context } from 'hono'
+import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { customAlphabet } from 'nanoid'
-import type { ZodType } from 'zod'
+import type { ZodType, z } from 'zod'
 
 /**
  * NanoID Custom Character Set
@@ -95,12 +96,12 @@ export const auditTrailLogger = async (
 }
 
 /**
- * Hono Validator Callback Function
+ * Validator Callback Function
  *
  * @description
  * Callback function for the built-in Hono Validator Middleware.
  */
-export const honoValidatorCb = async <TSchema extends ZodType>(
+export const validatorCallback = async <TSchema extends ZodType>(
     value: unknown,
     ctx: Context<THonoInstance>,
     schema: TSchema,
@@ -108,18 +109,80 @@ export const honoValidatorCb = async <TSchema extends ZodType>(
     const validator = await schema.safeParseAsync(value)
 
     if (!validator.data) {
-        return ctx.json<TApiResponseError>(
-            {
-                success: false,
-                error: {
-                    code: 'DATA_VALIDATION',
-                    message: 'An error occurred while validating input data.',
-                },
-                validator: validator.error?.issues,
-            },
-            400,
-        )
+        return apiResponseErrorWrapper(ctx, {
+            code: 'DATA_VALIDATION',
+            message: 'An error occurred while validating input data.',
+            validatorIssues: validator.error?.issues,
+        })
     }
 
     return validator.data
+}
+
+/**
+ * API Response Error Wrapper
+ *
+ * @description
+ * Wrapper for failed API responses.
+ */
+export const apiResponseErrorWrapper = (
+    ctx: Context<THonoInstance>,
+    {
+        message,
+        code = 'BAD_REQUEST',
+        validatorIssues,
+        status = 400,
+    }: {
+        message: string
+        code?: string
+        validatorIssues?: z.core.$ZodIssue[]
+        status?: ContentfulStatusCode
+    },
+) => {
+    return ctx.json<TApiResponseError>(
+        {
+            success: false,
+            error: {
+                requestId: ctx.get('requestId'),
+                code,
+                message,
+                ...(validatorIssues ? { validator: validatorIssues } : {}),
+            },
+        },
+        status,
+    )
+}
+
+/**
+ * API Response Success Wrapper
+ *
+ * @description
+ * Wrapper for successful API responses.
+ */
+export const apiResponseOkWrapper = <T = unknown>(
+    ctx: Context<THonoInstance>,
+    {
+        data,
+        count,
+        limit,
+        offset,
+        status = 200,
+    }: {
+        data: T
+        count?: number
+        limit?: number
+        offset?: number
+        status?: ContentfulStatusCode
+    },
+) => {
+    return ctx.json<TApiResponse<T>>(
+        {
+            success: true,
+            data,
+            count,
+            limit,
+            offset,
+        },
+        status,
+    )
 }

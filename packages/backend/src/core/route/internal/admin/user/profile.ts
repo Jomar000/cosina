@@ -1,4 +1,3 @@
-import type { TApiResponse } from '@hyperion/validator'
 import { profile } from '@hyperion/validator/internal/admin/user'
 import {
     and,
@@ -12,7 +11,11 @@ import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 
 import { AppError } from '../../../../../errors.js'
-import { honoValidatorCb } from '../../../../../utilities.js'
+import {
+    apiResponseErrorWrapper,
+    apiResponseOkWrapper,
+    validatorCallback,
+} from '../../../../../utilities.js'
 
 export const profileRoute = new Hono<THonoInstance>()
     /**
@@ -22,7 +25,7 @@ export const profileRoute = new Hono<THonoInstance>()
     .get(
         '/read',
         validator('query', async (value, ctx) =>
-            honoValidatorCb(value, ctx, profile.readInputSchema),
+            validatorCallback(value, ctx, profile.readInputSchema),
         ),
         async (ctx) => {
             const { userId } = ctx.req.valid('query')
@@ -48,10 +51,7 @@ export const profileRoute = new Hono<THonoInstance>()
                     .innerJoin(member, eq(member.userId, userProfile.userId))
                     .where(searchCondition)
 
-                return ctx.json<TApiResponse<typeof data>>(
-                    { success: true, data },
-                    200,
-                )
+                return apiResponseOkWrapper(ctx, { data })
             } catch (err) {
                 throw new AppError(
                     {
@@ -67,7 +67,7 @@ export const profileRoute = new Hono<THonoInstance>()
     .get(
         '/readMany',
         validator('query', async (value, ctx) =>
-            honoValidatorCb(value, ctx, profile.readManyInputSchema),
+            validatorCallback(value, ctx, profile.readManyInputSchema),
         ),
         async (ctx) => {
             const { limit, offset, sortOrder } = ctx.req.valid('query')
@@ -124,16 +124,7 @@ export const profileRoute = new Hono<THonoInstance>()
                             : desc(userProfile.userId),
                     )
 
-                return ctx.json<TApiResponse<typeof data>>(
-                    {
-                        success: true,
-                        data,
-                        limit,
-                        offset,
-                        count,
-                    },
-                    200,
-                )
+                return apiResponseOkWrapper(ctx, { data, count, limit, offset })
             } catch (err) {
                 throw new AppError(
                     {
@@ -149,7 +140,7 @@ export const profileRoute = new Hono<THonoInstance>()
     .post(
         '/update',
         validator('json', async (value, ctx) =>
-            honoValidatorCb(value, ctx, profile.updateInputSchema),
+            validatorCallback(value, ctx, profile.updateInputSchema),
         ),
         async (ctx) => {
             const {
@@ -182,15 +173,9 @@ export const profileRoute = new Hono<THonoInstance>()
             )[0].count
 
             if (count === 0) {
-                return ctx.json(
-                    {
-                        error: {
-                            code: 'BAD_REQUEST',
-                            message: 'User ID not found, nothing to update.',
-                        },
-                    },
-                    400,
-                )
+                return apiResponseErrorWrapper(ctx, {
+                    message: 'User ID not found, nothing to update.',
+                })
             }
 
             try {
@@ -217,10 +202,7 @@ export const profileRoute = new Hono<THonoInstance>()
                         updatedAt: userProfile.updatedAt,
                     })
 
-                return ctx.json<TApiResponse<typeof data>>(
-                    { success: true, data },
-                    200,
-                )
+                return apiResponseOkWrapper(ctx, { data })
             } catch (err) {
                 throw new AppError(
                     {
@@ -236,7 +218,7 @@ export const profileRoute = new Hono<THonoInstance>()
     .post(
         '/update/address',
         validator('json', async (value, ctx) =>
-            honoValidatorCb(value, ctx, profile.updateAddressInputSchema),
+            validatorCallback(value, ctx, profile.updateAddressInputSchema),
         ),
         async (ctx) => {
             const {
@@ -269,15 +251,9 @@ export const profileRoute = new Hono<THonoInstance>()
             )[0].count
 
             if (count === 0) {
-                return ctx.json(
-                    {
-                        error: {
-                            code: 'BAD_REQUEST',
-                            message: 'User ID not found, nothing to update.',
-                        },
-                    },
-                    400,
-                )
+                return apiResponseErrorWrapper(ctx, {
+                    message: 'User ID not found, nothing to update.',
+                })
             }
 
             try {
@@ -336,10 +312,7 @@ export const profileRoute = new Hono<THonoInstance>()
                         }
                     })
 
-                return ctx.json<TApiResponse<typeof data>>(
-                    { success: true, data },
-                    200,
-                )
+                return apiResponseOkWrapper(ctx, { data })
             } catch (err) {
                 throw new AppError(
                     {

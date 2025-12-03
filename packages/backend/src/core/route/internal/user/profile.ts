@@ -5,7 +5,7 @@ import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 
 import { AppError } from '../../../../errors.js'
-import { honoValidatorCb } from '../../../../utilities.js'
+import { validatorCallback } from '../../../../utilities.js'
 
 export const profileRoute = new Hono<THonoInstance>()
     /**
@@ -52,7 +52,7 @@ export const profileRoute = new Hono<THonoInstance>()
     .post(
         '/update',
         validator('json', async (value, ctx) =>
-            honoValidatorCb(value, ctx, profile.updateInputSchema),
+            validatorCallback(value, ctx, profile.updateInputSchema),
         ),
         async (ctx) => {
             const {
@@ -109,7 +109,7 @@ export const profileRoute = new Hono<THonoInstance>()
     .post(
         '/update/address',
         validator('json', async (value, ctx) =>
-            honoValidatorCb(value, ctx, profile.updateAddressInputSchema),
+            validatorCallback(value, ctx, profile.updateAddressInputSchema),
         ),
         async (ctx) => {
             const {

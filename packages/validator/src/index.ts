@@ -14,10 +14,11 @@ export type TApiResponseOk<T> = {
 export type TApiResponseError = {
     success: false
     error: {
+        requestId: string
         code: string
         message: string
+        validatorIssues?: z.core.$ZodIssue[]
     }
-    validator?: z.core.$ZodIssue[]
 }
 
 export type TApiResponse<T> = TApiResponseOk<T> | TApiResponseError

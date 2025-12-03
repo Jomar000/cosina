@@ -1,4 +1,3 @@
-import type { TApiResponse, TApiResponseError } from '@hyperion/validator'
 import {
     createUploadLinkInputSchema,
     downloadLinkCreateInputSchema,
@@ -13,7 +12,12 @@ import { encodeBase64 } from 'hono/utils/encode'
 import { validator } from 'hono/validator'
 
 import { AppError } from '../../../errors.js'
-import { honoValidatorCb, nanoidCustom } from '../../../utilities.js'
+import {
+    apiResponseErrorWrapper,
+    apiResponseOkWrapper,
+    nanoidCustom,
+    validatorCallback,
+} from '../../../utilities.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 
 export const objectStorageRoute = new Hono<THonoInstance>()
@@ -29,7 +33,7 @@ export const objectStorageRoute = new Hono<THonoInstance>()
     .post(
         '/download/link/create',
         validator('json', async (value, ctx) =>
-            honoValidatorCb(value, ctx, downloadLinkCreateInputSchema),
+            validatorCallback(value, ctx, downloadLinkCreateInputSchema),
         ),
         async (ctx) => {
             const { uploadId } = ctx.req.valid('json')
@@ -62,16 +66,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 .where(eq(upload.id, uploadId))
 
             if (linkedObjects.length === 0) {
-                return ctx.json<TApiResponseError>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'BAD_REQUEST',
-                            message: 'Upload ID not found.',
-                        },
-                    },
-                    400,
-                )
+                return apiResponseErrorWrapper(ctx, {
+                    message: 'Upload ID not found.',
+                })
             }
 
             const signedUrls: {
@@ -119,12 +116,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 }
             }
 
-            const data = { signedUrls }
-
-            return ctx.json<TApiResponse<typeof data>>(
-                { success: true, data },
-                200,
-            )
+            return apiResponseOkWrapper(ctx, {
+                data: { signedUrls },
+            })
         },
     )
     .get('/upload/create', async (ctx) => {
@@ -141,12 +135,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                     userId: ctx.get('user')!.id,
                 })
 
-            const data = { uploadId }
-
-            return ctx.json<TApiResponse<typeof data>>(
-                { success: true, data },
-                201,
-            )
+            return apiResponseOkWrapper(ctx, {
+                data: { uploadId },
+            })
         } catch (err) {
             throw new AppError(
                 {
@@ -161,7 +152,7 @@ export const objectStorageRoute = new Hono<THonoInstance>()
     .post(
         '/upload/commit',
         validator('json', async (value, ctx) =>
-            honoValidatorCb(value, ctx, uploadCommitInputSchema),
+            validatorCallback(value, ctx, uploadCommitInputSchema),
         ),
         async (ctx) => {
             const { attachments, uploadId } = ctx.req.valid('json')
@@ -178,17 +169,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 )
 
             if (!uploadData[0]) {
-                return ctx.json<TApiResponseError>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'BAD_REQUEST',
-                            message:
-                                'Upload ID not found or is already committed.',
-                        },
-                    },
-                    400,
-                )
+                return apiResponseErrorWrapper(ctx, {
+                    message: 'Upload ID not found or is already committed.',
+                })
             }
 
             const attachmentsToPurge = (
@@ -250,21 +233,18 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                         .where(eq(upload.id, uploadId))
                 })
 
-            const data = {
-                uploadId,
-                attachments: committedAttachments.map(({ id }) => id),
-            }
-
-            return ctx.json<TApiResponse<typeof data>>(
-                { success: true, data },
-                200,
-            )
+            return apiResponseOkWrapper(ctx, {
+                data: {
+                    uploadId,
+                    attachments: committedAttachments.map(({ id }) => id),
+                },
+            })
         },
     )
     .post(
         '/upload/attachment/create',
         validator('json', async (value, ctx) =>
-            honoValidatorCb(value, ctx, uploadAttachmentCreateInputSchema),
+            validatorCallback(value, ctx, uploadAttachmentCreateInputSchema),
         ),
         async (ctx) => {
             const { attachments, uploadId } = ctx.req.valid('json')
@@ -300,17 +280,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 )
 
             if (!uploadData[0]) {
-                return ctx.json<TApiResponseError>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'BAD_REQUEST',
-                            message:
-                                'Upload ID not found or is already committed.',
-                        },
-                    },
-                    400,
-                )
+                return apiResponseErrorWrapper(ctx, {
+                    message: 'Upload ID not found or is already committed.',
+                })
             }
 
             const signedUrls: {
@@ -465,12 +437,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                         .onConflictDoNothing()
                 })
 
-                const data = { uploadId, signedUrls }
-
-                return ctx.json<TApiResponse<typeof data>>(
-                    { success: true, data },
-                    200,
-                )
+                return apiResponseOkWrapper(ctx, {
+                    data: { uploadId, signedUrls },
+                })
             } catch (err) {
                 throw new AppError(
                     {
@@ -486,7 +455,7 @@ export const objectStorageRoute = new Hono<THonoInstance>()
     .post(
         '/upload/attachment/commit',
         validator('json', async (value, ctx) =>
-            honoValidatorCb(value, ctx, uploadAttachmentCommitInputSchema),
+            validatorCallback(value, ctx, uploadAttachmentCommitInputSchema),
         ),
         async (ctx) => {
             const { attachments, uploadId } = ctx.req.valid('json')
@@ -503,17 +472,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 )
 
             if (!uploadData[0]) {
-                return ctx.json<TApiResponseError>(
-                    {
-                        success: false,
-                        error: {
-                            code: 'BAD_REQUEST',
-                            message:
-                                'Upload ID not found or is already committed.',
-                        },
-                    },
-                    400,
-                )
+                return apiResponseErrorWrapper(ctx, {
+                    message: 'Upload ID not found or is already committed.',
+                })
             }
 
             const attachmentsToCommit = (
@@ -548,16 +509,13 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 attachments: attachmentsToCommit,
             }
 
-            return ctx.json<TApiResponse<typeof data>>(
-                { success: true, data },
-                200,
-            )
+            return apiResponseOkWrapper(ctx, { data })
         },
     )
     .post(
         '/create/uploadLink',
         validator('json', async (value, ctx) =>
-            honoValidatorCb(value, ctx, createUploadLinkInputSchema),
+            validatorCallback(value, ctx, createUploadLinkInputSchema),
         ),
         async (ctx) => {
             const objectData = ctx.req.valid('json')
@@ -714,15 +672,12 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 })
             }
 
-            const data = {
-                uploadId,
-                signedUrls,
-            }
-
-            return ctx.json<TApiResponse<typeof data>>(
-                { success: true, data },
-                200,
-            )
+            return apiResponseOkWrapper(ctx, {
+                data: {
+                    uploadId,
+                    signedUrls,
+                },
+            })
         },
     )
 
