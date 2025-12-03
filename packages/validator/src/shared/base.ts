@@ -25,8 +25,8 @@ export const outputSchema = <Data extends z.ZodType = z.ZodType>(data: Data) =>
             error: z.object({
                 code: z.string(),
                 message: z.string(),
+                validator: z.array(z.custom<z.core.$ZodIssue>()).optional(),
             }),
-            validationErrors: z.array(z.custom<z.core.$ZodIssue>()).optional(),
         }),
     ])
 

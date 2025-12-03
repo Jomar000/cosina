@@ -1,3 +1,4 @@
+import type { TApiResponse } from '@hyperion/validator'
 import { profile } from '@hyperion/validator/internal/admin/user'
 import {
     and,
@@ -47,7 +48,10 @@ export const profileRoute = new Hono<THonoInstance>()
                     .innerJoin(member, eq(member.userId, userProfile.userId))
                     .where(searchCondition)
 
-                return ctx.json({ data }, 200)
+                return ctx.json<TApiResponse<typeof data>>(
+                    { success: true, data },
+                    200,
+                )
             } catch (err) {
                 throw new AppError(
                     {
@@ -120,7 +124,16 @@ export const profileRoute = new Hono<THonoInstance>()
                             : desc(userProfile.userId),
                     )
 
-                return ctx.json({ limit, offset, count, data }, 200)
+                return ctx.json<TApiResponse<typeof data>>(
+                    {
+                        success: true,
+                        data,
+                        limit,
+                        offset,
+                        count,
+                    },
+                    200,
+                )
             } catch (err) {
                 throw new AppError(
                     {
@@ -204,7 +217,10 @@ export const profileRoute = new Hono<THonoInstance>()
                         updatedAt: userProfile.updatedAt,
                     })
 
-                return ctx.json({ data }, 200)
+                return ctx.json<TApiResponse<typeof data>>(
+                    { success: true, data },
+                    200,
+                )
             } catch (err) {
                 throw new AppError(
                     {
@@ -320,7 +336,10 @@ export const profileRoute = new Hono<THonoInstance>()
                         }
                     })
 
-                return ctx.json({ data }, 200)
+                return ctx.json<TApiResponse<typeof data>>(
+                    { success: true, data },
+                    200,
+                )
             } catch (err) {
                 throw new AppError(
                     {

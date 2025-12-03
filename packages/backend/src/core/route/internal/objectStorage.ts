@@ -1,3 +1,4 @@
+import type { TApiResponse, TApiResponseError } from '@hyperion/validator'
 import {
     createUploadLinkInputSchema,
     downloadLinkCreateInputSchema,
@@ -61,8 +62,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 .where(eq(upload.id, uploadId))
 
             if (linkedObjects.length === 0) {
-                return ctx.json(
+                return ctx.json<TApiResponseError>(
                     {
+                        success: false,
                         error: {
                             code: 'BAD_REQUEST',
                             message: 'Upload ID not found.',
@@ -117,7 +119,12 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 }
             }
 
-            return ctx.json({ data: signedUrls }, 200)
+            const data = { signedUrls }
+
+            return ctx.json<TApiResponse<typeof data>>(
+                { success: true, data },
+                200,
+            )
         },
     )
     .get('/upload/create', async (ctx) => {
@@ -134,10 +141,10 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                     userId: ctx.get('user')!.id,
                 })
 
-            return ctx.json(
-                {
-                    data: { uploadId },
-                },
+            const data = { uploadId }
+
+            return ctx.json<TApiResponse<typeof data>>(
+                { success: true, data },
                 201,
             )
         } catch (err) {
@@ -171,8 +178,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 )
 
             if (!uploadData[0]) {
-                return ctx.json(
+                return ctx.json<TApiResponseError>(
                     {
+                        success: false,
                         error: {
                             code: 'BAD_REQUEST',
                             message:
@@ -242,13 +250,13 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                         .where(eq(upload.id, uploadId))
                 })
 
-            return ctx.json(
-                {
-                    data: {
-                        uploadId,
-                        attachments: committedAttachments.map(({ id }) => id),
-                    },
-                },
+            const data = {
+                uploadId,
+                attachments: committedAttachments.map(({ id }) => id),
+            }
+
+            return ctx.json<TApiResponse<typeof data>>(
+                { success: true, data },
                 200,
             )
         },
@@ -292,8 +300,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 )
 
             if (!uploadData[0]) {
-                return ctx.json(
+                return ctx.json<TApiResponseError>(
                     {
+                        success: false,
                         error: {
                             code: 'BAD_REQUEST',
                             message:
@@ -456,10 +465,10 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                         .onConflictDoNothing()
                 })
 
-                return ctx.json(
-                    {
-                        data: { uploadId, signedUrls },
-                    },
+                const data = { uploadId, signedUrls }
+
+                return ctx.json<TApiResponse<typeof data>>(
+                    { success: true, data },
                     200,
                 )
             } catch (err) {
@@ -494,8 +503,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 )
 
             if (!uploadData[0]) {
-                return ctx.json(
+                return ctx.json<TApiResponseError>(
                     {
+                        success: false,
                         error: {
                             code: 'BAD_REQUEST',
                             message:
@@ -533,13 +543,13 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 .set({ isUploaded: true })
                 .where(inArray(objectStorage.id, attachmentsToCommit))
 
-            return ctx.json(
-                {
-                    data: {
-                        uploadId,
-                        attachments: attachmentsToCommit,
-                    },
-                },
+            const data = {
+                uploadId,
+                attachments: attachmentsToCommit,
+            }
+
+            return ctx.json<TApiResponse<typeof data>>(
+                { success: true, data },
                 200,
             )
         },
@@ -704,13 +714,13 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 })
             }
 
-            return ctx.json(
-                {
-                    data: {
-                        uploadId,
-                        signedUrls,
-                    },
-                },
+            const data = {
+                uploadId,
+                signedUrls,
+            }
+
+            return ctx.json<TApiResponse<typeof data>>(
+                { success: true, data },
                 200,
             )
         },

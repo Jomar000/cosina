@@ -1,3 +1,4 @@
+import type { TApiResponse } from '@hyperion/validator'
 import { Hono } from 'hono'
 
 export const passwordRoute = new Hono<THonoInstance>()
@@ -7,7 +8,10 @@ export const passwordRoute = new Hono<THonoInstance>()
      */
     .post('/override', async (ctx) => {
         // TODO: Password override logic here
-        return ctx.json({ data: '' }, 200)
+        return ctx.json<TApiResponse<string>>(
+            { success: true, data: 'TODO' },
+            200,
+        )
     })
 
 export default passwordRoute

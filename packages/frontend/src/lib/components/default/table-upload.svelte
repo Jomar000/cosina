@@ -43,13 +43,30 @@
         isPublic: boolean
         mimeType: string
         hashSha256: string
-        status: 'QUEUED' | 'SUCCESS' | 'FAILED'
+        status: 'QUEUED' | 'UPLOADED' | 'FAILED'
     }
 
     let fileList: Metadata[] = $state([])
     let addedToList: Metadata[] = $state([])
 
     const uploadQueue = new PQueue({ concurrency: 3 })
+
+    /**
+     * @description
+     * When an uploadId is passed to this component,
+     * assume that the operating mode is UPDATE.
+     *
+     * In the UPDATE opMode, the component retrieves the associated
+     * objects with the provided uploadId and displays it on the table.
+     *
+     * Once an action is triggered, either a new file is uploaded or the table
+     * was cleared, a new uploadId is requested and all succeeding changes are
+     * saved into this new uploadId.
+     *
+     * Otherwise, opMode is NEW.
+     * Generate a new uploadId and propagate to the parent component.
+     */
+    const opMode: 'NEW' | 'UPDATE' = uploadId === '' ? 'NEW' : 'UPDATE'
 
     //////////////
     // Handlers //
@@ -176,23 +193,23 @@
                     },
                 )
 
+            const signingResponseData = await signingResponse.json()
+
             /**
              * @description
              * STEP 3: Upload
              */
 
-            if (signingResponse.ok) {
-                const { data } = await signingResponse.json()
-
-                for (const su of data.signedUrls) {
+            if (signingResponseData.success) {
+                for (const su of signingResponseData.data.signedUrls) {
                     const queuedFn = async () => {
                         const hashIndex = addedToList.findIndex(
                             (q) => q.hashSha256 === su.hashSha256,
                         )
 
                         if (su.status === 409) {
-                            // File already exists, just set status to SUCCESS.
-                            addedToList[hashIndex].status = 'SUCCESS'
+                            // File already exists, just set status to UPLOADED.
+                            addedToList[hashIndex].status = 'UPLOADED'
                         } else {
                             try {
                                 // Upload the file.
@@ -223,8 +240,11 @@
                                         },
                                     )
 
-                                if (commitResponse.ok) {
-                                    addedToList[hashIndex].status = 'SUCCESS'
+                                const commitResponseData =
+                                    await commitResponse.json()
+
+                                if (commitResponseData.success) {
+                                    addedToList[hashIndex].status = 'UPLOADED'
                                 }
                             } catch {
                                 addedToList[hashIndex].status = 'FAILED'
@@ -245,14 +265,17 @@
     ///////////////
 
     onMount(async () => {
-        if (uploadId === '') {
-            // No uploadId provided, process is new upload.
+        if (opMode === 'NEW') {
             const response =
                 await honoClient.internal.objectStorage.upload.create.$get()
-            const { data } = await response.json()
-            uploadId = data.uploadId
+
+            const responseData = await response.json()
+
+            if ('data' in responseData) {
+                uploadId = responseData.data.uploadId
+            }
         } else {
-            // Retrieve uploadId and display contents.
+            //
         }
     })
 </script>
@@ -327,7 +350,7 @@
                                 >{formatBytes(p.file.size)}</Table.Cell
                             >
                             <Table.Cell>
-                                {#if p.status === 'SUCCESS'}
+                                {#if p.status === 'UPLOADED'}
                                     <Badge
                                         variant="default"
                                         class="bg-green-500 hover:bg-green-600"
@@ -335,7 +358,7 @@
                                         <CircleCheck
                                             class="mr-1.5 h-3.5 w-3.5"
                                         />
-                                        SUCCESS
+                                        UPLOADED
                                     </Badge>
                                 {:else if p.status === 'FAILED'}
                                     <Badge variant="destructive">

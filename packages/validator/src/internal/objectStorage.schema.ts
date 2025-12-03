@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-import * as base from '../shared/base.js'
 import * as field from '../shared/field.js'
 
 export const downloadLinkCreateInputSchema = z.object({
@@ -10,31 +9,6 @@ export const downloadLinkCreateInputSchema = z.object({
             error: 'Upload ID must be alphanumeric characters only.',
         }),
 })
-
-export const downloadLinkCreateOutputSchema = base.outputSchema(
-    z.array(
-        z.discriminatedUnion('status', [
-            z.object({
-                objectStorageId: z.string(),
-                encodedHash: z.string(),
-                signedUrl: z.string(),
-                status: z.literal(201),
-            }),
-            z.object({
-                key: z.string(),
-                encodedHash: z.null(),
-                signedUrl: z.null(),
-                status: z.literal(403),
-            }),
-            z.object({
-                key: z.string(),
-                encodedHash: z.null(),
-                signedUrl: z.null(),
-                status: z.literal(404),
-            }),
-        ]),
-    ),
-)
 
 /**
  * @deprecated
@@ -91,33 +65,6 @@ export const createUploadLinkInputSchema = z
             }
         }
     })
-
-/**
- * @deprecated
- */
-export const createUploadLinkOutputSchema = base.outputSchema(
-    z.object({
-        uploadId: z.string(),
-        signedUrls: z.array(
-            z.discriminatedUnion('status', [
-                z.object({
-                    key: z.string(),
-                    hash: z.string(),
-                    encodedHash: z.string(),
-                    signedUrl: z.string(),
-                    status: z.literal(201),
-                }),
-                z.object({
-                    key: z.string(),
-                    hash: z.string(),
-                    encodedHash: z.null(),
-                    signedUrl: z.null(),
-                    status: z.literal(409),
-                }),
-            ]),
-        ),
-    }),
-)
 
 export const uploadAttachmentCreateInputSchema = z.object({
     uploadId: field

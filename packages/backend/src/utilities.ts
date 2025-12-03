@@ -1,3 +1,4 @@
+import type { TApiResponseError } from '@hyperion/validator'
 import type { Context } from 'hono'
 import { customAlphabet } from 'nanoid'
 import type { ZodType } from 'zod'
@@ -107,13 +108,14 @@ export const honoValidatorCb = async <TSchema extends ZodType>(
     const validator = await schema.safeParseAsync(value)
 
     if (!validator.data) {
-        return ctx.json(
+        return ctx.json<TApiResponseError>(
             {
+                success: false,
                 error: {
                     code: 'DATA_VALIDATION',
                     message: 'An error occurred while validating input data.',
                 },
-                validationErrors: validator.error?.issues,
+                validator: validator.error?.issues,
             },
             400,
         )
