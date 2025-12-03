@@ -135,7 +135,7 @@ export const apiResponseErrorWrapper = (
     }: {
         message: string
         code?: string
-        validatorIssues?: z.core.$ZodIssue[]
+        validatorIssues?: z.core.$ZodIssueBase[]
         status?: ContentfulStatusCode
     },
 ) => {

@@ -17,7 +17,7 @@ export type TApiResponseError = {
         requestId: string
         code: string
         message: string
-        validatorIssues?: z.core.$ZodIssue[]
+        validatorIssues?: z.core.$ZodIssueBase[]
     }
 }
 

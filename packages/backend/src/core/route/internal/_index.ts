@@ -20,9 +20,14 @@ export const internalRoute = new Hono<THonoInstance>()
      * Routes
      */
     .route('/admin', adminRoute)
-    .route('/auth', authRoute)
     .route('/objectStorage', objectStorageRoute)
     .route('/user', userRoute)
-    .route('/ws', wsRoute)
+
+/**
+ * @description
+ * Routes excluded from RPC Type Inference
+ */
+internalRoute.route('/auth', authRoute)
+internalRoute.route('/ws', wsRoute)
 
 export default internalRoute
