@@ -32,7 +32,7 @@
         "prettier-plugin-tailwindcss": "^0.7.2",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.48.1",
-        "wrangler": "4.49.1"
+        "wrangler": "^4.52.1"
     },
     "pnpm": {
         "allowedDeprecatedVersions": {
@@ -43,7 +43,7 @@
             "@sveltejs/kit>cookie": "^0.7.2",
             "drizzle-kit>@esbuild-kit/core-utils": "npm:tsx@^4.20.6",
             "drizzle-kit>@esbuild-kit/esm-loader": "npm:tsx@^4.20.6",
-            "esbuild": "0.27.0"
+            "esbuild": "0.27.1"
         },
         "peerDependencyRules": {
             "allowedVersions": {
