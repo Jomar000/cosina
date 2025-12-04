@@ -52,15 +52,11 @@ export const app = new Hono<THonoInstance>()
     )
     .use(async (ctx, next) => {
         if (ctx.env.STATUS !== 'up') {
-            return ctx.json(
-                {
-                    error: {
-                        code: 'SERVICE_UNAVAILABLE',
-                        message: '🛠️ Service Unavailable 🛠️',
-                    },
-                },
-                503,
-            )
+            return apiResponseErrorWrapper(ctx, {
+                code: 'SERVICE_UNAVAILABLE',
+                message: '🛠️ Service Unavailable 🛠️',
+                status: 503,
+            })
         }
 
         await next()

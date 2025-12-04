@@ -1,6 +1,7 @@
 import { every } from 'hono/combine'
 import { createMiddleware } from 'hono/factory'
 
+import { apiResponseErrorWrapper } from '../../utilities.js'
 import { isAuthenticated } from './isAuthenticated.js'
 
 export const isAuthorized = (permissions: Record<string, string[]>) => {
@@ -15,16 +16,11 @@ export const isAuthorized = (permissions: Record<string, string[]>) => {
             })
 
             if (!success) {
-                return ctx.json(
-                    {
-                        error: {
-                            code: 'FORBIDDEN',
-                            message:
-                                'You are not allowed to access this resource.',
-                        },
-                    },
-                    403,
-                )
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'FORBIDDEN',
+                    message: 'You are not allowed to access this resource.',
+                    status: 403,
+                })
             }
 
             await next()

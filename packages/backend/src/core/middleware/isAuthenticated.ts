@@ -1,5 +1,7 @@
 import { createMiddleware } from 'hono/factory'
 
+import { apiResponseErrorWrapper } from '../../utilities.js'
+
 export const isAuthenticated = () => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
         const authData = await ctx.get('auth').api.getSession({
@@ -7,15 +9,11 @@ export const isAuthenticated = () => {
         })
 
         if (!authData) {
-            return ctx.json(
-                {
-                    error: {
-                        code: 'UNAUTHORIZED',
-                        message: 'You are not allowed to access this resource.',
-                    },
-                },
-                401,
-            )
+            return apiResponseErrorWrapper(ctx, {
+                code: 'UNAUTHORIZED',
+                message: 'You are not allowed to access this resource.',
+                status: 401,
+            })
         }
 
         const { role } = await ctx.get('auth').api.getActiveMemberRole({
