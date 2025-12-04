@@ -32,7 +32,7 @@
         "@sveltejs/vite-plugin-svelte": "^6.2.1",
         "@tailwindcss/vite": "^4.1.17",
         "@tanstack/svelte-form": "^1.27.0",
-        "@tanstack/svelte-query": "^6.0.9",
+        "@tanstack/svelte-query": "^6.0.10",
         "@tanstack/table-core": "^8.21.3",
         "@types/cloudflare-turnstile": "^0.2.2",
         "@vitest/browser": "^4.0.15",

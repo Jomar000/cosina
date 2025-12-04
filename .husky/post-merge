@@ -7,16 +7,13 @@ echo ==============================
 echo
 
 # Check if certain files were modified by the merge process
-lockFileChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'pnpm-lock.yaml' || true ) )
 validatorChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/validator/src/' || true ) )
 backendChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/backend/src/' || true ) )
 
-# Re-install dependencies when there are modifications to pnpm lockfile
-if [[ $lockFileChanged != '' ]]; then
-    echo Installing project dependencies...
-    pnpm -r i
-    echo
-fi
+# Re-install dependencies
+echo Installing project dependencies...
+pnpm -r i
+echo
 
 # Build validator package
 if [[ $validatorChanged != '' ]]; then

@@ -45,14 +45,14 @@ importers:
         specifier: 3.6.2
         version: 3.6.2
       prettier-plugin-multiline-arrays:
-        specifier: 4.0.3
-        version: 4.0.3(prettier@3.6.2)
+        specifier: ^4.0.5
+        version: 4.0.5(prettier@3.6.2)
       prettier-plugin-svelte:
         specifier: ^3.4.0
         version: 3.4.0(prettier@3.6.2)(svelte@5.45.5)
       prettier-plugin-tailwindcss:
         specifier: ^0.7.2
-        version: 0.7.2(prettier-plugin-multiline-arrays@4.0.3(prettier@3.6.2))(prettier-plugin-svelte@3.4.0(prettier@3.6.2)(svelte@5.45.5))(prettier@3.6.2)
+        version: 0.7.2(prettier-plugin-multiline-arrays@4.0.5(prettier@3.6.2))(prettier-plugin-svelte@3.4.0(prettier@3.6.2)(svelte@5.45.5))(prettier@3.6.2)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -157,8 +157,8 @@ importers:
         specifier: ^1.27.0
         version: 1.27.0(svelte@5.45.5)
       '@tanstack/svelte-query':
-        specifier: ^6.0.9
-        version: 6.0.9(svelte@5.45.5)
+        specifier: ^6.0.10
+        version: 6.0.10(svelte@5.45.5)
       '@tanstack/table-core':
         specifier: ^8.21.3
         version: 8.21.3
@@ -1371,8 +1371,8 @@ packages:
     resolution: {integrity: sha512-vGY+CWsFZeac3dELgB6UZ4c7OacwsLb8hvL2gLS6hTgy8Fl0Bm/aLokHaeDIP+q9F9HUZTnp360z9uv78eg8pg==}
     engines: {node: '>=18'}
 
-  '@tanstack/query-core@5.90.11':
-    resolution: {integrity: sha512-f9z/nXhCgWDF4lHqgIE30jxLe4sYv15QodfdPDKYAk7nAEjNcndy4dHz3ezhdUaR23BpWa4I2EH4/DZ0//Uf8A==}
+  '@tanstack/query-core@5.90.12':
+    resolution: {integrity: sha512-T1/8t5DhV/SisWjDnaiU2drl6ySvsHj1bHBCWNXd+/T+Hh1cf6JodyEYMd5sgwm+b/mETT4EV3H+zCVczCU5hg==}
 
   '@tanstack/store@0.7.7':
     resolution: {integrity: sha512-xa6pTan1bcaqYDS9BDpSiS63qa6EoDkPN9RsRaxHuDdVDNntzq3xNwR5YKTU/V3SkSyC9T4YVOPh2zRQN0nhIQ==}
@@ -1382,8 +1382,8 @@ packages:
     peerDependencies:
       svelte: ^5.0.0
 
-  '@tanstack/svelte-query@6.0.9':
-    resolution: {integrity: sha512-ezawzencc07h61M+p8R9Opp2CmpgGwrM05IsIGJiPkr1SrBPW8gDZ9sTdaQbEpzLNXMXaZUkq0MS+61Rw2EfSg==}
+  '@tanstack/svelte-query@6.0.10':
+    resolution: {integrity: sha512-J0kM3JNvRcRCM6cbHLeICs73aLp98N/nsihdVEtiNo3MEN4pAnO45qZ2yxX70MrEZ9vffXaCXMCChwgXs1lZ/Q==}
     peerDependencies:
       svelte: ^5.25.0
 
@@ -2840,11 +2840,11 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier-plugin-multiline-arrays@4.0.3:
-    resolution: {integrity: sha512-H1f/0zbvlO/FR0Fmyl31sSBodsIZkuQF0Omi9BrptLU31rZ+Almt9BbrE8IS3BFT/DGKePKb55XqN660LTnmsQ==}
+  prettier-plugin-multiline-arrays@4.0.5:
+    resolution: {integrity: sha512-P6S+yUWrGv7LHIL3p+sQVdeNdP2nTocyVTe0ta9UwmJGHTbDpQas8rAayxjIN61ujxPXydW6ObHPmSyv98gMdQ==}
     engines: {node: '>=20'}
     peerDependencies:
-      prettier: '>=3.0.0'
+      prettier: '>=3.0.0 <3.7.0'
 
   prettier-plugin-svelte@3.4.0:
     resolution: {integrity: sha512-pn1ra/0mPObzqoIQn/vUTR3ZZI6UuZ0sHqMK5x2jMLGrs53h0sXhkVuDcrlssHwIMk7FYrMjHBPoUSyyEEDlBQ==}
@@ -3340,8 +3340,8 @@ packages:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
     engines: {node: '>= 4.0.0'}
 
-  update-browserslist-db@1.2.1:
-    resolution: {integrity: sha512-R9NcHbbZ45RoWfTdhn1J9SS7zxNvlddv4YRrHTUaFdtjbmfncfedB45EC9IaqJQ97iAR1GZgOfyRQO+ExIF6EQ==}
+  update-browserslist-db@1.2.2:
+    resolution: {integrity: sha512-E85pfNzMQ9jpKkA7+TJAi4TJN+tBCuWh5rUcS/sv6cFi+1q9LYDwDI5dpUL0u/73EElyQ8d3TEaeW4sPedBqYA==}
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
@@ -4649,7 +4649,7 @@ snapshots:
       '@tanstack/devtools-event-client': 0.3.5
       '@tanstack/store': 0.7.7
 
-  '@tanstack/query-core@5.90.11': {}
+  '@tanstack/query-core@5.90.12': {}
 
   '@tanstack/store@0.7.7': {}
 
@@ -4659,9 +4659,9 @@ snapshots:
       '@tanstack/svelte-store': 0.7.7(svelte@5.45.5)
       svelte: 5.45.5
 
-  '@tanstack/svelte-query@6.0.9(svelte@5.45.5)':
+  '@tanstack/svelte-query@6.0.10(svelte@5.45.5)':
     dependencies:
-      '@tanstack/query-core': 5.90.11
+      '@tanstack/query-core': 5.90.12
       svelte: 5.45.5
 
   '@tanstack/svelte-store@0.7.7(svelte@5.45.5)':
@@ -5090,7 +5090,7 @@ snapshots:
       caniuse-lite: 1.0.30001759
       electron-to-chromium: 1.5.264
       node-releases: 2.0.27
-      update-browserslist-db: 1.2.1(browserslist@4.28.1)
+      update-browserslist-db: 1.2.2(browserslist@4.28.1)
 
   buffer@5.7.1:
     dependencies:
@@ -6052,7 +6052,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-multiline-arrays@4.0.3(prettier@3.6.2):
+  prettier-plugin-multiline-arrays@4.0.5(prettier@3.6.2):
     dependencies:
       '@augment-vir/common': 31.54.3
       prettier: 3.6.2
@@ -6063,11 +6063,11 @@ snapshots:
       prettier: 3.6.2
       svelte: 5.45.5
 
-  prettier-plugin-tailwindcss@0.7.2(prettier-plugin-multiline-arrays@4.0.3(prettier@3.6.2))(prettier-plugin-svelte@3.4.0(prettier@3.6.2)(svelte@5.45.5))(prettier@3.6.2):
+  prettier-plugin-tailwindcss@0.7.2(prettier-plugin-multiline-arrays@4.0.5(prettier@3.6.2))(prettier-plugin-svelte@3.4.0(prettier@3.6.2)(svelte@5.45.5))(prettier@3.6.2):
     dependencies:
       prettier: 3.6.2
     optionalDependencies:
-      prettier-plugin-multiline-arrays: 4.0.3(prettier@3.6.2)
+      prettier-plugin-multiline-arrays: 4.0.5(prettier@3.6.2)
       prettier-plugin-svelte: 3.4.0(prettier@3.6.2)(svelte@5.45.5)
 
   prettier@2.8.8: {}
@@ -6570,7 +6570,7 @@ snapshots:
 
   universalify@0.1.2: {}
 
-  update-browserslist-db@1.2.1(browserslist@4.28.1):
+  update-browserslist-db@1.2.2(browserslist@4.28.1):
     dependencies:
       browserslist: 4.28.1
       escalade: 3.2.0
