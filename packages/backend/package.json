@@ -7,7 +7,7 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "pnpm": ">=10.23.0",
+        "pnpm": ">=10.25.0",
         "node": ">=24.11.1"
     },
     "scripts": {
@@ -27,10 +27,10 @@
         "@hyperion/validator": "workspace:*",
         "@noble/hashes": "^2.0.1",
         "aws4fetch": "^1.0.20",
-        "better-auth": "^1.4.5",
+        "better-auth": "1.4.5",
         "dayjs": "^1.11.19",
         "drizzle-orm": "^0.44.7",
-        "hono": "^4.10.7",
+        "hono": "^4.10.8",
         "nanoid": "^5.1.6",
         "postgres": "^3.4.7",
         "uuid": "^13.0.0",
