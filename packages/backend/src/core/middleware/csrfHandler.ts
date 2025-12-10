@@ -10,8 +10,12 @@ import { apiResponseErrorWrapper } from '../../utilities.js'
  */
 export const csrfHandler = () => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
-        if (ctx.env.ENVIRONMENT === 'test') {
+        if (
+            ctx.env.ENVIRONMENT === 'test' ||
+            ctx.req.path.startsWith('/internal/auth')
+        ) {
             await next()
+            return
         }
 
         const safeMethods = [

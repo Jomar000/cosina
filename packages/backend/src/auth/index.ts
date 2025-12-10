@@ -176,7 +176,7 @@ export const auth = async (opts: {
             throw: true,
         },
         advanced: {
-            cookiePrefix: 'hyperion',
+            cookiePrefix: 'better-auth',
             defaultCookieAttributes: cookieAttrs,
             ipAddress: {
                 ipAddressHeaders: [
@@ -244,7 +244,10 @@ export const auth = async (opts: {
         },
         hooks: {
             before: createAuthMiddleware(async (ctx) => {
-                if (ctx.path.startsWith('/sign-in/')) {
+                if (
+                    ctx.path.startsWith('/sign-in/email') ||
+                    ctx.path.startsWith('/sign-in/username')
+                ) {
                     if (!ctx.query?.organizationId) {
                         throw new AppError({
                             code: 'BAD_REQUEST',
@@ -283,7 +286,10 @@ export const auth = async (opts: {
                 }
             }),
             after: createAuthMiddleware(async (ctx) => {
-                if (ctx.path.startsWith('/sign-in/')) {
+                if (
+                    ctx.path.startsWith('/sign-in/email') ||
+                    ctx.path.startsWith('/sign-in/username')
+                ) {
                     if (!ctx.context.newSession) {
                         throw new AppError({
                             code: 'UNPROCESSABLE_CONTENT',
