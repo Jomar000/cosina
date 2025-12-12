@@ -29,7 +29,7 @@
         "aws4fetch": "^1.0.20",
         "better-auth": "1.4.5",
         "dayjs": "^1.11.19",
-        "drizzle-orm": "^0.44.7",
+        "drizzle-orm": "^0.45.1",
         "hono": "^4.10.8",
         "nanoid": "^5.1.6",
         "postgres": "^3.4.7",
