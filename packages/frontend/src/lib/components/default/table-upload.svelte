@@ -10,7 +10,6 @@
     import ky from 'ky'
     import PQueue from 'p-queue'
     import { onMount } from 'svelte'
-    import { SvelteMap } from 'svelte/reactivity'
 
     import * as Avatar from '$lib/components/shadcn/avatar'
     import { Badge } from '$lib/components/shadcn/badge'
@@ -40,6 +39,7 @@
 
     type Metadata = {
         file: File
+        objectId: string
         isPublic: boolean
         mimeType: string
         hashSha256: string
@@ -80,7 +80,6 @@
         }
 
         const selectedFiles = (event.target as HTMLInputElement)?.files
-        const hashLookup: Map<string, File> = new SvelteMap()
         addedToList = []
 
         if (selectedFiles) {
@@ -143,13 +142,11 @@
                     continue
                 }
 
-                // Used to match Signed URLs
-                hashLookup.set(hashSha256, file)
-
                 addedToList = [
                     ...addedToList,
                     {
                         file,
+                        objectId: '',
                         hashSha256,
                         isPublic: false,
                         mimeType,
@@ -207,6 +204,8 @@
                             (q) => q.hashSha256 === su.hashSha256,
                         )
 
+                        addedToList[hashIndex].objectId = su.id
+
                         if (su.status === 409) {
                             // File already exists, just set status to UPLOADED.
                             addedToList[hashIndex].status = 'UPLOADED'
@@ -219,7 +218,7 @@
                                         'x-amz-checksum-sha256':
                                             su.encodedHash!,
                                     },
-                                    body: hashLookup.get(su.hashSha256)!,
+                                    body: addedToList[hashIndex].file,
                                 })
 
                                 // Report back that file is successfully uploaded.
@@ -256,6 +255,72 @@
                 }
 
                 await uploadQueue.onIdle()
+            }
+        }
+    }
+
+    const handleFileRetry = async (index: number) => {
+        const retryResponse =
+            await honoClient.internal.objectStorage.upload.attachment.retry.$post(
+                {
+                    json: {
+                        uploadId,
+                        attachments: [fileList[index].objectId],
+                    },
+                },
+                {
+                    headers: {
+                        'x-csrf-token': getCookie('csrf_token') ?? '',
+                    },
+                },
+            )
+
+        const retryResponseData = await retryResponse.json()
+
+        if (retryResponseData.success) {
+            for (const su of retryResponseData.data.signedUrls) {
+                if (su.status === 409) {
+                    // File already exists, just set status to UPLOADED.
+                    fileList[index].status = 'UPLOADED'
+                } else if (su.status === 200) {
+                    try {
+                        // Upload the file.
+                        await ky(su.signedUrl!, {
+                            method: 'PUT',
+                            headers: {
+                                'x-amz-checksum-sha256': su.encodedHash!,
+                            },
+                            body: fileList[index].file,
+                        })
+
+                        // Report back that file is successfully uploaded.
+                        const commitResponse =
+                            await honoClient.internal.objectStorage.upload.attachment.commit.$post(
+                                {
+                                    json: {
+                                        uploadId,
+                                        attachments: [fileList[index].objectId],
+                                    },
+                                },
+                                {
+                                    headers: {
+                                        'x-csrf-token':
+                                            getCookie('csrf_token') ?? '',
+                                    },
+                                },
+                            )
+
+                        const commitResponseData = await commitResponse.json()
+
+                        if (commitResponseData.success) {
+                            fileList[index].status = 'UPLOADED'
+                        }
+                    } catch {
+                        fileList[index].status = 'FAILED'
+                    }
+                } else {
+                    fileList[index].status = 'FAILED'
+                }
             }
         }
     }
@@ -318,11 +383,9 @@
                     <Table.Row>
                         <Table.Head class="w-20">Preview</Table.Head>
                         <Table.Head>Filename</Table.Head>
-                        <Table.Head class="w-[120px]">Size</Table.Head>
-                        <Table.Head class="w-[150px]">Status</Table.Head>
-                        <Table.Head class="w-[100px] text-right"
-                            >Actions</Table.Head
-                        >
+                        <Table.Head class="w-30">Size</Table.Head>
+                        <Table.Head class="w-37.5">Status</Table.Head>
+                        <Table.Head class="w-25 text-right">Actions</Table.Head>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -384,7 +447,10 @@
                                     </DropdownMenu.Trigger>
                                     <DropdownMenu.Content>
                                         {#if p.status === 'FAILED'}
-                                            <DropdownMenu.Item>
+                                            <DropdownMenu.Item
+                                                onclick={() =>
+                                                    handleFileRetry(i)}
+                                            >
                                                 <RefreshCw
                                                     class="mr-2 h-4 w-4"
                                                 />
