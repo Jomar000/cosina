@@ -7,7 +7,7 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "pnpm": ">=10.25.0",
+        "pnpm": ">=10.26.0",
         "node": ">=24.11.1"
     },
     "scripts": {
@@ -27,14 +27,14 @@
         "@hyperion/validator": "workspace:*",
         "@noble/hashes": "^2.0.1",
         "aws4fetch": "^1.0.20",
-        "better-auth": "1.4.5",
+        "better-auth": "^1.4.7",
         "dayjs": "^1.11.19",
         "drizzle-orm": "^0.45.1",
         "hono": "^4.11.1",
         "nanoid": "^5.1.6",
         "postgres": "^3.4.7",
         "uuid": "^13.0.0",
-        "zod": "^4.1.13"
+        "zod": "^4.2.1"
     },
     "devDependencies": {
         "@cloudflare/vitest-pool-workers": "0.10.9",
@@ -43,7 +43,7 @@
         "@vitest/snapshot": "^3.2.4",
         "drizzle-kit": "^0.31.8",
         "smol-toml": "^1.5.2",
-        "vite": "^7.2.7",
+        "vite": "^7.3.0",
         "vitest": "^3.2.4"
     },
     "exports": {

@@ -7,7 +7,7 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "pnpm": ">=10.25.0",
+        "pnpm": ">=10.26.0",
         "node": ">=24.11.1"
     },
     "scripts": {
@@ -16,7 +16,7 @@
     },
     "dependencies": {
         "dayjs": "^1.11.19",
-        "zod": "^4.1.13"
+        "zod": "^4.2.1"
     },
     "exports": {
         ".": {
