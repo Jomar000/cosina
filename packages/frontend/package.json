@@ -7,8 +7,8 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "pnpm": ">=10.26.0",
-        "node": ">=24.11.1"
+        "pnpm": ">=10.26.1",
+        "node": ">=24.12.0"
     },
     "scripts": {
         "dev": "vite dev --host",
@@ -50,7 +50,7 @@
         "p-queue": "^9.0.1",
         "playwright": "^1.57.0",
         "svelte": "^5.46.0",
-        "svelte-check": "^4.3.4",
+        "svelte-check": "^4.3.5",
         "svelte-sonner": "^1.0.7",
         "tailwind-merge": "^3.4.0",
         "tailwind-variants": "^3.2.2",
