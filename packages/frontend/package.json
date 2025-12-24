@@ -37,7 +37,7 @@
         "@types/cloudflare-turnstile": "^0.2.2",
         "@vitest/browser": "^4.0.16",
         "@vitest/browser-playwright": "^4.0.16",
-        "better-auth": "^1.4.9",
+        "better-auth": "1.4.7",
         "bits-ui": "^2.14.4",
         "clsx": "^2.1.1",
         "daisyui": "^5.5.14",
