@@ -31,7 +31,7 @@
         "prettier-plugin-svelte": "^3.4.1",
         "prettier-plugin-tailwindcss": "^0.7.2",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.51.0",
+        "typescript-eslint": "^8.52.0",
         "wrangler": "^4.56.0"
     },
     "pnpm": {
@@ -41,6 +41,8 @@
         },
         "overrides": {
             "@sveltejs/kit>cookie": "^0.7.2",
+            "drizzle-kit>@esbuild-kit/core-utils": "npm:tsx@^4.20.6",
+            "drizzle-kit>@esbuild-kit/esm-loader": "npm:tsx@^4.20.6",
             "esbuild": "0.27.2"
         },
         "peerDependencyRules": {
