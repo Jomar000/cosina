@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button } from '$lib/components/shadcn/button'
+    import { Button } from '$lib/components/shadcn/button/index.js'
     import { cn } from '$lib/shadcn.js'
     import PanelLeftIcon from '@lucide/svelte/icons/panel-left'
     import type { ComponentProps } from 'svelte'

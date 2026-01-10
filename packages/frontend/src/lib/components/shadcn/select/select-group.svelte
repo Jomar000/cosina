@@ -6,6 +6,7 @@
 </script>
 
 <SelectPrimitive.Group
+    bind:ref
     data-slot="select-group"
     {...restProps}
 />
