@@ -7,8 +7,8 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "pnpm": ">=10.28.0",
-        "node": ">=24.12.0"
+        "pnpm": ">=10.28.1",
+        "node": ">=24.13.0"
     },
     "scripts": {
         "build": "tsc --build ./tsconfig.json",
@@ -16,7 +16,7 @@
     },
     "dependencies": {
         "dayjs": "^1.11.19",
-        "zod": "^4.3.5"
+        "zod": "^4.3.6"
     },
     "exports": {
         ".": {

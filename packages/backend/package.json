@@ -7,8 +7,8 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "pnpm": ">=10.28.0",
-        "node": ">=24.12.0"
+        "pnpm": ">=10.28.1",
+        "node": ">=24.13.0"
     },
     "scripts": {
         "dev": "wrangler dev",
@@ -27,17 +27,17 @@
         "@hyperion/validator": "workspace:*",
         "@noble/hashes": "^2.0.1",
         "aws4fetch": "^1.0.20",
-        "better-auth": "1.4.13",
+        "better-auth": "^1.4.17",
         "dayjs": "^1.11.19",
         "drizzle-orm": "^0.45.1",
-        "hono": "^4.11.4",
+        "hono": "^4.11.5",
         "nanoid": "^5.1.6",
         "postgres": "^3.4.8",
         "uuid": "^13.0.0",
-        "zod": "^4.3.5"
+        "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@cloudflare/vitest-pool-workers": "0.12.4",
+        "@cloudflare/vitest-pool-workers": "^0.12.6",
         "@vitest/coverage-istanbul": "^3.2.4",
         "@vitest/runner": "^3.2.4",
         "@vitest/snapshot": "^3.2.4",
