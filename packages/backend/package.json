@@ -30,14 +30,15 @@
         "better-auth": "^1.4.17",
         "dayjs": "^1.11.19",
         "drizzle-orm": "^0.45.1",
-        "hono": "^4.11.5",
+        "hono": "^4.11.7",
         "nanoid": "^5.1.6",
         "postgres": "^3.4.8",
+        "resend": "^6.9.1",
         "uuid": "^13.0.0",
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@cloudflare/vitest-pool-workers": "^0.12.6",
+        "@cloudflare/vitest-pool-workers": "^0.12.7",
         "@vitest/coverage-istanbul": "^3.2.4",
         "@vitest/runner": "^3.2.4",
         "@vitest/snapshot": "^3.2.4",
