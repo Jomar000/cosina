@@ -77,12 +77,14 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                 status: 201 | 403
             }[] = []
 
-            for (const { objectStorage, objectStorageAcl } of linkedObjects) {
-                const isPublicObject = objectStorage.isPublic
+            for (const {
+                objectStorage: os,
+                objectStorageAcl: osa,
+            } of linkedObjects) {
+                const isPublicObject = os.isPublic
 
                 const hasObjectPermission =
-                    objectStorageAcl.userId === ctx.get('user')!.id &&
-                    Boolean(objectStorageAcl.mode & 1)
+                    osa.userId === ctx.get('user')!.id && Boolean(osa.mode & 1)
 
                 if (
                     ctx.get('isPrivilegedRole') ||
@@ -90,12 +92,12 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                     hasObjectPermission
                 ) {
                     signedUrls.push({
-                        objectStorageId: objectStorage.id,
+                        objectStorageId: os.id,
                         signedUrl: (
                             await ctx
                                 .get('aws4FetchClient')
                                 .sign(
-                                    `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET}/${objectStorage.id}?X-Amz-Expires=${300}`,
+                                    `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET}/${os.id}?X-Amz-Expires=${300}`,
                                     {
                                         method: 'GET',
                                         aws: {
@@ -109,7 +111,7 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                     })
                 } else {
                     signedUrls.push({
-                        objectStorageId: objectStorage.id,
+                        objectStorageId: os.id,
                         signedUrl: null,
                         status: 403,
                     })
