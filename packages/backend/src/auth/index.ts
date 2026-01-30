@@ -6,12 +6,14 @@ import { constantTimeEqual } from 'better-auth/crypto'
 import {
     captcha,
     createAuthMiddleware,
+    emailOTP,
     organization as organizationPlugin,
     username,
 } from 'better-auth/plugins'
 import { createAccessControl } from 'better-auth/plugins/access'
 import { and, eq, or } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
+import { Resend } from 'resend'
 
 import { AppError } from '../errors.js'
 import { aclBuilder } from './acl.js'
@@ -44,6 +46,8 @@ export const auth = async (opts: {
         sameSite: 'strict' as const,
         secure: true,
     }
+
+    const resend = new Resend(env.RESEND_API_KEY)
 
     const scryptOpts = {
         N: 2 ** 15,
@@ -176,7 +180,7 @@ export const auth = async (opts: {
             throw: true,
         },
         advanced: {
-            cookiePrefix: 'better-auth',
+            cookiePrefix: 'sentinel',
             defaultCookieAttributes: cookieAttrs,
             ipAddress: {
                 ipAddressHeaders: [
@@ -186,6 +190,7 @@ export const auth = async (opts: {
             },
             useSecureCookies: true,
         },
+        baseURL: env.BASE_URL,
         basePath: '/internal/auth',
         database: drizzleAdapter(db, {
             provider: 'pg',
@@ -215,7 +220,6 @@ export const auth = async (opts: {
                         return {
                             data: {
                                 ...session,
-                                token: nanoid(32),
                                 activeOrganizationId,
                             },
                         }
@@ -332,6 +336,28 @@ export const auth = async (opts: {
                           ],
                       }),
                   ]),
+            emailOTP({
+                overrideDefaultEmailVerification: true,
+                sendVerificationOTP: async ({ email, otp, type }) => {
+                    if (type === 'sign-in') {
+                        /* NOT IMPLEMENTED */
+                    } else if (type === 'email-verification') {
+                        await resend.emails.send({
+                            from: env.MAILER_ACCOUNT,
+                            to: email,
+                            subject: 'E-mail Verification',
+                            text: `${otp}`,
+                        })
+                    } else {
+                        await resend.emails.send({
+                            from: env.MAILER_ACCOUNT,
+                            to: email,
+                            subject: 'Password Reset',
+                            text: `${otp}`,
+                        })
+                    }
+                },
+            }),
             organizationPlugin({
                 ac: aclInstance,
                 roles: Object.keys(aclRoles)
@@ -370,10 +396,6 @@ export const auth = async (opts: {
             delete: async (key) => await kv.delete(key),
         },
         session: {
-            cookieCache: {
-                enabled: true,
-                maxAge: Number(env.SESSION_UPDATE_AGE),
-            },
             expiresIn: Number(env.SESSION_EXPIRATION),
             updateAge: Number(env.SESSION_UPDATE_AGE),
         },
