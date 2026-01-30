@@ -9,10 +9,10 @@ export const v1Route = new Hono<THonoInstance>()
      * Middleware
      */
     .use(corsHandler('default'))
-    /**
-     * @description
-     * Routes
-     */
     .use(initContext())
+/**
+ * @description
+ * Routes
+ */
 
 export default v1Route
