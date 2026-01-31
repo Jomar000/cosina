@@ -40,9 +40,7 @@ export const csrfHandler = () => {
                 })
             }
 
-            const allowedOrigins: string[] = ctx.env.ALLOWED_ORIGINS.split(',')
-
-            if (!allowedOrigins.includes(ctx.req.header('origin')!)) {
+            if (ctx.env.URL_FRONTEND !== ctx.req.header('origin')) {
                 return apiResponseErrorWrapper(ctx, {
                     code: 'FORBIDDEN',
                     message: 'Invalid request origin.',

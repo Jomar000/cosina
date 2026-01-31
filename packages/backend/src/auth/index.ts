@@ -190,7 +190,7 @@ export const auth = async (opts: {
             },
             useSecureCookies: true,
         },
-        baseURL: env.BASE_URL,
+        baseURL: env.URL_BACKEND,
         basePath: '/internal/auth',
         database: drizzleAdapter(db, {
             provider: 'pg',
@@ -399,7 +399,7 @@ export const auth = async (opts: {
             expiresIn: Number(env.SESSION_EXPIRATION),
             updateAge: Number(env.SESSION_UPDATE_AGE),
         },
-        trustedOrigins: env.ALLOWED_ORIGINS.split(','),
+        trustedOrigins: [env.URL_FRONTEND],
     })
 }
 

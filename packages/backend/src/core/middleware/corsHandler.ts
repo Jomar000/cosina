@@ -10,7 +10,7 @@ export const corsHandler = (mode: 'default' | 'reflect' = 'default') => {
             return
         }
 
-        let allowedOrigins: string[] = ctx.env.ALLOWED_ORIGINS.split(',')
+        let allowedOrigins: string[] = [ctx.env.URL_FRONTEND]
 
         if (mode === 'reflect') {
             allowedOrigins = ctx.req.header('origin')

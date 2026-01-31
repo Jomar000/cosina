@@ -34,8 +34,6 @@ port = 8080
 [vars]
 ENVIRONMENT = "development"
 STATUS = "up"
-ALLOWED_ORIGINS = "http://localhost:5173"
-BASE_URL = "http://localhost:8080"
 CF_R2_BUCKET = "hyperion-development"
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
@@ -47,6 +45,8 @@ CORS_MAX_AGE = 7200 # 2 hours (seconds)
 MAILER_ACCOUNT = "no-reply@hyperion.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
+URL_FRONTEND = "http://localhost:5173"
+URL_BACKEND = "http://localhost:8080"
 
 [[kv_namespaces]]
 binding = "HYPERION_KV"
@@ -77,8 +77,6 @@ route = { custom_domain = true, pattern = "" }
 [env.test.vars]
 ENVIRONMENT = "test"
 STATUS = "up"
-ALLOWED_ORIGINS = "http://localhost:5173"
-BASE_URL = "http://localhost:8080"
 CF_R2_BUCKET = "hyperion-test"
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
@@ -90,6 +88,8 @@ CORS_MAX_AGE = 7200 # 2 hours (seconds)
 MAILER_ACCOUNT = "no-reply@hyperion.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
+URL_FRONTEND = "http://localhost:5173"
+URL_BACKEND = "http://localhost:8080"
 
 [[env.test.kv_namespaces]]
 binding = "HYPERION_KV"
@@ -120,8 +120,6 @@ route = { custom_domain = true, pattern = "" }
 [env.staging.vars]
 ENVIRONMENT = "staging"
 STATUS = "up"
-ALLOWED_ORIGINS = "http://localhost:5173"
-BASE_URL = "http://localhost:8080"
 CF_R2_BUCKET = "hyperion-staging"
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
@@ -133,6 +131,8 @@ CORS_MAX_AGE = 7200 # 2 hours (seconds)
 MAILER_ACCOUNT = "no-reply@hyperion.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
+URL_FRONTEND = "http://localhost:5173"
+URL_BACKEND = "http://localhost:8080"
 
 [[env.staging.kv_namespaces]]
 binding = "HYPERION_KV"
@@ -162,8 +162,6 @@ route = { custom_domain = true, pattern = "" }
 [env.production.vars]
 ENVIRONMENT = "production"
 STATUS = "up"
-ALLOWED_ORIGINS = "http://localhost:5173"
-BASE_URL = "http://localhost:8080"
 CF_R2_BUCKET = "hyperion-production"
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
@@ -175,6 +173,8 @@ CORS_MAX_AGE = 7200 # 2 hours (seconds)
 MAILER_ACCOUNT = "no-reply@hyperion.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
+URL_FRONTEND = "http://localhost:5173"
+URL_BACKEND = "http://localhost:8080"
 
 [[env.production.kv_namespaces]]
 binding = "HYPERION_KV"
