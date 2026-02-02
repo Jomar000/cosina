@@ -258,16 +258,16 @@ importers:
 
 packages:
 
-  '@augment-vir/assert@31.59.0':
-    resolution: {integrity: sha512-AnARX2i+Q6G5pHu71yyDnRavVUPO6bqAbRssSt1+d/ukN00T4SXhy4FNzlNowmHK61baOuCtm6X0txl204AwsA==}
+  '@augment-vir/assert@31.59.1':
+    resolution: {integrity: sha512-nVrLVdcyHz/L4u9vWqEabHxqzSahSfSbEDswyQmEKEZn6bFAooasW3yztW1bZ8R/RF3+xsiWSTyGbPXqR1PGXA==}
     engines: {node: '>=22'}
 
-  '@augment-vir/common@31.59.0':
-    resolution: {integrity: sha512-AyH7YUX6NABcoKzhDTh9JVW41OOirL9zBsypR6z+pBiVymVJjurkvQUzSMFpKm/pjULyZeowyz/gJWtp3WirQw==}
+  '@augment-vir/common@31.59.1':
+    resolution: {integrity: sha512-CcQ0nEOt/F3/85hpxznaYtCjrAMzgirnVLnJD5XFO0sqnoQrYCONopomNC/AY/rJ6MfFMMZ0V9+14y0znkWyxw==}
     engines: {node: '>=22'}
 
-  '@augment-vir/core@31.59.0':
-    resolution: {integrity: sha512-ulPLFckWVv028vuoNiTXkf9BpmqKIx6YzjIl5vOqnX//Pnm0oa+Vfhly76H8AmueLW6oafDp4mkVjVlUsTbe3g==}
+  '@augment-vir/core@31.59.1':
+    resolution: {integrity: sha512-hBw3HzTAWP97S2ZkKjPe6aJL8uFb+3osdjHqEpnR9XYXkYm/zekuAgjt2BV0WtDpafGJqwAV5Whw5rjqrFqfxQ==}
     engines: {node: '>=22'}
 
   '@babel/code-frame@7.29.0':
@@ -1700,8 +1700,8 @@ packages:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
 
-  caniuse-lite@1.0.30001766:
-    resolution: {integrity: sha512-4C0lfJ0/YPjJQHagaE9x2Elb69CIqEPZeG0anQt9SIvIoOH4a4uaRl73IavyO+0qZh6MDLH//DrXThEYKHkmYA==}
+  caniuse-lite@1.0.30001767:
+    resolution: {integrity: sha512-34+zUAMhSH+r+9eKmYG+k2Rpt8XttfE4yXAjoZvkAPs15xcYQhyBYdalJ65BzivAvGRMViEjy6oKr/S91loekQ==}
 
   chai@5.3.3:
     resolution: {integrity: sha512-4zNhdJD/iOjSH0A05ea+Ke6MU5mmpQcbQsSOkgdaUMJ9zTlDTD/GYlwohmIE2u0gaxHYiVHEn1Fw9mZ/ktJWgw==}
@@ -3597,18 +3597,18 @@ packages:
 
 snapshots:
 
-  '@augment-vir/assert@31.59.0':
+  '@augment-vir/assert@31.59.1':
     dependencies:
-      '@augment-vir/core': 31.59.0
+      '@augment-vir/core': 31.59.1
       '@date-vir/duration': 8.1.0
       deep-eql: 5.0.2
       expect-type: 1.3.0
       type-fest: 5.4.3
 
-  '@augment-vir/common@31.59.0':
+  '@augment-vir/common@31.59.1':
     dependencies:
-      '@augment-vir/assert': 31.59.0
-      '@augment-vir/core': 31.59.0
+      '@augment-vir/assert': 31.59.1
+      '@augment-vir/core': 31.59.1
       '@date-vir/duration': 8.1.0
       ansi-styles: 6.2.3
       deepcopy-esm: 2.1.1
@@ -3616,7 +3616,7 @@ snapshots:
       type-fest: 5.4.3
       typed-event-target: 4.1.0
 
-  '@augment-vir/core@31.59.0':
+  '@augment-vir/core@31.59.1':
     dependencies:
       '@date-vir/duration': 8.1.0
       browser-or-node: 3.0.0
@@ -5006,7 +5006,7 @@ snapshots:
   browserslist@4.28.1:
     dependencies:
       baseline-browser-mapping: 2.9.19
-      caniuse-lite: 1.0.30001766
+      caniuse-lite: 1.0.30001767
       electron-to-chromium: 1.5.283
       node-releases: 2.0.27
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
@@ -5021,7 +5021,7 @@ snapshots:
 
   callsites@3.1.0: {}
 
-  caniuse-lite@1.0.30001766: {}
+  caniuse-lite@1.0.30001767: {}
 
   chai@5.3.3:
     dependencies:
@@ -6017,7 +6017,7 @@ snapshots:
 
   prettier-plugin-multiline-arrays@4.1.3(prettier@3.8.1):
     dependencies:
-      '@augment-vir/common': 31.59.0
+      '@augment-vir/common': 31.59.1
       prettier: 3.8.1
       proxy-vir: 2.0.1
 
@@ -6039,8 +6039,8 @@ snapshots:
 
   proxy-vir@2.0.1:
     dependencies:
-      '@augment-vir/assert': 31.59.0
-      '@augment-vir/common': 31.59.0
+      '@augment-vir/assert': 31.59.1
+      '@augment-vir/common': 31.59.1
 
   pump@3.0.3:
     dependencies:
@@ -6495,9 +6495,9 @@ snapshots:
 
   typed-event-target@4.1.0:
     dependencies:
-      '@augment-vir/assert': 31.59.0
-      '@augment-vir/common': 31.59.0
-      '@augment-vir/core': 31.59.0
+      '@augment-vir/assert': 31.59.1
+      '@augment-vir/common': 31.59.1
+      '@augment-vir/core': 31.59.1
 
   typescript-eslint@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
