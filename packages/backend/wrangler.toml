@@ -1,6 +1,6 @@
 name = "hyperion-backend"
 main = "src/core/index.ts"
-compatibility_date = "2025-11-09"
+compatibility_date = "2026-01-20"
 compatibility_flags = ['nodejs_compat']
 
 [observability]

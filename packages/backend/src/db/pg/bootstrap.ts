@@ -7,13 +7,15 @@ import { fileURLToPath } from 'node:url'
 import postgresJs from 'postgres'
 import { parse } from 'smol-toml'
 
-const isNode =
+const isNodeCompatible =
     typeof process !== 'undefined' &&
     typeof process.versions !== 'undefined' &&
     typeof process.versions.node !== 'undefined'
 
-if (!isNode) {
-    throw new Error('Database bootstrapping must be run in NodeJS.')
+if (!isNodeCompatible) {
+    throw new Error(
+        'Database bootstrapping must be run in NodeJS compatible runtime.',
+    )
 }
 
 const environment = process.argv[2].toLowerCase() as 'dev' | 'test'
