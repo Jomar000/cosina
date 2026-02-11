@@ -7,9 +7,9 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "bun": ">=1.3.8",
-        "node": ">=24.13.0",
-        "pnpm": ">=10.29.1"
+        "bun": ">=1.3.9",
+        "node": ">=24.13.1",
+        "pnpm": ">=10.29.3"
     },
     "scripts": {
         "dev": "wrangler dev",
@@ -17,8 +17,8 @@
         "test": "pnpm run migrate:test && vitest --run",
         "deploy:staging": "wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
         "deploy:prod": "wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
-        "migrate:dev": "bun ./src/db/pg/bootstrap.ts dev || node ./src/db/pg/bootstrap.ts dev",
-        "migrate:test": "bun ./src/db/pg/bootstrap.ts test || node ./src/db/pg/bootstrap.ts dev",
+        "migrate:dev": "bun ./src/db/pg/bootstrap.ts dev || tsx ./src/db/pg/bootstrap.ts dev",
+        "migrate:test": "bun ./src/db/pg/bootstrap.ts test || tsx ./src/db/pg/bootstrap.ts dev",
         "migrate:staging": "drizzle-kit migrate --config=drizzle-staging.config.ts",
         "migrate:prod": "drizzle-kit migrate --config=drizzle-production.config.ts",
         "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging --config=wrangler-staging.toml",
