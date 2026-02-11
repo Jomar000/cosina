@@ -25,57 +25,57 @@
             "label": "root",
             "icon": {
                 "id": "terminal",
-                "color": "terminal.ansiGreen",
+                "color": "terminal.ansiGreen"
             },
             "type": "shell",
             "hide": true,
             "command": "bash",
             "options": {
-                "cwd": "${workspaceFolder}",
+                "cwd": "${workspaceFolder}"
             },
-            "isBackground": true,
+            "isBackground": true
         },
         {
             "label": "validator",
             "icon": {
                 "id": "terminal",
-                "color": "terminal.ansiGreen",
+                "color": "terminal.ansiGreen"
             },
             "type": "shell",
             "hide": true,
             "command": "bash",
             "options": {
-                "cwd": "${workspaceFolder}/packages/validator",
+                "cwd": "${workspaceFolder}/packages/validator"
             },
-            "isBackground": true,
+            "isBackground": true
         },
         {
             "label": "backend",
             "icon": {
                 "id": "terminal",
-                "color": "terminal.ansiGreen",
+                "color": "terminal.ansiGreen"
             },
             "type": "shell",
             "hide": true,
             "command": "bash",
             "options": {
-                "cwd": "${workspaceFolder}/packages/backend",
+                "cwd": "${workspaceFolder}/packages/backend"
             },
-            "isBackground": true,
+            "isBackground": true
         },
         {
             "label": "frontend",
             "icon": {
                 "id": "terminal",
-                "color": "terminal.ansiGreen",
+                "color": "terminal.ansiGreen"
             },
             "type": "shell",
             "hide": true,
             "command": "bash",
             "options": {
-                "cwd": "${workspaceFolder}/packages/frontend",
+                "cwd": "${workspaceFolder}/packages/frontend"
             },
-            "isBackground": true,
-        },
+            "isBackground": true
+        }
     ]
 }
