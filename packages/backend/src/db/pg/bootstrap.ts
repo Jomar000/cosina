@@ -76,7 +76,15 @@ await setupClient.unsafe(
 
 await setupClient.unsafe(`CREATE DATABASE ${migrationClient.options.database};`)
 
-await migrate(drizzle(migrationClient), {
+/**
+ * Broken in Drizzle V1
+ * Directly use the connectionString until a fix is implemented
+ */
+// await migrate(drizzle(migrationClient), {
+//     migrationsFolder: './src/db/pg/migrations',
+// })
+
+await migrate(drizzle(connectionString), {
     migrationsFolder: './src/db/pg/migrations',
 })
 
@@ -84,3 +92,5 @@ await migrationClient.end()
 await setupClient.end()
 
 console.log('bootstrap: OPERATION COMPLETED. 🚀')
+
+process.exit(0)

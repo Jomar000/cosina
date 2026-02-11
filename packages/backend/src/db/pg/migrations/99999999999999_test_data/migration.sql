@@ -1,4 +1,4 @@
--- Defer Foreign Keys during seeding
+-- Custom SQL migration file, put your code below! ---- Defer Foreign Keys during seeding
 -- https://www.postgresql.org/docs/current/sql-set-constraints.html
 SET CONSTRAINTS ALL DEFERRED;
 
