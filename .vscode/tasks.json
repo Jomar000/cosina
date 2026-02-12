@@ -14,8 +14,8 @@
             "dependsOn": [
                 "root",
                 "validator",
-                "backend",
-                "frontend"
+                "api-public",
+                "web-public"
             ],
             "runOptions": {
                 "runOn": "folderOpen"
@@ -50,7 +50,7 @@
             "isBackground": true
         },
         {
-            "label": "backend",
+            "label": "api-public",
             "icon": {
                 "id": "terminal",
                 "color": "terminal.ansiGreen"
@@ -59,12 +59,12 @@
             "hide": true,
             "command": "bash",
             "options": {
-                "cwd": "${workspaceFolder}/packages/backend"
+                "cwd": "${workspaceFolder}/apps/api/public"
             },
             "isBackground": true
         },
         {
-            "label": "frontend",
+            "label": "web-public",
             "icon": {
                 "id": "terminal",
                 "color": "terminal.ansiGreen"
@@ -73,7 +73,7 @@
             "hide": true,
             "command": "bash",
             "options": {
-                "cwd": "${workspaceFolder}/packages/frontend"
+                "cwd": "${workspaceFolder}/apps/web/public"
             },
             "isBackground": true
         }

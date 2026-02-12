@@ -13,7 +13,7 @@
     },
     "references": [
         {
-            "path": "../backend/tsconfig.json"
+            "path": "../../api/public/tsconfig.json"
         }
     ]
     // Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias

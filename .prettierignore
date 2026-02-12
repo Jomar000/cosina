@@ -9,5 +9,6 @@
 !*.html
 !*.js
 !*.json
+!*.md
 !*.svelte
 !*.ts

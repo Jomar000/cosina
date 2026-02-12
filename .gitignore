@@ -25,23 +25,23 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
-###########
-# Backend #
-###########
+#######
+# API #
+#######
 
-/packages/backend/coverage
-/packages/backend/drizzle-*.config.ts
+coverage
+drizzle-*.config.ts
 
-############
-# Frontend #
-############
+#######
+# Web #
+#######
 
-/packages/frontend/test-results
+test-results
 
 # Output
-/packages/frontend/.svelte-kit
-/packages/frontend/build
+.svelte-kit
+build
 
 # Vite
-/packages/frontend/vite.config.js.timestamp-*
-/packages/frontend/vite.config.ts.timestamp-*
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*

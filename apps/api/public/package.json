@@ -1,8 +1,8 @@
 {
-    "name": "@hyperion/backend",
+    "name": "@hyperion/api-public",
     "version": "0.0.1",
     "author": "4thDEVisionTech",
-    "description": "Hyperion Backend Component",
+    "description": "Hyperion Public API Component",
     "type": "module",
     "private": true,
     "license": "ISC",
@@ -15,6 +15,8 @@
         "dev": "wrangler dev",
         "build": "wrangler deploy --outdir=./dist/$worker --dry-run --env=",
         "test": "pnpm run migrate:test && vitest --run",
+        "lint": "prettier --check . && eslint .",
+        "format": "prettier --write .",
         "deploy:staging": "wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
         "deploy:prod": "wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
         "migrate:dev": "bun ./src/db/pg/bootstrap.ts dev || tsx ./src/db/pg/bootstrap.ts dev",
@@ -39,7 +41,7 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@cloudflare/vitest-pool-workers": "^0.12.11",
+        "@cloudflare/vitest-pool-workers": "^0.12.12",
         "@vitest/coverage-istanbul": "^3.2.4",
         "@vitest/runner": "^3.2.4",
         "@vitest/snapshot": "^3.2.4",

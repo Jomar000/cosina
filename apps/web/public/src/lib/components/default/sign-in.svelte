@@ -78,7 +78,6 @@
             let response:
                 | ReturnType<typeof auth.client.signIn.email>
                 | ReturnType<typeof auth.client.signIn.username>
-                | null = null
 
             // Submit Form Data
             try {

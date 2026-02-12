@@ -38,7 +38,7 @@
             queryKey: [
                 'heartbeat',
             ],
-            queryFn: async () => await honoClient.heartbeat.$get(),
+            queryFn: async () => await honoClient.heartbeat.$get({}),
         }),
         () => queryClient,
     )

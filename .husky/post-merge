@@ -8,7 +8,7 @@ echo
 
 # Check if certain files were modified by the merge process
 validatorChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/validator/src/' || true ) )
-backendChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/backend/src/' || true ) )
+apiPublicChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'apps/api/public/src/' || true ) )
 
 # Re-install dependencies
 echo Installing project dependencies...
@@ -24,12 +24,12 @@ if [[ $validatorChanged != '' ]]; then
     echo
 fi
 
-# Build backend package
-if [[ $backendChanged != '' ]]; then
-    echo Building backend package...
-    pnpm --filter="@hyperion/backend" exec rm -rf dist
-    pnpm --filter="@hyperion/backend" exec rm -rf *.tsbuildinfo
-    pnpm --filter="@hyperion/backend" build
+# Build api-public package
+if [[ $apiPublicChanged != '' ]]; then
+    echo Building api-public package...
+    pnpm --filter="@hyperion/api-public" exec rm -rf dist
+    pnpm --filter="@hyperion/api-public" exec rm -rf *.tsbuildinfo
+    pnpm --filter="@hyperion/api-public" build
     echo
 fi
 
