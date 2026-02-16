@@ -7,20 +7,30 @@ echo ==============================
 echo
 
 # Check if certain files were modified by the merge process
-validatorChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/validator/src/' || true ) )
-apiPublicChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'apps/api/public/src/' || true ) )
+databaseChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/database/src/' || true ) )
+schemaChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/schema/src/' || true ) )
+apiPublicChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'apps/api-public/src/' || true ) )
 
 # Re-install dependencies
 echo Installing project dependencies...
 pnpm -r i
 echo
 
-# Build validator package
-if [[ $validatorChanged != '' ]]; then
-    echo Building validator package...
-    pnpm --filter="@hyperion/validator" exec rm -rf dist
-    pnpm --filter="@hyperion/validator" exec rm -rf *.tsbuildinfo
-    pnpm --filter="@hyperion/validator" build
+# Build database package
+if [[ $databaseChanged != '' ]]; then
+    echo Building database package...
+    pnpm --filter="@hyperion/database" exec rm -rf dist
+    pnpm --filter="@hyperion/database" exec rm -rf *.tsbuildinfo
+    pnpm --filter="@hyperion/database" build
+    echo
+fi
+
+# Build schema package
+if [[ $schemaChanged != '' ]]; then
+    echo Building schema package...
+    pnpm --filter="@hyperion/schema" exec rm -rf dist
+    pnpm --filter="@hyperion/schema" exec rm -rf *.tsbuildinfo
+    pnpm --filter="@hyperion/schema" build
     echo
 fi
 

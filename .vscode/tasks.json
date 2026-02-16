@@ -13,9 +13,10 @@
             "label": "Launch Workspace Terminals",
             "dependsOn": [
                 "root",
-                "validator",
-                "api-public",
-                "web-public"
+                "apps/api-public",
+                "apps/web-public",
+                "packages/database",
+                "packages/schema"
             ],
             "runOptions": {
                 "runOn": "folderOpen"
@@ -36,7 +37,7 @@
             "isBackground": true
         },
         {
-            "label": "validator",
+            "label": "packages/database",
             "icon": {
                 "id": "terminal",
                 "color": "terminal.ansiGreen"
@@ -45,12 +46,12 @@
             "hide": true,
             "command": "bash",
             "options": {
-                "cwd": "${workspaceFolder}/packages/validator"
+                "cwd": "${workspaceFolder}/packages/database"
             },
             "isBackground": true
         },
         {
-            "label": "api-public",
+            "label": "packages/schema",
             "icon": {
                 "id": "terminal",
                 "color": "terminal.ansiGreen"
@@ -59,12 +60,12 @@
             "hide": true,
             "command": "bash",
             "options": {
-                "cwd": "${workspaceFolder}/apps/api/public"
+                "cwd": "${workspaceFolder}/packages/schema"
             },
             "isBackground": true
         },
         {
-            "label": "web-public",
+            "label": "apps/api-public",
             "icon": {
                 "id": "terminal",
                 "color": "terminal.ansiGreen"
@@ -73,7 +74,21 @@
             "hide": true,
             "command": "bash",
             "options": {
-                "cwd": "${workspaceFolder}/apps/web/public"
+                "cwd": "${workspaceFolder}/apps/api-public"
+            },
+            "isBackground": true
+        },
+        {
+            "label": "apps/web-public",
+            "icon": {
+                "id": "terminal",
+                "color": "terminal.ansiGreen"
+            },
+            "type": "shell",
+            "hide": true,
+            "command": "bash",
+            "options": {
+                "cwd": "${workspaceFolder}/apps/web-public"
             },
             "isBackground": true
         }
