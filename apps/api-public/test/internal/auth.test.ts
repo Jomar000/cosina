@@ -1,4 +1,4 @@
-import type { signInOutputSchema } from '@hyperion/schema/internal/auth'
+import type { signInOutputSchema } from '@hyperion/contracts/internal/auth'
 import { env } from 'cloudflare:test'
 import { describe, expect, it } from 'vitest'
 import type z from 'zod'

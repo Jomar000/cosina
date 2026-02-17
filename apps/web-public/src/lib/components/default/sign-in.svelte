@@ -1,7 +1,7 @@
 <!-- https://shadcn-svelte.com/blocks/login#login-03 -->
 
 <script lang="ts">
-    import { auth as authValidator } from '@hyperion/schema/validator/internal'
+    import { auth as authValidator } from '@hyperion/contracts/validator/internal'
     import Eye from '@lucide/svelte/icons/eye'
     import EyeOff from '@lucide/svelte/icons/eye-off'
     import { createForm } from '@tanstack/svelte-form'

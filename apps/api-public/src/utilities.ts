@@ -1,4 +1,4 @@
-import type { TApiResponse, TApiResponseError } from '@hyperion/schema/types'
+import type { TApiResponse, TApiResponseError } from '@hyperion/contracts/types'
 import type { Context } from 'hono'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { customAlphabet } from 'nanoid'

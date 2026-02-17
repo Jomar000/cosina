@@ -4,7 +4,7 @@ import {
     uploadAttachmentCreateInputSchema,
     uploadAttachmentRetryInputSchema,
     uploadCommitInputSchema,
-} from '@hyperion/schema/validator/internal/objectStorage'
+} from '@hyperion/contracts/validator/internal/objectStorage'
 import { hexToBytes } from '@noble/hashes/utils.js'
 import { and, eq, inArray, notInArray } from 'drizzle-orm'
 import { Hono } from 'hono'

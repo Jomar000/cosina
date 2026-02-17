@@ -1,8 +1,8 @@
-// import type { authSignInOutputSchema } from '@hyperion/schema/internal/auth'
+// import type { authSignInOutputSchema } from '@hyperion/contracts/internal/auth'
 // import type {
 //     objectStorageDownloadLinkCreateOutputSchema,
 //     objectStorageCreateUploadLinkOutputSchema,
-// } from '@hyperion/schema/internal/objectStorage'
+// } from '@hyperion/contracts/internal/objectStorage'
 // import { env } from 'cloudflare:test'
 import {
     beforeAll,

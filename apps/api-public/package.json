@@ -23,8 +23,8 @@
         "test": "pnpm run migrate:test && vitest --run"
     },
     "dependencies": {
+        "@hyperion/contracts": "workspace:*",
         "@hyperion/database": "workspace:*",
-        "@hyperion/schema": "workspace:*",
         "@noble/hashes": "^2.0.1",
         "aws4fetch": "^1.0.20",
         "better-auth": "^1.4.18",
@@ -37,7 +37,7 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@cloudflare/vitest-pool-workers": "^0.12.12",
+        "@cloudflare/vitest-pool-workers": "^0.12.13",
         "@vitest/coverage-istanbul": "^3.2.4",
         "@vitest/runner": "^3.2.4",
         "@vitest/snapshot": "^3.2.4",

@@ -1,8 +1,8 @@
 {
-    "name": "@hyperion/schema",
+    "name": "@hyperion/contracts",
     "version": "0.0.1",
     "author": "4thDEVisionTech",
-    "description": "Hyperion Schema Component",
+    "description": "Hyperion Contracts Component",
     "type": "module",
     "private": true,
     "license": "ISC",

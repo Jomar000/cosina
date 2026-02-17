@@ -7,8 +7,8 @@ echo ==============================
 echo
 
 # Check if certain files were modified by the merge process
+contractsChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/contracts/src/' || true ) )
 databaseChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/database/src/' || true ) )
-schemaChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/schema/src/' || true ) )
 apiPublicChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'apps/api-public/src/' || true ) )
 
 # Re-install dependencies
@@ -16,21 +16,21 @@ echo Installing project dependencies...
 pnpm -r i
 echo
 
+# Build contracts package
+if [[ $contractsChanged != '' ]]; then
+    echo Building contracts package...
+    pnpm --filter="@hyperion/contracts" exec rm -rf dist
+    pnpm --filter="@hyperion/contracts" exec rm -rf *.tsbuildinfo
+    pnpm --filter="@hyperion/contracts" build
+    echo
+fi
+
 # Build database package
 if [[ $databaseChanged != '' ]]; then
     echo Building database package...
     pnpm --filter="@hyperion/database" exec rm -rf dist
     pnpm --filter="@hyperion/database" exec rm -rf *.tsbuildinfo
     pnpm --filter="@hyperion/database" build
-    echo
-fi
-
-# Build schema package
-if [[ $schemaChanged != '' ]]; then
-    echo Building schema package...
-    pnpm --filter="@hyperion/schema" exec rm -rf dist
-    pnpm --filter="@hyperion/schema" exec rm -rf *.tsbuildinfo
-    pnpm --filter="@hyperion/schema" build
     echo
 fi
 

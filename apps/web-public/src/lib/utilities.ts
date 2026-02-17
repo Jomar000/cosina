@@ -1,5 +1,5 @@
 import type { AppType } from '@hyperion/api-public'
-import type { base } from '@hyperion/schema/validator/shared'
+import type { base } from '@hyperion/contracts/validator/shared'
 import { hc } from 'hono/client'
 import ky, { type Options } from 'ky'
 import { customAlphabet } from 'nanoid'
