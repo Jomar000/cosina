@@ -1,5 +1,4 @@
 import {
-    downloadLinkCreateInputSchema,
     uploadAttachmentCommitInputSchema,
     uploadAttachmentCreateInputSchema,
     uploadAttachmentRetryInputSchema,
@@ -11,118 +10,15 @@ import { Hono } from 'hono'
 import { encodeBase64 } from 'hono/utils/encode'
 import { validator } from 'hono/validator'
 
-import { AppError } from '../../../errors.js'
+import { AppError } from '../../../../errors.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     nanoidCustom,
     validatorCallback,
-} from '../../../utilities.js'
-import { isAuthenticated } from '../../middleware/isAuthenticated.js'
+} from '../../../../utilities.js'
 
-export const objectStorageRoute = new Hono<THonoInstance>()
-    /**
-     * @description
-     * Middleware
-     */
-    .use(isAuthenticated())
-    /**
-     * @description
-     * Routes
-     */
-    .post(
-        '/download/link/create',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, downloadLinkCreateInputSchema),
-        ),
-        async (ctx) => {
-            const { uploadId } = ctx.req.valid('json')
-
-            const {
-                objectStorage,
-                objectStorageAcl,
-                upload,
-                uploadAttachment,
-            } = ctx.get('dbSchema')
-
-            const linkedObjects = await ctx
-                .get('dbClient')
-                .select({
-                    objectStorage,
-                    objectStorageAcl,
-                    uploadAttachment,
-                    upload,
-                })
-                .from(objectStorage)
-                .innerJoin(
-                    objectStorageAcl,
-                    eq(objectStorageAcl.objectStorageId, objectStorage.id),
-                )
-                .innerJoin(
-                    uploadAttachment,
-                    eq(uploadAttachment.objectStorageId, objectStorage.id),
-                )
-                .innerJoin(upload, eq(upload.id, uploadAttachment.uploadId))
-                .where(eq(upload.id, uploadId))
-
-            if (linkedObjects.length === 0) {
-                return apiResponseErrorWrapper(ctx, {
-                    message: 'Upload ID not found.',
-                })
-            }
-
-            const signedUrls: {
-                objectStorageId: string
-                signedUrl: string | null
-                status: 201 | 403
-            }[] = []
-
-            for (const {
-                objectStorage: os,
-                objectStorageAcl: osa,
-            } of linkedObjects) {
-                const isPublicObject = os.isPublic
-
-                const hasObjectPermission =
-                    osa.userId === ctx.get('user')!.id && Boolean(osa.mode & 1)
-
-                if (
-                    ctx.get('isPrivilegedRole') ||
-                    isPublicObject ||
-                    hasObjectPermission
-                ) {
-                    signedUrls.push({
-                        objectStorageId: os.id,
-                        signedUrl: (
-                            await ctx
-                                .get('aws4FetchClient')
-                                .sign(
-                                    `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET}/${os.id}?X-Amz-Expires=${300}`,
-                                    {
-                                        method: 'GET',
-                                        aws: {
-                                            service: 's3',
-                                            signQuery: true,
-                                        },
-                                    },
-                                )
-                        ).url,
-                        status: 201,
-                    })
-                } else {
-                    signedUrls.push({
-                        objectStorageId: os.id,
-                        signedUrl: null,
-                        status: 403,
-                    })
-                }
-            }
-
-            return apiResponseOkWrapper(ctx, {
-                data: { signedUrls },
-            })
-        },
-    )
+export const objectStoragePublic = new Hono<THonoInstance>()
     .get('/upload/create', async (ctx) => {
         const { upload } = ctx.get('dbSchema')
 
@@ -387,6 +283,7 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                         objectStorageData.push({
                             id: objectStorageId,
                             ...attachment,
+                            isPublic: true,
                             size: Number(attachment.size),
                         })
                     }
@@ -675,5 +572,3 @@ export const objectStorageRoute = new Hono<THonoInstance>()
             }
         },
     )
-
-export default objectStorageRoute
