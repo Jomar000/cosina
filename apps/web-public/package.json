@@ -26,7 +26,6 @@
     },
     "devDependencies": {
         "@hyperion/api-public": "workspace:*",
-        "@hyperion/database": "workspace:*",
         "@hyperion/contracts": "workspace:*",
         "@internationalized/date": "^3.11.0",
         "@lucide/svelte": "^0.568.0",
@@ -53,7 +52,7 @@
         "nanoid": "^5.1.6",
         "p-queue": "^9.1.0",
         "playwright": "^1.58.2",
-        "svelte": "^5.51.2",
+        "svelte": "^5.51.3",
         "svelte-check": "^4.4.0",
         "svelte-sonner": "^1.0.7",
         "tailwind-merge": "^3.4.1",
