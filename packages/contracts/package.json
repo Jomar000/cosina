@@ -18,8 +18,8 @@
         "prepare": "pnpm build"
     },
     "dependencies": {
-        "dayjs": "^1.11.19",
-        "zod": "^4.3.6"
+        "dayjs": "catalog:",
+        "zod": "catalog:"
     },
     "exports": {
         "./types": {

@@ -20,24 +20,24 @@
         "lint": "prettier --check . && eslint .",
         "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging --config=wrangler-staging.toml",
         "secret:prod": "wrangler secret bulk .dev.vars.production --env=production --config=wrangler-production.toml",
-        "test": "pnpm run migrate:test && vitest --run"
+        "test": "pnpm --filter=@hyperion/database run migrate:test && vitest --run"
     },
     "dependencies": {
         "@hyperion/contracts": "workspace:*",
         "@hyperion/database": "workspace:*",
         "@noble/hashes": "^2.0.1",
         "aws4fetch": "^1.0.20",
-        "better-auth": "^1.4.19",
-        "dayjs": "^1.11.19",
-        "drizzle-orm": "beta",
-        "hono": "^4.12.2",
-        "nanoid": "^5.1.6",
+        "better-auth": "catalog:",
+        "dayjs": "catalog:",
+        "drizzle-orm": "catalog:",
+        "hono": "catalog:",
+        "nanoid": "catalog:",
         "resend": "^6.9.2",
-        "uuid": "^13.0.0",
-        "zod": "^4.3.6"
+        "uuid": "catalog:",
+        "zod": "catalog:"
     },
     "devDependencies": {
-        "@cloudflare/vitest-pool-workers": "^0.12.17",
+        "@cloudflare/vitest-pool-workers": "^0.12.18",
         "@vitest/coverage-istanbul": "^3.2.4",
         "@vitest/runner": "^3.2.4",
         "@vitest/snapshot": "^3.2.4",
