@@ -48,6 +48,7 @@ export const uploadAttachmentCreateInputSchema = z.object({
             }),
         )
         .min(1, { error: 'At least one attachment must be provided.' })
+        .max(25, { error: 'A maximum of 25 attachments can be provided.' })
         .check((ctx) => {
             if (ctx.value.length > 1) {
                 const allHashes = ctx.value.map(({ hashSha256 }) => hashSha256)
@@ -86,7 +87,8 @@ export const uploadAttachmentCommitInputSchema = z.object({
                     error: 'Attachment ID must be alphanumeric characters only.',
                 }),
         )
-        .min(1, { error: 'At least one attachment must be provided.' }),
+        .min(1, { error: 'At least one attachment must be provided.' })
+        .max(25, { error: 'A maximum of 25 attachments can be provided.' }),
 })
 
 export const uploadAttachmentRetryInputSchema =
@@ -106,6 +108,7 @@ export const uploadCommitInputSchema = z.object({
                     error: 'Attachment ID must be alphanumeric characters only.',
                 }),
         )
+        .max(25, { error: 'A maximum of 25 attachments can be provided.' })
         .optional()
         .default([]),
 })
