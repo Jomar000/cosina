@@ -1,5 +1,9 @@
 name: Supabase Keepalive
 
+# DISABLED: This workflow is kept as a placeholder template for forked projects.
+# To enable, remove the `if: false` condition on the job below and configure
+# the required secrets: SUPABASE_URL and SUPABASE_ANON_KEY.
+
 on:
   schedule:
     # Runs every 5 days to prevent Supabase free tier from pausing (7-day inactivity limit)
@@ -8,6 +12,7 @@ on:
 
 jobs:
   supabase-keepalive:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Query Supabase to keep database active

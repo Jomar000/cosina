@@ -2,6 +2,7 @@
 # Global #
 ##########
 
+.claude
 dist
 node_modules
 
