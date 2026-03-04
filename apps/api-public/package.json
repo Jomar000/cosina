@@ -24,6 +24,7 @@
         "test:ui": "pnpm --filter=@hyperion/database run migrate:test && vitest --ui"
     },
     "dependencies": {
+        "@better-auth/drizzle-adapter": "catalog:",
         "@hyperion/contracts": "workspace:*",
         "@hyperion/database": "workspace:*",
         "@noble/hashes": "^2.0.1",

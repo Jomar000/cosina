@@ -15,7 +15,9 @@ if (
         'test',
     ].includes(environment)
 ) {
-    throw new Error('Invalid environment provided. Valid values are [dev|test]')
+    throw new Error(
+        'Invalid environment provided. Valid values are [development|test]',
+    )
 }
 
 const setupClient = postgresJs(connectionString, {

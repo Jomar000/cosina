@@ -2,13 +2,14 @@ import type {
     TApiResponseError,
     TApiResponseOk,
 } from '@hyperion/contracts/types'
-import { dbClient, dbSchema } from '@hyperion/database/postgres'
 import { env } from 'cloudflare:test'
-import { and, eq, like } from 'drizzle-orm'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../../../src/core/index.js'
-import { setTestingCookies } from '../../../utilities.js'
+import {
+    interceptPasswordResetToken,
+    setTestingCookies,
+} from '../../../utilities.js'
 
 let privilegedCookie: string
 let standardCookie: string
@@ -424,15 +425,19 @@ describe('Admin User Password Endpoint', () => {
      * Full Password Reset Flow
      *
      * Simulates the complete admin-initiated password reset process:
-     * 1. Admin triggers reset-request (sends OTP to user's email)
-     * 2. Intercept the OTP token from the verification table
-     * 3. Use the token to complete the password reset via auth endpoint
-     * 4. Verify sign-in with the new password
+     * 1. Admin triggers reset-request and intercepts the token from KV
+     * 2. Use the token to complete the password reset via auth endpoint
+     * 3. Verify sign-in with the new password
+     *
+     * The reset request and token interception are performed in
+     * `beforeAll()` so the KV write lives at the suite-level storage
+     * frame and persists across all `it()` blocks within this
+     * `describe()` (see `isolatedStorage` in vitest-pool-workers).
      */
     describe('Full Password Reset Flow (OTP Interception)', () => {
         let interceptedToken: string
 
-        it('Step 1: Admin triggers password reset request.', async () => {
+        beforeAll(async () => {
             const response = await app.request(
                 '/app/admin/user/password/reset-request',
                 {
@@ -454,57 +459,12 @@ describe('Admin User Password Endpoint', () => {
             expect(response.status).toBe(200)
             expect(responseData.success).toBe(true)
             expect(responseData.data).toBeNull()
-        })
 
-        it('Step 2: Intercept reset token from the verification table.', async () => {
-            /**
-             * @description
-             * After requestPasswordReset is called, better-auth stores a
-             * verification record in the database with:
-             * - identifier: "reset-password:{24charToken}"
-             * - value: the user ID
-             *
-             * We query by value (user ID) and identifier prefix to find the
-             * record, then extract the token from the identifier.
-             */
-            const { verification } = dbSchema
-
-            const db = dbClient({
-                host: env.HYPERION_HD.host,
-                port: Number(env.HYPERION_HD.port) || 5432,
-                database: env.HYPERION_HD.database,
-                user: env.HYPERION_HD.user,
-                pass: env.HYPERION_HD.password,
-            })
-
-            const records = await db
-                .select({
-                    identifier: verification.identifier,
-                    value: verification.value,
-                })
-                .from(verification)
-                .where(
-                    and(
-                        eq(verification.value, 'USER_002'),
-                        like(verification.identifier, 'reset-password:%'),
-                    ),
-                )
-
-            expect(records.length).toBeGreaterThan(0)
-
-            /**
-             * @description
-             * Extract the token from the identifier by stripping the
-             * "reset-password:" prefix.
-             */
-            interceptedToken = records[0].identifier.replace(
-                'reset-password:',
-                '',
-            )
+            interceptedToken = await interceptPasswordResetToken('USER_002')
             expect(interceptedToken).toBeTruthy()
         })
 
-        it('Step 3: Complete password reset using the intercepted token.', async () => {
+        it('Step 1: Complete password reset using the intercepted token.', async () => {
             const response = await app.request(
                 '/app/auth/password/reset',
                 {
@@ -528,7 +488,7 @@ describe('Admin User Password Endpoint', () => {
             expect(responseData.data).toBeNull()
         })
 
-        it('Step 4: Sign-in with the new password should pass.', async () => {
+        it('Step 2: Sign-in with the new password should pass.', async () => {
             const response = await app.request(
                 '/app/auth/sign-in/username',
                 {
@@ -553,7 +513,7 @@ describe('Admin User Password Endpoint', () => {
             expect(responseData).toHaveProperty('data')
         })
 
-        it('Step 5: Sign-in with the old password should fail.', async () => {
+        it('Step 3: Sign-in with the old password should fail.', async () => {
             const response = await app.request(
                 '/app/auth/sign-in/username',
                 {
@@ -580,7 +540,7 @@ describe('Admin User Password Endpoint', () => {
             )
         })
 
-        it('Step 6: Restore original password.', async () => {
+        it('Step 4: Restore original password.', async () => {
             /**
              * @description
              * Use admin direct reset to restore the original password
