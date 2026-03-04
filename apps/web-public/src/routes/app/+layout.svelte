@@ -2,6 +2,7 @@
     import { onMount, setContext } from 'svelte'
 
     import { goto } from '$app/navigation'
+    import { authClient } from '$lib/clients'
     import { useAuthContext } from '$lib/states/auth'
     import { useSessionContext } from '$lib/states/session'
     import { getCookie } from '$lib/utilities'
@@ -29,6 +30,9 @@
     // Handlers //
     //////////////
 
+    /**
+     * @deprecated
+     */
     const checkRolePermission: TCheckRolePermission = (permissions) => {
         if (!session.isValid()) {
             return false
@@ -46,11 +50,14 @@
     }
 
     const signOut = async () => {
-        await auth.client.signOut(undefined, {
-            headers: {
-                'x-csrf-token': getCookie('csrf_token') ?? '',
+        await authClient['sign-out'].$post(
+            {},
+            {
+                headers: {
+                    'x-csrf-token': getCookie('csrf_token') ?? '',
+                },
             },
-        })
+        )
         clearSessionDataAndRedirect()
     }
 

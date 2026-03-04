@@ -6,7 +6,6 @@
     import { PUBLIC_NAME } from '$env/static/public'
     import CaptchaModal from '$lib/components/default/modal-captcha.svelte'
     import SignInForm from '$lib/components/default/sign-in.svelte'
-    import { useAuthContext } from '$lib/states/auth'
     import { useSessionContext } from '$lib/states/session'
 
     //////////////
@@ -14,7 +13,6 @@
     //////////////
 
     const session = useSessionContext()
-    const auth = useAuthContext()
 
     ////////////////////
     // Initialization //
@@ -64,7 +62,6 @@
             <SignInForm
                 bind:showCaptchaModal
                 {session}
-                {auth}
             />
         </div>
     </div>

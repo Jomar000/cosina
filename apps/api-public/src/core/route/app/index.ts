@@ -2,13 +2,13 @@ import { Hono } from 'hono'
 
 import { corsHandler } from '../../middleware/corsHandler.js'
 import { initContext } from '../../middleware/initContext.js'
-import { adminRoute } from './admin/_index.js'
+import { adminRoute } from './admin/index.js'
 import { authRoute } from './auth.js'
 import { objectStorageRoute } from './objectStorage.js'
-import { userRoute } from './user/_index.js'
+import { userRoute } from './user/index.js'
 import { wsRoute } from './ws.js'
 
-export const internalRoute = new Hono<THonoInstance>()
+export const appRoute = new Hono<THonoInstance>()
     /**
      * @description
      * Middleware
@@ -20,6 +20,7 @@ export const internalRoute = new Hono<THonoInstance>()
      * Routes
      */
     .route('/admin', adminRoute)
+    .route('/auth', authRoute)
     .route('/objectStorage', objectStorageRoute)
     .route('/user', userRoute)
 
@@ -27,7 +28,6 @@ export const internalRoute = new Hono<THonoInstance>()
  * @description
  * Routes excluded from RPC Type Inference
  */
-internalRoute.route('/auth', authRoute)
-internalRoute.route('/ws', wsRoute)
+appRoute.route('/ws', wsRoute)
 
-export default internalRoute
+export default appRoute

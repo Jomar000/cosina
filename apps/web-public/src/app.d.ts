@@ -32,6 +32,9 @@ declare global {
         (typeof authValidator.signInOutputSchema.def.options)['0']['shape']['data']
     >
 
+    /**
+     * @deprecated
+     */
     type TCheckRolePermission = (
         permissions: Record<string, string[]>,
     ) => boolean

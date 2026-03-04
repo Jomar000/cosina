@@ -18,7 +18,7 @@
         "prepare": "pnpm exec husky"
     },
     "devDependencies": {
-        "@changesets/cli": "^2.29.8",
+        "@changesets/cli": "^2.30.0",
         "@eslint/compat": "^2.0.2",
         "@eslint/js": "^10.0.1",
         "@types/node": "^24.11.0",
@@ -29,12 +29,12 @@
         "husky": "^9.1.7",
         "prettier": "^3.8.1",
         "prettier-plugin-multiline-arrays": "^4.1.4",
-        "prettier-plugin-svelte": "^3.5.0",
+        "prettier-plugin-svelte": "^3.5.1",
         "prettier-plugin-tailwindcss": "^0.7.2",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.56.1",
-        "wrangler": "^4.69.0"
+        "wrangler": "^4.70.0"
     },
     "pnpm": {
         "allowedDeprecatedVersions": {

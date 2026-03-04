@@ -1,0 +1,1105 @@
+import type {
+    TApiResponseError,
+    TApiResponseOk,
+} from '@hyperion/contracts/types'
+import { dbClient, dbSchema } from '@hyperion/database/postgres'
+import { env } from 'cloudflare:test'
+import { and, eq, like } from 'drizzle-orm'
+import { beforeAll, describe, expect, it } from 'vitest'
+
+import app from '../../src/core/index.js'
+import { setTestingCookies } from '../utilities.js'
+
+let privilegedCookie: string // eslint-disable-line @typescript-eslint/no-unused-vars
+let standardCookie: string
+
+beforeAll(async () => {
+    ;[
+        privilegedCookie,
+        standardCookie,
+    ] = await setTestingCookies()
+})
+
+/**
+ * @description
+ * Some marked tests trigger a false-positive unhandled rejection error.
+ * Handled by the event listeners defined on vitest.setup.ts
+ */
+
+describe('Auth Endpoint', () => {
+    describe('Sign-in', () => {
+        describe('Username', () => {
+            it('Sign-in with valid credentials should pass.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/username',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'superadministrator',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData =
+                    await response.json<TApiResponseOk<unknown>>()
+
+                expect(response.status).toBe(200)
+                expect(response.headers.get('set-cookie')).toBeTruthy()
+                expect(responseData).toHaveProperty('data')
+            })
+
+            it('Sign-in with missing Organization ID should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/username',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            accountId: 'superadministrator',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(400)
+                expect(responseData).toHaveProperty('error')
+            })
+
+            it('Sign-in with invalid Organization ID should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/username',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'INVALID',
+                            accountId: 'superadministrator',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(422)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.message).toBe(
+                    'Invalid credentials provided.',
+                )
+            })
+
+            it('Sign-in with invalid username should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/username',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'INVALID',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(422)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.message).toBe(
+                    'Invalid credentials provided.',
+                )
+            })
+
+            it('Sign-in with invalid password should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/username',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'superadministrator',
+                            password: 'P@ssw0rd4321',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(422)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.message).toBe(
+                    'Invalid credentials provided.',
+                )
+            })
+
+            it('Sign-in with weak password should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/username',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'superadministrator',
+                            password: 'weak',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(400)
+                expect(responseData).toHaveProperty('error')
+            })
+
+            it('Sign-in with locked account should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/username',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'locked',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(423)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.message).toBe(
+                    'Account is currently locked.',
+                )
+            })
+        })
+
+        describe('E-mail', () => {
+            it('Sign-in with valid credentials should pass.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/email',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'superadministrator@hyperion.app',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData =
+                    await response.json<TApiResponseOk<unknown>>()
+
+                expect(response.status).toBe(200)
+                expect(response.headers.get('set-cookie')).toBeTruthy()
+                expect(responseData).toHaveProperty('data')
+            })
+
+            it('Sign-in with missing Organization ID should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/email',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            accountId: 'superadministrator@hyperion.app',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(400)
+                expect(responseData).toHaveProperty('error')
+            })
+
+            it('Sign-in with invalid Organization ID should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/email',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'INVALID',
+                            accountId: 'superadministrator@hyperion.app',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(422)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.message).toBe(
+                    'Invalid credentials provided.',
+                )
+            })
+
+            it('Sign-in with invalid e-mail should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/email',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'INVALID@INVALID.invalid',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(422)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.message).toBe(
+                    'Invalid credentials provided.',
+                )
+            })
+
+            it('Sign-in with invalid password should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/email',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'superadministrator@hyperion.app',
+                            password: 'P@ssw0rd4321',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(422)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.message).toBe(
+                    'Invalid credentials provided.',
+                )
+            })
+
+            it('Sign-in with weak password should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/email',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'superadministrator@hyperion.app',
+                            password: 'weak',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(400)
+                expect(responseData).toHaveProperty('error')
+            })
+
+            it('Sign-in with locked account should fail.', async () => {
+                const response = await app.request(
+                    '/app/auth/sign-in/email',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: 'vitest-pool-worker',
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'locked@hyperion.app',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(423)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.message).toBe(
+                    'Account is currently locked.',
+                )
+            })
+        })
+    })
+
+    describe('Sign-out', () => {
+        it('Sign-out with valid session should pass.', async () => {
+            // Sign in first to get a session cookie
+            const signInResponse = await app.request(
+                '/app/auth/sign-in/username',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organizationId: 'superorganization',
+                        accountId: 'superadministrator',
+                        password: 'P@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const sessionCookie = signInResponse.headers
+                .getSetCookie()
+                .join('; ')
+
+            const response = await app.request(
+                '/app/auth/sign-out',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        cookie: sessionCookie,
+                    },
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseOk<null>>()
+
+            expect(response.status).toBe(200)
+            expect(response.headers.get('set-cookie')).toBeTruthy()
+            expect(responseData.success).toBe(true)
+            expect(responseData.data).toBeNull()
+        })
+    })
+
+    /**
+     * @description
+     * Password Change
+     *
+     * Route: POST /app/auth/password/change
+     * Requires authentication. Takes currentPassword + newPassword.
+     */
+    describe('Password Change', () => {
+        it('Unauthenticated request should return 401.', async () => {
+            const response = await app.request(
+                '/app/auth/password/change',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        currentPassword: 'P@ssw0rd1234',
+                        newPassword: 'N3wP@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(401)
+            expect(responseData).toHaveProperty('error')
+            expect(responseData.error.code).toBe('UNAUTHORIZED')
+        })
+
+        it('Missing currentPassword should return 400.', async () => {
+            const response = await app.request(
+                '/app/auth/password/change',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                        cookie: standardCookie,
+                    },
+                    body: JSON.stringify({
+                        newPassword: 'N3wP@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(400)
+            expect(responseData).toHaveProperty('error')
+        })
+
+        it('Missing newPassword should return 400.', async () => {
+            const response = await app.request(
+                '/app/auth/password/change',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                        cookie: standardCookie,
+                    },
+                    body: JSON.stringify({
+                        currentPassword: 'P@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(400)
+            expect(responseData).toHaveProperty('error')
+        })
+
+        it('Weak newPassword should return 400.', async () => {
+            const response = await app.request(
+                '/app/auth/password/change',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                        cookie: standardCookie,
+                    },
+                    body: JSON.stringify({
+                        currentPassword: 'P@ssw0rd1234',
+                        newPassword: 'weak',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(400)
+            expect(responseData).toHaveProperty('error')
+        })
+
+        it('Incorrect currentPassword should return 422.', async () => {
+            const response = await app.request(
+                '/app/auth/password/change',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                        cookie: standardCookie,
+                    },
+                    body: JSON.stringify({
+                        currentPassword: 'Wr0ng@P@ssw0rd99',
+                        newPassword: 'N3wP@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(422)
+            expect(responseData).toHaveProperty('error')
+            expect(responseData.error.message).toBe(
+                'Password change failed. Please verify your current password.',
+            )
+        })
+
+        it('Valid password change should pass.', async () => {
+            const response = await app.request(
+                '/app/auth/password/change',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                        cookie: standardCookie,
+                    },
+                    body: JSON.stringify({
+                        currentPassword: 'P@ssw0rd1234',
+                        newPassword: 'N3wP@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseOk<null>>()
+
+            expect(response.status).toBe(200)
+            expect(responseData.success).toBe(true)
+            expect(responseData.data).toBeNull()
+        })
+
+        it('Sign-in with the new password should pass.', async () => {
+            const response = await app.request(
+                '/app/auth/sign-in/username',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organizationId: 'superorganization',
+                        accountId: 'member',
+                        password: 'N3wP@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseOk<unknown>>()
+
+            expect(response.status).toBe(200)
+            expect(response.headers.get('set-cookie')).toBeTruthy()
+            expect(responseData).toHaveProperty('data')
+        })
+
+        it('Sign-in with the old password should fail.', async () => {
+            const response = await app.request(
+                '/app/auth/sign-in/username',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organizationId: 'superorganization',
+                        accountId: 'member',
+                        password: 'P@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(422)
+            expect(responseData).toHaveProperty('error')
+            expect(responseData.error.message).toBe(
+                'Invalid credentials provided.',
+            )
+        })
+
+        it('Restore original password.', async () => {
+            /**
+             * @description
+             * Sign in with new password to get a fresh session,
+             * then change back to original.
+             */
+            const signInResponse = await app.request(
+                '/app/auth/sign-in/username',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organizationId: 'superorganization',
+                        accountId: 'member',
+                        password: 'N3wP@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const freshCookie = signInResponse.headers.getSetCookie().join('; ')
+
+            const response = await app.request(
+                '/app/auth/password/change',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                        cookie: freshCookie,
+                    },
+                    body: JSON.stringify({
+                        currentPassword: 'N3wP@ssw0rd1234',
+                        newPassword: 'P@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseOk<null>>()
+
+            expect(response.status).toBe(200)
+            expect(responseData.success).toBe(true)
+        })
+    })
+
+    /**
+     * @description
+     * Password Reset Request
+     *
+     * Route: POST /app/auth/password/reset-request
+     * Public endpoint. Takes email. Silently succeeds to prevent enumeration.
+     */
+    describe('Password Reset Request', () => {
+        it('Missing email should return 400.', async () => {
+            const response = await app.request(
+                '/app/auth/password/reset-request',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({}),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(400)
+            expect(responseData).toHaveProperty('error')
+        })
+
+        it('Invalid email format should return 400.', async () => {
+            const response = await app.request(
+                '/app/auth/password/reset-request',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'not-an-email',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(400)
+            expect(responseData).toHaveProperty('error')
+        })
+
+        it('Valid email should return 200.', async () => {
+            const response = await app.request(
+                '/app/auth/password/reset-request',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'member@hyperion.app',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseOk<null>>()
+
+            expect(response.status).toBe(200)
+            expect(responseData.success).toBe(true)
+            expect(responseData.data).toBeNull()
+        })
+
+        it('Non-existent email should silently succeed with 200.', async () => {
+            const response = await app.request(
+                '/app/auth/password/reset-request',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'nonexistent@hyperion.app',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseOk<null>>()
+
+            expect(response.status).toBe(200)
+            expect(responseData.success).toBe(true)
+            expect(responseData.data).toBeNull()
+        })
+    })
+
+    /**
+     * @description
+     * Password Reset
+     *
+     * Route: POST /app/auth/password/reset
+     * Public endpoint. Takes token + newPassword.
+     */
+    describe('Password Reset', () => {
+        it('Missing token should return 400.', async () => {
+            const response = await app.request(
+                '/app/auth/password/reset',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        newPassword: 'N3wP@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(400)
+            expect(responseData).toHaveProperty('error')
+        })
+
+        it('Missing newPassword should return 400.', async () => {
+            const response = await app.request(
+                '/app/auth/password/reset',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: 'some-token-value',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(400)
+            expect(responseData).toHaveProperty('error')
+        })
+
+        it('Weak newPassword should return 400.', async () => {
+            const response = await app.request(
+                '/app/auth/password/reset',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: 'some-token-value',
+                        newPassword: 'weak',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(400)
+            expect(responseData).toHaveProperty('error')
+        })
+
+        it('Invalid token should return 422.', async () => {
+            const response = await app.request(
+                '/app/auth/password/reset',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: 'invalid-token-value-here',
+                        newPassword: 'N3wP@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(422)
+            expect(responseData).toHaveProperty('error')
+            expect(responseData.error.message).toBe(
+                'Password reset failed. The token may be invalid or expired.',
+            )
+        })
+    })
+
+    /**
+     * @description
+     * Full Password Reset Flow (Token Interception)
+     *
+     * Simulates the complete user-initiated password reset process:
+     * 1. User requests password reset via email
+     * 2. Intercept the reset token from the verification table
+     * 3. Use the token to complete the password reset
+     * 4. Verify sign-in with the new password
+     */
+    describe('Full Password Reset Flow (Token Interception)', () => {
+        let interceptedToken: string
+
+        it('Step 1: Request password reset.', async () => {
+            const response = await app.request(
+                '/app/auth/password/reset-request',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'member@hyperion.app',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseOk<null>>()
+
+            expect(response.status).toBe(200)
+            expect(responseData.success).toBe(true)
+            expect(responseData.data).toBeNull()
+        })
+
+        it('Step 2: Intercept reset token from the verification table.', async () => {
+            /**
+             * @description
+             * After requestPasswordReset is called, better-auth stores a
+             * verification record in the database with:
+             * - identifier: "reset-password:{24charToken}"
+             * - value: the user ID
+             *
+             * We query by value (user ID) and identifier prefix to find the
+             * record, then extract the token from the identifier.
+             */
+            const { verification } = dbSchema
+
+            const db = dbClient({
+                host: env.HYPERION_HD.host,
+                port: Number(env.HYPERION_HD.port) || 5432,
+                database: env.HYPERION_HD.database,
+                user: env.HYPERION_HD.user,
+                pass: env.HYPERION_HD.password,
+            })
+
+            const records = await db
+                .select({
+                    identifier: verification.identifier,
+                    value: verification.value,
+                })
+                .from(verification)
+                .where(
+                    and(
+                        eq(verification.value, 'USER_003'),
+                        like(verification.identifier, 'reset-password:%'),
+                    ),
+                )
+
+            expect(records.length).toBeGreaterThan(0)
+
+            /**
+             * @description
+             * Extract the token from the identifier by stripping the
+             * "reset-password:" prefix.
+             */
+            interceptedToken = records[0].identifier.replace(
+                'reset-password:',
+                '',
+            )
+            expect(interceptedToken).toBeTruthy()
+        })
+
+        it('Step 3: Complete password reset using the intercepted token.', async () => {
+            const response = await app.request(
+                '/app/auth/password/reset',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: interceptedToken,
+                        newPassword: 'R3set@P@ssw0rd5678',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseOk<null>>()
+
+            expect(response.status).toBe(200)
+            expect(responseData.success).toBe(true)
+            expect(responseData.data).toBeNull()
+        })
+
+        it('Step 4: Sign-in with the new password should pass.', async () => {
+            const response = await app.request(
+                '/app/auth/sign-in/username',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organizationId: 'superorganization',
+                        accountId: 'member',
+                        password: 'R3set@P@ssw0rd5678',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseOk<unknown>>()
+
+            expect(response.status).toBe(200)
+            expect(response.headers.get('set-cookie')).toBeTruthy()
+            expect(responseData).toHaveProperty('data')
+        })
+
+        it('Step 5: Sign-in with the old password should fail.', async () => {
+            const response = await app.request(
+                '/app/auth/sign-in/username',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organizationId: 'superorganization',
+                        accountId: 'member',
+                        password: 'P@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseError>()
+
+            expect(response.status).toBe(422)
+            expect(responseData).toHaveProperty('error')
+            expect(responseData.error.message).toBe(
+                'Invalid credentials provided.',
+            )
+        })
+
+        it('Step 6: Restore original password.', async () => {
+            /**
+             * @description
+             * Sign in with new password to get a fresh session,
+             * then use password change to restore original.
+             */
+            const signInResponse = await app.request(
+                '/app/auth/sign-in/username',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organizationId: 'superorganization',
+                        accountId: 'member',
+                        password: 'R3set@P@ssw0rd5678',
+                    }),
+                },
+                env,
+            )
+
+            const freshCookie = signInResponse.headers.getSetCookie().join('; ')
+
+            const response = await app.request(
+                '/app/auth/password/change',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: 'vitest-pool-worker',
+                        'content-type': 'application/json',
+                        cookie: freshCookie,
+                    },
+                    body: JSON.stringify({
+                        currentPassword: 'R3set@P@ssw0rd5678',
+                        newPassword: 'P@ssw0rd1234',
+                    }),
+                },
+                env,
+            )
+
+            const responseData = await response.json<TApiResponseOk<null>>()
+
+            expect(response.status).toBe(200)
+            expect(responseData.success).toBe(true)
+        })
+    })
+})

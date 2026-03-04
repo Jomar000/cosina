@@ -4,18 +4,15 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { constantTimeEqual } from 'better-auth/crypto'
 import {
-    captcha,
-    createAuthMiddleware,
     emailOTP,
     organization as organizationPlugin,
     username,
 } from 'better-auth/plugins'
 import { createAccessControl } from 'better-auth/plugins/access'
-import { and, eq, or } from 'drizzle-orm'
+import { eq, or } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { Resend } from 'resend'
 
-import { AppError } from '../errors.js'
 import { aclBuilder } from './acl.js'
 
 /**
@@ -30,13 +27,7 @@ export const auth = async (opts: {
 }) => {
     const { db, dbSchema, kv, env } = opts
 
-    const {
-        member,
-        organization: organizationTable,
-        role,
-        user,
-        userAttribute,
-    } = dbSchema
+    const { organization: organizationTable } = dbSchema
 
     const cookieAttrs = {
         domain: env.COOKIE_DOMAIN,
@@ -58,7 +49,7 @@ export const auth = async (opts: {
 
     /**
      * @description
-     * Provides the ACL to the sign-in hook
+     * Provides the ACL to the Organization plugin
      */
     const { roles: aclRoles, permissions: aclPermissions } = await aclBuilder(
         db,
@@ -91,90 +82,6 @@ export const auth = async (opts: {
         })
     }
 
-    /**
-     * @description
-     * Get organization member data
-     */
-    const getOrgMemberData = async ({
-        organizationId,
-        email,
-        username,
-    }: {
-        organizationId: string
-        email?: string
-        username?: string
-    }) => {
-        if (!(email || username)) {
-            return null
-        }
-
-        const orgMemberData =
-            (
-                await db
-                    .select()
-                    .from(user)
-                    .innerJoin(member, eq(user.id, member.userId))
-                    .innerJoin(
-                        organizationTable,
-                        eq(member.organizationId, organizationTable.id),
-                    )
-                    .innerJoin(role, eq(member.role, role.name))
-                    .where(
-                        and(
-                            or(
-                                email ? eq(user.email, email) : undefined,
-                                username
-                                    ? eq(user.username, username)
-                                    : undefined,
-                            ),
-                            eq(organizationTable.slug, organizationId),
-                        ),
-                    )
-            )[0] ?? null
-
-        return orgMemberData
-    }
-
-    /**
-     * @description
-     * Verify if the user account is locked
-     */
-    const verifyAccountLock = async ({
-        email,
-        username,
-    }: {
-        email?: string
-        username?: string
-    }) => {
-        if (!(email || username)) {
-            return
-        }
-
-        const isLocked =
-            (
-                await db
-                    .select({
-                        isLocked: userAttribute.isLocked,
-                    })
-                    .from(userAttribute)
-                    .innerJoin(user, eq(user.id, userAttribute.userId))
-                    .where(
-                        or(
-                            email ? eq(user.email, email) : undefined,
-                            username ? eq(user.username, username) : undefined,
-                        ),
-                    )
-            )[0]?.isLocked ?? false
-
-        if (isLocked) {
-            throw new AppError({
-                code: 'LOCKED',
-                message: 'Account is currently locked.',
-                status: 423,
-            })
-        }
-    }
-
     return betterAuth({
         onAPIError: {
             throw: true,
@@ -191,7 +98,6 @@ export const auth = async (opts: {
             useSecureCookies: true,
         },
         baseURL: env.URL_BACKEND,
-        basePath: '/internal/auth',
         database: drizzleAdapter(db, {
             provider: 'pg',
         }),
@@ -199,23 +105,31 @@ export const auth = async (opts: {
             session: {
                 create: {
                     before: async (session, ctx) => {
-                        const { id: activeOrganizationId } = (
-                            await db
-                                .select({ id: organizationTable.id })
-                                .from(organizationTable)
-                                .where(
-                                    or(
-                                        eq(
-                                            organizationTable.id,
-                                            ctx?.query.organizationId,
-                                        ),
-                                        eq(
-                                            organizationTable.slug,
-                                            ctx?.query.organizationId,
-                                        ),
-                                    ),
-                                )
-                        )[0]
+                        const organizationId = ctx?.query?.organizationId
+
+                        let activeOrganizationId = ''
+
+                        // Check if the provided organizationId is valid.
+                        // If yes, set it as the activeOrganizationId for this session.
+                        if (organizationId)
+                            activeOrganizationId =
+                                (
+                                    await db
+                                        .select({ id: organizationTable.id })
+                                        .from(organizationTable)
+                                        .where(
+                                            or(
+                                                eq(
+                                                    organizationTable.id,
+                                                    organizationId,
+                                                ),
+                                                eq(
+                                                    organizationTable.slug,
+                                                    organizationId,
+                                                ),
+                                            ),
+                                        )
+                                )[0]?.id ?? ''
 
                         return {
                             data: {
@@ -245,100 +159,27 @@ export const auth = async (opts: {
                     return constantTimeEqual(hexToBytes(key), targetKey)
                 },
             },
-        },
-        hooks: {
-            before: createAuthMiddleware(async (ctx) => {
-                if (
-                    ctx.path.startsWith('/sign-in/email') ||
-                    ctx.path.startsWith('/sign-in/username')
-                ) {
-                    if (!ctx.query?.organizationId) {
-                        throw new AppError({
-                            code: 'BAD_REQUEST',
-                            message: 'Organization ID was not provided.',
-                            status: 400,
-                        })
-                    }
-
-                    const orgMemberData = await getOrgMemberData({
-                        organizationId: ctx.query.organizationId,
-                        username: ctx.body.username,
-                        email: ctx.body.email,
-                    })
-
-                    if (!orgMemberData) {
-                        throw new AppError({
-                            code: 'UNPROCESSABLE_CONTENT',
-                            message: 'Invalid credentials provided.',
-                            status: 422,
-                        })
-                    }
-
-                    await verifyAccountLock({
-                        username: ctx.body.username,
-                        email: ctx.body.email,
-                    })
-
-                    // Inject member data to the request context
-                    // and make it available to the after hook
-                    ctx.context._name = orgMemberData.user.username
-                    ctx.context._email = orgMemberData.user.email
-                    ctx.context._avatar = orgMemberData.user.image
-                    ctx.context._permissions = aclPermissions
-                    ctx.context._roles = aclRoles
-                    ctx.context._userRoles = orgMemberData.role.name.split(',')
+            sendResetPassword: async ({ user, url }) => {
+                if (env.ENVIRONMENT === 'test') {
+                    return
                 }
-            }),
-            after: createAuthMiddleware(async (ctx) => {
-                if (
-                    ctx.path.startsWith('/sign-in/email') ||
-                    ctx.path.startsWith('/sign-in/username')
-                ) {
-                    if (!ctx.context.newSession) {
-                        throw new AppError({
-                            code: 'UNPROCESSABLE_CONTENT',
-                            message: 'Invalid credentials provided.',
-                            status: 422,
-                        })
-                    }
 
-                    return ctx.json({
-                        data: {
-                            name: ctx.context._name,
-                            email: ctx.context._email,
-                            ...(ctx.context._avatar
-                                ? { avatar: ctx.context._avatar }
-                                : {}),
-                            permissions: ctx.context._permissions,
-                            roles: ctx.context._roles,
-                            userRoles: ctx.context._userRoles,
-                            expiresAt:
-                                Math.floor(new Date().getTime() / 1000) +
-                                Number(env.SESSION_EXPIRATION),
-                        },
-                    })
-                }
-            }),
+                await resend.emails.send({
+                    from: env.MAILER_ACCOUNT,
+                    to: user.email,
+                    subject: 'Password Reset',
+                    text: url,
+                })
+            },
         },
         plugins: [
-            ...(env.ENVIRONMENT === 'test'
-                ? []
-                : [
-                      captcha({
-                          provider: 'cloudflare-turnstile',
-                          secretKey: env.CF_TURNSTILE_SECRET_KEY,
-                          siteVerifyURLOverride: env.CF_TURNSTILE_SITE_VERIFY,
-                          endpoints: [
-                              '/forget-password',
-                              '/sign-in/email',
-                              '/sign-in/username',
-                              '/sign-up/email',
-                          ],
-                      }),
-                  ]),
             emailOTP({
                 overrideDefaultEmailVerification: true,
                 sendVerificationOTP: async ({ email, otp, type }) => {
+                    if (env.ENVIRONMENT === 'test') {
+                        return
+                    }
+
                     if (type === 'sign-in') {
                         /* NOT IMPLEMENTED */
                     } else if (type === 'email-verification') {
@@ -346,14 +187,14 @@ export const auth = async (opts: {
                             from: env.MAILER_ACCOUNT,
                             to: email,
                             subject: 'E-mail Verification',
-                            text: `${otp}`,
+                            text: otp,
                         })
                     } else {
                         await resend.emails.send({
                             from: env.MAILER_ACCOUNT,
                             to: email,
                             subject: 'Password Reset',
-                            text: `${otp}`,
+                            text: otp,
                         })
                     }
                 },

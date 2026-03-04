@@ -7,9 +7,9 @@ import { AppError } from '../errors.js'
 import { apiResponseErrorWrapper } from '../utilities.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
 import { csrfHandler } from './middleware/csrfHandler.js'
-import { baseRoute } from './route/base/_index.js'
-import { internalRoute } from './route/internal/_index.js'
-import { v1Route } from './route/v1/_index.js'
+import { appRoute } from './route/app/index.js'
+import { heartbeatRoute } from './route/heartbeat.js'
+import { v1Route } from './route/v1/index.js'
 
 export const app = new Hono<THonoInstance>()
     /**
@@ -66,10 +66,9 @@ export const app = new Hono<THonoInstance>()
      * @description
      * Routes
      */
-    .route('/', baseRoute)
-    .route('/internal', internalRoute)
+    .route('/app', appRoute)
+    .route('/heartbeat', heartbeatRoute)
     .route('/v1', v1Route)
 
 export default app
 export { WebSocketServer }
-export type AppType = typeof app

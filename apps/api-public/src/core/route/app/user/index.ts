@@ -16,3 +16,4 @@ export const userRoute = new Hono<THonoInstance>()
     .route('/profile', profileRoute)
 
 export default userRoute
+export type UserRouteType = typeof userRoute

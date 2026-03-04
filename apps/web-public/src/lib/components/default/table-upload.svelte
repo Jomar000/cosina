@@ -11,13 +11,14 @@
     import PQueue from 'p-queue'
     import { onMount } from 'svelte'
 
+    import { objectStorageClient } from '$lib/clients'
     import * as Avatar from '$lib/components/shadcn/avatar'
     import { Badge } from '$lib/components/shadcn/badge'
     import { Button } from '$lib/components/shadcn/button'
     import * as Card from '$lib/components/shadcn/card'
     import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu'
     import * as Table from '$lib/components/shadcn/table'
-    import { formatBytes, getCookie, honoClient } from '$lib/utilities'
+    import { formatBytes, getCookie } from '$lib/utilities'
 
     ////////////////
     // Properties //
@@ -171,7 +172,7 @@
             ]
 
             const signingResponse =
-                await honoClient.internal.objectStorage.upload.attachment.create.$post(
+                await objectStorageClient.upload.attachment.create.$post(
                     {
                         json: {
                             uploadId,
@@ -223,7 +224,7 @@
 
                                 // Report back that file is successfully uploaded.
                                 const commitResponse =
-                                    await honoClient.internal.objectStorage.upload.attachment.commit.$post(
+                                    await objectStorageClient.upload.attachment.commit.$post(
                                         {
                                             json: {
                                                 uploadId,
@@ -261,7 +262,7 @@
 
     const handleFileRetry = async (index: number) => {
         const retryResponse =
-            await honoClient.internal.objectStorage.upload.attachment.retry.$post(
+            await objectStorageClient.upload.attachment.retry.$post(
                 {
                     json: {
                         uploadId,
@@ -295,7 +296,7 @@
 
                         // Report back that file is successfully uploaded.
                         const commitResponse =
-                            await honoClient.internal.objectStorage.upload.attachment.commit.$post(
+                            await objectStorageClient.upload.attachment.commit.$post(
                                 {
                                     json: {
                                         uploadId,
@@ -331,8 +332,7 @@
 
     onMount(async () => {
         if (opMode === 'NEW') {
-            const response =
-                await honoClient.internal.objectStorage.upload.create.$get()
+            const response = await objectStorageClient.upload.create.$get()
 
             const responseData = await response.json()
 

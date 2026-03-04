@@ -32,6 +32,40 @@ export const signInOutputSchema = base.outputSchema(
     }),
 )
 
+export const passwordChangeInputSchema = z.object({
+    currentPassword: field
+        .vText({
+            fieldName: 'Current Password',
+            min: 12,
+            max: 128,
+        })
+        .check(refinement.password()),
+    newPassword: field
+        .vText({
+            fieldName: 'New Password',
+            min: 12,
+            max: 128,
+        })
+        .check(refinement.password()),
+})
+
+export const passwordResetRequestInputSchema = z.object({
+    email: z
+        .email({ error: 'Please provide a valid e-mail address.' })
+        .toLowerCase(),
+})
+
+export const passwordResetInputSchema = z.object({
+    token: field.vText({ fieldName: 'Token', max: 512 }),
+    newPassword: field
+        .vText({
+            fieldName: 'New Password',
+            min: 12,
+            max: 128,
+        })
+        .check(refinement.password()),
+})
+
 export const signUpInputSchema = z.object({
     email: z
         .email({ error: 'Please provide a valid e-mail address.' })

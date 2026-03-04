@@ -730,3 +730,6 @@ export const objectStorageRoute = new Hono<THonoInstance>()
             }
         },
     )
+
+export default objectStorageRoute
+export type ObjectStorageRouteType = typeof objectStorageRoute

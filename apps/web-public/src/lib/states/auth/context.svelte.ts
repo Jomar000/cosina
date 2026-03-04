@@ -6,6 +6,11 @@ import { createContext } from 'svelte'
 import { PUBLIC_API_URL } from '$env/static/public'
 import type { SessionState } from '../session/context.svelte'
 
+/**
+ * @deprecated
+ * Possibly for removal once better-auth client is no longer used
+ */
+
 export class AuthState {
     ////////////
     // Fields //
@@ -30,7 +35,7 @@ export class AuthState {
 
     #auth = $derived(
         createAuthClient({
-            baseURL: `${PUBLIC_API_URL}/internal/auth`,
+            baseURL: `${PUBLIC_API_URL}/app/auth`,
             plugins: [
                 usernameClient(),
                 organizationClient({

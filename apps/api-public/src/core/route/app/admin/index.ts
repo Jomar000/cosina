@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 
 import { isAuthorized } from '../../../middleware/isAuthorized.js'
-import { userRoute } from './user/_index.js'
+import { userRoute } from './user/index.js'
 
 export const adminRoute = new Hono<THonoInstance>()
     /**

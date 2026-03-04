@@ -6,11 +6,11 @@
     } from '@tanstack/svelte-query'
     import { ModeWatcher } from 'mode-watcher'
 
+    import { heartbeatClient } from '$lib/clients'
     import LoadingScreen from '$lib/components/default/loading-screen.svelte'
     import Sonner from '$lib/components/shadcn/sonner/sonner.svelte'
     import { AuthProvider } from '$lib/states/auth'
     import { SessionProvider } from '$lib/states/session'
-    import { honoClient } from '$lib/utilities'
     import '../app.css'
 
     ////////////////
@@ -38,7 +38,7 @@
             queryKey: [
                 'heartbeat',
             ],
-            queryFn: async () => await honoClient.heartbeat.$get({}),
+            queryFn: async () => await heartbeatClient.index.$get({}),
         }),
         () => queryClient,
     )

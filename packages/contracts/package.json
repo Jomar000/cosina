@@ -30,6 +30,10 @@
             "types": "./dist/validator/internal/index.d.ts",
             "default": "./dist/validator/internal/index.js"
         },
+        "./validator/internal/auth": {
+            "types": "./dist/validator/internal/auth.schema.d.ts",
+            "default": "./dist/validator/internal/auth.schema.js"
+        },
         "./validator/internal/admin/user": {
             "types": "./dist/validator/internal/admin/user/index.d.ts",
             "default": "./dist/validator/internal/admin/user/index.js"

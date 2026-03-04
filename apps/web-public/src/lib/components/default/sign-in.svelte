@@ -1,6 +1,7 @@
 <!-- https://shadcn-svelte.com/blocks/login#login-03 -->
 
 <script lang="ts">
+    import type { TApiResponse } from '@hyperion/contracts/types'
     import { auth as authValidator } from '@hyperion/contracts/validator/internal'
     import Eye from '@lucide/svelte/icons/eye'
     import EyeOff from '@lucide/svelte/icons/eye-off'
@@ -13,6 +14,7 @@
 
     import { goto } from '$app/navigation'
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
+    import { authClient } from '$lib/clients'
     import { Button } from '$lib/components/shadcn/button'
     import * as Card from '$lib/components/shadcn/card'
     import {
@@ -24,7 +26,6 @@
     } from '$lib/components/shadcn/field'
     import { Input } from '$lib/components/shadcn/input'
     import { cn } from '$lib/shadcn'
-    import type { AuthState } from '$lib/states/auth/context.svelte'
     import type { SessionState } from '$lib/states/session/context.svelte'
     import { getCookie } from '$lib/utilities'
 
@@ -34,12 +35,10 @@
 
     let {
         class: className,
-        auth,
         session,
-        showCaptchaModal = $bindable(false),
+        showCaptchaModal = $bindable(false), // eslint-disable-line no-useless-assignment
         ...restProps
     }: HTMLAttributes<HTMLDivElement> & {
-        auth: AuthState
         session: SessionState
         showCaptchaModal: boolean
     } = $props()
@@ -75,49 +74,36 @@
                 })
             })
 
-            let response:
-                | ReturnType<typeof auth.client.signIn.email>
-                | ReturnType<typeof auth.client.signIn.username>
-
             // Submit Form Data
             try {
-                if (data.accountId.includes('@')) {
-                    response = await auth.client.signIn.email(
-                        {
-                            email: data.accountId,
+                const endpoint = data.accountId.includes('@')
+                    ? authClient['sign-in'].email
+                    : authClient['sign-in'].username
+
+                const response = await endpoint.$post(
+                    {
+                        json: {
+                            organizationId: data.organizationId,
+                            accountId: data.accountId,
                             password: data.password,
                         },
-                        {
-                            headers: {
-                                'x-captcha-response': captchaToken,
-                                'x-csrf-token': getCookie('csrf_token') ?? '',
-                            },
-                            query: { organizationId: data.organizationId },
+                    },
+                    {
+                        headers: {
+                            'x-captcha-response': captchaToken,
+                            'x-csrf-token': getCookie('csrf_token') ?? '',
                         },
-                    )
-                } else {
-                    response = await auth.client.signIn.username(
-                        {
-                            username: data.accountId,
-                            password: data.password,
-                        },
-                        {
-                            headers: {
-                                'x-captcha-response': captchaToken,
-                                'x-csrf-token': getCookie('csrf_token') ?? '',
-                            },
-                            query: { organizationId: data.organizationId },
-                        },
-                    )
+                    },
+                )
+
+                const responseData =
+                    (await response.json()) as TApiResponse<TSessionData>
+
+                if (!responseData.success) {
+                    throw new Error(responseData.error.message)
                 }
 
-                if (response.error) {
-                    const { error: _error } = response.error
-                    throw new Error(_error.message)
-                }
-
-                const { data: _data } = response.data
-                session.set(_data)
+                session.set(responseData.data)
 
                 if (!session.isValid()) {
                     throw new Error('Invalid session data.')

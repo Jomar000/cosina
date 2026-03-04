@@ -6,7 +6,7 @@ catalog:
   better-auth: 1.4.21
   dayjs: ^1.11.19
   drizzle-orm: 1.0.0-beta.15-859cf75
-  hono: ^4.12.3
+  hono: ^4.12.4
   nanoid: ^5.1.6
   uuid: ^13.0.0
   zod: ^4.3.6

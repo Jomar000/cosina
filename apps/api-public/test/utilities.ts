@@ -5,7 +5,7 @@ import app from '../src/core/index.js'
 export const setTestingCookies = async () => {
     const response = await Promise.all([
         app.request(
-            '/internal/auth/sign-in/username?organizationId=superorganization',
+            '/app/auth/sign-in/username',
             {
                 method: 'POST',
                 headers: {
@@ -13,14 +13,15 @@ export const setTestingCookies = async () => {
                     'content-type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: 'superadministrator',
+                    organizationId: 'superorganization',
+                    accountId: 'superadministrator',
                     password: 'P@ssw0rd1234',
                 }),
             },
             env,
         ),
         app.request(
-            '/internal/auth/sign-in/username?organizationId=superorganization',
+            '/app/auth/sign-in/username',
             {
                 method: 'POST',
                 headers: {
@@ -28,7 +29,8 @@ export const setTestingCookies = async () => {
                     'content-type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: 'member',
+                    organizationId: 'superorganization',
+                    accountId: 'member',
                     password: 'P@ssw0rd1234',
                 }),
             },
@@ -37,7 +39,7 @@ export const setTestingCookies = async () => {
     ])
 
     return [
-        response[0].headers.get('set-cookie') ?? '',
-        response[1].headers.get('set-cookie') ?? '',
-    ]
+        response[0].headers.getSetCookie().join('; '),
+        response[1].headers.getSetCookie().join('; '),
+    ] as const
 }

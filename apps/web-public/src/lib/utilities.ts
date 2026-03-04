@@ -1,11 +1,4 @@
-import type { AppType } from '@hyperion/api-public'
-import type { base } from '@hyperion/contracts/validator/shared'
-import { hc } from 'hono/client'
-import ky, { type Options } from 'ky'
 import { customAlphabet } from 'nanoid'
-import type { z } from 'zod'
-
-import { PUBLIC_API_URL } from '$env/static/public'
 
 /**
  * Debounce Function
@@ -63,30 +56,6 @@ export const nanoidCustom = customAlphabet(
 )
 
 /**
- * API Client
- *
- * @description
- * Handle calls to Internal APIs using Ky HTTP client.
- *
- * @link
- * https://github.com/sindresorhus/ky
- *
- * @deprecated
- */
-export const apiClient = async <
-    T extends z.output<ReturnType<typeof base.outputSchema>>,
->(
-    path: string,
-    init?: Options,
-) => {
-    return ky<T>(path, {
-        ...init,
-        credentials: 'include',
-        prefixUrl: PUBLIC_API_URL,
-    }).json()
-}
-
-/**
  * @description
  * Strip properties with values considered as empty such as '', null & undefined.
  */
@@ -126,18 +95,6 @@ export const getCookie = (name: string) => {
 
     return cookies[name] ?? null
 }
-
-/**
- * @description
- * Hono RPC Client
- *
- * @link
- * https://hono.dev/docs/guides/rpc
- */
-export const honoClient = hc<AppType>(PUBLIC_API_URL, {
-    init: { credentials: 'include' },
-    fetch: ky,
-})
 
 /**
  * @description
