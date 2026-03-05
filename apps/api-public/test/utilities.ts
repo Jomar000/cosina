@@ -98,24 +98,28 @@ export const interceptPasswordResetToken = async (
         pass: env.HYPERION_HD.password,
     })
 
-    const records = await db
-        .select({
-            identifier: verification.identifier,
-            value: verification.value,
-        })
-        .from(verification)
-        .where(
-            and(
-                eq(verification.value, userId),
-                like(verification.identifier, 'reset-password:%'),
-            ),
+    try {
+        const records = await db
+            .select({
+                identifier: verification.identifier,
+                value: verification.value,
+            })
+            .from(verification)
+            .where(
+                and(
+                    eq(verification.value, userId),
+                    like(verification.identifier, 'reset-password:%'),
+                ),
+            )
+
+        if (records.length > 0) {
+            return records[0].identifier.replace('reset-password:', '')
+        }
+
+        throw new Error(
+            `No password reset token found for user "${userId}" in KV or database.`,
         )
-
-    if (records.length > 0) {
-        return records[0].identifier.replace('reset-password:', '')
+    } finally {
+        await db.$client.end()
     }
-
-    throw new Error(
-        `No password reset token found for user "${userId}" in KV or database.`,
-    )
 }
