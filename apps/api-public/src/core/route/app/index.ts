@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 
 import { corsHandler } from '../../middleware/corsHandler.js'
+import { csrfHandler } from '../../middleware/csrfHandler.js'
 import { initContext } from '../../middleware/initContext.js'
 import { adminRoute } from './admin/index.js'
 import { authRoute } from './auth.js'
@@ -14,6 +15,7 @@ export const appRoute = new Hono<THonoInstance>()
      * Middleware
      */
     .use(corsHandler('default'))
+    .use(csrfHandler())
     .use(initContext())
     /**
      * @description

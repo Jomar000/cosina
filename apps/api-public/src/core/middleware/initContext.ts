@@ -14,34 +14,40 @@ export const initContext = () => {
             pass: ctx.env.HYPERION_HD.password,
         })
 
-        ctx.set(
-            'auth',
-            await auth({
-                db: initDbClient,
-                dbSchema,
-                kv: ctx.env.HYPERION_KV,
-                env: ctx.env,
-            }),
-        )
-        ctx.set(
-            'aws4FetchClient',
-            new AwsClient({
-                accessKeyId: ctx.env.CF_R2_ACCESS_KEY_ID,
-                secretAccessKey: ctx.env.CF_R2_SECRET_ACCESS_KEY,
-            }),
-        )
-        ctx.set('dbClient', initDbClient)
-        ctx.set('dbSchema', dbSchema)
-        ctx.set('doWssClient', ctx.env.HYPERION_DO_WSS)
-        ctx.set('ipAddress', ctx.req.header('cf-connecting-ip') || 'N/A')
-        ctx.set('isPrivilegedRole', false)
-        ctx.set('kvClient', ctx.env.HYPERION_KV)
-        ctx.set('r2Client', ctx.env.HYPERION_R2)
-        ctx.set('role', 'N/A')
-        ctx.set('session', null)
-        ctx.set('user', null)
-        ctx.set('userAgent', ctx.req.header('user-agent') || 'N/A')
+        try {
+            ctx.set(
+                'auth',
+                await auth({
+                    db: initDbClient,
+                    dbSchema,
+                    kv: ctx.env.HYPERION_KV,
+                    env: ctx.env,
+                }),
+            )
+            ctx.set(
+                'aws4FetchClient',
+                new AwsClient({
+                    accessKeyId: ctx.env.CF_R2_ACCESS_KEY_ID,
+                    secretAccessKey: ctx.env.CF_R2_SECRET_ACCESS_KEY,
+                }),
+            )
+            ctx.set('dbClient', initDbClient)
+            ctx.set('dbSchema', dbSchema)
+            ctx.set('doWssClient', ctx.env.HYPERION_DO_WSS)
+            ctx.set('ipAddress', ctx.req.header('cf-connecting-ip') || 'N/A')
+            ctx.set('isPrivilegedRole', false)
+            ctx.set('kvClient', ctx.env.HYPERION_KV)
+            ctx.set('r2Client', ctx.env.HYPERION_R2)
+            ctx.set('role', 'N/A')
+            ctx.set('session', null)
+            ctx.set('user', null)
+            ctx.set('userAgent', ctx.req.header('user-agent') || 'N/A')
 
-        await next()
+            await next()
+        } finally {
+            // Always release the DB connection after the request completes to
+            // prevent connection exhaustion across multiple requests (e.g. tests).
+            await initDbClient.$client.end()
+        }
     })
 }

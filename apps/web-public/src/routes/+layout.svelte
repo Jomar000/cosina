@@ -33,6 +33,7 @@
         },
     })
 
+    // Checks liveness and sets the csrf_token cookie in a single request.
     const heartbeatQuery = createQuery(
         () => ({
             queryKey: [

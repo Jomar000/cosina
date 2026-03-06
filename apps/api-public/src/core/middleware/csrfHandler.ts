@@ -1,3 +1,4 @@
+import { constantTimeEqual } from 'better-auth/crypto'
 import { getCookie, setCookie } from 'hono/cookie'
 import { createMiddleware } from 'hono/factory'
 import { nanoid } from 'nanoid'
@@ -17,6 +18,7 @@ export const csrfHandler = () => {
 
         const safeMethods = [
             'GET',
+            'HEAD',
             'OPTIONS',
         ]
 
@@ -48,7 +50,14 @@ export const csrfHandler = () => {
             const tokenFromCookie = getCookie(ctx, 'csrf_token')
             const tokenFromHeader = ctx.req.header('x-csrf-token')
 
-            if (!tokenFromCookie || tokenFromCookie !== tokenFromHeader) {
+            if (
+                !tokenFromCookie ||
+                !tokenFromHeader ||
+                !constantTimeEqual(
+                    new TextEncoder().encode(tokenFromCookie),
+                    new TextEncoder().encode(tokenFromHeader),
+                )
+            ) {
                 return apiResponseErrorWrapper(ctx, {
                     code: 'FORBIDDEN',
                     message: 'Invalid CSRF token received.',

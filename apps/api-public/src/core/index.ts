@@ -6,9 +6,8 @@ import { v7 as uuidv7 } from 'uuid'
 import { AppError } from '../errors.js'
 import { apiResponseErrorWrapper } from '../utilities.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
-import { csrfHandler } from './middleware/csrfHandler.js'
 import { appRoute } from './route/app/index.js'
-import { heartbeatRoute } from './route/heartbeat.js'
+import { rootRoute } from './route/root/index.js'
 import { v1Route } from './route/v1/index.js'
 
 export const app = new Hono<THonoInstance>()
@@ -61,13 +60,12 @@ export const app = new Hono<THonoInstance>()
 
         await next()
     })
-    .use(csrfHandler())
     /**
      * @description
      * Routes
      */
+    .route('/', rootRoute)
     .route('/app', appRoute)
-    .route('/heartbeat', heartbeatRoute)
     .route('/v1', v1Route)
 
 export default app
