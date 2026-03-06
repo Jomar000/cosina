@@ -32,10 +32,9 @@ catalogs:
       version: 4.3.6
 
 overrides:
-  '@sveltejs/kit>cookie': ^0.7.2
   drizzle-kit>@esbuild-kit/core-utils: npm:tsx@^4.21.0
   drizzle-kit>@esbuild-kit/esm-loader: npm:tsx@^4.21.0
-  globals: ^17.3.0
+  globals: ^17.4.0
   esbuild: ^0.27.3
   test-exclude>glob: ^13.0.1
 
@@ -2063,8 +2062,8 @@ packages:
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
-  cookie@0.7.2:
-    resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
+  cookie@0.6.0:
+    resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
     engines: {node: '>= 0.6'}
 
   cookie@1.1.1:
@@ -5250,7 +5249,7 @@ snapshots:
       '@sveltejs/vite-plugin-svelte': 6.2.4(svelte@5.53.7)(vite@7.3.1(@types/node@25.3.5)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1))
       '@types/cookie': 0.6.0
       acorn: 8.16.0
-      cookie: 0.7.2
+      cookie: 0.6.0
       devalue: 5.6.3
       esm-env: 1.2.2
       kleur: 4.1.5
@@ -6008,7 +6007,7 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  cookie@0.7.2: {}
+  cookie@0.6.0: {}
 
   cookie@1.1.1: {}
 

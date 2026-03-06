@@ -38,30 +38,18 @@
     },
     "pnpm": {
         "allowedDeprecatedVersions": {
-            "prebuild-install": "*",
-            "q": "*",
-            "rimraf": "*"
+            "prebuild-install": "*"
         },
         "overrides": {
-            "@sveltejs/kit>cookie": "^0.7.2",
             "drizzle-kit>@esbuild-kit/core-utils": "npm:tsx@^4.21.0",
             "drizzle-kit>@esbuild-kit/esm-loader": "npm:tsx@^4.21.0",
-            "globals": "^17.3.0",
+            "globals": "^17.4.0",
             "esbuild": "^0.27.3",
             "test-exclude>glob": "^13.0.1"
         },
         "peerDependencyRules": {
-            "allowedVersions": {
-                "@typescript-eslint/eslint-plugin>eslint": "^10.0.0",
-                "@typescript-eslint/parser>eslint": "^10.0.0",
-                "@typescript-eslint/type-utils>eslint": "^10.0.0",
-                "@typescript-eslint/utils>eslint": "^10.0.0",
-                "typescript-eslint>eslint": "^10.0.0",
-                "typescript": "^5.9.2"
-            },
-            "ignoreMissing": [
-                "@types/node"
-            ]
+            "allowedVersions": {},
+            "ignoreMissing": []
         }
     }
 }

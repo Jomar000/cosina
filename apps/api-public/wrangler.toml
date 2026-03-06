@@ -1,7 +1,11 @@
 name = "hyperion-backend"
 main = "src/core/index.ts"
-compatibility_date = "2026-01-20"
+compatibility_date = "2026-03-06"
 compatibility_flags = ['nodejs_compat']
+
+##########
+# Global #
+##########
 
 [observability]
 enabled = true
@@ -21,22 +25,22 @@ new_sqlite_classes = ["WebSocketServer"]
 command = "tsc --build ./tsconfig.build.json"
 watch_dir = [
     "./src/",
-    "../validator/src/",
+    "../../packages/contracts/src/",
 ]
-
-#######
-# DEV #
-#######
 
 [dev]
 port = 8080
 
+########################
+# DEV (no environment) #
+########################
+
 [vars]
 ENVIRONMENT = "development"
 STATUS = "up"
-CF_R2_BUCKET_PRIVATE = "hyperion-development"
-CF_R2_BUCKET_PUBLIC = "hyperion-development"
-CF_R2_BUCKET_PUBLIC_URL = ""
+CF_R2_BUCKET_PRIVATE = "hyperion-development-prv"
+CF_R2_BUCKET_PUBLIC = "hyperion-development-pub"
+CF_R2_BUCKET_PUBLIC_URL = "https://hyperion-development-r2.4thdevision.tech"
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
 CORS_ALLOW_CREDENTIALS = 1 # (0|1)
@@ -65,7 +69,7 @@ class_name = "WebSocketServer"
 
 [[r2_buckets]]
 binding = 'HYPERION_R2'
-bucket_name = 'hyperion-dev'
+bucket_name = 'hyperion-development'
 
 ########
 # TEST #
@@ -79,9 +83,9 @@ route = { custom_domain = true, pattern = "" }
 [env.test.vars]
 ENVIRONMENT = "test"
 STATUS = "up"
-CF_R2_BUCKET_PRIVATE = "hyperion-test"
-CF_R2_BUCKET_PUBLIC = "hyperion-test"
-CF_R2_BUCKET_PUBLIC_URL = ""
+CF_R2_BUCKET_PRIVATE = "hyperion-test-prv"
+CF_R2_BUCKET_PUBLIC = "hyperion-test-pub"
+CF_R2_BUCKET_PUBLIC_URL = "https://hyperion-development-r2.4thdevision.tech"
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
 CORS_ALLOW_CREDENTIALS = 1 # (0|1)
@@ -124,8 +128,8 @@ route = { custom_domain = true, pattern = "" }
 [env.staging.vars]
 ENVIRONMENT = "staging"
 STATUS = "up"
-CF_R2_BUCKET_PRIVATE = "hyperion-staging"
-CF_R2_BUCKET_PUBLIC = "hyperion-staging"
+CF_R2_BUCKET_PRIVATE = "hyperion-staging-prv"
+CF_R2_BUCKET_PUBLIC = "hyperion-staging-pub"
 CF_R2_BUCKET_PUBLIC_URL = ""
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
@@ -168,8 +172,8 @@ route = { custom_domain = true, pattern = "" }
 [env.production.vars]
 ENVIRONMENT = "production"
 STATUS = "up"
-CF_R2_BUCKET_PRIVATE = "hyperion-production"
-CF_R2_BUCKET_PUBLIC = "hyperion-production"
+CF_R2_BUCKET_PRIVATE = "hyperion-production-prv"
+CF_R2_BUCKET_PUBLIC = "hyperion-production-pub"
 CF_R2_BUCKET_PUBLIC_URL = ""
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 COOKIE_DOMAIN = "localhost"
