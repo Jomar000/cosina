@@ -6,7 +6,8 @@ catalog:
   '@better-auth/drizzle-adapter': ^1.5.4
   better-auth: ^1.5.4
   dayjs: ^1.11.19
-  drizzle-orm: 1.0.0-beta.15-859cf75
+  drizzle-kit: 1.0.0-beta.16-ea816b6
+  drizzle-orm: 1.0.0-beta.16-ea816b6
   hono: ^4.12.5
   nanoid: ^5.1.6
   uuid: ^13.0.0
