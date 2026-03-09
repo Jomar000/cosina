@@ -3,7 +3,7 @@ import {
     passwordResetInputSchema,
     passwordResetRequestInputSchema,
     signInInputSchema,
-} from '@hyperion/contracts/validator/internal/auth'
+} from '@hyperion/contracts/validator/app/auth'
 import { and, eq } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { Hono } from 'hono'

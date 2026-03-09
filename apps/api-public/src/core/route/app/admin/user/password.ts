@@ -1,4 +1,4 @@
-import { password } from '@hyperion/contracts/validator/internal/admin/user'
+import { password } from '@hyperion/contracts/validator/app/admin/user'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'

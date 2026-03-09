@@ -26,25 +26,25 @@
             "types": "./dist/types/index.d.ts",
             "default": "./dist/types/index.js"
         },
-        "./validator/internal": {
-            "types": "./dist/validator/internal/index.d.ts",
-            "default": "./dist/validator/internal/index.js"
+        "./validator/app": {
+            "types": "./dist/validator/app/index.d.ts",
+            "default": "./dist/validator/app/index.js"
         },
-        "./validator/internal/auth": {
-            "types": "./dist/validator/internal/auth.schema.d.ts",
-            "default": "./dist/validator/internal/auth.schema.js"
+        "./validator/app/auth": {
+            "types": "./dist/validator/app/auth.schema.d.ts",
+            "default": "./dist/validator/app/auth.schema.js"
         },
-        "./validator/internal/admin/user": {
-            "types": "./dist/validator/internal/admin/user/index.d.ts",
-            "default": "./dist/validator/internal/admin/user/index.js"
+        "./validator/app/admin/user": {
+            "types": "./dist/validator/app/admin/user/index.d.ts",
+            "default": "./dist/validator/app/admin/user/index.js"
         },
-        "./validator/internal/objectStorage": {
-            "types": "./dist/validator/internal/objectStorage.schema.d.ts",
-            "default": "./dist/validator/internal/objectStorage.schema.js"
+        "./validator/app/objectStorage": {
+            "types": "./dist/validator/app/objectStorage.schema.d.ts",
+            "default": "./dist/validator/app/objectStorage.schema.js"
         },
-        "./validator/internal/user": {
-            "types": "./dist/validator/internal/user/index.d.ts",
-            "default": "./dist/validator/internal/user/index.js"
+        "./validator/app/user": {
+            "types": "./dist/validator/app/user/index.d.ts",
+            "default": "./dist/validator/app/user/index.js"
         },
         "./validator/shared": {
             "types": "./dist/validator/shared/index.d.ts",

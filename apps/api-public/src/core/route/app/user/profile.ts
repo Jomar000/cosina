@@ -1,4 +1,4 @@
-import { profile } from '@hyperion/contracts/validator/internal/user'
+import { profile } from '@hyperion/contracts/validator/app/user'
 import { and, eq, getTableColumns } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'

@@ -1,2 +1,2 @@
-export * as internal from './internal/index.js'
+export * as app from './app/index.js'
 export * as shared from './shared/index.js'
