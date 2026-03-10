@@ -25,11 +25,6 @@ export const appRoute = new Hono<THonoInstance>()
     .route('/auth', authRoute)
     .route('/objectStorage', objectStorageRoute)
     .route('/user', userRoute)
-
-/**
- * @description
- * Routes excluded from RPC Type Inference
- */
-appRoute.route('/ws', wsRoute)
+    .route('/ws', wsRoute)
 
 export default appRoute

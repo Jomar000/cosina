@@ -540,13 +540,20 @@ export const permission = pgTable(
     (t) => [
         unique('ctaxe84nuq66_unique').on(t.component, t.action, t.roleId),
         index('7vz0lkc6bbu7_index').on(t.roleId),
+        foreignKey({
+            name: '7vz0lkc6bbu7_fkey',
+            columns: [t.roleId],
+            foreignColumns: [role.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
     ],
 )
 
 export const role = pgTable(
     'role',
     {
-        id: integer('id').generatedByDefaultAsIdentity().primaryKey(),
+        id: smallint('id').generatedByDefaultAsIdentity().primaryKey(),
         name: text('name').unique('629pi1o76z2z_unique').notNull(),
         description: text('description'),
         createdAt: timestamp('created_at', {

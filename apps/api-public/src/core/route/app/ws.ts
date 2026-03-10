@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 
+import { apiResponseErrorWrapper } from '../../../utilities.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 
 export const wsRoute = new Hono<THonoInstance>()
@@ -28,11 +29,39 @@ export const wsRoute = new Hono<THonoInstance>()
             return ctx.text('Expected Upgrade: websocket', 426)
         }
 
+        const authHeaders = ctx.req.raw.headers
+
+        const [
+            { success: canListen },
+            { success: canBroadcast },
+        ] = await Promise.all([
+            ctx.get('auth').api.hasPermission({
+                headers: authHeaders,
+                body: { permissions: { ws: ['listen'] } },
+            }),
+            ctx.get('auth').api.hasPermission({
+                headers: authHeaders,
+                body: { permissions: { ws: ['broadcast'] } },
+            }),
+        ])
+
+        if (!canListen) {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'FORBIDDEN',
+                message: 'You are not allowed to access this resource.',
+                status: 403,
+            })
+        }
+
+        const headers = new Headers(authHeaders)
+        headers.set('X-WS-Can-Broadcast', canBroadcast ? 'true' : 'false')
+
         // README: WebSocket logic is implemented in src/app/durableObject/webSocketServer.ts
         const id = ctx.get('doWssClient').idFromName(channel)
         const stub = ctx.get('doWssClient').get(id)
 
-        return stub.fetch(ctx.req.raw)
+        return stub.fetch(new Request(ctx.req.raw, { headers }))
     })
 
 export default wsRoute
+export type WsRouteType = typeof wsRoute

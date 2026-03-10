@@ -12,10 +12,15 @@ export class WebSocketServer extends DurableObject {
         super(ctx, env)
     }
 
-    async fetch(): Promise<Response> {
+    async fetch(request: Request): Promise<Response> {
         const { 0: client, 1: server } = new WebSocketPair()
 
         this.ctx.acceptWebSocket(server)
+
+        const canBroadcast =
+            request.headers.get('X-WS-Can-Broadcast') === 'true'
+
+        server.serializeAttachment({ canBroadcast })
 
         return new Response(null, {
             status: 101,
@@ -33,6 +38,14 @@ export class WebSocketServer extends DurableObject {
 
     webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) {
         try {
+            const { canBroadcast } = ws.deserializeAttachment() as {
+                canBroadcast: boolean
+            }
+
+            if (!canBroadcast) {
+                return
+            }
+
             const data = JSON.parse(
                 message instanceof ArrayBuffer
                     ? new TextDecoder().decode(message)

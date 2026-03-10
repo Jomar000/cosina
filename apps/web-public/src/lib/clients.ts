@@ -2,6 +2,7 @@ import type { AuthRouteType } from '@hyperion/api-public/auth'
 import type { HeartbeatRouteType } from '@hyperion/api-public/heartbeat'
 import type { ObjectStorageRouteType } from '@hyperion/api-public/objectStorage'
 import type { UserRouteType } from '@hyperion/api-public/user'
+import type { WsRouteType } from '@hyperion/api-public/ws'
 import { hc } from 'hono/client'
 import ky from 'ky'
 
@@ -45,6 +46,18 @@ export const objectStorageClient = hc<ObjectStorageRouteType>(
  * User RPC Client
  */
 export const userClient = hc<UserRouteType>(`${PUBLIC_API_URL}/app/user`, {
+    init: { credentials: 'include' },
+    fetch: ky,
+})
+
+/**
+ * @description
+ * WebSocket RPC Client
+ *
+ * @example
+ * const socket = wsClient[':channel'].$ws({ param: { channel: 'my-channel' } })
+ */
+export const wsClient = hc<WsRouteType>(`${PUBLIC_API_URL}/app/ws`, {
     init: { credentials: 'include' },
     fetch: ky,
 })

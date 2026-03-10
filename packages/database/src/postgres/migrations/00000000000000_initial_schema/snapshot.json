@@ -1721,6 +1721,23 @@
             "entityType": "indexes"
         },
         {
+            "nameExplicit": true,
+            "columns": [
+                "role_id"
+            ],
+            "schemaTo": "public",
+            "tableTo": "role",
+            "columnsTo": [
+                "id"
+            ],
+            "onUpdate": "NO ACTION",
+            "onDelete": "NO ACTION",
+            "name": "7vz0lkc6bbu7_fkey",
+            "schema": "public",
+            "table": "permission",
+            "entityType": "fks"
+        },
+        {
             "isRlsEnabled": false,
             "name": "role",
             "schema": "public",
@@ -1737,7 +1754,7 @@
             "entityType": "pks"
         },
         {
-            "type": "integer",
+            "type": "smallint",
             "typeSchema": null,
             "notNull": true,
             "dimensions": 0,
@@ -1748,7 +1765,7 @@
                 "type": "byDefault",
                 "startWith": "1",
                 "minValue": "1",
-                "maxValue": "2147483647",
+                "maxValue": "32767",
                 "increment": "1",
                 "cache": 1,
                 "cycle": false

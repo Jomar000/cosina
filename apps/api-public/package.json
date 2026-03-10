@@ -63,6 +63,10 @@
         "./user": {
             "types": "./dist/core/route/app/user/index.d.ts",
             "default": "./dist/core/route/app/user/index.js"
+        },
+        "./ws": {
+            "types": "./dist/core/route/app/ws.d.ts",
+            "default": "./dist/core/route/app/ws.js"
         }
     }
 }
