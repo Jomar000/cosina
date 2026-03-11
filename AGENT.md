@@ -57,7 +57,7 @@
     - `field.ts` — Low-level Zod field builders (`vBoolean`, `vInt`, `vNumeric`, `vText`) accepting `{ fieldName, message, min, max }`.
     - `base.ts` — Composed schemas: `addressInputSchema`, `readManyInputSchema` (limit/offset/sort), `outputSchema<Data>`.
     - `refinement.ts` — Custom `.check()` callbacks: `dateString()`, `password()` (uppercase + lowercase + numeric + symbol), `updatedFields()`.
-2.  **Internal Validators (`@hyperion/contracts/validator/internal`):** Domain-specific schemas organized by feature (`auth`, `user`, `admin/user`, `objectStorage`).
+2.  **Internal Validators (`@hyperion/contracts/validator/app`):** Domain-specific schemas organized by feature (`auth`, `user`, `admin/user`, `objectStorage`).
 3.  **Adding a New Validator:**
     - Create `*.schema.ts` in the appropriate `internal/` subdirectory using shared field builders and refinements.
     - Re-export from the nearest `index.ts`.

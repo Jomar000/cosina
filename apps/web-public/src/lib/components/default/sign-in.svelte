@@ -2,7 +2,7 @@
 
 <script lang="ts">
     import type { TApiResponse } from '@hyperion/contracts/types'
-    import { auth as authValidator } from '@hyperion/contracts/validator/internal'
+    import { auth as authValidator } from '@hyperion/contracts/validator/app'
     import Eye from '@lucide/svelte/icons/eye'
     import EyeOff from '@lucide/svelte/icons/eye-off'
     import { createForm } from '@tanstack/svelte-form'
