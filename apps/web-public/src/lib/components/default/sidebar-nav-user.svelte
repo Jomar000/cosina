@@ -1,4 +1,8 @@
 <script lang="ts">
+    import * as Avatar from '@hyperion/ui/components/avatar'
+    import * as DropdownMenu from '@hyperion/ui/components/dropdown-menu'
+    import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import { useSidebar } from '@hyperion/ui/components/sidebar'
     import BadgeCheckIcon from '@lucide/svelte/icons/badge-check'
     import BellIcon from '@lucide/svelte/icons/bell'
     import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down'
@@ -6,11 +10,6 @@
     import LogOutIcon from '@lucide/svelte/icons/log-out'
     import SparklesIcon from '@lucide/svelte/icons/sparkles'
     import { getContext } from 'svelte'
-
-    import * as Avatar from '$lib/components/shadcn/avatar'
-    import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu'
-    import * as Sidebar from '$lib/components/shadcn/sidebar'
-    import { useSidebar } from '$lib/components/shadcn/sidebar'
 
     // let { user }: { user: { name: string; email: string; avatar: string } } =
     //     $props()

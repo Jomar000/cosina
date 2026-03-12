@@ -1,12 +1,12 @@
 <script lang="ts">
+    import { Button } from '@hyperion/ui/components/button'
+    import * as Card from '@hyperion/ui/components/card'
+    import * as Select from '@hyperion/ui/components/select'
     import GalleryVerticalEndIcon from '@lucide/svelte/icons/gallery-vertical-end'
     import UserStar from '@lucide/svelte/icons/user-star'
     import { onMount } from 'svelte'
 
     import { goto } from '$app/navigation'
-    import Button from '$lib/components/shadcn/button/button.svelte'
-    import * as Card from '$lib/components/shadcn/card'
-    import * as Select from '$lib/components/shadcn/select'
     import { useSessionContext } from '$lib/states/session'
 
     //////////////

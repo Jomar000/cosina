@@ -16,7 +16,8 @@
                 "apps/api-public",
                 "apps/web-public",
                 "packages/contracts",
-                "packages/database"
+                "packages/database",
+                "packages/ui"
             ],
             "runOptions": {
                 "runOn": "folderOpen"
@@ -61,6 +62,20 @@
             "command": "bash",
             "options": {
                 "cwd": "${workspaceFolder}/packages/database"
+            },
+            "isBackground": true
+        },
+        {
+            "label": "packages/ui",
+            "icon": {
+                "id": "terminal",
+                "color": "terminal.ansiGreen"
+            },
+            "type": "shell",
+            "hide": true,
+            "command": "bash",
+            "options": {
+                "cwd": "${workspaceFolder}/packages/ui"
             },
             "isBackground": true
         },

@@ -1,4 +1,10 @@
 <script lang="ts">
+    import * as Avatar from '@hyperion/ui/components/avatar'
+    import { Badge } from '@hyperion/ui/components/badge'
+    import { Button } from '@hyperion/ui/components/button'
+    import * as Card from '@hyperion/ui/components/card'
+    import * as DropdownMenu from '@hyperion/ui/components/dropdown-menu'
+    import * as Table from '@hyperion/ui/components/table'
     import CircleCheck from '@lucide/svelte/icons/circle-check'
     import CircleX from '@lucide/svelte/icons/circle-x'
     import CloudUpload from '@lucide/svelte/icons/cloud-upload'
@@ -12,12 +18,6 @@
     import { onMount } from 'svelte'
 
     import { objectStorageClient } from '$lib/clients'
-    import * as Avatar from '$lib/components/shadcn/avatar'
-    import { Badge } from '$lib/components/shadcn/badge'
-    import { Button } from '$lib/components/shadcn/button'
-    import * as Card from '$lib/components/shadcn/card'
-    import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu'
-    import * as Table from '$lib/components/shadcn/table'
     import { formatBytes, getCookie } from '$lib/utilities'
 
     ////////////////

@@ -1,11 +1,11 @@
 <script lang="ts">
+    import * as Sidebar from '@hyperion/ui/components/sidebar'
     import ListIcon from '@lucide/svelte/icons/list'
     import UsersIcon from '@lucide/svelte/icons/users'
     import { onMount } from 'svelte'
 
     import { goto } from '$app/navigation'
     import AppSidebar from '$lib/components/default/sidebar.svelte'
-    import * as Sidebar from '$lib/components/shadcn/sidebar'
     import { useSessionContext } from '$lib/states/session'
 
     ////////////////

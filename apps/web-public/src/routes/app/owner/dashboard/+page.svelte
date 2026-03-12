@@ -1,7 +1,7 @@
 <script lang="ts">
-    import * as Breadcrumb from '$lib/components/shadcn/breadcrumb'
-    import { Separator } from '$lib/components/shadcn/separator'
-    import * as Sidebar from '$lib/components/shadcn/sidebar'
+    import * as Breadcrumb from '@hyperion/ui/components/breadcrumb'
+    import { Separator } from '@hyperion/ui/components/separator'
+    import * as Sidebar from '@hyperion/ui/components/sidebar'
 </script>
 
 <!-- BREADCRUMB -->

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu'
-    import * as Sidebar from '$lib/components/shadcn/sidebar'
-    import { useSidebar } from '$lib/components/shadcn/sidebar'
+    import * as DropdownMenu from '@hyperion/ui/components/dropdown-menu'
+    import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import { useSidebar } from '@hyperion/ui/components/sidebar'
     import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down'
     import PlusIcon from '@lucide/svelte/icons/plus'
 

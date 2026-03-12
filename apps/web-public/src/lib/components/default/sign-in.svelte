@@ -3,6 +3,17 @@
 <script lang="ts">
     import type { TApiResponse } from '@hyperion/contracts/types'
     import { auth as authValidator } from '@hyperion/contracts/validator/app'
+    import { Button } from '@hyperion/ui/components/button'
+    import * as Card from '@hyperion/ui/components/card'
+    import {
+        Field,
+        FieldDescription,
+        FieldError,
+        FieldGroup,
+        FieldLabel,
+    } from '@hyperion/ui/components/field'
+    import { Input } from '@hyperion/ui/components/input'
+    import { cn } from '@hyperion/ui/utils'
     import Eye from '@lucide/svelte/icons/eye'
     import EyeOff from '@lucide/svelte/icons/eye-off'
     import { createForm } from '@tanstack/svelte-form'
@@ -15,17 +26,6 @@
     import { goto } from '$app/navigation'
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
     import { authClient } from '$lib/clients'
-    import { Button } from '$lib/components/shadcn/button'
-    import * as Card from '$lib/components/shadcn/card'
-    import {
-        Field,
-        FieldDescription,
-        FieldError,
-        FieldGroup,
-        FieldLabel,
-    } from '$lib/components/shadcn/field'
-    import { Input } from '@hyperion/ui/components/input'
-    import { cn } from '$lib/shadcn'
     import type { SessionState } from '$lib/states/session/context.svelte'
     import { getCookie } from '$lib/utilities'
 

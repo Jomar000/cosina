@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Toaster as Sonner } from '@hyperion/ui/components/sonner'
     import {
         createQuery,
         QueryClient,
@@ -8,7 +9,6 @@
 
     import { heartbeatClient } from '$lib/clients'
     import LoadingScreen from '$lib/components/default/loading-screen.svelte'
-    import Sonner from '$lib/components/shadcn/sonner/sonner.svelte'
     import { AuthProvider } from '$lib/states/auth'
     import { SessionProvider } from '$lib/states/session'
     import '../app.css'

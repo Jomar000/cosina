@@ -14,6 +14,9 @@
     "references": [
         {
             "path": "../api-public/tsconfig.json"
+        },
+        {
+            "path": "../../packages/ui/tsconfig.json"
         }
     ]
     // Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias

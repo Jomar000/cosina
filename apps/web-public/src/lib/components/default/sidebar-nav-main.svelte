@@ -1,10 +1,9 @@
 <script lang="ts">
+    import * as Collapsible from '@hyperion/ui/components/collapsible'
+    import * as Sidebar from '@hyperion/ui/components/sidebar'
     import ChevronRightIcon from '@lucide/svelte/icons/chevron-right'
     import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
     import type { Component } from 'svelte'
-
-    import * as Collapsible from '$lib/components/shadcn/collapsible'
-    import * as Sidebar from '$lib/components/shadcn/sidebar'
 
     let {
         items,
