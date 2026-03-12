@@ -24,10 +24,14 @@
             "svelte": "./dist/components/*/index.js",
             "default": "./dist/components/*/index.js"
         },
-        "./shared": {
-            "types": "./dist/shared/index.d.ts",
-            "svelte": "./dist/shared/index.js",
-            "default": "./dist/shared/index.js"
+        "./hooks": {
+            "types": "./dist/hooks/index.d.ts",
+            "default": "./dist/hooks/index.js"
+        },
+        "./shared/*": {
+            "types": "./dist/shared/*/index.d.ts",
+            "svelte": "./dist/shared/*/index.js",
+            "default": "./dist/shared/*/index.js"
         },
         "./styles": "./dist/styles/globals.css",
         "./utils": {
