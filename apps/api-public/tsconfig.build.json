@@ -13,10 +13,13 @@
     },
     "references": [
         {
-            "path": "../../packages/contracts/tsconfig.json"
+            "path": "../../packages/types/tsconfig.json"
         },
         {
-            "path": "../../packages/database/tsconfig.json"
+            "path": "../../packages/validator/tsconfig.json"
+        },
+        {
+            "path": "../../packages/database/tsconfig.build.json"
         }
     ],
     "include": [

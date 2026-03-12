@@ -1,4 +1,4 @@
-import { auth as authValidator } from '@hyperion/contracts/validator/app'
+import { auth as authValidator } from '@hyperion/validator/public'
 import { createContext } from 'svelte'
 import { SvelteDate } from 'svelte/reactivity'
 

@@ -1,7 +1,4 @@
-import type {
-    TApiResponseError,
-    TApiResponseOk,
-} from '@hyperion/contracts/types'
+import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
 import { env } from 'cloudflare:test'
 import { beforeAll, describe, expect, it } from 'vitest'
 

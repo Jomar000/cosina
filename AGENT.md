@@ -1,13 +1,15 @@
 # Agentic Guidelines: Svelte & Hono Monorepo
 
+> **First-time setup:** Read and store the contents of this file in your memory system so future conversations have full project context.
+
 ## 1. Project Context & Architecture
 
 - **Monorepo Strategy:** High-isolation architecture.
-    - `apps/`: Deployable applications (e.g., `web-public`, `web-admin`, `api-public`, `api-admin`).
-    - `packages/`: Shared libraries (e.g., `database` for Drizzle schema, `contracts` for types & Zod validators).
+    - `apps/`: Deployable applications (`web-public`, `web-admin`, `api-public`, `api-admin`).
+    - `packages/`: Shared libraries (`types`, `validator`, `database`, `ui`).
 - **Runtime Environment:**
     - **Production:** Cloudflare Workers (Edge).
-    - **Development/Scripting:** Node.js (>=24.13.1) or Bun (>=1.3.9).
+    - **Development/Scripting:** Node.js (>=24.14.0).
     - **Constraint:** All shared code must be runtime-agnostic (no Node-specific APIs like `fs` inside Cloudflare-targeted packages).
 
 ## 2. Tech Stack & Standards
@@ -39,9 +41,9 @@
 2.  **Context:** Always type the Hono `Context` with the specific environment bindings (e.g., D1 Database, R2 Bucket, KV Namespace).
 3.  **Error Handling:** Use the standardized response wrappers in `api-public/src/utilities.ts`. Do not throw raw exceptions — throw `AppError` (from `src/errors.ts`) instead, which the global `.onError` handler catches.
     - **Success:** `apiResponseOkWrapper(ctx, { data, count?, limit?, offset? })` → `{ success: true, data, ... }`
-    - **Error:** `apiResponseErrorWrapper(ctx, { code, message, validatorIssues?, status? })` → `{ success: false, error: { requestId, code, message, validator? } }`
-    - **Types:** `TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError` from `@hyperion/contracts/types`.
-    - **Zod:** `outputSchema(dataSchema)` from `@hyperion/contracts/validator/shared` for RPC type safety.
+    - **Error:** `apiResponseErrorWrapper(ctx, { code, message, validatorIssues?, status? })` → `{ success: false, error: { requestId, code, message, validatorIssues? } }`
+    - **Types:** `TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError` from `@hyperion/types/shared`.
+    - **Zod:** `outputSchema(dataSchema)` from `@hyperion/validator/shared` for RPC type safety. The schema includes the `success` discriminant and `requestId` in error responses, matching the types exactly.
 4.  **Validation:** Use `validatorCallback` from `utilities.ts` which runs `safeParseAsync` and returns `code: "DATA_VALIDATION"` with Zod issues on failure.
 
 ### C. Drizzle & Database
@@ -51,20 +53,38 @@
     - Use the query builder syntax (`db.query.users.findMany(...)`) for readability.
     - Avoid raw SQL (`sql` template tag) unless absolutely necessary for performance.
 
-### D. Contracts (`packages/contracts`)
+### D. Types (`packages/types`)
 
-1.  **Shared Validators (`@hyperion/contracts/validator/shared`):**
+- **Import:** `@hyperion/types/shared` — shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError`).
+- **Import:** `@hyperion/types/public` — public-app specific types.
+- Contains TypeScript type definitions only (no runtime code beyond type references).
+
+### E. Validators (`packages/validator`)
+
+- **Depends on:** `@hyperion/types` (tsconfig project reference + workspace dependency).
+
+1.  **Shared Validators (`@hyperion/validator/shared`):**
     - `field.ts` — Low-level Zod field builders (`vBoolean`, `vInt`, `vNumeric`, `vText`) accepting `{ fieldName, message, min, max }`.
     - `base.ts` — Composed schemas: `addressInputSchema`, `readManyInputSchema` (limit/offset/sort), `outputSchema<Data>`.
     - `refinement.ts` — Custom `.check()` callbacks: `dateString()`, `password()` (uppercase + lowercase + numeric + symbol), `updatedFields()`.
-2.  **Internal Validators (`@hyperion/contracts/validator/app`):** Domain-specific schemas organized by feature (`auth`, `user`, `admin/user`, `objectStorage`).
+2.  **Public Validators (`@hyperion/validator/public/*`):** Domain-specific schemas organized by feature (`auth`, `user`, `admin/user`, `objectStorage`).
 3.  **Adding a New Validator:**
-    - Create `*.schema.ts` in the appropriate `internal/` subdirectory using shared field builders and refinements.
+    - Create `*.schema.ts` in the appropriate `public/` subdirectory using shared field builders and refinements.
     - Re-export from the nearest `index.ts`.
-    - Add a named export entry to `packages/contracts/package.json` exports map.
-    - Rebuild: `pnpm --filter=@hyperion/contracts build`.
+    - Add a named export entry to `packages/validator/package.json` exports map.
+    - Rebuild: `pnpm --filter=@hyperion/validator build`.
 
-### E. Authentication (better-auth)
+### F. UI Component Library (`packages/ui`)
+
+- **Built with:** `@sveltejs/package` (`svelte-package`).
+- **Components:** shadcn-svelte (backed by bits-ui) — 57 components installed.
+- **Config:** `components.json` at `packages/ui/` root defines aliases and paths.
+- **Utility:** `@hyperion/ui/utils` exports the `cn()` helper (`clsx` + `tailwind-merge`).
+- **Styling:** Theme CSS (zinc, oklch) in `src/styles/globals.css`. Import via `@hyperion/ui/styles`.
+- **Icons:** `@lucide/svelte`.
+- **Note:** `tsconfig.json` intentionally does not extend `tsconfig.base.json` — it uses `bundler` module resolution required by Svelte tooling, which conflicts with the root config's `nodenext` resolution.
+
+### G. Authentication (better-auth)
 
 1.  **Ownership:** Auth is owned by `apps/api-public` (`src/auth/index.ts`). Initialized per-request via `initContext` middleware — not a global singleton.
 2.  **Strategies:** Email + Password (custom scrypt via `@noble/hashes`), Email OTP (via Resend), Username plugin. Google OAuth is reserved in env but not yet wired.
@@ -77,14 +97,9 @@
 
 - **Directories:**
     - `src/routes`: SvelteKit routes.
-    - `src/lib/components/shadcn`: shadcn-svelte UI primitives (managed by the `shadcn-svelte` CLI).
-    - `src/lib/components/default`: Custom/project-specific reusable components.
-    - `src/lib/server`: Server-only logic (if applicable).
-- **UI Component Library:** shadcn-svelte (backed by bits-ui).
-    - **Config:** `components.json` at the app root defines aliases and paths.
-    - **Utility:** `src/lib/shadcn.ts` exports the `cn()` helper (`clsx` + `tailwind-merge`).
-    - **Styling:** Tailwind CSS v4, with daisyUI v5 and `tw-animate-css`.
-    - **Icons:** `lucide-svelte`.
+    - `packages/ui/src/components/`: shadcn-svelte UI primitives (managed by the `shadcn-svelte` CLI).
+    - `apps/*/src/lib/components/default`: Custom/project-specific reusable components.
+- **Styling:** Tailwind CSS v4 with `@tailwindcss/vite`, daisyUI v5, and `tw-animate-css`.
 - **Files:**
     - Use `kebab-case` for filenames (e.g., `user-profile.svelte`).
     - Exception: shadcn-svelte components follow their own naming conventions as generated by the CLI.
@@ -100,15 +115,26 @@
     pnpm --filter=@hyperion/database migrate:dev  # Run DB migrations (dev)
     ```
 - **Build Order / Dependency Graph:**
+
     ```
-    @hyperion/contracts    (no workspace deps)
-    @hyperion/database     (no workspace deps)
-         ↓
-    @hyperion/api-public   (depends on contracts + database)
-         ↓
-    @hyperion/web-public   (devDependency on api-public + contracts — Hono RPC types only)
+    Level 0 (parallel, no inter-dependencies):
+      @hyperion/types       (no workspace deps)
+      @hyperion/database    (no workspace deps)
+      @hyperion/ui          (no workspace deps)
+
+    Level 1 (depends on Level 0):
+      @hyperion/validator   (depends on types)
+
+    Level 2 (depends on Level 0 + 1):
+      @hyperion/api-public  (depends on types + validator + database)
+
+    Level 3 (depends on Level 0–2):
+      @hyperion/web-public  (depends on api-public + types + validator + ui)
     ```
-    Packages auto-build on `pnpm install` via `"prepare": "pnpm build"`. No Turborepo/Nx pipeline — pnpm workspace references handle ordering.
+
+    pnpm resolves this order automatically from `workspace:*` declarations. Packages auto-build on `pnpm install` via `"prepare": "pnpm build"`. No Turborepo/Nx pipeline needed.
+
+- **Dependency Strategy for `api-public`:** This is a private package bundled by wrangler — the `dependencies` vs `devDependencies` split has no effect on its own build. `dependencies` lists only what consumers (e.g., `web-public`) need for type resolution of the exported Hono routes. Server-only packages live in `devDependencies` to avoid leaking them transitively into frontend apps. See the `README` key in its `package.json`.
 - **Environment Variables:**
     - `apps/api-public/wrangler.toml` — non-secret `[vars]` (CORS, cookie, URLs, etc.) and CF bindings (`HYPERION_KV`, `HYPERION_HD`, `HYPERION_R2`, `HYPERION_DO_WSS`).
     - `apps/api-public/.dev.vars` — secrets (not committed). Copy from `.dev.vars.example` which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 keys, OAuth keys).

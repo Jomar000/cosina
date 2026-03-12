@@ -1,4 +1,4 @@
-import type { TApiResponse, TApiResponseError } from '@hyperion/contracts/types'
+import type { TApiResponse, TApiResponseError } from '@hyperion/types/shared'
 import type { Context } from 'hono'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { customAlphabet } from 'nanoid'
@@ -146,7 +146,7 @@ export const apiResponseErrorWrapper = (
                 requestId: ctx.get('requestId'),
                 code,
                 message,
-                ...(validatorIssues ? { validator: validatorIssues } : {}),
+                ...(validatorIssues ? { validatorIssues } : {}),
             },
         },
         status,

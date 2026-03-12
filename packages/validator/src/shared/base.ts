@@ -16,16 +16,21 @@ export const addressInputSchema = z.object({
 export const outputSchema = <Data extends z.ZodType = z.ZodType>(data: Data) =>
     z.union([
         z.object({
+            success: z.literal(true),
             data,
             count: z.number().optional(),
             limit: z.number().optional(),
             offset: z.number().optional(),
         }),
         z.object({
+            success: z.literal(false),
             error: z.object({
+                requestId: z.string(),
                 code: z.string(),
                 message: z.string(),
-                validator: z.array(z.custom<z.core.$ZodIssue>()).optional(),
+                validatorIssues: z
+                    .array(z.custom<z.core.$ZodIssue>())
+                    .optional(),
             }),
         }),
     ])

@@ -1,0 +1,50 @@
+{
+    "name": "@hyperion/validator",
+    "version": "0.0.1",
+    "author": "4thDEVisionTech",
+    "description": "Hyperion Validator Component",
+    "type": "module",
+    "private": true,
+    "license": "ISC",
+    "engines": {
+        "node": ">=24.14.0",
+        "pnpm": ">=10.31.0"
+    },
+    "scripts": {
+        "build": "tsc --build ./tsconfig.json",
+        "format": "prettier --write .",
+        "lint": "prettier --check . && eslint .",
+        "prepare": "pnpm build"
+    },
+    "dependencies": {
+        "@hyperion/types": "workspace:*",
+        "dayjs": "catalog:",
+        "zod": "catalog:"
+    },
+    "exports": {
+        "./shared": {
+            "types": "./dist/shared/index.d.ts",
+            "default": "./dist/shared/index.js"
+        },
+        "./public": {
+            "types": "./dist/public/index.d.ts",
+            "default": "./dist/public/index.js"
+        },
+        "./public/auth": {
+            "types": "./dist/public/auth.schema.d.ts",
+            "default": "./dist/public/auth.schema.js"
+        },
+        "./public/admin/user": {
+            "types": "./dist/public/admin/user/index.d.ts",
+            "default": "./dist/public/admin/user/index.js"
+        },
+        "./public/objectStorage": {
+            "types": "./dist/public/objectStorage.schema.d.ts",
+            "default": "./dist/public/objectStorage.schema.js"
+        },
+        "./public/user": {
+            "types": "./dist/public/user/index.d.ts",
+            "default": "./dist/public/user/index.js"
+        }
+    }
+}

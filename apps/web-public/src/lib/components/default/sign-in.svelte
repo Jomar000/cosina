@@ -1,8 +1,8 @@
 <!-- https://shadcn-svelte.com/blocks/login#login-03 -->
 
 <script lang="ts">
-    import type { TApiResponse } from '@hyperion/contracts/types'
-    import { auth as authValidator } from '@hyperion/contracts/validator/app'
+    import type { TApiResponse } from '@hyperion/types/shared'
+    import { auth as authValidator } from '@hyperion/validator/public'
     import { Button } from '@hyperion/ui/components/button'
     import * as Card from '@hyperion/ui/components/card'
     import {

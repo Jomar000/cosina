@@ -13,7 +13,13 @@
     },
     "references": [
         {
-            "path": "../api-public/tsconfig.json"
+            "path": "../api-public/tsconfig.build.json"
+        },
+        {
+            "path": "../../packages/types/tsconfig.json"
+        },
+        {
+            "path": "../../packages/validator/tsconfig.json"
         },
         {
             "path": "../../packages/ui/tsconfig.json"

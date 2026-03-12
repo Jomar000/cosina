@@ -1,0 +1,8 @@
+{
+    "files": [],
+    "references": [
+        { "path": "packages/types" },
+        { "path": "packages/validator" },
+        { "path": "packages/database/tsconfig.build.json" },
+        { "path": "apps/api-public/tsconfig.build.json" }]
+}

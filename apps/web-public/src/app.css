@@ -1,5 +1,5 @@
 @import '@hyperion/ui/styles';
 
-@source '../../../packages/ui/dist';
-
 @plugin 'daisyui';
+
+@source '../../../packages/ui/dist';

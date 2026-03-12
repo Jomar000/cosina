@@ -1,4 +1,4 @@
-import { profile } from '@hyperion/contracts/validator/app/admin/user'
+import { profile } from '@hyperion/validator/public/admin/user'
 import {
     and,
     asc,
