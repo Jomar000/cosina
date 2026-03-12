@@ -1,5 +1,8 @@
 {
     "compilerOptions": {
+        "composite": true,
+        "declaration": true,
+        "declarationMap": true,
         "target": "ESNext",
         "module": "ESNext",
         "moduleResolution": "bundler",
@@ -13,6 +16,8 @@
         "skipLibCheck": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
+        "rootDir": "src",
+        "outDir": "dist",
         "paths": {
             "$lib": ["./src"],
             "$lib/*": ["./src/*"]

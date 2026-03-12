@@ -7,12 +7,9 @@
         "module": "nodenext",
         "moduleResolution": "nodenext",
 
-        /* JavaScript Support */
-        "allowJs": true,
-        "checkJs": true,
-
         /* Emit */
         "declaration": true,
+        "declarationMap": true,
         "removeComments": true,
         "noEmitOnError": true,
 
