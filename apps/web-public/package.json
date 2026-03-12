@@ -27,6 +27,7 @@
     "devDependencies": {
         "@hyperion/api-public": "workspace:*",
         "@hyperion/contracts": "workspace:*",
+        "@hyperion/ui": "workspace:*",
         "@internationalized/date": "^3.12.0",
         "@lucide/svelte": "^0.577.0",
         "@playwright/test": "^1.58.2",

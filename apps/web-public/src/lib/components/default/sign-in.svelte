@@ -24,7 +24,7 @@
         FieldGroup,
         FieldLabel,
     } from '$lib/components/shadcn/field'
-    import { Input } from '$lib/components/shadcn/input'
+    import { Input } from '@hyperion/ui/components/input'
     import { cn } from '$lib/shadcn'
     import type { SessionState } from '$lib/states/session/context.svelte'
     import { getCookie } from '$lib/utilities'

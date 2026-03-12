@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "lib": [
+            "ESNext",
+            "DOM",
+            "DOM.Iterable"
+        ],
+        "strict": true,
+        "verbatimModuleSyntax": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "paths": {
+            "$lib": ["./src"],
+            "$lib/*": ["./src/*"]
+        }
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.svelte"
+    ]
+}
