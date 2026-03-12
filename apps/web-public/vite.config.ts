@@ -11,6 +11,9 @@ export default defineConfig({
     build: {
         target: 'esnext',
     },
+    server: {
+        port: 5174,
+    },
     plugins: [
         tailwindcss(),
         sveltekit(),

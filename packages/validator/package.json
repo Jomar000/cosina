@@ -22,9 +22,25 @@
         "zod": "catalog:"
     },
     "exports": {
-        "./shared": {
-            "types": "./dist/shared/index.d.ts",
-            "default": "./dist/shared/index.js"
+        "./backoffice": {
+            "types": "./dist/backoffice/index.d.ts",
+            "default": "./dist/backoffice/index.js"
+        },
+        "./backoffice/auth": {
+            "types": "./dist/backoffice/auth.schema.d.ts",
+            "default": "./dist/backoffice/auth.schema.js"
+        },
+        "./backoffice/admin/user": {
+            "types": "./dist/backoffice/admin/user/index.d.ts",
+            "default": "./dist/backoffice/admin/user/index.js"
+        },
+        "./backoffice/objectStorage": {
+            "types": "./dist/backoffice/objectStorage.schema.d.ts",
+            "default": "./dist/backoffice/objectStorage.schema.js"
+        },
+        "./backoffice/user": {
+            "types": "./dist/backoffice/user/index.d.ts",
+            "default": "./dist/backoffice/user/index.js"
         },
         "./public": {
             "types": "./dist/public/index.d.ts",
@@ -45,6 +61,10 @@
         "./public/user": {
             "types": "./dist/public/user/index.d.ts",
             "default": "./dist/public/user/index.js"
+        },
+        "./shared": {
+            "types": "./dist/shared/index.d.ts",
+            "default": "./dist/shared/index.js"
         }
     }
 }

@@ -5,10 +5,10 @@ import type { auth } from './auth/index.js'
 
 declare global {
     type THonoBindings = {
-        HYPERION_DO_WSS: DurableObjectNamespace<WebSocketServer>
-        HYPERION_HD: Hyperdrive
-        HYPERION_KV: KVNamespace
-        HYPERION_R2: R2Bucket
+        HYPERIONPUB_DO_WSS: DurableObjectNamespace<WebSocketServer>
+        HYPERIONPUB_HD: Hyperdrive
+        HYPERIONPUB_KV: KVNamespace
+        HYPERIONPUB_R2: R2Bucket
     } & Env
 
     type THonoVariables = {

@@ -20,13 +20,17 @@
         "zod": "catalog:"
     },
     "exports": {
-        "./shared": {
-            "types": "./dist/shared/index.d.ts",
-            "default": "./dist/shared/index.js"
+        "./backoffice": {
+            "types": "./dist/backoffice/index.d.ts",
+            "default": "./dist/backoffice/index.js"
         },
         "./public": {
             "types": "./dist/public/index.d.ts",
             "default": "./dist/public/index.js"
+        },
+        "./shared": {
+            "types": "./dist/shared/index.d.ts",
+            "default": "./dist/shared/index.js"
         }
     }
 }

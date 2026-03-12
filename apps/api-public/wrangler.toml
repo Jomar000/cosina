@@ -29,7 +29,7 @@ watch_dir = [
 ]
 
 [dev]
-port = 8080
+port = 8081
 
 ########################
 # DEV (no environment) #
@@ -51,24 +51,24 @@ CORS_MAX_AGE = 7200 # 2 hours (seconds)
 MAILER_ACCOUNT = "no-reply@hyperion.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
-URL_FRONTEND = "http://localhost:5173"
-URL_BACKEND = "http://localhost:8080"
+URL_FRONTEND = "http://localhost:5174"
+URL_BACKEND = "http://localhost:8081"
 
 [[kv_namespaces]]
-binding = "HYPERION_KV"
+binding = "HYPERIONPUB_KV"
 id = "00000000000000000000000000000000"
 
 [[hyperdrive]]
-binding = "HYPERION_HD"
+binding = "HYPERIONPUB_HD"
 id = "00000000000000000000000000000000"
 localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion"
 
 [[durable_objects.bindings]]
-name = "HYPERION_DO_WSS"
+name = "HYPERIONPUB_DO_WSS"
 class_name = "WebSocketServer"
 
 [[r2_buckets]]
-binding = 'HYPERION_R2'
+binding = 'HYPERIONPUB_R2'
 bucket_name = 'hyperion-development'
 
 ########
@@ -96,24 +96,24 @@ CORS_MAX_AGE = 7200 # 2 hours (seconds)
 MAILER_ACCOUNT = "no-reply@hyperion.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
-URL_FRONTEND = "http://localhost:5173"
-URL_BACKEND = "http://localhost:8080"
+URL_FRONTEND = "http://localhost:5174"
+URL_BACKEND = "http://localhost:8081"
 
 [[env.test.kv_namespaces]]
-binding = "HYPERION_KV"
+binding = "HYPERIONPUB_KV"
 id = "00000000000000000000000000000001"
 
 [[env.test.hyperdrive]]
-binding = "HYPERION_HD"
+binding = "HYPERIONPUB_HD"
 id = "00000000000000000000000000000001"
 localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion_test"
 
 [[env.test.durable_objects.bindings]]
-name = "HYPERION_DO_WSS"
+name = "HYPERIONPUB_DO_WSS"
 class_name = "WebSocketServer"
 
 [[env.test.r2_buckets]]
-binding = 'HYPERION_R2'
+binding = 'HYPERIONPUB_R2'
 bucket_name = 'hyperion-test'
 
 ###########
@@ -141,23 +141,23 @@ CORS_MAX_AGE = 7200 # 2 hours (seconds)
 MAILER_ACCOUNT = "no-reply@hyperion.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
-URL_FRONTEND = "http://localhost:5173"
-URL_BACKEND = "http://localhost:8080"
+URL_FRONTEND = "http://localhost:5174"
+URL_BACKEND = "http://localhost:8081"
 
 [[env.staging.kv_namespaces]]
-binding = "HYPERION_KV"
+binding = "HYPERIONPUB_KV"
 id = "00000000000000000000000000000002"
 
 [[env.staging.hyperdrive]]
-binding = "HYPERION_HD"
+binding = "HYPERIONPUB_HD"
 id = "00000000000000000000000000000002"
 
 [[env.staging.durable_objects.bindings]]
-name = "HYPERION_DO_WSS"
+name = "HYPERIONPUB_DO_WSS"
 class_name = "WebSocketServer"
 
 [[env.staging.r2_buckets]]
-binding = 'HYPERION_R2'
+binding = 'HYPERIONPUB_R2'
 bucket_name = 'hyperion-staging'
 
 ##############
@@ -185,21 +185,21 @@ CORS_MAX_AGE = 7200 # 2 hours (seconds)
 MAILER_ACCOUNT = "no-reply@hyperion.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
-URL_FRONTEND = "http://localhost:5173"
-URL_BACKEND = "http://localhost:8080"
+URL_FRONTEND = "http://localhost:5174"
+URL_BACKEND = "http://localhost:8081"
 
 [[env.production.kv_namespaces]]
-binding = "HYPERION_KV"
+binding = "HYPERIONPUB_KV"
 id = "00000000000000000000000000000003"
 
 [[env.production.hyperdrive]]
-binding = "HYPERION_HD"
+binding = "HYPERIONPUB_HD"
 id = "00000000000000000000000000000003"
 
 [[env.production.durable_objects.bindings]]
-name = "HYPERION_DO_WSS"
+name = "HYPERIONPUB_DO_WSS"
 class_name = "WebSocketServer"
 
 [[env.production.r2_buckets]]
-binding = 'HYPERION_R2'
+binding = 'HYPERIONPUB_R2'
 bucket_name = 'hyperion-production'

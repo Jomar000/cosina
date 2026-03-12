@@ -7,11 +7,11 @@ import { auth } from '../../auth/index.js'
 export const initContext = () => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
         const initDbClient = dbClient({
-            host: ctx.env.HYPERION_HD.host,
-            port: ctx.env.HYPERION_HD.port,
-            database: ctx.env.HYPERION_HD.database,
-            user: ctx.env.HYPERION_HD.user,
-            pass: ctx.env.HYPERION_HD.password,
+            host: ctx.env.HYPERIONPUB_HD.host,
+            port: ctx.env.HYPERIONPUB_HD.port,
+            database: ctx.env.HYPERIONPUB_HD.database,
+            user: ctx.env.HYPERIONPUB_HD.user,
+            pass: ctx.env.HYPERIONPUB_HD.password,
         })
 
         try {
@@ -20,7 +20,7 @@ export const initContext = () => {
                 await auth({
                     db: initDbClient,
                     dbSchema,
-                    kv: ctx.env.HYPERION_KV,
+                    kv: ctx.env.HYPERIONPUB_KV,
                     env: ctx.env,
                 }),
             )
@@ -33,11 +33,11 @@ export const initContext = () => {
             )
             ctx.set('dbClient', initDbClient)
             ctx.set('dbSchema', dbSchema)
-            ctx.set('doWssClient', ctx.env.HYPERION_DO_WSS)
+            ctx.set('doWssClient', ctx.env.HYPERIONPUB_DO_WSS)
             ctx.set('ipAddress', ctx.req.header('cf-connecting-ip') || 'N/A')
             ctx.set('isPrivilegedRole', false)
-            ctx.set('kvClient', ctx.env.HYPERION_KV)
-            ctx.set('r2Client', ctx.env.HYPERION_R2)
+            ctx.set('kvClient', ctx.env.HYPERIONPUB_KV)
+            ctx.set('r2Client', ctx.env.HYPERIONPUB_R2)
             ctx.set('role', 'N/A')
             ctx.set('session', null)
             ctx.set('user', null)

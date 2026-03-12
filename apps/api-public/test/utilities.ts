@@ -70,12 +70,12 @@ export const interceptPasswordResetToken = async (
      * @description
      * Attempt 1: Read from KV (secondaryStorage).
      */
-    const kvKeys = await env.HYPERION_KV.list({
+    const kvKeys = await env.HYPERIONPUB_KV.list({
         prefix: 'verification:reset-password:',
     })
 
     for (const key of kvKeys.keys) {
-        const value = await env.HYPERION_KV.get(key.name)
+        const value = await env.HYPERIONPUB_KV.get(key.name)
         if (value) {
             const parsed = JSON.parse(value)
             if (parsed.value === userId) {
@@ -91,11 +91,11 @@ export const interceptPasswordResetToken = async (
     const { verification } = dbSchema
 
     const db = dbClient({
-        host: env.HYPERION_HD.host,
-        port: Number(env.HYPERION_HD.port) || 5432,
-        database: env.HYPERION_HD.database,
-        user: env.HYPERION_HD.user,
-        pass: env.HYPERION_HD.password,
+        host: env.HYPERIONPUB_HD.host,
+        port: Number(env.HYPERIONPUB_HD.port) || 5432,
+        database: env.HYPERIONPUB_HD.database,
+        user: env.HYPERIONPUB_HD.user,
+        pass: env.HYPERIONPUB_HD.password,
     })
 
     try {

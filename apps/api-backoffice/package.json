@@ -1,0 +1,73 @@
+{
+    "name": "@hyperion/api-backoffice",
+    "version": "0.0.1",
+    "author": "4thDEVisionTech",
+    "description": "Hyperion Backoffice API Component",
+    "type": "module",
+    "private": true,
+    "license": "ISC",
+    "engines": {
+        "node": ">=24.14.0",
+        "pnpm": ">=10.32.1"
+    },
+    "scripts": {
+        "build": "wrangler deploy --outdir=./dist/$worker --dry-run --env=",
+        "deploy:prod": "wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
+        "deploy:staging": "wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
+        "dev": "wrangler dev",
+        "format": "prettier --write .",
+        "lint": "prettier --check . && eslint .",
+        "secret:prod": "wrangler secret bulk .dev.vars.production --env=production --config=wrangler-production.toml",
+        "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging --config=wrangler-staging.toml",
+        "test": "pnpm --filter=@hyperion/database run migrate:test && vitest --run",
+        "test:ui": "pnpm --filter=@hyperion/database run migrate:test && vitest --ui"
+    },
+    "README": "This is a private package bundled by wrangler — the deps/devDeps split has no effect on its own build. dependencies lists only what consumers need for type resolution of the exported Hono routes. Server-only packages live in devDependencies to avoid leaking them transitively into frontend apps.",
+    "dependencies": {
+        "@hyperion/types": "workspace:*",
+        "@hyperion/validator": "workspace:*",
+        "hono": "catalog:",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "@better-auth/drizzle-adapter": "catalog:",
+        "@cloudflare/vitest-pool-workers": "^0.12.21",
+        "@hyperion/database": "workspace:*",
+        "@noble/hashes": "^2.0.1",
+        "@vitest/coverage-istanbul": "^3.2.4",
+        "@vitest/runner": "^3.2.4",
+        "@vitest/snapshot": "^3.2.4",
+        "@vitest/ui": "^3.2.4",
+        "aws4fetch": "^1.0.20",
+        "better-auth": "catalog:",
+        "dayjs": "catalog:",
+        "drizzle-orm": "catalog:",
+        "nanoid": "catalog:",
+        "resend": "^6.9.3",
+        "uuid": "catalog:",
+        "vite": "catalog:",
+        "vitest": "^3.2.4"
+    },
+    "exports": {
+        "./auth": {
+            "types": "./dist/core/route/app/auth.d.ts",
+            "default": "./dist/core/route/app/auth.js"
+        },
+        "./heartbeat": {
+            "types": "./dist/core/route/heartbeat.d.ts",
+            "default": "./dist/core/route/heartbeat.js"
+        },
+        "./objectStorage": {
+            "types": "./dist/core/route/app/objectStorage.d.ts",
+            "default": "./dist/core/route/app/objectStorage.js"
+        },
+        "./user": {
+            "types": "./dist/core/route/app/user/index.d.ts",
+            "default": "./dist/core/route/app/user/index.js"
+        },
+        "./ws": {
+            "types": "./dist/core/route/app/ws.d.ts",
+            "default": "./dist/core/route/app/ws.js"
+        }
+    }
+}

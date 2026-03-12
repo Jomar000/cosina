@@ -142,6 +142,73 @@ importers:
         specifier: ^4.72.0
         version: 4.72.0
 
+  apps/api-backoffice:
+    dependencies:
+      '@hyperion/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@hyperion/validator':
+        specifier: workspace:*
+        version: link:../../packages/validator
+      hono:
+        specifier: 'catalog:'
+        version: 4.12.7
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
+    devDependencies:
+      '@better-auth/drizzle-adapter':
+        specifier: 'catalog:'
+        version: 1.5.5(@better-auth/core@1.5.5(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(better-call@1.3.2(zod@4.3.6))(jose@6.2.1)(kysely@0.28.11)(nanostores@1.1.1))(@better-auth/utils@0.3.1)(drizzle-orm@1.0.0-beta.17-67b1795(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.6)(valibot@1.2.0(typescript@5.9.3))(zod@4.3.6))
+      '@cloudflare/vitest-pool-workers':
+        specifier: ^0.12.21
+        version: 0.12.21(@vitest/runner@3.2.4)(@vitest/snapshot@3.2.4)(vitest@3.2.4)
+      '@hyperion/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@noble/hashes':
+        specifier: ^2.0.1
+        version: 2.0.1
+      '@vitest/coverage-istanbul':
+        specifier: ^3.2.4
+        version: 3.2.4(vitest@3.2.4)
+      '@vitest/runner':
+        specifier: ^3.2.4
+        version: 3.2.4
+      '@vitest/snapshot':
+        specifier: ^3.2.4
+        version: 3.2.4
+      '@vitest/ui':
+        specifier: ^3.2.4
+        version: 3.2.4(vitest@3.2.4)
+      aws4fetch:
+        specifier: ^1.0.20
+        version: 1.0.20
+      better-auth:
+        specifier: 'catalog:'
+        version: 1.5.5(f579203d0141a698bffff2f7bcf8a030)
+      dayjs:
+        specifier: 'catalog:'
+        version: 1.11.20
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 1.0.0-beta.17-67b1795(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.6)(valibot@1.2.0(typescript@5.9.3))(zod@4.3.6)
+      nanoid:
+        specifier: 'catalog:'
+        version: 5.1.6
+      resend:
+        specifier: ^6.9.3
+        version: 6.9.3
+      uuid:
+        specifier: 'catalog:'
+        version: 13.0.0
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1)
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/node@25.5.0)(@vitest/ui@3.2.4)(happy-dom@20.0.3)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1)
+
   apps/api-public:
     dependencies:
       '@hyperion/types':
@@ -208,6 +275,111 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@25.5.0)(@vitest/ui@3.2.4)(happy-dom@20.0.3)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1)
+
+  apps/web-backoffice:
+    devDependencies:
+      '@hyperion/api-backoffice':
+        specifier: workspace:*
+        version: link:../api-backoffice
+      '@hyperion/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@hyperion/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@hyperion/validator':
+        specifier: workspace:*
+        version: link:../../packages/validator
+      '@lucide/svelte':
+        specifier: 'catalog:'
+        version: 0.577.0(svelte@5.53.11)
+      '@playwright/test':
+        specifier: ^1.58.2
+        version: 1.58.2
+      '@sveltejs/adapter-static':
+        specifier: ^3.0.10
+        version: 3.0.10(@sveltejs/kit@2.54.0(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.53.11)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.53.11)(typescript@5.9.3)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1)))
+      '@sveltejs/kit':
+        specifier: ^2.54.0
+        version: 2.54.0(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.53.11)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.53.11)(typescript@5.9.3)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@sveltejs/vite-plugin-svelte':
+        specifier: 'catalog:'
+        version: 6.2.4(svelte@5.53.11)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@tailwindcss/vite':
+        specifier: ^4.2.1
+        version: 4.2.1(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@tanstack/svelte-form':
+        specifier: ^1.28.5
+        version: 1.28.5(svelte@5.53.11)
+      '@tanstack/svelte-query':
+        specifier: ^6.1.0
+        version: 6.1.0(svelte@5.53.11)
+      '@types/cloudflare-turnstile':
+        specifier: ^0.2.2
+        version: 0.2.2
+      '@vitest/browser':
+        specifier: ^4.1.0
+        version: 4.1.0(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.0)
+      '@vitest/browser-playwright':
+        specifier: ^4.1.0
+        version: 4.1.0(playwright@1.58.2)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.0)
+      better-auth:
+        specifier: 'catalog:'
+        version: 1.5.5(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(@sveltejs/kit@2.54.0(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.53.11)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.53.11)(typescript@5.9.3)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1)))(better-sqlite3@12.4.1)(drizzle-kit@0.31.9)(mongodb@7.1.0)(mysql2@3.15.3)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(svelte@5.53.11)(vitest@4.1.0)
+      daisyui:
+        specifier: ^5.5.19
+        version: 5.5.19
+      dayjs:
+        specifier: 'catalog:'
+        version: 1.11.20
+      file-type:
+        specifier: ^21.3.1
+        version: 21.3.1
+      hono:
+        specifier: 'catalog:'
+        version: 4.12.7
+      ky:
+        specifier: ^1.14.3
+        version: 1.14.3
+      mode-watcher:
+        specifier: 'catalog:'
+        version: 1.1.0(svelte@5.53.11)
+      nanoid:
+        specifier: 'catalog:'
+        version: 5.1.6
+      p-queue:
+        specifier: ^9.1.0
+        version: 9.1.0
+      playwright:
+        specifier: ^1.58.2
+        version: 1.58.2
+      svelte:
+        specifier: 'catalog:'
+        version: 5.53.11
+      svelte-check:
+        specifier: 'catalog:'
+        version: 4.4.5(picomatch@4.0.3)(svelte@5.53.11)(typescript@5.9.3)
+      svelte-sonner:
+        specifier: 'catalog:'
+        version: 1.1.0(svelte@5.53.11)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.2.1
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1)
+      vite-imagetools:
+        specifier: ^10.0.0
+        version: 10.0.0(rollup@4.59.0)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1))
+      vitest:
+        specifier: ^4.1.0
+        version: 4.1.0(@types/node@25.5.0)(@vitest/browser-playwright@4.1.0)(happy-dom@20.0.3)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.1))
+      vitest-browser-svelte:
+        specifier: ^2.0.2
+        version: 2.0.2(svelte@5.53.11)(vitest@4.1.0)
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
 
   apps/web-public:
     devDependencies:
