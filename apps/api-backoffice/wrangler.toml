@@ -25,7 +25,9 @@ new_sqlite_classes = ["WebSocketServer"]
 command = "tsc --build ./tsconfig.build.json"
 watch_dir = [
     "./src/",
-    "../../packages/contracts/src/",
+    "../../packages/types/src/",
+    "../../packages/validator/src/",
+    "../../packages/database/src/",
 ]
 
 [dev]

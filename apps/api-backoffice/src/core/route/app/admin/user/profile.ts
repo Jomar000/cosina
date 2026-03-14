@@ -168,7 +168,9 @@ export const profileRoute = new Hono<THonoInstance>()
 
             if (count === 0) {
                 return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
                     message: 'User ID not found, nothing to update.',
+                    status: 404,
                 })
             }
 
@@ -246,7 +248,9 @@ export const profileRoute = new Hono<THonoInstance>()
 
             if (count === 0) {
                 return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
                     message: 'User ID not found, nothing to update.',
+                    status: 404,
                 })
             }
 

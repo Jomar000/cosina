@@ -1,4 +1,4 @@
-name = "hyperion-backend"
+name = "hyperion-backend-public"
 main = "src/core/index.ts"
 compatibility_date = "2026-03-06"
 compatibility_flags = ['nodejs_compat']
@@ -25,7 +25,9 @@ new_sqlite_classes = ["WebSocketServer"]
 command = "tsc --build ./tsconfig.build.json"
 watch_dir = [
     "./src/",
-    "../../packages/contracts/src/",
+    "../../packages/types/src/",
+    "../../packages/validator/src/",
+    "../../packages/database/src/",
 ]
 
 [dev]

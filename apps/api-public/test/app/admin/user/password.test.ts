@@ -260,7 +260,7 @@ describe('Admin User Password Endpoint', () => {
             expect(responseData.data).toBeNull()
         })
 
-        it('Reset request for a non-existent user should return 400.', async () => {
+        it('Reset request for a non-existent user should return 404.', async () => {
             const response = await app.request(
                 '/app/admin/user/password/reset-request',
                 {
@@ -279,7 +279,7 @@ describe('Admin User Password Endpoint', () => {
 
             const responseData = await response.json<TApiResponseError>()
 
-            expect(response.status).toBe(400)
+            expect(response.status).toBe(404)
             expect(responseData).toHaveProperty('error')
             expect(responseData.error.message).toBe('User ID not found.')
         })
@@ -367,7 +367,7 @@ describe('Admin User Password Endpoint', () => {
             )
         })
 
-        it('Direct reset for a non-existent user should return 400.', async () => {
+        it('Direct reset for a non-existent user should return 404.', async () => {
             const response = await app.request(
                 '/app/admin/user/password/reset',
                 {
@@ -387,7 +387,7 @@ describe('Admin User Password Endpoint', () => {
 
             const responseData = await response.json<TApiResponseError>()
 
-            expect(response.status).toBe(400)
+            expect(response.status).toBe(404)
             expect(responseData).toHaveProperty('error')
             expect(responseData.error.message).toBe('User ID not found.')
         })

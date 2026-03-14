@@ -48,7 +48,9 @@ export const passwordRoute = new Hono<THonoInstance>()
 
             if (!targetUser) {
                 return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
                     message: 'User ID not found.',
+                    status: 404,
                 })
             }
 
@@ -108,7 +110,9 @@ export const passwordRoute = new Hono<THonoInstance>()
 
             if (!targetMember) {
                 return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
                     message: 'User ID not found.',
+                    status: 404,
                 })
             }
 
