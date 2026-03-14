@@ -1,5 +1,6 @@
 import { profile } from '@hyperion/validator/backoffice/user'
-import { and, eq, getTableColumns } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
+import { getColumns } from 'drizzle-orm/utils'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 
@@ -27,7 +28,7 @@ export const profileRoute = new Hono<THonoInstance>()
             )
 
             const { createdAt, updatedAt, ...selectedColumns } =
-                getTableColumns(userProfile)
+                getColumns(userProfile)
 
             const data = await ctx
                 .get('dbClient')

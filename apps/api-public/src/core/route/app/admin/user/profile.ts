@@ -1,12 +1,6 @@
 import { profile } from '@hyperion/validator/public/admin/user'
-import {
-    and,
-    asc,
-    count as countFn,
-    desc,
-    eq,
-    getTableColumns,
-} from 'drizzle-orm'
+import { and, asc, count as countFn, desc, eq } from 'drizzle-orm'
+import { getColumns } from 'drizzle-orm/utils'
 import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 
@@ -42,7 +36,7 @@ export const profileRoute = new Hono<THonoInstance>()
                 )
 
                 const { createdAt, updatedAt, ...selectedColumns } =
-                    getTableColumns(userProfile)
+                    getColumns(userProfile)
 
                 const data = await ctx
                     .get('dbClient')
@@ -93,7 +87,7 @@ export const profileRoute = new Hono<THonoInstance>()
                 )[0].count
 
                 const { createdAt, updatedAt, ...selectedColumns } =
-                    getTableColumns(userProfile)
+                    getColumns(userProfile)
 
                 const subquery = ctx
                     .get('dbClient')
