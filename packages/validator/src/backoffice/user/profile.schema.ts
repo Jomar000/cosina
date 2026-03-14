@@ -10,7 +10,10 @@ export const updateInputSchema = z.object({
         .uppercase()
         .optional(),
     lastName: field.vText({ fieldName: 'Last Name' }).uppercase(),
-    nameExtension: field.vText({ fieldName: 'Name Extension' }).uppercase(),
+    nameExtension: field
+        .vText({ fieldName: 'Name Extension' })
+        .uppercase()
+        .optional(),
     gender: z.enum(
         [
             'MALE',

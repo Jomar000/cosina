@@ -77,7 +77,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
 
             if (linkedObjects.length === 0) {
                 return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
                     message: 'Upload ID not found.',
+                    status: 404,
                 })
             }
 
@@ -189,7 +191,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
 
             if (!uploadData[0]) {
                 return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
                     message: 'Upload ID not found or is already committed.',
+                    status: 404,
                 })
             }
 
@@ -321,7 +325,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
 
             if (!uploadData[0]) {
                 return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
                     message: 'Upload ID not found or is already committed.',
+                    status: 404,
                 })
             }
 
@@ -539,7 +545,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
 
             if (!uploadData[0]) {
                 return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
                     message: 'Upload ID not found or is already committed.',
+                    status: 404,
                 })
             }
 
@@ -678,7 +686,9 @@ export const objectStorageRoute = new Hono<THonoInstance>()
 
             if (!uploadData[0]) {
                 return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
                     message: 'Upload ID not found or is already committed.',
+                    status: 404,
                 })
             }
 

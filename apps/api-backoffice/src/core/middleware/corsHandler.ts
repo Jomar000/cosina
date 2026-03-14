@@ -26,15 +26,27 @@ export const corsHandler = (mode: 'default' | 'reflect' = 'default') => {
         const corsMiddlewareHandler = cors({
             origin: allowedOrigins,
             ...(ctx.env.CORS_ALLOW_METHODS
-                ? { allowMethods: ctx.env.CORS_ALLOW_METHODS.split(',') }
+                ? {
+                      allowMethods: ctx.env.CORS_ALLOW_METHODS.split(',').map(
+                          (s) => s.trim(),
+                      ),
+                  }
                 : {}),
             ...(ctx.env.CORS_ALLOW_HEADERS
-                ? { allowHeaders: ctx.env.CORS_ALLOW_HEADERS.split(',') }
+                ? {
+                      allowHeaders: ctx.env.CORS_ALLOW_HEADERS.split(',').map(
+                          (s) => s.trim(),
+                      ),
+                  }
                 : {}),
             maxAge: Number(ctx.env.CORS_MAX_AGE) || 7200,
             ...(allowCredentials ? { credentials: true } : {}),
             ...(ctx.env.CORS_EXPOSE_HEADERS
-                ? { exposeHeaders: ctx.env.CORS_EXPOSE_HEADERS.split(',') }
+                ? {
+                      exposeHeaders: ctx.env.CORS_EXPOSE_HEADERS.split(',').map(
+                          (s) => s.trim(),
+                      ),
+                  }
                 : {}),
         })
 

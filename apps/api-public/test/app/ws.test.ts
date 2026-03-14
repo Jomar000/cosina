@@ -20,12 +20,12 @@ describe('WebSocket Endpoint', () => {
      * @description
      * Authentication Guard
      *
-     * isAuthenticated() middleware runs before all route logic.
+     * isAuthorized() middleware wraps isAuthenticated() and runs before all route logic.
      */
     describe('Authentication Guard', () => {
         it('Unauthenticated request should return 401.', async () => {
             const response = await app.request(
-                '/app/ws/test-channel',
+                '/app/ws/general',
                 {
                     method: 'GET',
                     headers: {
@@ -46,14 +46,15 @@ describe('WebSocket Endpoint', () => {
 
     /**
      * @description
-     * Channel Validation
+     * Unregistered Channel
      *
-     * Channel name must be between 1 and 32 characters.
+     * Channels are statically registered via createWsChannel factory.
+     * Requests to unregistered channels should return 404.
      */
-    describe('Channel Validation', () => {
-        it('Channel name exceeding 32 characters should return 400.', async () => {
+    describe('Unregistered Channel', () => {
+        it('Request to an unregistered channel should return 404.', async () => {
             const response = await app.request(
-                '/app/ws/this-channel-name-exceeds-32-chars',
+                '/app/ws/nonexistent-channel',
                 {
                     method: 'GET',
                     headers: {
@@ -65,7 +66,7 @@ describe('WebSocket Endpoint', () => {
                 env,
             )
 
-            expect(response.status).toBe(400)
+            expect(response.status).toBe(404)
         })
     })
 
@@ -78,7 +79,7 @@ describe('WebSocket Endpoint', () => {
     describe('WebSocket Upgrade Guard', () => {
         it('Request without Upgrade header should return 426.', async () => {
             const response = await app.request(
-                '/app/ws/test-channel',
+                '/app/ws/general',
                 {
                     method: 'GET',
                     headers: {
@@ -94,7 +95,7 @@ describe('WebSocket Endpoint', () => {
 
         it('Request with incorrect Upgrade value should return 426.', async () => {
             const response = await app.request(
-                '/app/ws/test-channel',
+                '/app/ws/general',
                 {
                     method: 'GET',
                     headers: {
@@ -116,12 +117,12 @@ describe('WebSocket Endpoint', () => {
      *
      * - Owners and admins receive ws.broadcast + ws.listen.
      * - Members receive ws.listen only.
-     * - Both roles should successfully upgrade to WebSocket (101).
+     * - All roles with ws.listen should successfully upgrade to WebSocket (101).
      */
     describe('Permission Guard', () => {
         it('Owner (ws.broadcast + ws.listen) connecting should return 101.', async () => {
             const response = await app.request(
-                '/app/ws/test-channel',
+                '/app/ws/general',
                 {
                     method: 'GET',
                     headers: {
@@ -138,7 +139,7 @@ describe('WebSocket Endpoint', () => {
 
         it('Member (ws.listen only) connecting should return 101.', async () => {
             const response = await app.request(
-                '/app/ws/test-channel',
+                '/app/ws/general',
                 {
                     method: 'GET',
                     headers: {
@@ -174,7 +175,7 @@ describe('WebSocket Endpoint', () => {
             const adminCookie = signInResponse.headers.getSetCookie().join('; ')
 
             const response = await app.request(
-                '/app/ws/test-channel',
+                '/app/ws/general',
                 {
                     method: 'GET',
                     headers: {

@@ -35,24 +35,23 @@ const config = {
                     `${env.PUBLIC_API_URL}/`,
                 ],
                 'default-src': ['self'],
-                'font-src': ['*'],
+                'font-src': ['self'],
                 'form-action': ['self'],
                 'frame-src': [
                     'self',
                     'https://challenges.cloudflare.com/',
                 ],
                 'img-src': [
+                    'self',
                     'blob:',
                     'data:',
-                    'mediastream:',
-                    '*',
                 ],
                 'manifest-src': ['self'],
                 'media-src': [
+                    'self',
                     'blob:',
                     'data:',
                     'mediastream:',
-                    '*',
                 ],
                 'object-src': ['none'],
                 'script-src': [

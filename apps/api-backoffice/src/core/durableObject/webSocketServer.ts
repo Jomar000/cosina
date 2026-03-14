@@ -32,44 +32,47 @@ export class WebSocketServer extends DurableObject {
         try {
             ws.close(code)
         } catch {
-            /* EMPTY */
+            // Best-effort close — socket may already be disconnected by the client
         }
     }
 
     webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) {
+        const { canBroadcast } = ws.deserializeAttachment() as {
+            canBroadcast: boolean
+        }
+
+        if (!canBroadcast) {
+            return
+        }
+
+        let data: unknown
+
         try {
-            const { canBroadcast } = ws.deserializeAttachment() as {
-                canBroadcast: boolean
-            }
-
-            if (!canBroadcast) {
-                return
-            }
-
-            const data = JSON.parse(
+            data = JSON.parse(
                 message instanceof ArrayBuffer
                     ? new TextDecoder().decode(message)
                     : message,
             )
-
-            if (data) {
-                this.ctx.getWebSockets().forEach((wsClient) => {
-                    // Don't send back to self
-                    if (
-                        wsClient.readyState === wsClient.OPEN &&
-                        wsClient.bufferedAmount === 0 &&
-                        wsClient !== ws
-                    ) {
-                        wsClient.send(
-                            typeof data === 'object'
-                                ? JSON.stringify(data)
-                                : data,
-                        )
-                    }
-                })
-            }
         } catch {
-            /* EMPTY */
+            ws.close(1003, 'Invalid JSON payload.')
+            return
+        }
+
+        if (data) {
+            this.ctx.getWebSockets().forEach((wsClient) => {
+                // Don't send back to self
+                if (
+                    wsClient.readyState === wsClient.OPEN &&
+                    wsClient.bufferedAmount === 0 &&
+                    wsClient !== ws
+                ) {
+                    wsClient.send(
+                        typeof data === 'object'
+                            ? JSON.stringify(data)
+                            : String(data),
+                    )
+                }
+            })
         }
     }
 

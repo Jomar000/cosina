@@ -18,9 +18,13 @@ const buildPermissions = async (
     dbSchema: THonoVariables['dbSchema'],
     kv: THonoVariables['kvClient'],
 ) => {
-    let permissions: Record<string, string[]> | null = JSON.parse(
-        `${await kv.get('cache:aclPermissions')}`,
-    )
+    let permissions: Record<string, string[]> | null = null
+
+    try {
+        permissions = JSON.parse(`${await kv.get('cache:aclPermissions')}`)
+    } catch {
+        await kv.delete('cache:aclPermissions')
+    }
 
     if (!permissions) {
         const { permission, role } = dbSchema
@@ -67,9 +71,13 @@ const buildRoles = async (
     dbSchema: THonoVariables['dbSchema'],
     kv: THonoVariables['kvClient'],
 ) => {
-    let roles: Record<string, Record<string, string[]>> | null = JSON.parse(
-        `${await kv.get('cache:aclRoles')}`,
-    )
+    let roles: Record<string, Record<string, string[]>> | null = null
+
+    try {
+        roles = JSON.parse(`${await kv.get('cache:aclRoles')}`)
+    } catch {
+        await kv.delete('cache:aclRoles')
+    }
 
     if (!roles) {
         const { permission, role } = dbSchema

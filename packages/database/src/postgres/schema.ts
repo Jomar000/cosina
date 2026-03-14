@@ -36,7 +36,7 @@ export const address = pgTable('address', {
         .generatedByDefaultAsIdentity()
         .primaryKey(),
     publicId: uuid('public_id')
-        .unique('c2nhrro7q3w6_unique')
+        .unique()
         .notNull()
         .$defaultFn(() => uuidv7()),
     line1: text('line_1').notNull(),
@@ -68,7 +68,7 @@ export const auditTrail = pgTable(
             .generatedByDefaultAsIdentity()
             .primaryKey(),
         publicId: uuid('public_id')
-            .unique('oxbb5xf5czye_unique')
+            .unique()
             .notNull()
             .$defaultFn(() => uuidv7()),
         organizationId: text('organization_id'),
@@ -90,17 +90,15 @@ export const auditTrail = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index('xhbjm31r4h6s_index').on(t.organizationId),
+        index().on(t.organizationId),
         foreignKey({
-            name: 'xhbjm31r4h6s_fkey',
             columns: [t.organizationId],
             foreignColumns: [organization.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index('kg5nldbccqqf_index').on(t.userId),
+        index().on(t.userId),
         foreignKey({
-            name: 'kg5nldbccqqf_fkey',
             columns: [t.userId],
             foreignColumns: [user.id],
         }),
@@ -111,7 +109,7 @@ export const objectStorage = pgTable('object_storage', {
     id: text('id').primaryKey(),
     size: bigint('size', { mode: 'number' }).notNull(),
     mimeType: text('mime_type'),
-    hashSha256: text('hash_sha256').unique('ectz8nfqt8mj_unique').notNull(),
+    hashSha256: text('hash_sha256').unique().notNull(),
     isPublic: boolean('is_public').notNull().default(false),
     isUploaded: boolean('is_uploaded').notNull().default(false),
     createdAt: timestamp('created_at', {
@@ -140,23 +138,21 @@ export const objectStorageAcl = pgTable(
         mode: integer('mode').notNull().default(1),
     },
     (t) => [
-        index('xabdmms1rce4_index').on(t.objectStorageId),
+        index().on(t.objectStorageId),
         foreignKey({
-            name: 'xabdmms1rce4_fkey',
             columns: [t.objectStorageId],
             foreignColumns: [objectStorage.id],
         })
             .onDelete('cascade')
             .onUpdate('no action'),
-        index('68ghia6fpgvj_index').on(t.userId),
+        index().on(t.userId),
         foreignKey({
-            name: '68ghia6fpgvj_fkey',
             columns: [t.userId],
             foreignColumns: [user.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        unique('i9c1la91qvh8_unique').on(t.objectStorageId, t.userId),
+        unique().on(t.objectStorageId, t.userId),
     ],
 )
 
@@ -180,9 +176,8 @@ export const upload = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index('dwolixf6w8hp_index').on(t.userId),
+        index().on(t.userId),
         foreignKey({
-            name: 'dwolixf6w8hp_fkey',
             columns: [t.userId],
             foreignColumns: [user.id],
         })
@@ -198,23 +193,21 @@ export const uploadAttachment = pgTable(
         objectStorageId: text('object_storage_id').notNull(),
     },
     (t) => [
-        index('c0g7vcldgcc1_index').on(t.uploadId),
+        index().on(t.uploadId),
         foreignKey({
-            name: 'c0g7vcldgcc1_fkey',
             columns: [t.uploadId],
             foreignColumns: [upload.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index('o7xm4my0uq10_index').on(t.objectStorageId),
+        index().on(t.objectStorageId),
         foreignKey({
-            name: 'o7xm4my0uq10_fkey',
             columns: [t.objectStorageId],
             foreignColumns: [objectStorage.id],
         })
             .onDelete('cascade')
             .onUpdate('no action'),
-        unique('23aso68ioiyj_unique').on(t.uploadId, t.objectStorageId),
+        unique().on(t.uploadId, t.objectStorageId),
     ],
 )
 
@@ -237,9 +230,8 @@ export const userAttribute = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index('nhsl7a2vq0j4_index').on(t.userId),
+        index().on(t.userId),
         foreignKey({
-            name: 'nhsl7a2vq0j4_fkey',
             columns: [t.userId],
             foreignColumns: [user.id],
         })
@@ -273,17 +265,15 @@ export const userProfile = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index('eem2zxeduyfv_index').on(t.userId),
+        index().on(t.userId),
         foreignKey({
-            name: 'eem2zxeduyfv_fkey',
             columns: [t.userId],
             foreignColumns: [user.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index('qun382y3zidg_index').on(t.addressId),
+        index().on(t.addressId),
         foreignKey({
-            name: 'qun382y3zidg_fkey',
             columns: [t.addressId],
             foreignColumns: [address.id],
         })
@@ -319,17 +309,15 @@ export const userRelationship = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index('pa6kbv7tko20_index').on(t.userId),
+        index().on(t.userId),
         foreignKey({
-            name: 'pa6kbv7tko20_fkey',
             columns: [t.userId],
             foreignColumns: [user.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index('7ms4oot44t7x_index').on(t.addressId),
+        index().on(t.addressId),
         foreignKey({
-            name: '7ms4oot44t7x_fkey',
             columns: [t.addressId],
             foreignColumns: [address.id],
         })
@@ -376,15 +364,14 @@ export const account = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index('ame54f8rq90m_index').on(t.userId),
+        index().on(t.userId),
         foreignKey({
-            name: 'ame54f8rq90m_fkey',
             columns: [t.userId],
             foreignColumns: [user.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        unique('fmpxm18jipcc_unique').on(t.providerId, t.accountId),
+        unique().on(t.providerId, t.accountId),
     ],
 )
 
@@ -415,25 +402,23 @@ export const invitation = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index('vsccwld046ul_index').on(t.inviterId),
+        index().on(t.email),
+        index().on(t.inviterId),
         foreignKey({
-            name: 'vsccwld046ul_fkey',
             columns: [t.inviterId],
             foreignColumns: [user.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index('dwh0vrawi8kc_index').on(t.organizationId),
+        index().on(t.organizationId),
         foreignKey({
-            name: 'dwh0vrawi8kc_fkey',
             columns: [t.organizationId],
             foreignColumns: [organization.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index('to5af3ntvzc0_index').on(t.role),
+        index().on(t.role),
         foreignKey({
-            name: 'to5af3ntvzc0_fkey',
             columns: [t.role],
             foreignColumns: [role.name],
         })
@@ -463,26 +448,23 @@ export const member = pgTable(
             .defaultNow(),
     },
     (t) => [
-        unique('qticc263mdrn_unique').on(t.organizationId, t.userId),
-        index('0xl3tx6iju2c_index').on(t.userId),
+        unique().on(t.organizationId, t.userId),
+        index().on(t.userId),
         foreignKey({
-            name: '0xl3tx6iju2c_fkey',
             columns: [t.userId],
             foreignColumns: [user.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index('ey8flhlguwkb_index').on(t.organizationId),
+        index().on(t.organizationId),
         foreignKey({
-            name: 'ey8flhlguwkb_fkey',
             columns: [t.organizationId],
             foreignColumns: [organization.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index('kn8m1fkitar0_index').on(t.role),
+        index().on(t.role),
         foreignKey({
-            name: 'kn8m1fkitar0_fkey',
             columns: [t.role],
             foreignColumns: [role.name],
         })
@@ -496,7 +478,7 @@ export const organization = pgTable(
     {
         id: text('id').primaryKey(),
         name: text('name').notNull(),
-        slug: text('slug').unique('vcr7tjb6whfs_unique').notNull(),
+        slug: text('slug').unique().notNull(),
         logo: text('logo'),
         metadata: text('metadata'),
         createdAt: timestamp('created_at', {
@@ -513,7 +495,7 @@ export const organization = pgTable(
             .defaultNow(),
     },
     () => [
-        check('vcr7tjb6whfs_check', sql`slug = LOWER(slug)`),
+        check('organization_slug_check', sql`slug = LOWER(slug)`),
     ],
 )
 
@@ -538,10 +520,9 @@ export const permission = pgTable(
             .defaultNow(),
     },
     (t) => [
-        unique('ctaxe84nuq66_unique').on(t.component, t.action, t.roleId),
-        index('7vz0lkc6bbu7_index').on(t.roleId),
+        unique().on(t.component, t.action, t.roleId),
+        index().on(t.roleId),
         foreignKey({
-            name: '7vz0lkc6bbu7_fkey',
             columns: [t.roleId],
             foreignColumns: [role.id],
         })
@@ -554,7 +535,7 @@ export const role = pgTable(
     'role',
     {
         id: smallint('id').generatedByDefaultAsIdentity().primaryKey(),
-        name: text('name').unique('629pi1o76z2z_unique').notNull(),
+        name: text('name').unique().notNull(),
         description: text('description'),
         createdAt: timestamp('created_at', {
             withTimezone: true,
@@ -570,7 +551,7 @@ export const role = pgTable(
             .defaultNow(),
     },
     () => [
-        check('629pi1o76z2z_check', sql`name = LOWER(name)`),
+        check('role_name_check', sql`name = LOWER(name)`),
     ],
 )
 
@@ -579,7 +560,7 @@ export const session = pgTable(
     {
         id: text('id').primaryKey(),
         userId: text('user_id').notNull(),
-        token: text('token').unique('d3j63aa60m5j_unique').notNull(),
+        token: text('token').unique().notNull(),
         expiresAt: timestamp('expires_at', {
             withTimezone: true,
             mode: 'date',
@@ -603,19 +584,48 @@ export const session = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index('11rzmcpm3uv0_index').on(t.userId),
+        index().on(t.userId),
         foreignKey({
-            name: '11rzmcpm3uv0_fkey',
             columns: [t.userId],
             foreignColumns: [user.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index('n6ebx1rg81k4_index').on(t.activeOrganizationId),
+        index().on(t.activeOrganizationId),
         foreignKey({
-            name: 'n6ebx1rg81k4_fkey',
             columns: [t.activeOrganizationId],
             foreignColumns: [organization.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+    ],
+)
+
+export const twoFactor = pgTable(
+    'two_factor',
+    {
+        id: text('id').primaryKey(),
+        userId: text('user_id').notNull(),
+        secret: text('secret'),
+        backupCodes: text('backup_codes'),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        index().on(t.userId),
+        foreignKey({
+            columns: [t.userId],
+            foreignColumns: [user.id],
         })
             .onDelete('no action')
             .onUpdate('no action'),
@@ -627,10 +637,10 @@ export const user = pgTable(
     {
         id: text('id').primaryKey(),
         name: text('name').notNull(),
-        email: text('email').unique('mfll9xelu6gc_unique').notNull(),
+        email: text('email').unique().notNull(),
         emailVerified: boolean('email_verified').notNull().default(false),
         image: text('image'),
-        username: text('username').unique('2qajnnnraodw_unique').notNull(),
+        username: text('username').unique().notNull(),
         displayUsername: text('display_username'),
         twoFactorEnabled: boolean('two_factor_enabled')
             .notNull()
@@ -649,14 +659,14 @@ export const user = pgTable(
             .defaultNow(),
     },
     () => [
-        check('mfll9xelu6gc_check', sql`email = LOWER(email)`),
-        check('2qajnnnraodw_check', sql`username = LOWER(username)`),
+        check('user_email_check', sql`email = LOWER(email)`),
+        check('user_username_check', sql`username = LOWER(username)`),
     ],
 )
 
 export const verification = pgTable('verification', {
     id: text('id').primaryKey(),
-    identifier: text('identifier').unique('46hrccabod8t_unique').notNull(),
+    identifier: text('identifier').unique().notNull(),
     value: text('value').notNull(),
     expiresAt: timestamp('expires_at', {
         withTimezone: true,

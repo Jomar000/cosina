@@ -307,7 +307,7 @@ describe('Object Storage Endpoint', () => {
 
                 const responseData = await response.json<TApiResponseError>()
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(404)
                 expect(responseData).toHaveProperty('error')
                 expect(responseData.error.message).toBe(
                     'Upload ID not found or is already committed.',
@@ -501,7 +501,7 @@ describe('Object Storage Endpoint', () => {
 
                 const responseData = await response.json<TApiResponseError>()
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(404)
                 expect(responseData).toHaveProperty('error')
                 expect(responseData.error.message).toBe(
                     'Upload ID not found or is already committed.',
@@ -1025,7 +1025,7 @@ describe('Object Storage Endpoint', () => {
 
                 const responseData = await response.json<TApiResponseError>()
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(404)
                 expect(responseData).toHaveProperty('error')
                 expect(responseData.error.message).toBe(
                     'Upload ID not found or is already committed.',
@@ -1191,7 +1191,7 @@ describe('Object Storage Endpoint', () => {
 
                 const responseData = await response.json<TApiResponseError>()
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(404)
                 expect(responseData).toHaveProperty('error')
                 expect(responseData.error.message).toBe(
                     'Upload ID not found or is already committed.',
@@ -1329,7 +1329,7 @@ describe('Object Storage Endpoint', () => {
 
                 const responseData = await response.json<TApiResponseError>()
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(404)
                 expect(responseData).toHaveProperty('error')
                 expect(responseData.error.message).toBe(
                     'Upload ID not found or is already committed.',
@@ -1575,7 +1575,7 @@ describe('Object Storage Endpoint', () => {
 
                 const responseData = await response.json<TApiResponseError>()
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(404)
                 expect(responseData).toHaveProperty('error')
                 expect(responseData.error.message).toBe('Upload ID not found.')
             })
@@ -1722,7 +1722,7 @@ describe('Object Storage Endpoint', () => {
 
                 const responseData = await response.json<TApiResponseError>()
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(404)
                 expect(responseData).toHaveProperty('error')
                 expect(responseData.error.message).toBe('Upload ID not found.')
             })

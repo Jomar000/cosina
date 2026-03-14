@@ -370,7 +370,7 @@
                 >
                 <Button
                     onclick={() =>
-                        document.getElementById('fileInput')!.click()}
+                        document.getElementById('fileInput')?.click()}
                 >
                     <CloudUpload class="mr-2 h-4 w-4" />
                     Upload
