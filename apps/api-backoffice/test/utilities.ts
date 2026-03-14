@@ -1,5 +1,5 @@
 import { dbClient, dbSchema } from '@hyperion/database/postgres'
-import { env } from 'cloudflare:test'
+import { env } from 'cloudflare:workers'
 import { and, eq, like } from 'drizzle-orm'
 
 import app from '../src/core/index.js'
@@ -54,9 +54,9 @@ export const setTestingCookies = async () => {
  * verification table. This ensures compatibility with better-auth
  * versions that store verification tokens in either location.
  *
- * When using KV, this must be called within the same `beforeAll()` or
- * `it()` block that triggered the reset request, as KV keys are scoped
- * by `isolatedStorage` in `@cloudflare/vitest-pool-workers`.
+ * When using KV, this must be called within the same test file that
+ * triggered the reset request, as storage is isolated per test file
+ * (see @cloudflare/vitest-pool-workers v0.13.0).
  *
  * - better-auth >=1.5.3 with secondaryStorage: KV key pattern
  *   "verification:reset-password:{token}"

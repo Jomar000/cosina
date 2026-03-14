@@ -4,22 +4,33 @@
 // CloudFlare Workers Vitest Integration
 // https://developers.cloudflare.com/workers/testing/vitest-integration
 
-// NOTE
-// @cloudflare/vitest-pool-workers does not run on Vitest 4 as of this writing
-// https://github.com/cloudflare/workers-sdk/issues/11064
+import { cloudflareTest } from '@cloudflare/vitest-pool-workers'
+import { defineConfig } from 'vitest/config'
 
-import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
-
-export default defineWorkersConfig({
+export default defineConfig({
+    plugins: [
+        cloudflareTest({
+            wrangler: {
+                configPath: './wrangler.toml',
+                environment: 'test',
+            },
+        }),
+    ],
     test: {
         coverage: {
             provider: 'istanbul',
         },
-        poolOptions: {
-            workers: {
-                wrangler: {
-                    configPath: './wrangler.toml',
-                    environment: 'test',
+        deps: {
+            // Workerd only runs ESM — CJS dependencies must be pre-bundled via Vite's
+            // SSR optimizer so they are converted to ESM before workerd loads them.
+            // resend → svix (pure CJS) → uuid
+            // https://developers.cloudflare.com/workers/testing/vitest-integration/known-issues/#module-resolution
+            optimizer: {
+                ssr: {
+                    enabled: true,
+                    include: [
+                        'resend',
+                    ],
                 },
             },
         },

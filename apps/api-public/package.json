@@ -46,7 +46,7 @@
         "resend": "catalog:",
         "uuid": "catalog:",
         "vite": "catalog:",
-        "vitest": "^3.2.4"
+        "vitest": "catalog:"
     },
     "exports": {
         "./auth": {

@@ -1,5 +1,5 @@
 import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
-import { env } from 'cloudflare:test'
+import { env } from 'cloudflare:workers'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../src/core/index.js'
@@ -899,9 +899,9 @@ describe('Auth Endpoint', () => {
      * 3. Verify sign-in with the new password
      *
      * The reset request and token interception are performed in
-     * `beforeAll()` so the KV write lives at the suite-level storage
-     * frame and persists across all `it()` blocks within this
-     * `describe()` (see `isolatedStorage` in vitest-pool-workers).
+     * `beforeAll()` so the KV write persists across all `it()` blocks
+     * within this `describe()`. Storage isolation is per test file
+     * (see @cloudflare/vitest-pool-workers v0.13.0).
      */
     describe('Full Password Reset Flow (Token Interception)', () => {
         let interceptedToken: string

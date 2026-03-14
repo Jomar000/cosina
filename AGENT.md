@@ -172,12 +172,13 @@ Use the appropriate model based on task complexity and scope. Each tier lists th
 
 ## 7. Testing: Cloudflare Workers (vitest-pool-workers)
 
-- **Isolated Storage:** `@cloudflare/vitest-pool-workers` enables `isolatedStorage` by default. This means **all writes to KV, R2, D1, Durable Objects, and Caches within an `it()` block are rolled back** when that test ends.
-    - Data seeded in `beforeAll()` persists across all `it()` blocks within its `describe()` scope (suite-level storage frame).
-    - Data written inside an `it()` block is **not visible** in subsequent `it()` blocks.
-- **Debugging Checklist:** When tests fail due to missing data that was written in a prior step:
-    1. Check if the write happened inside an `it()` block and the read happens in a different `it()` block — this will fail due to `isolatedStorage`.
-    2. Move shared setup (e.g., token generation, data seeding) into the `beforeAll()` of the enclosing `describe()` so it lives at the suite-level storage frame.
+- **Storage Isolation:** `@cloudflare/vitest-pool-workers` v0.13.0 isolates storage **per test file** (not per `it()` block). All writes to KV, R2, D1, Durable Objects, and Caches persist across `it()` blocks within the same file and are reset between files.
+    - Data seeded in `beforeAll()` persists across all `it()` blocks within the file.
+    - Data written inside an `it()` block **is visible** in subsequent `it()` blocks within the same file.
+    - Database writes (Postgres via Hyperdrive) are **never** covered by storage isolation — they persist globally.
+- **Debugging Checklist:** When tests fail due to missing or unexpected data:
+    1. Check if the data comes from a different test file — storage is isolated per file.
+    2. Move shared setup (e.g., token generation, data seeding) into `beforeAll()`.
     3. Verify whether the storage backend changed (e.g., better-auth moving from DB to KV when `secondaryStorage` is configured) — the data may exist but in a different location than expected.
 
 ---
