@@ -16,12 +16,13 @@ export const initContext = () => {
         })
 
         try {
-            const acl = await aclBuilder(
+            const initAcl = await aclBuilder(
                 initDbClient,
                 dbSchema,
                 ctx.env.HYPERIONBOFC_KV,
             )
-            ctx.set('acl', acl)
+
+            ctx.set('acl', initAcl)
             ctx.set(
                 'auth',
                 await auth({
@@ -29,7 +30,7 @@ export const initContext = () => {
                     dbSchema,
                     kv: ctx.env.HYPERIONBOFC_KV,
                     env: ctx.env,
-                    acl,
+                    acl: initAcl,
                 }),
             )
             ctx.set(
