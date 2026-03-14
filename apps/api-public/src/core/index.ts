@@ -53,7 +53,7 @@ export const app = new Hono<THonoInstance>()
         if (ctx.env.STATUS !== 'up') {
             return apiResponseErrorWrapper(ctx, {
                 code: 'SERVICE_UNAVAILABLE',
-                message: '🛠️ Service Unavailable 🛠️',
+                message: 'Service Unavailable',
                 status: 503,
             })
         }

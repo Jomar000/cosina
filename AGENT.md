@@ -5,7 +5,7 @@
 ## 1. Project Context & Architecture
 
 - **Monorepo Strategy:** High-isolation architecture.
-    - `apps/`: Deployable applications (`web-public`, `web-admin`, `api-public`, `api-admin`).
+    - `apps/`: Deployable applications (`web-public`, `web-backoffice`, `api-public`, `api-backoffice`).
     - `packages/`: Shared libraries (`types`, `validator`, `database`, `ui`).
 - **Runtime Environment:**
     - **Production:** Cloudflare Workers (Edge).

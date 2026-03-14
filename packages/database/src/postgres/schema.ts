@@ -71,8 +71,8 @@ export const auditTrail = pgTable(
             .unique('oxbb5xf5czye_unique')
             .notNull()
             .$defaultFn(() => uuidv7()),
-        organizationId: text('organization_id').notNull(),
-        userId: text('user_id').notNull(),
+        organizationId: text('organization_id'),
+        userId: text('user_id'),
         component: text('component').notNull(),
         action: text('action').notNull(),
         description: text('description').notNull(),
@@ -661,9 +661,7 @@ export const verification = pgTable('verification', {
     expiresAt: timestamp('expires_at', {
         withTimezone: true,
         mode: 'date',
-    })
-        .notNull()
-        .defaultNow(),
+    }).notNull(),
     createdAt: timestamp('created_at', {
         withTimezone: true,
         mode: 'date',

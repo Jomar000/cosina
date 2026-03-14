@@ -10,7 +10,6 @@ import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 import type { z } from 'zod'
 
-import { aclBuilder } from '../../../auth/acl.js'
 import { AppError } from '../../../errors.js'
 import {
     apiResponseErrorWrapper,
@@ -133,15 +132,7 @@ const signInHandler = async (
         })
     }
 
-    /**
-     * @description
-     * Build ACL data
-     */
-    const { permissions, roles } = await aclBuilder(
-        db,
-        ctx.get('dbSchema'),
-        ctx.get('kvClient'),
-    )
+    const { permissions, roles } = ctx.get('acl')
 
     /**
      * @description

@@ -102,7 +102,7 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                                       await ctx
                                           .get('aws4FetchClient')
                                           .sign(
-                                              `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET_PRIVATE}/${os.id}?X-Amz-Expires=${300}`,
+                                              `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET_PRIVATE}/${os.id}?X-Amz-Expires=${ctx.env.CF_R2_PRESIGN_EXPIRY}`,
                                               {
                                                   method: 'GET',
                                                   aws: {
@@ -134,7 +134,7 @@ export const objectStorageRoute = new Hono<THonoInstance>()
             })
         },
     )
-    .get('/upload/create', async (ctx) => {
+    .post('/upload/create', async (ctx) => {
         const { upload } = ctx.get('dbSchema')
 
         try {
@@ -458,7 +458,7 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                         ctx
                             .get('aws4FetchClient')
                             .sign(
-                                `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${uploadBucket}/${objectStorageId}?X-Amz-Expires=${300}`,
+                                `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${uploadBucket}/${objectStorageId}?X-Amz-Expires=${ctx.env.CF_R2_PRESIGN_EXPIRY}`,
                                 {
                                     method: 'PUT',
                                     headers: {
@@ -617,7 +617,7 @@ export const objectStorageRoute = new Hono<THonoInstance>()
                                 await ctx
                                     .get('aws4FetchClient')
                                     .sign(
-                                        `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${uploadBucket}/${objectStorageId}?X-Amz-Expires=${300}`,
+                                        `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${uploadBucket}/${objectStorageId}?X-Amz-Expires=${ctx.env.CF_R2_PRESIGN_EXPIRY}`,
                                         {
                                             method: 'PUT',
                                             headers: {

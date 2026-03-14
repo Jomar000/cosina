@@ -98,6 +98,4 @@ export const vText = ({
         })
         .trim()
         .min(min, `${fieldName} must be ${min} character(s) or more.`)
-        .max(max, {
-            error: `${fieldName} must be ${max} character(s) or less.`,
-        })
+        .max(max, `${fieldName} must be ${max} character(s) or less.`)

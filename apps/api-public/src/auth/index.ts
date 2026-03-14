@@ -13,7 +13,7 @@ import { eq, or } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { Resend } from 'resend'
 
-import { aclBuilder } from './acl.js'
+import type { aclBuilder } from './acl.js'
 
 /**
  * @link
@@ -24,8 +24,9 @@ export const auth = async (opts: {
     dbSchema: THonoVariables['dbSchema']
     kv: THonoVariables['kvClient']
     env: THonoBindings
+    acl: Awaited<ReturnType<typeof aclBuilder>>
 }) => {
-    const { db, dbSchema, kv, env } = opts
+    const { db, dbSchema, kv, env, acl } = opts
 
     const { organization: organizationTable } = dbSchema
 
@@ -51,17 +52,7 @@ export const auth = async (opts: {
      * @description
      * Provides the ACL to the Organization plugin
      */
-    const { roles: aclRoles, permissions: aclPermissions } = await aclBuilder(
-        db,
-        dbSchema,
-        kv,
-    )
-
-    /**
-     * @description
-     * Provides the ACL to the Organization plugin
-     */
-    const aclInstance = createAccessControl(aclPermissions)
+    const aclInstance = createAccessControl(acl.permissions)
 
     /**
      * @description
@@ -201,14 +192,17 @@ export const auth = async (opts: {
             }),
             organizationPlugin({
                 ac: aclInstance,
-                roles: Object.keys(aclRoles)
-                    .map((role) => ({
-                        [role]: aclInstance.newRole(aclRoles[role]),
-                    }))
-                    .reduce((accumulator, value) => {
-                        accumulator = { ...accumulator, ...value }
-                        return accumulator
-                    }, {}),
+                roles: Object.fromEntries(
+                    Object.entries(acl.roles).map(
+                        ([
+                            role,
+                            perms,
+                        ]) => [
+                            role,
+                            aclInstance.newRole(perms),
+                        ],
+                    ),
+                ),
             }),
             username({
                 usernameValidator: (value) => /^[\w-.]+$/.test(value),

@@ -25,7 +25,7 @@ describe('Object Storage Endpoint', () => {
             const response = await app.request(
                 '/app/objectStorage/upload/create',
                 {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
                         origin: 'vitest-pool-worker',
                     },
@@ -169,7 +169,7 @@ describe('Object Storage Endpoint', () => {
                 const response = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -191,7 +191,7 @@ describe('Object Storage Endpoint', () => {
                 const response = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: standardCookie,
@@ -216,7 +216,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -318,7 +318,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -359,7 +359,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -406,7 +406,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -461,7 +461,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -513,7 +513,7 @@ describe('Object Storage Endpoint', () => {
                 const upload1Response = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -592,7 +592,7 @@ describe('Object Storage Endpoint', () => {
                 const upload2Response = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -657,7 +657,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -751,7 +751,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -809,7 +809,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -922,7 +922,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -1039,7 +1039,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -1144,7 +1144,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -1202,7 +1202,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -1296,7 +1296,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -1349,7 +1349,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: standardCookie,
@@ -1473,7 +1473,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: privilegedCookie,
@@ -1585,7 +1585,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: standardCookie,
@@ -1754,7 +1754,7 @@ describe('Object Storage Endpoint', () => {
                 const uploadResponse = await app.request(
                     '/app/objectStorage/upload/create',
                     {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             origin: 'vitest-pool-worker',
                             cookie: standardCookie,

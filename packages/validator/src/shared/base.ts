@@ -1,3 +1,4 @@
+import type { TValidatorIssue } from '@hyperion/types/shared'
 import { z } from 'zod'
 
 import { vText } from './field.js'
@@ -29,7 +30,7 @@ export const outputSchema = <Data extends z.ZodType = z.ZodType>(data: Data) =>
                 code: z.string(),
                 message: z.string(),
                 validatorIssues: z
-                    .array(z.custom<z.core.$ZodIssue>())
+                    .array(z.custom<TValidatorIssue>())
                     .optional(),
             }),
         }),

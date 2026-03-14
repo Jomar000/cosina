@@ -1,4 +1,9 @@
-import type { z } from 'zod'
+export type TValidatorIssue = {
+    path?: PropertyKey[]
+    code: string
+    message: string
+    input?: unknown
+}
 
 export type TApiResponseOk<T> = {
     success: true
@@ -14,7 +19,7 @@ export type TApiResponseError = {
         requestId: string
         code: string
         message: string
-        validatorIssues?: z.core.$ZodIssueBase[]
+        validatorIssues?: TValidatorIssue[]
     }
 }
 

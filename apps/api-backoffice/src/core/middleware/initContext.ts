@@ -2,6 +2,7 @@ import { dbClient, dbSchema } from '@hyperion/database/postgres'
 import { AwsClient } from 'aws4fetch'
 import { createMiddleware } from 'hono/factory'
 
+import { aclBuilder } from '../../auth/acl.js'
 import { auth } from '../../auth/index.js'
 
 export const initContext = () => {
@@ -15,6 +16,12 @@ export const initContext = () => {
         })
 
         try {
+            const acl = await aclBuilder(
+                initDbClient,
+                dbSchema,
+                ctx.env.HYPERIONBOFC_KV,
+            )
+            ctx.set('acl', acl)
             ctx.set(
                 'auth',
                 await auth({
@@ -22,6 +29,7 @@ export const initContext = () => {
                     dbSchema,
                     kv: ctx.env.HYPERIONBOFC_KV,
                     env: ctx.env,
+                    acl,
                 }),
             )
             ctx.set(
@@ -30,6 +38,12 @@ export const initContext = () => {
                     accessKeyId: ctx.env.CF_R2_ACCESS_KEY_ID,
                     secretAccessKey: ctx.env.CF_R2_SECRET_ACCESS_KEY,
                 }),
+            )
+            ctx.set(
+                'correlationId',
+                ctx.req.header('cf-ray') ??
+                    ctx.req.header('x-request-id') ??
+                    null,
             )
             ctx.set('dbClient', initDbClient)
             ctx.set('dbSchema', dbSchema)

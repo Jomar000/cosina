@@ -1,6 +1,7 @@
 import type { dbClient, dbSchema } from '@hyperion/database/postgres'
 import type { AwsClient } from 'aws4fetch'
 
+import type { aclBuilder } from './auth/acl.js'
 import type { auth } from './auth/index.js'
 
 declare global {
@@ -12,8 +13,10 @@ declare global {
     } & Env
 
     type THonoVariables = {
+        acl: Awaited<ReturnType<typeof aclBuilder>>
         auth: Awaited<ReturnType<typeof auth>>
         aws4FetchClient: AwsClient
+        correlationId: string | null
         dbClient: ReturnType<typeof dbClient>
         dbSchema: typeof dbSchema
         doWssClient: DurableObjectNamespace<WebSocketServer>

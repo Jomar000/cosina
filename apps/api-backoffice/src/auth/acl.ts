@@ -115,9 +115,16 @@ export const aclBuilder = async (
     db: THonoVariables['dbClient'],
     dbSchema: THonoVariables['dbSchema'],
     kv: THonoVariables['kvClient'],
-) => ({
-    permissions: await buildPermissions(db, dbSchema, kv),
-    roles: await buildRoles(db, dbSchema, kv),
-})
+) => {
+    const [
+        permissions,
+        roles,
+    ] = await Promise.all([
+        buildPermissions(db, dbSchema, kv),
+        buildRoles(db, dbSchema, kv),
+    ])
+
+    return { permissions, roles }
+}
 
 export default aclBuilder

@@ -332,7 +332,7 @@
 
     onMount(async () => {
         if (opMode === 'NEW') {
-            const response = await objectStorageClient.upload.create.$get()
+            const response = await objectStorageClient.upload.create.$post()
 
             const responseData = await response.json()
 

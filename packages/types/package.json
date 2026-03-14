@@ -16,9 +16,7 @@
         "lint": "prettier --check . && eslint .",
         "prepare": "pnpm build"
     },
-    "dependencies": {
-        "zod": "catalog:"
-    },
+    "dependencies": {},
     "exports": {
         "./backoffice": {
             "types": "./dist/backoffice/index.d.ts",

@@ -1,8 +1,12 @@
-import type { TApiResponse, TApiResponseError } from '@hyperion/types/shared'
+import type {
+    TApiResponse,
+    TApiResponseError,
+    TValidatorIssue,
+} from '@hyperion/types/shared'
 import type { Context } from 'hono'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { customAlphabet } from 'nanoid'
-import type { ZodType, z } from 'zod'
+import type { ZodType } from 'zod'
 
 /**
  * NanoID Custom Character Set
@@ -81,8 +85,8 @@ export const auditTrailLogger = async (
         .get('dbClient')
         .insert(auditTrail)
         .values({
-            organizationId: ctx.get('session')?.activeOrganizationId || 'N/A',
-            userId: ctx.get('user')?.id || 'N/A',
+            organizationId: ctx.get('session')?.activeOrganizationId ?? null,
+            userId: ctx.get('user')?.id ?? null,
             component: data.component,
             action: data.action,
             description: data.description,
@@ -108,7 +112,7 @@ export const validatorCallback = async <TSchema extends ZodType>(
 ) => {
     const validator = await schema.safeParseAsync(value)
 
-    if (!validator.data) {
+    if (!validator.success) {
         return apiResponseErrorWrapper(ctx, {
             code: 'DATA_VALIDATION',
             message: 'An error occurred while validating input data.',
@@ -135,7 +139,7 @@ export const apiResponseErrorWrapper = (
     }: {
         message: string
         code?: string
-        validatorIssues?: z.core.$ZodIssueBase[]
+        validatorIssues?: TValidatorIssue[]
         status?: ContentfulStatusCode
     },
 ) => {
