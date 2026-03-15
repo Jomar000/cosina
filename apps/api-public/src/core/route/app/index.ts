@@ -5,7 +5,7 @@ import { csrfHandler } from '../../middleware/csrfHandler.js'
 import { initContext } from '../../middleware/initContext.js'
 import { adminRoute } from './admin/index.js'
 import { authRoute } from './auth.js'
-import { objectStorageRoute } from './objectStorage.js'
+import { objectStorageRoute } from './objectStorage/index.js'
 import { userRoute } from './user/index.js'
 import { wsRoute } from './ws.js'
 
