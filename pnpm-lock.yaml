@@ -103,8 +103,8 @@ catalogs:
       specifier: ^1.1.0
       version: 1.1.0
     nanoid:
-      specifier: ^5.1.6
-      version: 5.1.6
+      specifier: ^5.1.7
+      version: 5.1.7
     p-queue:
       specifier: ^9.1.0
       version: 9.1.0
@@ -270,7 +270,7 @@ importers:
         version: 1.0.0-beta.17-67b1795(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.6)(valibot@1.2.0(typescript@5.9.3))(zod@4.3.6)
       nanoid:
         specifier: 'catalog:'
-        version: 5.1.6
+        version: 5.1.7
       resend:
         specifier: 'catalog:'
         version: 6.9.3
@@ -337,7 +337,7 @@ importers:
         version: 1.0.0-beta.17-67b1795(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.6)(valibot@1.2.0(typescript@5.9.3))(zod@4.3.6)
       nanoid:
         specifier: 'catalog:'
-        version: 5.1.6
+        version: 5.1.7
       resend:
         specifier: 'catalog:'
         version: 6.9.3
@@ -421,7 +421,7 @@ importers:
         version: 1.1.0(svelte@5.53.12)
       nanoid:
         specifier: 'catalog:'
-        version: 5.1.6
+        version: 5.1.7
       p-queue:
         specifier: 'catalog:'
         version: 9.1.0
@@ -526,7 +526,7 @@ importers:
         version: 1.1.0(svelte@5.53.12)
       nanoid:
         specifier: 'catalog:'
-        version: 5.1.6
+        version: 5.1.7
       p-queue:
         specifier: 'catalog:'
         version: 9.1.0
@@ -3857,8 +3857,8 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@5.1.6:
-    resolution: {integrity: sha512-c7+7RQ+dMB5dPwwCp4ee1/iV/q2P6aK1mTZcfr1BTuVlyW9hJYiMPybJCcnBlQtuSmTIWNeazm/zqNoZSSElBg==}
+  nanoid@5.1.7:
+    resolution: {integrity: sha512-ua3NDgISf6jdwezAheMOk4mbE1LXjm1DfMUDMuJf4AqxLFK3ccGpgWizwa5YV7Yz9EpXwEaWoRXSb/BnV0t5dQ==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -3875,8 +3875,8 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  node-abi@3.88.0:
-    resolution: {integrity: sha512-At6b4UqIEVudaqPsXjmUO1r/N5BUr4yhDGs5PkBE8/oG5+TfLPhFechiskFsnT6Ql0VfUXbalUUCbfXxtj7K+w==}
+  node-abi@3.89.0:
+    resolution: {integrity: sha512-6u9UwL0HlAl21+agMN3YAMXcKByMqwGx+pq+P76vii5f7hTPtKDp08/H9py6DY+cfDw7kQNTGEj/rly3IgbNQA==}
     engines: {node: '>=10'}
 
   node-fetch-native@1.6.7:
@@ -8095,7 +8095,7 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  nanoid@5.1.6: {}
+  nanoid@5.1.7: {}
 
   nanostores@1.2.0: {}
 
@@ -8106,7 +8106,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  node-abi@3.88.0:
+  node-abi@3.89.0:
     dependencies:
       semver: 7.7.4
     optional: true
@@ -8274,7 +8274,7 @@ snapshots:
       minimist: 1.2.8
       mkdirp-classic: 0.5.3
       napi-build-utils: 2.0.0
-      node-abi: 3.88.0
+      node-abi: 3.89.0
       pump: 3.0.4
       rc: 1.2.8
       simple-get: 4.0.1
