@@ -31,14 +31,14 @@ catalog:
   dayjs: ^1.11.20
   drizzle-kit: 1.0.0-beta.17-67b1795
   drizzle-orm: 1.0.0-beta.17-67b1795
-  file-type: ^21.3.2
+  file-type: ^21.3.3
   hono: ^4.12.8
   ky: ^1.14.3
   mode-watcher: ^1.1.0
   nanoid: ^5.1.7
   p-queue: ^9.1.0
   playwright: ^1.58.2
-  resend: ^6.9.3
+  resend: ^6.9.4
   svelte: ^5.53.12
   svelte-check: ^4.4.5
   svelte-sonner: ^1.1.0
