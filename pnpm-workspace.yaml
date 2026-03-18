@@ -4,7 +4,7 @@ packages:
 
 catalog:
   '@better-auth/drizzle-adapter': ^1.5.5
-  '@cloudflare/vitest-pool-workers': ^0.13.1
+  '@cloudflare/vitest-pool-workers': ^0.13.2
   '@internationalized/date': ^3.12.0
   '@lucide/svelte': ^0.577.0
   '@noble/hashes': ^2.0.1
@@ -39,7 +39,7 @@ catalog:
   p-queue: ^9.1.0
   playwright: ^1.58.2
   resend: ^6.9.4
-  svelte: ^5.53.12
+  svelte: ^5.54.0
   svelte-check: ^4.4.5
   svelte-sonner: ^1.1.0
   tailwind-merge: ^3.5.0
