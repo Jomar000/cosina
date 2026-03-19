@@ -14,7 +14,7 @@
     bind:this={ref}
     data-slot="context-menu-shortcut"
     class={cn(
-        'ms-auto text-xs tracking-widest text-muted-foreground',
+        'ml-auto text-xs tracking-widest text-muted-foreground group-focus/context-menu-item:text-accent-foreground',
         className,
     )}
     {...restProps}

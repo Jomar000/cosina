@@ -13,7 +13,7 @@
     bind:ref
     data-slot="navigation-menu-list"
     class={cn(
-        'group flex flex-1 list-none items-center justify-center gap-1',
+        'group flex flex-1 list-none items-center justify-center gap-0',
         className,
     )}
     {...restProps}

@@ -13,7 +13,7 @@
 <div
     {...restProps}
     bind:this={ref}
-    class={cn('flex flex-col', className)}
+    class={cn('flex w-full flex-col gap-4', className)}
 >
     {@render children?.()}
 </div>

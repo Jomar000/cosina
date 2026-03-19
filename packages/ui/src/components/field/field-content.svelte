@@ -14,7 +14,7 @@
     bind:this={ref}
     data-slot="field-content"
     class={cn(
-        'group/field-content flex flex-1 flex-col gap-1.5 leading-snug',
+        'group/field-content flex flex-1 flex-col gap-0.5 leading-snug',
         className,
     )}
     {...restProps}

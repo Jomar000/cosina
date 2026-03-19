@@ -18,7 +18,7 @@
         if (!colorConfig || !colorConfig.length) return
 
         const themeContents = []
-        for (let [
+        for (const [
             _theme,
             prefix,
         ] of Object.entries(THEMES)) {

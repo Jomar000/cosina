@@ -6,16 +6,18 @@
     import type { Snippet } from 'svelte'
     import Command from './command.svelte'
     import * as Dialog from '$lib/components/dialog/index.js'
-    import type { WithoutChildrenOrChild } from '$lib/utils.js'
+    import { cn, type WithoutChildrenOrChild } from '$lib/utils.js'
 
     let {
         open = $bindable(false),
         ref = $bindable(null),
         value = $bindable(''),
         title = 'Command Palette',
-        description = 'Search for a command to run',
+        description = 'Search for a command to run...',
+        showCloseButton = false,
         portalProps,
         children,
+        class: className,
         ...restProps
     }: WithoutChildrenOrChild<DialogPrimitive.RootProps> &
         WithoutChildrenOrChild<CommandPrimitive.RootProps> & {
@@ -23,6 +25,8 @@
             children: Snippet
             title?: string
             description?: string
+            showCloseButton?: boolean
+            class?: string
         } = $props()
 </script>
 
@@ -35,11 +39,14 @@
         <Dialog.Description>{description}</Dialog.Description>
     </Dialog.Header>
     <Dialog.Content
-        class="overflow-hidden p-0"
+        class={cn(
+            'top-1/3 translate-y-0 overflow-hidden rounded-xl! p-0',
+            className,
+        )}
+        {showCloseButton}
         {portalProps}
     >
         <Command
-            class="**:data-[slot=command-input-wrapper]:h-12 [&_[data-command-group]]:px-2 [&_[data-command-group]:not([hidden])_~[data-command-group]]:pt-0 [&_[data-command-input-wrapper]_svg]:h-5 [&_[data-command-input-wrapper]_svg]:w-5 [&_[data-command-input]]:h-12 [&_[data-command-item]]:px-2 [&_[data-command-item]]:py-3 [&_[data-command-item]_svg]:h-5 [&_[data-command-item]_svg]:w-5"
             {...restProps}
             bind:value
             bind:ref
