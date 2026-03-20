@@ -35,23 +35,20 @@
         "tsx": "^4.21.0",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.57.1",
-        "wrangler": "^4.75.0"
+        "wrangler": "^4.76.0"
     },
     "pnpm": {
         "allowedDeprecatedVersions": {
+            "@esbuild-kit/core-utils": "*",
+            "@esbuild-kit/esm-loader": "*",
             "prebuild-install": "*"
         },
         "overrides": {
-            "drizzle-kit>@esbuild-kit/core-utils": "npm:tsx@^4.21.0",
-            "drizzle-kit>@esbuild-kit/esm-loader": "npm:tsx@^4.21.0",
             "globals": "^17.4.0",
-            "esbuild": "^0.27.3",
-            "test-exclude>glob": "^13.0.1"
+            "esbuild": "^0.27.3"
         },
         "peerDependencyRules": {
-            "allowedVersions": {
-                "vite": "^8.0.0"
-            },
+            "allowedVersions": {},
             "ignoreMissing": []
         }
     }

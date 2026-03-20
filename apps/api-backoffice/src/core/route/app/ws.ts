@@ -42,4 +42,3 @@ export const wsRoute = new Hono<THonoInstance>().route(
 )
 
 export default wsRoute
-export type WsRouteType = typeof wsRoute

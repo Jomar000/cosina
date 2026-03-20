@@ -2,7 +2,6 @@ import type { AdminRouteType } from '@hyperion/api-public/app/admin'
 import type { AuthRouteType } from '@hyperion/api-public/app/auth'
 import type { ObjectStorageRouteType } from '@hyperion/api-public/app/objectStorage'
 import type { UserRouteType } from '@hyperion/api-public/app/user'
-import type { WsRouteType } from '@hyperion/api-public/app/ws'
 import type { HeartbeatRouteType } from '@hyperion/api-public/root/heartbeat'
 import { hc } from 'hono/client'
 import ky from 'ky'
@@ -62,12 +61,13 @@ export const userClient = hc<UserRouteType>(`${PUBLIC_API_URL}/app/user`, {
 
 /**
  * @description
- * WebSocket RPC Client
+ * Native WebSocket Client
  *
  * @example
- * const socket = wsClient[':channel'].$ws({ param: { channel: 'my-channel' } })
+ * const socket = wsNativeClient('general')
+ * socket.addEventListener('message', (e) => console.log(e.data))
  */
-export const wsClient = hc<WsRouteType>(`${PUBLIC_API_URL}/app/ws`, {
-    init: { credentials: 'include' },
-    fetch: ky,
-})
+export function wsNativeClient(channel: string): WebSocket {
+    const wsBase = PUBLIC_API_URL.replace(/^https?/, 'wss')
+    return new WebSocket(`${wsBase}/app/ws/${channel}`)
+}

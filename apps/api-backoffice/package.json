@@ -65,10 +65,6 @@
             "types": "./dist/core/route/app/user/index.d.ts",
             "default": "./dist/core/route/app/user/index.js"
         },
-        "./app/ws": {
-            "types": "./dist/core/route/app/ws.d.ts",
-            "default": "./dist/core/route/app/ws.js"
-        },
         "./root/heartbeat": {
             "types": "./dist/core/route/root/heartbeat.d.ts",
             "default": "./dist/core/route/root/heartbeat.js"

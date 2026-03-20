@@ -4,7 +4,7 @@ packages:
 
 catalog:
   '@better-auth/drizzle-adapter': ^1.5.5
-  '@cloudflare/vitest-pool-workers': ^0.13.2
+  '@cloudflare/vitest-pool-workers': ^0.13.3
   '@internationalized/date': ^3.12.0
   '@lucide/svelte': ^0.577.0
   '@noble/hashes': ^2.0.1
@@ -29,8 +29,8 @@ catalog:
   clsx: ^2.1.1
   daisyui: ^5.5.19
   dayjs: ^1.11.20
-  drizzle-kit: 1.0.0-beta.17-67b1795
-  drizzle-orm: 1.0.0-beta.17-67b1795
+  drizzle-kit: 1.0.0-beta.18-7eb39f0
+  drizzle-orm: 1.0.0-beta.18-7eb39f0
   file-type: ^21.3.3
   hono: ^4.12.8
   ky: ^1.14.3
