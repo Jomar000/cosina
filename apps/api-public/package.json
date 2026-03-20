@@ -49,25 +49,29 @@
         "vitest": "catalog:"
     },
     "exports": {
-        "./auth": {
+        "./app/admin": {
+            "types": "./dist/core/route/app/admin/index.d.ts",
+            "default": "./dist/core/route/app/admin/index.js"
+        },
+        "./app/auth": {
             "types": "./dist/core/route/app/auth.d.ts",
             "default": "./dist/core/route/app/auth.js"
         },
-        "./heartbeat": {
-            "types": "./dist/core/route/heartbeat.d.ts",
-            "default": "./dist/core/route/heartbeat.js"
+        "./app/objectStorage": {
+            "types": "./dist/core/route/app/objectStorage/index.d.ts",
+            "default": "./dist/core/route/app/objectStorage/index.js"
         },
-        "./objectStorage": {
-            "types": "./dist/core/route/app/objectStorage.d.ts",
-            "default": "./dist/core/route/app/objectStorage.js"
-        },
-        "./user": {
+        "./app/user": {
             "types": "./dist/core/route/app/user/index.d.ts",
             "default": "./dist/core/route/app/user/index.js"
         },
-        "./ws": {
+        "./app/ws": {
             "types": "./dist/core/route/app/ws.d.ts",
             "default": "./dist/core/route/app/ws.js"
+        },
+        "./root/heartbeat": {
+            "types": "./dist/core/route/root/heartbeat.d.ts",
+            "default": "./dist/core/route/root/heartbeat.js"
         }
     }
 }

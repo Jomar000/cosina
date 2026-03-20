@@ -1,12 +1,22 @@
-import type { AuthRouteType } from '@hyperion/api-public/auth'
-import type { HeartbeatRouteType } from '@hyperion/api-public/heartbeat'
-import type { ObjectStorageRouteType } from '@hyperion/api-public/objectStorage'
-import type { UserRouteType } from '@hyperion/api-public/user'
-import type { WsRouteType } from '@hyperion/api-public/ws'
+import type { AdminRouteType } from '@hyperion/api-public/app/admin'
+import type { AuthRouteType } from '@hyperion/api-public/app/auth'
+import type { ObjectStorageRouteType } from '@hyperion/api-public/app/objectStorage'
+import type { UserRouteType } from '@hyperion/api-public/app/user'
+import type { WsRouteType } from '@hyperion/api-public/app/ws'
+import type { HeartbeatRouteType } from '@hyperion/api-public/root/heartbeat'
 import { hc } from 'hono/client'
 import ky from 'ky'
 
 import { PUBLIC_API_URL } from '$env/static/public'
+
+/**
+ * @description
+ * Admin RPC Client
+ */
+export const adminClient = hc<AdminRouteType>(`${PUBLIC_API_URL}/app/admin`, {
+    init: { credentials: 'include' },
+    fetch: ky,
+})
 
 /**
  * @description

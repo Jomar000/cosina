@@ -20,3 +20,4 @@ export const adminRoute = new Hono<THonoInstance>()
     .route('/user', userRoute)
 
 export default adminRoute
+export type AdminRouteType = typeof adminRoute
