@@ -10,6 +10,7 @@ echo
 contractsChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/contracts/src/' || true ) )
 databaseChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'packages/database/src/' || true ) )
 apiPublicChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'apps/api-public/src/' || true ) )
+apiBackOfficeChanged=$( git diff --name-only 'HEAD@{1}' HEAD | ( grep 'apps/api-backoffice/src/' || true ) )
 
 # Re-install dependencies
 echo Installing project dependencies...
@@ -40,6 +41,15 @@ if [[ $apiPublicChanged != '' ]]; then
     pnpm --filter="@hyperion/api-public" exec rm -rf dist
     pnpm --filter="@hyperion/api-public" exec rm -rf *.tsbuildinfo
     pnpm --filter="@hyperion/api-public" build
+    echo
+fi
+
+# Build api-backoffice package
+if [[ $apiBackOfficeChanged != '' ]]; then
+    echo Building api-backoffice package...
+    pnpm --filter="@hyperion/api-backoffice" exec rm -rf dist
+    pnpm --filter="@hyperion/api-backoffice" exec rm -rf *.tsbuildinfo
+    pnpm --filter="@hyperion/api-backoffice" build
     echo
 fi
 
