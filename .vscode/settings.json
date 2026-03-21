@@ -1,4 +1,6 @@
 {
+    "css.lint.unknownAtRules": "ignore",
+
     "editor.detectIndentation": false,
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
