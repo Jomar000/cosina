@@ -3,7 +3,7 @@ packages:
   - packages/**
 
 catalog:
-  '@better-auth/drizzle-adapter': ^1.5.5
+  '@better-auth/drizzle-adapter': ^1.5.6
   '@cloudflare/vitest-pool-workers': ^0.13.3
   '@internationalized/date': ^3.12.0
   '@lucide/svelte': ^0.577.0
@@ -14,7 +14,7 @@ catalog:
   '@sveltejs/vite-plugin-svelte': ^7.0.0
   '@tailwindcss/vite': ^4.2.2
   '@tanstack/svelte-form': ^1.28.5
-  '@tanstack/svelte-query': ^6.1.7
+  '@tanstack/svelte-query': ^6.1.8
   '@tanstack/table-core': ^8.21.3
   '@types/cloudflare-turnstile': ^0.2.2
   '@vitest/browser': ^4.1.0
@@ -24,14 +24,14 @@ catalog:
   '@vitest/snapshot': ^4.1.0
   '@vitest/ui': ^4.1.0
   aws4fetch: ^1.0.20
-  better-auth: ^1.5.5
+  better-auth: ^1.5.6
   bits-ui: ^2.16.3
   clsx: ^2.1.1
   daisyui: ^5.5.19
   dayjs: ^1.11.20
   drizzle-kit: 1.0.0-beta.18-7eb39f0
   drizzle-orm: 1.0.0-beta.18-7eb39f0
-  file-type: ^21.3.3
+  file-type: ^21.3.4
   hono: ^4.12.8
   ky: ^1.14.3
   mode-watcher: ^1.1.0
