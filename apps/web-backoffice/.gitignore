@@ -2,7 +2,8 @@
 # Global #
 ##########
 
-.claude
+.claude/*
+!.claude/settings.json
 dist
 node_modules
 
