@@ -2,7 +2,7 @@
 
 https://csp-evaluator.withgoogle.com/
 
-If using CloudFlare, add this on the `Rules > Transform Rules > Modify Response Header`
+If using CloudFlare, add this on the `Rules > Overview > Response Header Transform Rules`
 
 **Header Name**
 
