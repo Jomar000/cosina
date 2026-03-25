@@ -17,8 +17,6 @@
         "strict": true,
         "verbatimModuleSyntax": true,
         "skipLibCheck": true,
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
         "rootDir": "src",
         "outDir": "dist",
         "paths": {
