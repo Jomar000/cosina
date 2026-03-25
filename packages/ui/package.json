@@ -51,21 +51,21 @@
         "@tanstack/table-core": "catalog:",
         "bits-ui": "catalog:",
         "clsx": "catalog:",
-        "embla-carousel-svelte": "^8.6.0",
-        "formsnap": "^2.0.1",
-        "layerchart": "2.0.0-next.43",
+        "embla-carousel-svelte": "catalog:",
+        "formsnap": "catalog:",
+        "layerchart": "catalog:",
         "mode-watcher": "catalog:",
-        "paneforge": "^1.0.2",
+        "paneforge": "catalog:",
         "shadcn-svelte": "^1.2.3",
         "svelte": "catalog:",
         "svelte-check": "catalog:",
         "svelte-sonner": "catalog:",
-        "sveltekit-superforms": "^2.30.0",
+        "sveltekit-superforms": "catalog:",
         "tailwind-merge": "catalog:",
         "tailwind-variants": "catalog:",
         "tailwindcss": "catalog:",
         "tw-animate-css": "catalog:",
-        "vaul-svelte": "1.0.0-next.7"
+        "vaul-svelte": "catalog:"
     },
     "peerDependencies": {
         "svelte": "^5.0.0"

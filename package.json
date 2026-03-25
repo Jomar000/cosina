@@ -49,7 +49,7 @@
         },
         "peerDependencyRules": {
             "allowedVersions": {
-                "typescript": "$typescript"
+                "typescript": "^6.0.0"
             },
             "ignoreMissing": []
         }
