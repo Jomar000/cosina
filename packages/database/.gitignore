@@ -3,6 +3,7 @@
 ##########
 
 .claude/*
+!.claude/skills
 !.claude/settings.json
 dist
 node_modules
