@@ -1,6 +1,7 @@
 -- Defer Foreign Keys during seeding
 -- https://www.postgresql.org/docs/current/sql-set-constraints.html
 SET CONSTRAINTS ALL DEFERRED;
+--> statement-breakpoint
 
 -- Permission
 INSERT INTO "permission"
@@ -15,6 +16,7 @@ VALUES
     ('ws', 'broadcast', 2),
     ('ws', 'listen', 2),
     ('ws', 'listen', 3);
+--> statement-breakpoint
 
 -- Role
 INSERT INTO "role"
