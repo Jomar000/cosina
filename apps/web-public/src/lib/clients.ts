@@ -26,10 +26,13 @@ const kyClient = ky.extend({
             (req) => {
                 if (SAFE_METHODS.includes(req.method)) return
 
-                const match = getCookie('csrf_token')
+                const csrfToken = getCookie('csrf_token')
 
-                if (match) {
-                    req.headers.set('x-csrf-token', decodeURIComponent(match))
+                if (csrfToken) {
+                    req.headers.set(
+                        'x-csrf-token',
+                        decodeURIComponent(csrfToken),
+                    )
                 }
             },
         ],

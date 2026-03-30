@@ -1,4 +1,4 @@
-> **Sync note:** This is the Claude Code version of the shared project guidelines. Any changes to project context, tech stack, file structure, or dev workflow must be reflected in `GEMINI.md`. When adding or modifying skills, update both `.claude/skills/` (Claude Code) and `.agents/skills/` (Gemini).
+> **Sync note:** This is the Gemini version of the shared project guidelines. Any changes to project context, tech stack, file structure, or dev workflow must be reflected in `CLAUDE.md`. When adding or modifying skills, update both `.agents/skills/` (Gemini) and `.claude/skills/` (Claude Code).
 
 # Agentic Guidelines: Svelte & Hono Monorepo
 
@@ -49,19 +49,17 @@
     - `apps/api-public/.dev.vars` — secrets (not committed). Copy from `.dev.vars.example` which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 keys, OAuth keys).
     - `packages/database/.env` / `.env.test` — Postgres connection strings for local dev and test migrations.
 
-## 5. Available Skills
+## 5. Project Skills
 
-Use the Skill tool to load the relevant skill before starting any task in these areas:
+Project skills live in `.agents/skills/`. Each skill covers a focused domain with detailed coding rules, patterns, or checklists. Load the relevant skill before starting any task in these areas:
 
-| Skill                         | When to use                                                                     |
-| ----------------------------- | ------------------------------------------------------------------------------- |
-| `svelte-patterns`             | Working on frontend Svelte/SvelteKit code or UI components                      |
-| `hono-patterns`               | Implementing or modifying Hono API routes, middleware, or error handling        |
-| `database-validator-patterns` | Modifying DB schema, writing Drizzle queries, or adding/updating Zod validators |
-| `auth-implementation`         | Implementing auth logic or fixing auth bugs                                     |
-| `cloudflare-worker-testing`   | Debugging or writing vitest tests targeting Cloudflare Workers                  |
-| `monorepo-troubleshooting`    | Fixing build errors, setting up new packages, or understanding the build graph  |
-| `ai-model-selection`          | Selecting the appropriate Claude or Gemini model tier for a task                |
+- `svelte-patterns` — Working on frontend Svelte/SvelteKit code or UI components
+- `hono-patterns` — Implementing or modifying Hono API routes, middleware, or error handling
+- `database-validator-patterns` — Modifying DB schema, writing Drizzle queries, or adding/updating Zod validators
+- `auth-implementation` — Implementing auth logic or fixing auth bugs
+- `cloudflare-worker-testing` — Debugging or writing vitest tests targeting Cloudflare Workers
+- `monorepo-troubleshooting` — Fixing build errors, setting up new packages, or understanding the build graph
+- `ai-model-selection` — Selecting the appropriate AI model tier for a task
 
 ## 6. Permissions & Command Boundaries
 
