@@ -7,6 +7,34 @@ import { hc } from 'hono/client'
 import ky from 'ky'
 
 import { PUBLIC_API_URL } from '$env/static/public'
+import { getCookie } from './utilities'
+
+/**
+ * @description
+ * Inject CSRF token to ky client
+ */
+
+const SAFE_METHODS = [
+    'GET',
+    'HEAD',
+    'OPTIONS',
+]
+
+const kyClient = ky.extend({
+    hooks: {
+        beforeRequest: [
+            (req) => {
+                if (SAFE_METHODS.includes(req.method)) return
+
+                const match = getCookie('csrf_token')
+
+                if (match) {
+                    req.headers.set('x-csrf-token', decodeURIComponent(match))
+                }
+            },
+        ],
+    },
+})
 
 /**
  * @description
@@ -14,7 +42,7 @@ import { PUBLIC_API_URL } from '$env/static/public'
  */
 export const adminClient = hc<AdminRouteType>(`${PUBLIC_API_URL}/app/admin`, {
     init: { credentials: 'include' },
-    fetch: ky,
+    fetch: kyClient,
 })
 
 /**
@@ -23,7 +51,7 @@ export const adminClient = hc<AdminRouteType>(`${PUBLIC_API_URL}/app/admin`, {
  */
 export const authClient = hc<AuthRouteType>(`${PUBLIC_API_URL}/app/auth`, {
     init: { credentials: 'include' },
-    fetch: ky,
+    fetch: kyClient,
 })
 
 /**
@@ -34,7 +62,7 @@ export const heartbeatClient = hc<HeartbeatRouteType>(
     `${PUBLIC_API_URL}/heartbeat`,
     {
         init: { credentials: 'include' },
-        fetch: ky,
+        fetch: kyClient,
     },
 )
 
@@ -46,7 +74,7 @@ export const objectStorageClient = hc<ObjectStorageRouteType>(
     `${PUBLIC_API_URL}/app/objectStorage`,
     {
         init: { credentials: 'include' },
-        fetch: ky,
+        fetch: kyClient,
     },
 )
 
@@ -56,7 +84,7 @@ export const objectStorageClient = hc<ObjectStorageRouteType>(
  */
 export const userClient = hc<UserRouteType>(`${PUBLIC_API_URL}/app/user`, {
     init: { credentials: 'include' },
-    fetch: ky,
+    fetch: kyClient,
 })
 
 /**

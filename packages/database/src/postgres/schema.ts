@@ -38,6 +38,7 @@ export const address = pgTable('address', {
     publicId: uuid('public_id')
         .unique()
         .notNull()
+        .default(sql`gen_random_uuid()`)
         .$defaultFn(() => uuidv7()),
     line1: text('line_1').notNull(),
     line2: text('line_2'),
@@ -70,6 +71,7 @@ export const auditTrail = pgTable(
         publicId: uuid('public_id')
             .unique()
             .notNull()
+            .default(sql`gen_random_uuid()`)
             .$defaultFn(() => uuidv7()),
         organizationId: text('organization_id'),
         userId: text('user_id'),

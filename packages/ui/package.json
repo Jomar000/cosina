@@ -56,7 +56,7 @@
         "layerchart": "catalog:",
         "mode-watcher": "catalog:",
         "paneforge": "catalog:",
-        "shadcn-svelte": "^1.2.4",
+        "shadcn-svelte": "^1.2.5",
         "svelte": "catalog:",
         "svelte-check": "catalog:",
         "svelte-sonner": "catalog:",
