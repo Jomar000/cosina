@@ -19,8 +19,12 @@
         "lint": "prettier --check . && eslint .",
         "secret:prod": "wrangler secret bulk .dev.vars.production --env=production --config=wrangler-production.toml",
         "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging --config=wrangler-staging.toml",
-        "test": "pnpm --filter=@hyperion/database run migrate:test && vitest --run",
-        "test:ui": "pnpm --filter=@hyperion/database run migrate:test && vitest --ui"
+        "test": "pnpm run test:con && pnpm run test:seq",
+        "test:con": "pnpm --filter=@hyperion/database run migrate:test && vitest run --project=concurrent-test-files",
+        "test:seq": "pnpm --filter=@hyperion/database run migrate:test && vitest run --project=sequential-test-files",
+        "test:ui": "echo Use `test:ui:con` or `test:ui:seq` instead",
+        "test:ui:con": "pnpm --filter=@hyperion/database run migrate:test && vitest --ui --project=concurrent-test-files",
+        "test:ui:seq": "pnpm --filter=@hyperion/database run migrate:test && vitest --ui --project=sequential-test-files"
     },
     "README": "This is a private package bundled by wrangler — the deps/devDeps split has no effect on its own build. dependencies lists only what consumers need for type resolution of the exported Hono routes. Server-only packages live in devDependencies to avoid leaking them transitively into frontend apps.",
     "dependencies": {

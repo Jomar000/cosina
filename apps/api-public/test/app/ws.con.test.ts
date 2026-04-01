@@ -15,7 +15,7 @@ beforeAll(async () => {
     ] = await setTestingCookies()
 })
 
-describe('WebSocket Endpoint', () => {
+describe.concurrent('WebSocket Endpoint', () => {
     /**
      * @description
      * Authentication Guard
