@@ -4,11 +4,11 @@ packages:
 
 catalog:
   '@better-auth/drizzle-adapter': ^1.5.6
-  '@cloudflare/vitest-pool-workers': ^0.13.5
+  '@cloudflare/vitest-pool-workers': ^0.14.0
   '@internationalized/date': ^3.12.0
   '@lucide/svelte': ^1.7.0
   '@noble/hashes': ^2.0.1
-  '@playwright/test': ^1.59.0
+  '@playwright/test': ^1.59.1
   '@sveltejs/adapter-static': ^3.0.10
   '@sveltejs/kit': ^2.55.0
   '@sveltejs/vite-plugin-svelte': ^7.0.0
@@ -32,16 +32,16 @@ catalog:
   drizzle-kit: 1.0.0-beta.19
   drizzle-orm: 1.0.0-beta.19
   embla-carousel-svelte: ^8.6.0
-  file-type: ^21.3.4
+  file-type: ^22.0.0
   formsnap: ^2.0.1
   hono: ^4.12.9
   ky: ^1.14.3
   layerchart: 2.0.0-next.43
   mode-watcher: ^1.1.0
   nanoid: ^5.1.7
-  p-queue: ^9.1.0
+  p-queue: ^9.1.1
   paneforge: ^1.0.2
-  playwright: ^1.59.0
+  playwright: ^1.59.1
   resend: ^6.10.0
   svelte: ^5.55.1
   svelte-check: ^4.4.6
