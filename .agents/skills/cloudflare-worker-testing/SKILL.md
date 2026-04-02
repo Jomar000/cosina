@@ -16,3 +16,14 @@ description: Checklist and rules for debugging or writing vitest tests targeting
 - **Concurrency & Execution Order:** To improve test performance, tests within a single file should be partitioned by their execution behavior. Follow the Concurrent/Sequential pattern:
     - `describe.concurrent('Concurrent Tests', ...)`: Group tests that are read-only, non-mutating validation tests (e.g., 401 unauthenticated, 403 forbidden, 400 bad requests) or simple read scenarios that do not depend on the outcome of other tests. These will run in parallel.
     - `describe('Sequential Tests', ...)`: Group tests that mutate global state (e.g., Create, Update, Delete) or that strictly depend on the sequence of operations (e.g., obtaining an ID from a Create test to use in a subsequent Update test). These must run synchronously to prevent race conditions.
+- **Test Data Hardening:** Tests must be resilient to changes in seed data (e.g., `99999999999999_test_data`). Follow these rules:
+    1. **Never hardcode numeric DB IDs** (`warehouseId: 1`, `itemId: 1`, etc.) in tests that reach the database. Resolve all reference IDs via API calls in `beforeAll()` using discovery helpers from `apps/api-backoffice/test/utilities.ts`.
+    2. **Exception — validation-only tests:** Auth guard tests (401/403) and schema validation tests (400) that fail *before* DB access may use placeholder IDs (any positive integer), since the request is rejected at the middleware or validator layer.
+    3. **Sequential dependency:** When a sequential test creates an entity, subsequent sequential tests that need a related ID should reuse that test's captured ID (e.g., use `createdTableId` as `floorPlanId`) rather than a hardcoded seed ID.
+    4. **Unique names:** All `name`, `sku`, `slug`, `code` fields must use a unique suffix. Use `generateUniqueName(prefix)` from `utilities.ts` (e.g., `generateUniqueName('__vitest__item')`).
+    5. **Resilient count assertions:** Avoid `expect(data).toHaveLength(n)` on endpoints whose tables contain seed data. Use `toBeGreaterThanOrEqual(1)` or filter strictly by test-created records.
+    - **Discovery helpers** (in `apps/api-backoffice/test/utilities.ts`):
+        - `getAnyWarehouseId(cookie)` → POST `/app/warehouse/readMany`
+        - `getAnyItemId(cookie)` → POST `/app/inventory/item/readMany`
+        - `getAnyPaymentTypeId(cookie)` → POST `/app/paymentType/readMany`
+        - `generateUniqueName(prefix)` → `${prefix}_${Date.now()}_${random}`

@@ -1,8 +1,72 @@
+import type { TApiResponseOk } from '@hyperion/types/shared'
 import { dbClient, dbSchema } from '@hyperion/database/postgres'
 import { env } from 'cloudflare:workers'
 import { and, eq, like } from 'drizzle-orm'
 
 import app from '../src/core/index.js'
+
+export const generateUniqueName = (prefix: string): string =>
+    `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+
+export const getAnyWarehouseId = async (cookie: string): Promise<number> => {
+    const res = await app.request(
+        '/app/warehouse/readMany',
+        {
+            method: 'POST',
+            headers: {
+                origin: 'vitest-pool-worker',
+                'content-type': 'application/json',
+                cookie,
+            },
+        },
+        env,
+    )
+    const data = await res.json<TApiResponseOk<{ id: number }[]>>()
+    if (!data.data.length)
+        throw new Error('No rows found in "warehouse" table — check seed data.')
+    return data.data[0].id
+}
+
+export const getAnyItemId = async (cookie: string): Promise<number> => {
+    const res = await app.request(
+        '/app/inventory/item/readMany',
+        {
+            method: 'POST',
+            headers: {
+                origin: 'vitest-pool-worker',
+                'content-type': 'application/json',
+                cookie,
+            },
+            body: JSON.stringify({ limit: 1, isDisabled: false }),
+        },
+        env,
+    )
+    const data = await res.json<TApiResponseOk<{ id: number }[]>>()
+    if (!data.data.length)
+        throw new Error('No rows found in "item" table — check seed data.')
+    return data.data[0].id
+}
+
+export const getAnyPaymentTypeId = async (cookie: string): Promise<number> => {
+    const res = await app.request(
+        '/app/paymentType/readMany',
+        {
+            method: 'POST',
+            headers: {
+                origin: 'vitest-pool-worker',
+                'content-type': 'application/json',
+                cookie,
+            },
+        },
+        env,
+    )
+    const data = await res.json<TApiResponseOk<{ id: number }[]>>()
+    if (!data.data.length)
+        throw new Error(
+            'No rows found in "payment_type" table — check seed data.',
+        )
+    return data.data[0].id
+}
 
 export const setTestingCookies = async () => {
     const response = await Promise.all([
