@@ -18,8 +18,8 @@ export const vBoolean = (fieldName: string) =>
 export const vInt = ({
     fieldName = 'Field',
     message = undefined,
-    min = -2147483647,
-    max = 2147483647,
+    min = Number.MIN_SAFE_INTEGER,
+    max = Number.MAX_SAFE_INTEGER,
 }: {
     fieldName?: string
     message?: string

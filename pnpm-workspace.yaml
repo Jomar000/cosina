@@ -34,7 +34,7 @@ catalog:
   embla-carousel-svelte: ^8.6.0
   file-type: ^22.0.0
   formsnap: ^2.0.1
-  hono: ^4.12.9
+  hono: ^4.12.10
   ky: ^1.14.3
   layerchart: 2.0.0-next.43
   mode-watcher: ^1.1.0
