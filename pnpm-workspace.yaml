@@ -10,7 +10,7 @@ catalog:
   '@noble/hashes': ^2.0.1
   '@playwright/test': ^1.59.1
   '@sveltejs/adapter-static': ^3.0.10
-  '@sveltejs/kit': ^2.55.0
+  '@sveltejs/kit': ^2.56.1
   '@sveltejs/vite-plugin-svelte': ^7.0.0
   '@tailwindcss/vite': ^4.2.2
   '@tanstack/svelte-form': ^1.28.6
