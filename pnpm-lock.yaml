@@ -73,8 +73,8 @@ catalogs:
       specifier: ^1.5.6
       version: 1.5.6
     bits-ui:
-      specifier: ^2.16.5
-      version: 2.16.5
+      specifier: ^2.17.2
+      version: 2.17.2
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
@@ -100,8 +100,8 @@ catalogs:
       specifier: ^2.0.1
       version: 2.0.1
     hono:
-      specifier: ^4.12.10
-      version: 4.12.10
+      specifier: ^4.12.11
+      version: 4.12.11
     ky:
       specifier: ^1.14.3
       version: 1.14.3
@@ -157,8 +157,8 @@ catalogs:
       specifier: 1.0.0-next.7
       version: 1.0.0-next.7
     vite:
-      specifier: ^8.0.3
-      version: 8.0.3
+      specifier: ^8.0.5
+      version: 8.0.5
     vite-imagetools:
       specifier: ^10.0.0
       version: 10.0.0
@@ -242,14 +242,14 @@ importers:
         version: link:../../packages/validator
       hono:
         specifier: 'catalog:'
-        version: 4.12.10
+        version: 4.12.11
       zod:
         specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
       '@better-auth/drizzle-adapter':
         specifier: 'catalog:'
-        version: 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.14)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6))
+        version: 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.16)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6))
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
         version: 0.14.1(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(vitest@4.1.2)
@@ -276,13 +276,13 @@ importers:
         version: 1.0.20
       better-auth:
         specifier: 'catalog:'
-        version: 1.5.6(375d798e4e7614449624709a1d8ea3a9)
+        version: 1.5.6(86be100e7560dce1c5b574c7ca0dcdc3)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.20
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.14)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
+        version: 1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.16)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
       nanoid:
         specifier: 'catalog:'
         version: 5.1.7
@@ -294,10 +294,10 @@ importers:
         version: 13.0.0
       vite:
         specifier: 'catalog:'
-        version: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+        version: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
 
   apps/api-public:
     dependencies:
@@ -309,14 +309,14 @@ importers:
         version: link:../../packages/validator
       hono:
         specifier: 'catalog:'
-        version: 4.12.10
+        version: 4.12.11
       zod:
         specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
       '@better-auth/drizzle-adapter':
         specifier: 'catalog:'
-        version: 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.14)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6))
+        version: 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.16)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6))
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
         version: 0.14.1(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(vitest@4.1.2)
@@ -343,13 +343,13 @@ importers:
         version: 1.0.20
       better-auth:
         specifier: 'catalog:'
-        version: 1.5.6(375d798e4e7614449624709a1d8ea3a9)
+        version: 1.5.6(86be100e7560dce1c5b574c7ca0dcdc3)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.20
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.14)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
+        version: 1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.16)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
       nanoid:
         specifier: 'catalog:'
         version: 5.1.7
@@ -361,10 +361,10 @@ importers:
         version: 13.0.0
       vite:
         specifier: 'catalog:'
-        version: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+        version: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
 
   apps/web-backoffice:
     devDependencies:
@@ -388,16 +388,16 @@ importers:
         version: 1.59.1
       '@sveltejs/adapter-static':
         specifier: 'catalog:'
-        version: 3.0.10(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))
+        version: 3.0.10(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))
       '@sveltejs/kit':
         specifier: 'catalog:'
-        version: 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       '@sveltejs/vite-plugin-svelte':
         specifier: 'catalog:'
-        version: 7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       '@tailwindcss/vite':
         specifier: 'catalog:'
-        version: 4.2.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 4.2.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       '@tanstack/svelte-form':
         specifier: 'catalog:'
         version: 1.28.6(svelte@5.55.1)
@@ -409,13 +409,13 @@ importers:
         version: 0.2.2
       '@vitest/browser':
         specifier: 'catalog:'
-        version: 4.1.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
+        version: 4.1.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
       '@vitest/browser-playwright':
         specifier: 'catalog:'
-        version: 4.1.2(playwright@1.59.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
+        version: 4.1.2(playwright@1.59.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
       better-auth:
         specifier: 'catalog:'
-        version: 1.5.6(375d798e4e7614449624709a1d8ea3a9)
+        version: 1.5.6(86be100e7560dce1c5b574c7ca0dcdc3)
       daisyui:
         specifier: 'catalog:'
         version: 5.5.19
@@ -427,7 +427,7 @@ importers:
         version: 22.0.0
       hono:
         specifier: 'catalog:'
-        version: 4.12.10
+        version: 4.12.11
       ky:
         specifier: 'catalog:'
         version: 1.14.3
@@ -457,13 +457,13 @@ importers:
         version: 4.2.2
       vite:
         specifier: 'catalog:'
-        version: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+        version: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
       vite-imagetools:
         specifier: 'catalog:'
-        version: 10.0.0(rollup@4.59.0)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 10.0.0(rollup@4.59.0)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       vitest-browser-svelte:
         specifier: 'catalog:'
         version: 2.1.0(svelte@5.55.1)(vitest@4.1.2)
@@ -493,16 +493,16 @@ importers:
         version: 1.59.1
       '@sveltejs/adapter-static':
         specifier: 'catalog:'
-        version: 3.0.10(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))
+        version: 3.0.10(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))
       '@sveltejs/kit':
         specifier: 'catalog:'
-        version: 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       '@sveltejs/vite-plugin-svelte':
         specifier: 'catalog:'
-        version: 7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       '@tailwindcss/vite':
         specifier: 'catalog:'
-        version: 4.2.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 4.2.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       '@tanstack/svelte-form':
         specifier: 'catalog:'
         version: 1.28.6(svelte@5.55.1)
@@ -514,13 +514,13 @@ importers:
         version: 0.2.2
       '@vitest/browser':
         specifier: 'catalog:'
-        version: 4.1.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
+        version: 4.1.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
       '@vitest/browser-playwright':
         specifier: 'catalog:'
-        version: 4.1.2(playwright@1.59.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
+        version: 4.1.2(playwright@1.59.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
       better-auth:
         specifier: 'catalog:'
-        version: 1.5.6(375d798e4e7614449624709a1d8ea3a9)
+        version: 1.5.6(86be100e7560dce1c5b574c7ca0dcdc3)
       daisyui:
         specifier: 'catalog:'
         version: 5.5.19
@@ -532,7 +532,7 @@ importers:
         version: 22.0.0
       hono:
         specifier: 'catalog:'
-        version: 4.12.10
+        version: 4.12.11
       ky:
         specifier: 'catalog:'
         version: 1.14.3
@@ -562,13 +562,13 @@ importers:
         version: 4.2.2
       vite:
         specifier: 'catalog:'
-        version: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+        version: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
       vite-imagetools:
         specifier: 'catalog:'
-        version: 10.0.0(rollup@4.59.0)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 10.0.0(rollup@4.59.0)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       vitest-browser-svelte:
         specifier: 'catalog:'
         version: 2.1.0(svelte@5.55.1)(vitest@4.1.2)
@@ -580,10 +580,10 @@ importers:
     dependencies:
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.14)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
+        version: 1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.16)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
       postgres:
-        specifier: ^3.4.8
-        version: 3.4.8
+        specifier: ^3.4.9
+        version: 3.4.9
       uuid:
         specifier: 'catalog:'
         version: 13.0.0
@@ -607,13 +607,13 @@ importers:
         version: 2.5.7(svelte@5.55.1)(typescript@6.0.2)
       '@sveltejs/vite-plugin-svelte':
         specifier: 'catalog:'
-        version: 7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+        version: 7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       '@tanstack/table-core':
         specifier: 'catalog:'
         version: 8.21.3
       bits-ui:
         specifier: 'catalog:'
-        version: 2.16.5(@internationalized/date@3.12.0)(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)
+        version: 2.17.2(@internationalized/date@3.12.0)(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -622,10 +622,10 @@ importers:
         version: 8.6.0(svelte@5.55.1)
       formsnap:
         specifier: 'catalog:'
-        version: 2.0.1(svelte@5.55.1)(sveltekit-superforms@2.30.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(@types/json-schema@7.0.15)(svelte@5.55.1)(typescript@6.0.2))
+        version: 2.0.1(svelte@5.55.1)(sveltekit-superforms@2.30.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(@types/json-schema@7.0.15)(svelte@5.55.1)(typescript@6.0.2))
       layerchart:
         specifier: 'catalog:'
-        version: 2.0.0-next.49(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(zod@4.3.6)
+        version: 2.0.0-next.49(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(zod@4.3.6)
       mode-watcher:
         specifier: 'catalog:'
         version: 1.1.0(svelte@5.55.1)
@@ -646,7 +646,7 @@ importers:
         version: 1.1.0(svelte@5.55.1)
       sveltekit-superforms:
         specifier: 'catalog:'
-        version: 2.30.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(@types/json-schema@7.0.15)(svelte@5.55.1)(typescript@6.0.2)
+        version: 2.30.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(@types/json-schema@7.0.15)(svelte@5.55.1)(typescript@6.0.2)
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.5.0
@@ -2437,8 +2437,8 @@ packages:
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
-  baseline-browser-mapping@2.10.14:
-    resolution: {integrity: sha512-fOVLPAsFTsQfuCkvahZkzq6nf8KvGWanlYoTh0SVA0A/PIUxQGU2AOZAoD95n2gFLVDW/jP6sbGLny95nmEuHA==}
+  baseline-browser-mapping@2.10.16:
+    resolution: {integrity: sha512-Lyf3aK28zpsD1yQMiiHD4RvVb6UdMoo8xzG2XzFIfR9luPzOpcBlAsT/qfB1XWS1bxWT+UtE4WmQgsp297FYOA==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -2523,8 +2523,8 @@ packages:
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
 
-  bits-ui@2.16.5:
-    resolution: {integrity: sha512-Dx+Sc1DGzRaRfzpxrBI40d+O7vykIZ8E2G6tCaOzqYLzg+mN3YYK+8f8ysAFLfkHzey1MACGrYO3IcO6ROKlSA==}
+  bits-ui@2.17.2:
+    resolution: {integrity: sha512-Xbmrlf3ft/5RtMgUL/uam+rcrWYM4LoIGosklV34iSE6GGsPFWgaivzzX60rnWjWlG5F7ZuXXZ4iag949UekMA==}
     engines: {node: '>=20'}
     peerDependencies:
       '@internationalized/date': ^3.8.1
@@ -2587,8 +2587,8 @@ packages:
     resolution: {integrity: sha512-8WB3Jcas3swSvjIeA2yvCJ+Miyz5l1ZmB6HFb9R1317dt9LCQoswg/BGrmAmkWVEszSrrg4RwmO46qIm2OEnSA==}
     engines: {node: '>=16'}
 
-  caniuse-lite@1.0.30001785:
-    resolution: {integrity: sha512-blhOL/WNR+Km1RI/LCVAvA73xplXA7ZbjzI4YkMK9pa6T/P3F2GxjNpEkyw5repTw9IvkyrjyHpwjnhZ5FOvYQ==}
+  caniuse-lite@1.0.30001786:
+    resolution: {integrity: sha512-4oxTZEvqmLLrERwxO76yfKM7acZo310U+v4kqexI2TL1DkkUEMT8UijrxxcnVdxR3qkVf5awGRX+4Z6aPHVKrA==}
 
   chai@6.2.2:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
@@ -3349,8 +3349,8 @@ packages:
     resolution: {integrity: sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==}
     engines: {node: '>=16.9.0'}
 
-  hono@4.12.10:
-    resolution: {integrity: sha512-mx/p18PLy5og9ufies2GOSUqep98Td9q4i/EF6X7yJgAiIopxqdfIO3jbqsi3jRgTgw88jMDEzVKi+V2EF+27w==}
+  hono@4.12.11:
+    resolution: {integrity: sha512-r4xbIa3mGGGoH9nN4A14DOg2wx7y2oQyJEb5O57C/xzETG/qx4c7CVDQ5WMeKHZ7ORk2W0hZ/sQKXTav3cmYBA==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@2.0.2:
@@ -4023,8 +4023,8 @@ packages:
     resolution: {integrity: sha512-Jtc2612XINuBjIl/QTWsV5UvE8UHuNblcO3vVADSrKsrc6RqGX6lOW1cEo3CM2v0XG4Nat8nI+YM7/f26VxXLw==}
     engines: {node: '>=12'}
 
-  postgres@3.4.8:
-    resolution: {integrity: sha512-d+JFcLM17njZaOLkv6SCev7uoLaBtfK86vMUXhW1Z4glPWh4jozno9APvW/XKFJ3CCxVoC7OL38BqRydtu5nGg==}
+  postgres@3.4.9:
+    resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
     engines: {node: '>=12'}
 
   prebuild-install@7.1.3:
@@ -4648,8 +4648,8 @@ packages:
     resolution: {integrity: sha512-PlBfpQwiUvGViBNX84Yxwjsdhd1TUlXr6zjX7eoirtCPIr08NAmxwa+fcYBTeRQxHo9YC9wwF3m9i700sHma8g==}
     engines: {node: '>=20'}
 
-  typebox@1.1.14:
-    resolution: {integrity: sha512-R9qoa9IE8Yevoy06ixre1VkribJwOl1wj5fq60gUK6Qxkd2Cw+omHEaHnJh+uE4ewMjLWweR3RERKvhjEtLWsA==}
+  typebox@1.1.16:
+    resolution: {integrity: sha512-czccfm5FNze8MqHI+HWMactX7S8fZNugjXL56b6YeEvIgLnbZMuLdZ/uSwSgAK0vm55OGzVbZGofjEP7nRZYGQ==}
 
   typed-event-target@4.3.0:
     resolution: {integrity: sha512-21TH+1pkLuMNjwsDDXY5272CWmxgwszWd7kOoTsxgc87kcSkH9wiandsyVQbOXC2e85H8k+xKL3OEfKxt/pwxg==}
@@ -4750,8 +4750,8 @@ packages:
     peerDependencies:
       vite: '>=7.0.0'
 
-  vite@8.0.3:
-    resolution: {integrity: sha512-B9ifbFudT1TFhfltfaIPgjo9Z3mDynBTJSUYxTjOQruf/zHH+ezCQKcoqO+h7a9Pw9Nm/OtlXAiGT1axBgwqrQ==}
+  vite@8.0.5:
+    resolution: {integrity: sha512-nmu43Qvq9UopTRfMx2jOYW5l16pb3iDC1JH6yMuPkpVbzK0k+L7dfsEDH4jRgYFmsg0sTAqkojoZgzLMlwHsCQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -5261,12 +5261,12 @@ snapshots:
       nanostores: 1.2.0
       zod: 4.3.6
 
-  '@better-auth/drizzle-adapter@1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.14)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6))':
+  '@better-auth/drizzle-adapter@1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.16)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6))':
     dependencies:
       '@better-auth/core': 1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0)
       '@better-auth/utils': 0.3.1
     optionalDependencies:
-      drizzle-orm: 1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.14)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
+      drizzle-orm: 1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.16)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
 
   '@better-auth/kysely-adapter@1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(kysely@0.28.15)':
     dependencies:
@@ -5486,7 +5486,7 @@ snapshots:
       cjs-module-lexer: 1.4.3
       esbuild: 0.27.7
       miniflare: 4.20260401.0
-      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       wrangler: 4.80.0
       zod: 3.25.76
     transitivePeerDependencies:
@@ -6231,15 +6231,15 @@ snapshots:
     dependencies:
       acorn: 8.16.0
 
-  '@sveltejs/adapter-static@3.0.10(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))':
+  '@sveltejs/adapter-static@3.0.10(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))':
     dependencies:
-      '@sveltejs/kit': 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@sveltejs/kit': 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
 
-  '@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))':
+  '@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@sveltejs/acorn-typescript': 1.0.9(acorn@8.16.0)
-      '@sveltejs/vite-plugin-svelte': 7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@sveltejs/vite-plugin-svelte': 7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       '@types/cookie': 0.6.0
       acorn: 8.16.0
       cookie: 0.6.0
@@ -6251,7 +6251,7 @@ snapshots:
       set-cookie-parser: 3.1.0
       sirv: 3.0.2
       svelte: 5.55.1
-      vite: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+      vite: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       typescript: 6.0.2
@@ -6267,14 +6267,14 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))':
+  '@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))':
     dependencies:
       deepmerge: 4.3.1
       magic-string: 0.30.21
       obug: 2.1.1
       svelte: 5.55.1
-      vite: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
-      vitefu: 1.1.3(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      vite: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+      vitefu: 1.1.3(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
 
   '@swc/helpers@0.5.21':
     dependencies:
@@ -6341,12 +6341,12 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.2.2
       '@tailwindcss/oxide-win32-x64-msvc': 4.2.2
 
-  '@tailwindcss/vite@4.2.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))':
+  '@tailwindcss/vite@4.2.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))':
     dependencies:
       '@tailwindcss/node': 4.2.2
       '@tailwindcss/oxide': 4.2.2
       tailwindcss: 4.2.2
-      vite: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+      vite: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
 
   '@tanstack/devtools-event-client@0.4.3': {}
 
@@ -6622,29 +6622,29 @@ snapshots:
       validator: 13.15.35
     optional: true
 
-  '@vitest/browser-playwright@4.1.2(playwright@1.59.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)':
+  '@vitest/browser-playwright@4.1.2(playwright@1.59.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)':
     dependencies:
-      '@vitest/browser': 4.1.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
-      '@vitest/mocker': 4.1.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@vitest/browser': 4.1.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
+      '@vitest/mocker': 4.1.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       playwright: 1.59.1
       tinyrainbow: 3.1.0
-      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
     transitivePeerDependencies:
       - bufferutil
       - msw
       - utf-8-validate
       - vite
 
-  '@vitest/browser@4.1.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)':
+  '@vitest/browser@4.1.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)':
     dependencies:
       '@blazediff/core': 1.9.1
-      '@vitest/mocker': 4.1.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@vitest/mocker': 4.1.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       '@vitest/utils': 4.1.2
       magic-string: 0.30.21
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.1.0
-      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       ws: 8.20.0
     transitivePeerDependencies:
       - bufferutil
@@ -6664,7 +6664,7 @@ snapshots:
       magicast: 0.5.2
       obug: 2.1.1
       tinyrainbow: 3.1.0
-      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -6677,13 +6677,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))':
+  '@vitest/mocker@4.1.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))':
     dependencies:
       '@vitest/spy': 4.1.2
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+      vite: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
 
   '@vitest/pretty-format@4.1.2':
     dependencies:
@@ -6712,7 +6712,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.1.0
-      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
 
   '@vitest/utils@4.1.2':
     dependencies:
@@ -6788,12 +6788,12 @@ snapshots:
 
   base64-js@1.5.1: {}
 
-  baseline-browser-mapping@2.10.14: {}
+  baseline-browser-mapping@2.10.16: {}
 
-  better-auth@1.5.6(375d798e4e7614449624709a1d8ea3a9):
+  better-auth@1.5.6(86be100e7560dce1c5b574c7ca0dcdc3):
     dependencies:
       '@better-auth/core': 1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0)
-      '@better-auth/drizzle-adapter': 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.14)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6))
+      '@better-auth/drizzle-adapter': 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.16)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6))
       '@better-auth/kysely-adapter': 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(kysely@0.28.15)
       '@better-auth/memory-adapter': 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)
       '@better-auth/mongo-adapter': 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(mongodb@7.1.0)
@@ -6811,17 +6811,17 @@ snapshots:
       zod: 4.3.6
     optionalDependencies:
       '@prisma/client': 7.4.2(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.2))(typescript@6.0.2)
-      '@sveltejs/kit': 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@sveltejs/kit': 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       better-sqlite3: 12.4.1
       drizzle-kit: 0.31.9
-      drizzle-orm: 1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.14)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
+      drizzle-orm: 1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.16)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6)
       mongodb: 7.1.0
       mysql2: 3.15.3
       prisma: 7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.2)
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
       svelte: 5.55.1
-      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
       - '@opentelemetry/api'
@@ -6850,15 +6850,15 @@ snapshots:
       file-uri-to-path: 1.0.0
     optional: true
 
-  bits-ui@2.16.5(@internationalized/date@3.12.0)(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1):
+  bits-ui@2.17.2(@internationalized/date@3.12.0)(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1):
     dependencies:
       '@floating-ui/core': 1.7.5
       '@floating-ui/dom': 1.7.6
       '@internationalized/date': 3.12.0
       esm-env: 1.2.2
-      runed: 0.35.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)
+      runed: 0.35.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)
       svelte: 5.55.1
-      svelte-toolbelt: 0.10.6(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)
+      svelte-toolbelt: 0.10.6(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)
       tabbable: 6.4.0
     transitivePeerDependencies:
       - '@sveltejs/kit'
@@ -6891,8 +6891,8 @@ snapshots:
 
   browserslist@4.28.2:
     dependencies:
-      baseline-browser-mapping: 2.10.14
-      caniuse-lite: 1.0.30001785
+      baseline-browser-mapping: 2.10.16
+      caniuse-lite: 1.0.30001786
       electron-to-chromium: 1.5.331
       node-releases: 2.0.37
       update-browserslist-db: 1.2.3(browserslist@4.28.2)
@@ -6941,7 +6941,7 @@ snapshots:
   camelcase@8.0.0:
     optional: true
 
-  caniuse-lite@1.0.30001785: {}
+  caniuse-lite@1.0.30001786: {}
 
   chai@6.2.2: {}
 
@@ -7218,7 +7218,7 @@ snapshots:
       get-tsconfig: 4.13.7
       jiti: 2.6.1
 
-  drizzle-orm@1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.8)(typebox@1.1.14)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6):
+  drizzle-orm@1.0.0-beta.20(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.16)(valibot@1.3.1(typescript@6.0.2))(zod@4.3.6):
     dependencies:
       '@types/mssql': 9.1.9(@azure/core-client@1.10.1)
       mssql: 11.0.1(@azure/core-client@1.10.1)
@@ -7230,8 +7230,8 @@ snapshots:
       better-sqlite3: 12.4.1
       gel: 2.0.2
       mysql2: 3.15.3
-      postgres: 3.4.8
-      typebox: 1.1.14
+      postgres: 3.4.9
+      typebox: 1.1.16
       valibot: 1.3.1(typescript@6.0.2)
       zod: 4.3.6
 
@@ -7537,11 +7537,11 @@ snapshots:
       signal-exit: 4.1.0
     optional: true
 
-  formsnap@2.0.1(svelte@5.55.1)(sveltekit-superforms@2.30.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(@types/json-schema@7.0.15)(svelte@5.55.1)(typescript@6.0.2)):
+  formsnap@2.0.1(svelte@5.55.1)(sveltekit-superforms@2.30.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(@types/json-schema@7.0.15)(svelte@5.55.1)(typescript@6.0.2)):
     dependencies:
       svelte: 5.55.1
       svelte-toolbelt: 0.5.0(svelte@5.55.1)
-      sveltekit-superforms: 2.30.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(@types/json-schema@7.0.15)(svelte@5.55.1)(typescript@6.0.2)
+      sveltekit-superforms: 2.30.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(@types/json-schema@7.0.15)(svelte@5.55.1)(typescript@6.0.2)
 
   fs-constants@1.0.0:
     optional: true
@@ -7642,7 +7642,7 @@ snapshots:
   hono@4.11.4:
     optional: true
 
-  hono@4.12.10: {}
+  hono@4.12.11: {}
 
   html-escaper@2.0.2: {}
 
@@ -7832,7 +7832,7 @@ snapshots:
 
   kysely@0.28.15: {}
 
-  layerchart@2.0.0-next.49(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(zod@4.3.6):
+  layerchart@2.0.0-next.49(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(zod@4.3.6):
     dependencies:
       '@dagrejs/dagre': 2.0.4
       '@layerstack/svelte-actions': 1.0.1-next.18
@@ -7862,7 +7862,7 @@ snapshots:
       d3-tile: 1.0.0
       d3-time: 3.1.0
       memoize: 10.2.0
-      runed: 0.37.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(zod@4.3.6)
+      runed: 0.37.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(zod@4.3.6)
       svelte: 5.55.1
     transitivePeerDependencies:
       - '@sveltejs/kit'
@@ -8263,7 +8263,7 @@ snapshots:
   postgres@3.4.7:
     optional: true
 
-  postgres@3.4.8: {}
+  postgres@3.4.9: {}
 
   prebuild-install@7.1.3:
     dependencies:
@@ -8513,23 +8513,23 @@ snapshots:
       esm-env: 1.2.2
       svelte: 5.55.1
 
-  runed@0.35.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1):
+  runed@0.35.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1):
     dependencies:
       dequal: 2.0.3
       esm-env: 1.2.2
       lz-string: 1.5.0
       svelte: 5.55.1
     optionalDependencies:
-      '@sveltejs/kit': 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@sveltejs/kit': 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
 
-  runed@0.37.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(zod@4.3.6):
+  runed@0.37.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(zod@4.3.6):
     dependencies:
       dequal: 2.0.3
       esm-env: 1.2.2
       lz-string: 1.5.0
       svelte: 5.55.1
     optionalDependencies:
-      '@sveltejs/kit': 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@sveltejs/kit': 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       zod: 4.3.6
 
   rw@1.3.3: {}
@@ -8728,10 +8728,10 @@ snapshots:
       runed: 0.28.0(svelte@5.55.1)
       svelte: 5.55.1
 
-  svelte-toolbelt@0.10.6(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1):
+  svelte-toolbelt@0.10.6(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1):
     dependencies:
       clsx: 2.1.1
-      runed: 0.35.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)
+      runed: 0.35.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)
       style-to-object: 1.0.14
       svelte: 5.55.1
     transitivePeerDependencies:
@@ -8783,9 +8783,9 @@ snapshots:
       magic-string: 0.30.21
       zimmerframe: 1.1.4
 
-  sveltekit-superforms@2.30.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(@types/json-schema@7.0.15)(svelte@5.55.1)(typescript@6.0.2):
+  sveltekit-superforms@2.30.1(@sveltejs/kit@2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(@types/json-schema@7.0.15)(svelte@5.55.1)(typescript@6.0.2):
     dependencies:
-      '@sveltejs/kit': 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@sveltejs/kit': 2.56.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.1)(typescript@6.0.2)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       devalue: 5.6.4
       memoize-weak: 1.0.2
       svelte: 5.55.1
@@ -8802,7 +8802,7 @@ snapshots:
       joi: 17.13.3
       json-schema-to-ts: 3.1.1
       superstruct: 2.0.2
-      typebox: 1.1.14
+      typebox: 1.1.16
       valibot: 1.3.1(typescript@6.0.2)
       yup: 1.7.1
       zod: 4.3.6
@@ -8974,7 +8974,7 @@ snapshots:
     dependencies:
       tagged-tag: 1.0.0
 
-  typebox@1.1.14:
+  typebox@1.1.16:
     optional: true
 
   typed-event-target@4.3.0:
@@ -9053,16 +9053,16 @@ snapshots:
       svelte: 5.55.1
       svelte-toolbelt: 0.7.1(svelte@5.55.1)
 
-  vite-imagetools@10.0.0(rollup@4.59.0)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)):
+  vite-imagetools@10.0.0(rollup@4.59.0)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)):
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.59.0)
       imagetools-core: 9.1.0
       sharp: 0.34.5
-      vite: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+      vite: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
     transitivePeerDependencies:
       - rollup
 
-  vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1):
+  vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -9080,21 +9080,21 @@ snapshots:
       - '@emnapi/core'
       - '@emnapi/runtime'
 
-  vitefu@1.1.3(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)):
+  vitefu@1.1.3(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)):
     optionalDependencies:
-      vite: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+      vite: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
 
   vitest-browser-svelte@2.1.0(svelte@5.55.1)(vitest@4.1.2):
     dependencies:
       '@playwright/test': 1.59.1
       '@testing-library/svelte-core': 1.0.0(svelte@5.55.1)
       svelte: 5.55.1
-      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
 
-  vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)):
+  vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@25.5.2)(@vitest/browser-playwright@4.1.2)(@vitest/ui@4.1.2)(happy-dom@20.0.3)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)):
     dependencies:
       '@vitest/expect': 4.1.2
-      '@vitest/mocker': 4.1.2(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@vitest/mocker': 4.1.2(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       '@vitest/pretty-format': 4.1.2
       '@vitest/runner': 4.1.2
       '@vitest/snapshot': 4.1.2
@@ -9111,12 +9111,12 @@ snapshots:
       tinyexec: 1.0.4
       tinyglobby: 0.2.15
       tinyrainbow: 3.1.0
-      vite: 8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+      vite: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/node': 25.5.2
-      '@vitest/browser-playwright': 4.1.2(playwright@1.59.1)(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
+      '@vitest/browser-playwright': 4.1.2(playwright@1.59.1)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.2)
       '@vitest/ui': 4.1.2(vitest@4.1.2)
       happy-dom: 20.0.3
     transitivePeerDependencies:
