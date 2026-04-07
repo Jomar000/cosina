@@ -1,114 +1,17 @@
-import type { TApiResponseOk } from '@hyperion/types/shared'
 import { dbClient, dbSchema } from '@hyperion/database/postgres'
 import { env } from 'cloudflare:workers'
 import { and, eq, like } from 'drizzle-orm'
 
 import app from '../src/core/index.js'
 
+/**
+ * @description
+ * Generates a unique name by combining a prefix with the current timestamp
+ * and a short random alphanumeric suffix. Useful for seeding test records
+ * that must not collide across parallel test runs.
+ */
 export const generateUniqueName = (prefix: string): string =>
     `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
-
-export const getAnyWarehouseId = async (cookie: string): Promise<number> => {
-    const res = await app.request(
-        '/app/warehouse/readMany',
-        {
-            method: 'POST',
-            headers: {
-                origin: 'vitest-pool-worker',
-                'content-type': 'application/json',
-                cookie,
-            },
-        },
-        env,
-    )
-    const data = await res.json<TApiResponseOk<{ id: number }[]>>()
-    if (!data.data.length)
-        throw new Error('No rows found in "warehouse" table — check seed data.')
-    return data.data[0].id
-}
-
-export const getAnyItemId = async (cookie: string): Promise<number> => {
-    const res = await app.request(
-        '/app/inventory/item/readMany',
-        {
-            method: 'POST',
-            headers: {
-                origin: 'vitest-pool-worker',
-                'content-type': 'application/json',
-                cookie,
-            },
-            body: JSON.stringify({ limit: 1, isDisabled: false }),
-        },
-        env,
-    )
-    const data = await res.json<TApiResponseOk<{ id: number }[]>>()
-    if (!data.data.length)
-        throw new Error('No rows found in "item" table — check seed data.')
-    return data.data[0].id
-}
-
-export const getAnyPaymentTypeId = async (cookie: string): Promise<number> => {
-    const res = await app.request(
-        '/app/paymentType/readMany',
-        {
-            method: 'POST',
-            headers: {
-                origin: 'vitest-pool-worker',
-                'content-type': 'application/json',
-                cookie,
-            },
-        },
-        env,
-    )
-    const data = await res.json<TApiResponseOk<{ id: number }[]>>()
-    if (!data.data.length)
-        throw new Error(
-            'No rows found in "payment_type" table — check seed data.',
-        )
-    return data.data[0].id
-}
-
-export const setTestingCookies = async () => {
-    const response = await Promise.all([
-        app.request(
-            '/app/auth/sign-in/username',
-            {
-                method: 'POST',
-                headers: {
-                    origin: 'vitest-pool-worker',
-                    'content-type': 'application/json',
-                },
-                body: JSON.stringify({
-                    organizationId: 'superorganization',
-                    accountId: 'superadministrator',
-                    password: 'P@ssw0rd1234',
-                }),
-            },
-            env,
-        ),
-        app.request(
-            '/app/auth/sign-in/username',
-            {
-                method: 'POST',
-                headers: {
-                    origin: 'vitest-pool-worker',
-                    'content-type': 'application/json',
-                },
-                body: JSON.stringify({
-                    organizationId: 'superorganization',
-                    accountId: 'member',
-                    password: 'P@ssw0rd1234',
-                }),
-            },
-            env,
-        ),
-    ])
-
-    return [
-        response[0].headers.getSetCookie().join('; '),
-        response[1].headers.getSetCookie().join('; '),
-    ] as const
-}
 
 /**
  * @description
@@ -186,4 +89,51 @@ export const interceptPasswordResetToken = async (
     } finally {
         await db.$client.end()
     }
+}
+
+/**
+ * @description
+ * Signs in as both `superadministrator` and `member` in parallel and returns
+ * their session cookies as a readonly tuple `[adminCookie, memberCookie]`.
+ */
+export const setTestingCookies = async () => {
+    const response = await Promise.all([
+        app.request(
+            '/app/auth/sign-in/username',
+            {
+                method: 'POST',
+                headers: {
+                    origin: 'vitest-pool-worker',
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify({
+                    organizationId: 'superorganization',
+                    accountId: 'superadministrator',
+                    password: 'P@ssw0rd1234',
+                }),
+            },
+            env,
+        ),
+        app.request(
+            '/app/auth/sign-in/username',
+            {
+                method: 'POST',
+                headers: {
+                    origin: 'vitest-pool-worker',
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify({
+                    organizationId: 'superorganization',
+                    accountId: 'member',
+                    password: 'P@ssw0rd1234',
+                }),
+            },
+            env,
+        ),
+    ])
+
+    return [
+        response[0].headers.getSetCookie().join('; '),
+        response[1].headers.getSetCookie().join('; '),
+    ] as const
 }
