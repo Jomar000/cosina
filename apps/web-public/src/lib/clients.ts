@@ -23,13 +23,13 @@ const SAFE_METHODS = [
 const kyClient = ky.extend({
     hooks: {
         beforeRequest: [
-            (req) => {
-                if (SAFE_METHODS.includes(req.method)) return
+            ({ request }) => {
+                if (SAFE_METHODS.includes(request.method)) return
 
                 const csrfToken = getCookie('csrf_token')
 
                 if (csrfToken) {
-                    req.headers.set(
+                    request.headers.set(
                         'x-csrf-token',
                         decodeURIComponent(csrfToken),
                     )
