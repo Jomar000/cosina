@@ -1,19 +1,25 @@
 import { z } from 'zod'
 
 export const vBoolean = (fieldName: string) =>
-    z.coerce
-        .string()
-        .toLowerCase()
-        .pipe(
-            z.enum(
-                [
-                    'true',
-                    'false',
-                ],
-                { error: `${fieldName} must be a boolean string.` },
-            ),
+    z
+        .union([
+            z.boolean(),
+            z
+                .string()
+                .toLowerCase()
+                .pipe(
+                    z.enum(
+                        [
+                            'true',
+                            'false',
+                        ],
+                        { error: `${fieldName} must be a boolean string.` },
+                    ),
+                ),
+        ])
+        .transform((field) =>
+            typeof field === 'boolean' ? field : field === 'true',
         )
-        .transform((field) => field === 'true')
 
 export const vInt = ({
     fieldName = 'Field',
