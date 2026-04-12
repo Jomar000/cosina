@@ -70,10 +70,6 @@ localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion"
 name = "HYPERIONBOFC_DO_WSS"
 class_name = "WebSocketServer"
 
-[[r2_buckets]]
-binding = 'HYPERIONBOFC_R2'
-bucket_name = 'hyperion-development'
-
 ########
 # TEST #
 ########
@@ -116,10 +112,6 @@ localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion_te
 name = "HYPERIONBOFC_DO_WSS"
 class_name = "WebSocketServer"
 
-[[env.test.r2_buckets]]
-binding = 'HYPERIONBOFC_R2'
-bucket_name = 'hyperion-test'
-
 ###########
 # STAGING #
 ###########
@@ -161,10 +153,6 @@ id = "00000000000000000000000000000002"
 name = "HYPERIONBOFC_DO_WSS"
 class_name = "WebSocketServer"
 
-[[env.staging.r2_buckets]]
-binding = 'HYPERIONBOFC_R2'
-bucket_name = 'hyperion-staging'
-
 ##############
 # PRODUCTION #
 ##############
@@ -205,7 +193,3 @@ id = "00000000000000000000000000000003"
 [[env.production.durable_objects.bindings]]
 name = "HYPERIONBOFC_DO_WSS"
 class_name = "WebSocketServer"
-
-[[env.production.r2_buckets]]
-binding = 'HYPERIONBOFC_R2'
-bucket_name = 'hyperion-production'

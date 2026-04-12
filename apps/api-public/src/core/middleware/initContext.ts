@@ -52,7 +52,6 @@ export const initContext = () => {
             ctx.set('ipAddress', ctx.req.header('cf-connecting-ip') || 'N/A')
             ctx.set('isPrivilegedRole', false)
             ctx.set('kvClient', ctx.env.HYPERIONPUB_KV)
-            ctx.set('r2Client', ctx.env.HYPERIONPUB_R2)
             ctx.set('role', 'N/A')
             ctx.set('session', null)
             ctx.set('user', null)
