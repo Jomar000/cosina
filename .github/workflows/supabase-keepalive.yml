@@ -16,21 +16,47 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Query Supabase to keep database active
-        run: |
-          response=$(curl -s -w "\n%{http_code}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/rpc/version" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { setTimeout } = require('timers/promises');
+            const url = '${{ secrets.SUPABASE_URL }}/rest/v1/rpc/keepalive_version';
+            const apiKey = '${{ secrets.SUPABASE_ANON_KEY }}';
 
-          status=$(echo "$response" | tail -1)
-          body=$(echo "$response" | head -n -1)
+            const MAX_RETRIES = 3;
+            const RETRY_DELAY_MS = 5000;
 
-          echo "Response status: $status"
-          echo "Response body: $body"
+            for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+              try {
+                const response = await fetch(url, {
+                  method: 'GET',
+                  headers: { apiKey },
+                });
 
-          if [ "$status" -ge 200 ] && [ "$status" -lt 300 ]; then
-            echo "Supabase database is alive!"
-          else
-            echo "Unexpected status code: $status"
-            exit 1
-          fi
+                const status = response.status;
+                const body = await response.text();
+
+                console.log(`Attempt ${attempt}/${MAX_RETRIES}: Status ${status}`);
+                console.log(`Response body: ${body}`);
+
+                if (status >= 200 && status < 300) {
+                  console.log(`✓ PostgreSQL version: ${body} (attempt ${attempt})`);
+                  return;
+                } else {
+                  if (attempt < MAX_RETRIES) {
+                    console.log(`Waiting ${RETRY_DELAY_MS}ms before retry...`);
+                    await setTimeout(RETRY_DELAY_MS);
+                  } else {
+                    console.error(`Failed after ${MAX_RETRIES} attempts with status ${status}`);
+                    throw new Error(`Supabase keepalive failed: ${status} - ${body}`);
+                  }
+                }
+              } catch (error) {
+                console.error(`Attempt ${attempt} failed:`, error.message);
+                if (attempt < MAX_RETRIES) {
+                  console.log(`Waiting ${RETRY_DELAY_MS}ms before retry...`);
+                  await setTimeout(RETRY_DELAY_MS);
+                }
+              }
+            }

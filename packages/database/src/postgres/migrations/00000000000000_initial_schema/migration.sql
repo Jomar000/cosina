@@ -273,6 +273,8 @@ BEGIN
 END;
 $$;
 
+--
+
 CREATE OR REPLACE FUNCTION add_updated_at_triggers_fn()
     RETURNS void
     LANGUAGE "plpgsql"
@@ -302,6 +304,8 @@ $$;
 SELECT "public".add_updated_at_triggers_fn();
 
 DROP FUNCTION "public".add_updated_at_triggers_fn();
+
+--
 
 CREATE OR REPLACE FUNCTION set_deferrable_fk_constraints_fn()
     RETURNS void
@@ -334,3 +338,20 @@ $$;
 SELECT "public".set_deferrable_fk_constraints_fn();
 
 DROP FUNCTION "public".set_deferrable_fk_constraints_fn();
+
+--
+-- Used for Supabase Keepalive Workflow
+-- Harden the Data API by exposing only the `api` schema and turning off the pg_graphql extension
+--
+
+CREATE SCHEMA IF NOT EXISTS api;
+GRANT USAGE ON SCHEMA API TO anon, authenticated;
+
+CREATE OR REPLACE FUNCTION "api".keepalive_version()
+    RETURNS TEXT
+    LANGUAGE "sql"
+    SET search_path = ''
+    SECURITY DEFINER
+AS $$
+    SELECT version();
+$$;
