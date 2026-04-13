@@ -272,6 +272,7 @@ BEGIN
 	RETURN NEW;
 END;
 $$;
+--> statement-breakpoint
 
 --
 
@@ -300,10 +301,10 @@ BEGIN
     END LOOP;
 END;
 $$;
+--> statement-breakpoint
 
-SELECT "public".add_updated_at_triggers_fn();
-
-DROP FUNCTION "public".add_updated_at_triggers_fn();
+SELECT "public".add_updated_at_triggers_fn();--> statement-breakpoint
+DROP FUNCTION "public".add_updated_at_triggers_fn();--> statement-breakpoint
 
 --
 
@@ -334,18 +335,18 @@ BEGIN
     END LOOP;
 END;
 $$;
+--> statement-breakpoint
 
-SELECT "public".set_deferrable_fk_constraints_fn();
-
-DROP FUNCTION "public".set_deferrable_fk_constraints_fn();
+SELECT "public".set_deferrable_fk_constraints_fn();--> statement-breakpoint
+DROP FUNCTION "public".set_deferrable_fk_constraints_fn();--> statement-breakpoint
 
 --
 -- Used for Supabase Keepalive Workflow
 -- Harden the Data API by exposing only the `api` schema and turning off the pg_graphql extension
 --
 
-CREATE SCHEMA IF NOT EXISTS api;
-GRANT USAGE ON SCHEMA API TO anon, authenticated;
+CREATE SCHEMA IF NOT EXISTS api;--> statement-breakpoint
+--GRANT USAGE ON SCHEMA API TO anon, authenticated;
 
 CREATE OR REPLACE FUNCTION "api".keepalive_version()
     RETURNS TEXT
@@ -355,3 +356,4 @@ CREATE OR REPLACE FUNCTION "api".keepalive_version()
 AS $$
     SELECT version();
 $$;
+--> statement-breakpoint
