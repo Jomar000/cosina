@@ -9,7 +9,6 @@ declare global {
         HYPERIONPUB_DO_WSS: DurableObjectNamespace<WebSocketServer>
         HYPERIONPUB_HD: Hyperdrive
         HYPERIONPUB_KV: KVNamespace
-        HYPERIONPUB_R2: R2Bucket
     } & Env
 
     type THonoVariables = {

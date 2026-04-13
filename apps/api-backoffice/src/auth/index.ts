@@ -1,5 +1,5 @@
 import { scryptAsync } from '@noble/hashes/scrypt.js'
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js'
+import { bytesToHex, hexToBytes, utf8ToBytes } from '@noble/hashes/utils.js'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { constantTimeEqual } from 'better-auth/crypto'
@@ -56,21 +56,26 @@ export const auth = async (opts: {
 
     /**
      * @description
-     * Customized scrypt key generation based on better-auth logic with minor tweaks.
+     * Derives a 64-byte key from a password and salt using scrypt (RFC 7914).
+     * Password is NFKC-normalized and both inputs are explicitly converted to
+     * Uint8Array for compatibility with {@link https://www.npmjs.com/package/@noble/hashes | @noble/hashes} ≥ 2.2.0,
+     * which removed implicit string-to-bytes coercion.
      *
-     * @link
-     * https://github.com/better-auth/better-auth/blob/main/packages/better-auth/src/crypto/password.ts
+     * `maxmem` uses `(N + p + 1) * r * 128` — noble's internal accounting that
+     * includes the `tmp` scratch block. This exceeds the RFC 7914 formula of
+     * `(N + p) * r * 128` by one block and is specific to this implementation.
      *
-     * @link
-     * https://github.com/paulmillr/noble-hashes?tab=readme-ov-file#scrypt
+     * @see {@link https://datatracker.ietf.org/doc/html/rfc7914 | RFC 7914 — scrypt}
      */
     const generateKey = async (password: string, salt: string) => {
-        return scryptAsync(password.normalize('NFKC'), salt, {
-            ...scryptOpts,
-            maxmem:
-                scryptOpts.N * scryptOpts.r * scryptOpts.p * 128 +
-                128 * scryptOpts.r * scryptOpts.p,
-        })
+        return scryptAsync(
+            utf8ToBytes(password.normalize('NFKC')),
+            utf8ToBytes(salt),
+            {
+                ...scryptOpts,
+                maxmem: (scryptOpts.N + scryptOpts.p + 1) * scryptOpts.r * 128,
+            },
+        )
     }
 
     return betterAuth({
