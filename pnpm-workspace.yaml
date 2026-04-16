@@ -3,9 +3,9 @@ packages:
   - packages/**
 
 catalog:
-  '@better-auth/drizzle-adapter': ^1.6.3
-  '@cloudflare/vitest-pool-workers': ^0.14.6
-  '@internationalized/date': ^3.12.0
+  '@better-auth/drizzle-adapter': ^1.6.4
+  '@cloudflare/vitest-pool-workers': ^0.14.7
+  '@internationalized/date': ^3.12.1
   '@lucide/svelte': ^1.8.0
   '@noble/hashes': ^2.2.0
   '@playwright/test': ^1.59.1
@@ -24,26 +24,26 @@ catalog:
   '@vitest/snapshot': ^4.1.4
   '@vitest/ui': ^4.1.4
   aws4fetch: ^1.0.20
-  better-auth: ^1.6.3
+  better-auth: ^1.6.4
   bits-ui: ^2.17.3
   clsx: ^2.1.1
   daisyui: ^5.5.19
   dayjs: ^1.11.20
-  drizzle-kit: 1.0.0-beta.20
-  drizzle-orm: 1.0.0-beta.20
+  drizzle-kit: 1.0.0-beta.21
+  drizzle-orm: 1.0.0-beta.21
   embla-carousel-svelte: ^8.6.0
   file-type: ^22.0.1
   formsnap: ^2.0.1
-  hono: ^4.12.12
-  ky: ^2.0.0
+  hono: ^4.12.14
+  ky: ^2.0.1
   layerchart: 2.0.0-next.49
   mode-watcher: ^1.1.0
-  nanoid: ^5.1.7
+  nanoid: ^5.1.9
   p-queue: ^9.1.2
   paneforge: ^1.0.2
   playwright: ^1.59.1
   resend: ^6.11.0
-  svelte: ^5.55.3
+  svelte: ^5.55.4
   svelte-check: ^4.4.6
   svelte-sonner: ^1.1.0
   sveltekit-superforms: ^2.30.1
