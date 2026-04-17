@@ -33,7 +33,7 @@
         "prettier-plugin-svelte": "^3.5.1",
         "prettier-plugin-tailwindcss": "^0.7.2",
         "tsx": "^4.21.0",
-        "typescript": "^6.0.2",
+        "typescript": "^6.0.3",
         "typescript-eslint": "^8.58.2",
         "wrangler": "^4.83.0"
     },
@@ -46,6 +46,18 @@
         "overrides": {
             "globals": "^17.4.0",
             "esbuild": "^0.27.3"
+        },
+        "packageExtensions": {
+            "@better-auth/drizzle-adapter@*": {
+                "peerDependencies": {
+                    "drizzle-orm": "*"
+                }
+            },
+            "better-auth@*": {
+                "peerDependencies": {
+                    "drizzle-orm": "*"
+                }
+            }
         },
         "peerDependencyRules": {
             "allowedVersions": {

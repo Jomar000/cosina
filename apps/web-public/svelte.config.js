@@ -5,7 +5,7 @@ import { loadEnv } from 'vite'
 const mode =
     process.argv.find((arg) => arg.startsWith('--mode='))?.split('=')[1] || ''
 
-const env = loadEnv(mode, process.cwd(), '')
+const env = loadEnv(mode, import.meta.dirname, '')
 
 /**
  * @type {import('@sveltejs/kit').Config}
@@ -34,6 +34,7 @@ const config = {
                     'self',
                     `https://${env.PUBLIC_CF_ACCOUNT_ID}.r2.cloudflarestorage.com/`,
                     `${env.PUBLIC_API_URL}/`,
+                    `${env.PUBLIC_API_URL.replace(/^http?/, 'ws')}/`,
                 ],
                 'default-src': ['self'],
                 'font-src': ['self'],

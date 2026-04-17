@@ -62,15 +62,18 @@ export class WebSocketServer extends DurableObject {
             this.ctx.getWebSockets().forEach((wsClient) => {
                 // Don't send back to self
                 if (
-                    wsClient.readyState === wsClient.OPEN &&
-                    wsClient.bufferedAmount === 0 &&
+                    wsClient.readyState === 1 && // 1 is OPEN
                     wsClient !== ws
                 ) {
-                    wsClient.send(
-                        typeof data === 'object'
-                            ? JSON.stringify(data)
-                            : String(data),
-                    )
+                    try {
+                        wsClient.send(
+                            typeof data === 'object'
+                                ? JSON.stringify(data)
+                                : String(data),
+                        )
+                    } catch {
+                        /* EMPTY */
+                    }
                 }
             })
         }
@@ -78,8 +81,13 @@ export class WebSocketServer extends DurableObject {
 
     sendMessage(message: string) {
         this.ctx.getWebSockets().forEach((ws) => {
-            if (ws.readyState === ws.OPEN && ws.bufferedAmount === 0) {
-                ws.send(message)
+            if (ws.readyState === 1) {
+                // 1 is OPEN
+                try {
+                    ws.send(message)
+                } catch {
+                    /* EMPTY */
+                }
             }
         })
     }
