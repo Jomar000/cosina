@@ -47,22 +47,9 @@
             "globals": "^17.4.0",
             "esbuild": "^0.27.3"
         },
-        "packageExtensions": {
-            "@better-auth/drizzle-adapter@*": {
-                "peerDependencies": {
-                    "drizzle-orm": "*"
-                }
-            },
-            "better-auth@*": {
-                "peerDependencies": {
-                    "drizzle-orm": "*"
-                }
-            }
-        },
         "peerDependencyRules": {
             "allowedVersions": {
-                "@better-auth/drizzle-adapter>drizzle-orm": "*",
-                "better-auth>drizzle-orm": "*",
+                "drizzle-orm": "*",
                 "typescript": "^6.0.0"
             },
             "ignoreMissing": []
