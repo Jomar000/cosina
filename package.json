@@ -19,11 +19,11 @@
         "test": "echo 'Tests must be run per-app to ensure a clean DB state per session'"
     },
     "devDependencies": {
-        "@changesets/cli": "^2.30.0",
+        "@changesets/cli": "^2.31.0",
         "@eslint/compat": "^2.0.5",
         "@eslint/js": "^10.0.1",
         "@types/node": "^24.12.2",
-        "eslint": "^10.2.0",
+        "eslint": "^10.2.1",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-svelte": "^3.17.0",
         "globals": "^17.5.0",
