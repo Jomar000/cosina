@@ -14,7 +14,7 @@ catalog:
   '@sveltejs/vite-plugin-svelte': ^7.0.0
   '@tailwindcss/vite': ^4.2.2
   '@tanstack/svelte-form': ^1.29.0
-  '@tanstack/svelte-query': ^6.1.16
+  '@tanstack/svelte-query': ^6.1.18
   '@tanstack/table-core': ^8.21.3
   '@types/cloudflare-turnstile': ^0.2.2
   '@vitest/browser': ^4.1.4
