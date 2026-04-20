@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+export const INT4_MIN = -2147483648
+export const INT4_MAX = 2147483647
+
 export const vBoolean = (fieldName: string) =>
     z
         .union([
@@ -24,8 +27,8 @@ export const vBoolean = (fieldName: string) =>
 export const vInt = ({
     fieldName = 'Field',
     message = undefined,
-    min = Number.MIN_SAFE_INTEGER,
-    max = Number.MAX_SAFE_INTEGER,
+    min = INT4_MIN,
+    max = INT4_MAX,
 }: {
     fieldName?: string
     message?: string
@@ -33,18 +36,36 @@ export const vInt = ({
     max?: number
 }) =>
     z
-        .number({
-            error: message
-                ? message.replace('%f', fieldName)
-                : `${fieldName} must be an integer.`,
-        })
-        .int({
-            error: message
-                ? message.replace('%f', fieldName)
-                : `${fieldName} must be an integer.`,
-        })
-        .min(min, `${fieldName} must be greater than or equal to ${min}.`)
-        .max(max, `${fieldName} must be less than or equal to ${max}.`)
+        .union(
+            [
+                z.string(),
+                z.number(),
+            ],
+            {
+                error: message
+                    ? message.replace('%f', fieldName)
+                    : `${fieldName} must be an integer.`,
+            },
+        )
+        .transform((field) => Number(field))
+        .pipe(
+            z
+                .number({
+                    error: message
+                        ? message.replace('%f', fieldName)
+                        : `${fieldName} must be an integer.`,
+                })
+                .int({
+                    error: message
+                        ? message.replace('%f', fieldName)
+                        : `${fieldName} must be an integer.`,
+                })
+                .min(
+                    min,
+                    `${fieldName} must be greater than or equal to ${min}.`,
+                )
+                .max(max, `${fieldName} must be less than or equal to ${max}.`),
+        )
 
 export const vNumeric = ({
     fieldName = 'Field',

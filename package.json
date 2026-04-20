@@ -49,7 +49,8 @@
         },
         "peerDependencyRules": {
             "allowedVersions": {
-                "drizzle-orm": "*",
+                "@better-auth/drizzle-adapter>drizzle-orm": "*",
+                "better-auth>drizzle-orm": "*",
                 "typescript": "^6.0.0"
             },
             "ignoreMissing": []

@@ -78,25 +78,23 @@ export const auditTrailLogger = async (
                 'recordTable' | 'recordId' | 'recordDataOld' | 'recordDataNew'
             >
         >,
+    client: Pick<typeof ctx.var.dbClient, 'insert'> = ctx.get('dbClient'),
 ) => {
     const { auditTrail } = ctx.get('dbSchema')
 
-    await ctx
-        .get('dbClient')
-        .insert(auditTrail)
-        .values({
-            organizationId: ctx.get('session')?.activeOrganizationId ?? null,
-            userId: ctx.get('user')?.id ?? null,
-            component: data.component,
-            action: data.action,
-            description: data.description,
-            recordTable: data.recordTable,
-            recordId: data.recordId,
-            recordDataOld: data.recordDataOld,
-            recordDataNew: data.recordDataNew,
-            ipAddress: ctx.get('ipAddress'),
-            userAgent: ctx.get('userAgent'),
-        })
+    await client.insert(auditTrail).values({
+        organizationId: ctx.get('session')?.activeOrganizationId ?? null,
+        userId: ctx.get('user')?.id ?? null,
+        component: data.component,
+        action: data.action,
+        description: data.description,
+        recordTable: data.recordTable,
+        recordId: data.recordId,
+        recordDataOld: data.recordDataOld,
+        recordDataNew: data.recordDataNew,
+        ipAddress: ctx.get('ipAddress'),
+        userAgent: ctx.get('userAgent'),
+    })
 }
 
 /**
