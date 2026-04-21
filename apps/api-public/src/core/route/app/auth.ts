@@ -14,6 +14,7 @@ import { AppError } from '../../../errors.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    auditTrailLogger,
     validatorCallback,
 } from '../../../utilities.js'
 import { captchaHandler } from '../../middleware/captchaHandler.js'
@@ -142,6 +143,12 @@ const signInHandler = async (
         ctx.header('set-cookie', cookie, { append: true })
     }
 
+    await auditTrailLogger(ctx, {
+        component: 'auth',
+        action: 'sign_in',
+        description: `User signed in via ${credentialType}`,
+    })
+
     return apiResponseOkWrapper(ctx, {
         data: {
             name: orgMemberData.user.username,
@@ -193,6 +200,12 @@ export const authRoute = new Hono<THonoInstance>()
                 })
             }
 
+            await auditTrailLogger(ctx, {
+                component: 'auth',
+                action: 'password_change',
+                description: 'User changed their password',
+            })
+
             return apiResponseOkWrapper(ctx, { data: null })
         },
     )
@@ -216,6 +229,12 @@ export const authRoute = new Hono<THonoInstance>()
                  * Silently succeed to prevent email enumeration
                  */
             }
+
+            await auditTrailLogger(ctx, {
+                component: 'auth',
+                action: 'password_reset_request',
+                description: 'Password reset requested',
+            })
 
             return apiResponseOkWrapper(ctx, { data: null })
         },
@@ -242,6 +261,12 @@ export const authRoute = new Hono<THonoInstance>()
                     status: 422,
                 })
             }
+
+            await auditTrailLogger(ctx, {
+                component: 'auth',
+                action: 'password_reset',
+                description: 'Password was reset via token',
+            })
 
             return apiResponseOkWrapper(ctx, { data: null })
         },
@@ -273,6 +298,12 @@ export const authRoute = new Hono<THonoInstance>()
         for (const cookie of betterAuthResponse.headers.getSetCookie()) {
             ctx.header('set-cookie', cookie, { append: true })
         }
+
+        await auditTrailLogger(ctx, {
+            component: 'auth',
+            action: 'sign_out',
+            description: 'User signed out',
+        })
 
         return apiResponseOkWrapper(ctx, { data: null })
     })

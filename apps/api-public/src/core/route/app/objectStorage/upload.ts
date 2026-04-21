@@ -7,6 +7,7 @@ import { AppError } from '../../../../errors.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    auditTrailLogger,
     nanoidCustom,
     validatorCallback,
 } from '../../../../utilities.js'
@@ -29,6 +30,14 @@ export const uploadRoute = new Hono<THonoInstance>()
                     id: uploadId,
                     userId: ctx.get('user')!.id,
                 })
+
+            await auditTrailLogger(ctx, {
+                component: 'object_storage',
+                action: 'upload_create',
+                description: 'Upload session created',
+                recordTable: 'upload',
+                recordId: uploadId,
+            })
 
             return apiResponseOkWrapper(ctx, {
                 data: { uploadId },
@@ -123,6 +132,18 @@ export const uploadRoute = new Hono<THonoInstance>()
                             .update(upload)
                             .set({ isCommitted: true })
                             .where(eq(upload.id, uploadId))
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'object_storage',
+                                action: 'upload_commit',
+                                description: 'Upload committed',
+                                recordTable: 'upload',
+                                recordId: uploadId,
+                            },
+                            tx,
+                        )
 
                         return await tx
                             .select({ id: objectStorage.id })

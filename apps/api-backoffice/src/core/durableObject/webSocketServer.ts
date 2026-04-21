@@ -7,6 +7,18 @@
 
 import { DurableObject } from 'cloudflare:workers'
 
+const wsLog = (entry: Record<string, unknown>) =>
+    console.log(JSON.stringify(entry))
+
+const wsError = (entry: Record<string, unknown>) =>
+    console.error(JSON.stringify(entry))
+
+const serializeError = (err: unknown) => ({
+    name: err instanceof Error ? err.name : 'UNKNOWN_ERROR',
+    message: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+})
+
 export class WebSocketServer extends DurableObject {
     constructor(ctx: DurableObjectState, env: THonoBindings) {
         super(ctx, env)
@@ -22,6 +34,8 @@ export class WebSocketServer extends DurableObject {
 
         server.serializeAttachment({ canBroadcast })
 
+        wsLog({ type: 'WS_CONNECT', canBroadcast })
+
         return new Response(null, {
             status: 101,
             webSocket: client,
@@ -29,11 +43,16 @@ export class WebSocketServer extends DurableObject {
     }
 
     webSocketClose(ws: WebSocket, code: number) {
+        wsLog({ type: 'WS_CLOSE', code })
         try {
             ws.close(code)
-        } catch {
-            // Best-effort close — socket may already be disconnected by the client
+        } catch (err) {
+            wsError({ type: 'WS_CLOSE_ERROR', code, ...serializeError(err) })
         }
+    }
+
+    webSocketError(ws: WebSocket, error: unknown) {
+        wsError({ type: 'WS_ERROR', ...serializeError(error) })
     }
 
     webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) {
@@ -53,26 +72,26 @@ export class WebSocketServer extends DurableObject {
                     ? new TextDecoder().decode(message)
                     : message,
             )
-        } catch {
+        } catch (err) {
+            wsError({ type: 'WS_MESSAGE_PARSE_ERROR', ...serializeError(err) })
             ws.close(1003, 'Invalid JSON payload.')
             return
         }
 
         if (data) {
             this.ctx.getWebSockets().forEach((wsClient) => {
-                // Don't send back to self
-                if (
-                    wsClient.readyState === 1 && // 1 is OPEN
-                    wsClient !== ws
-                ) {
+                if (wsClient.readyState === 1 && wsClient !== ws) {
                     try {
                         wsClient.send(
                             typeof data === 'object'
                                 ? JSON.stringify(data)
                                 : String(data),
                         )
-                    } catch {
-                        /* EMPTY */
+                    } catch (err) {
+                        wsError({
+                            type: 'WS_MESSAGE_SEND_ERROR',
+                            ...serializeError(err),
+                        })
                     }
                 }
             })
@@ -82,11 +101,13 @@ export class WebSocketServer extends DurableObject {
     sendMessage(message: string) {
         this.ctx.getWebSockets().forEach((ws) => {
             if (ws.readyState === 1) {
-                // 1 is OPEN
                 try {
                     ws.send(message)
-                } catch {
-                    /* EMPTY */
+                } catch (err) {
+                    wsError({
+                        type: 'WS_MESSAGE_SEND_ERROR',
+                        ...serializeError(err),
+                    })
                 }
             }
         })

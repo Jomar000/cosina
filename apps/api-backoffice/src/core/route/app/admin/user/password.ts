@@ -7,6 +7,7 @@ import { AppError } from '../../../../../errors.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    auditTrailLogger,
     validatorCallback,
 } from '../../../../../utilities.js'
 
@@ -74,6 +75,14 @@ export const passwordRoute = new Hono<THonoInstance>()
                     err instanceof Error ? err : undefined,
                 )
             }
+
+            await auditTrailLogger(ctx, {
+                component: 'admin.user.password',
+                action: 'reset_request',
+                description: 'Admin requested password reset for user',
+                recordTable: 'user',
+                recordId: userId,
+            })
 
             return apiResponseOkWrapper(ctx, { data: null })
         },
@@ -151,6 +160,14 @@ export const passwordRoute = new Hono<THonoInstance>()
                     err instanceof Error ? err : undefined,
                 )
             }
+
+            await auditTrailLogger(ctx, {
+                component: 'admin.user.password',
+                action: 'reset',
+                description: 'Admin reset password for user',
+                recordTable: 'user',
+                recordId: userId,
+            })
 
             return apiResponseOkWrapper(ctx, { data: null })
         },

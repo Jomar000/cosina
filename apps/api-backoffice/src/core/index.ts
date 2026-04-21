@@ -6,6 +6,7 @@ import { v7 as uuidv7 } from 'uuid'
 import { AppError } from '../errors.js'
 import { apiResponseErrorWrapper } from '../utilities.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
+import { requestTimer } from './middleware/requestTimer.js'
 import { appRoute } from './route/app/index.js'
 import { rootRoute } from './route/root/index.js'
 import { v1Route } from './route/v1/index.js'
@@ -49,6 +50,7 @@ export const app = new Hono<THonoInstance>()
             generator: () => uuidv7(),
         }),
     )
+    .use(requestTimer)
     .use(async (ctx, next) => {
         if (ctx.env.STATUS !== 'up') {
             return apiResponseErrorWrapper(ctx, {

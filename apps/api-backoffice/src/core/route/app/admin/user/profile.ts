@@ -8,6 +8,7 @@ import { AppError } from '../../../../../errors.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    auditTrailLogger,
     validatorCallback,
 } from '../../../../../utilities.js'
 
@@ -198,6 +199,14 @@ export const profileRoute = new Hono<THonoInstance>()
                         updatedAt: userProfile.updatedAt,
                     })
 
+                await auditTrailLogger(ctx, {
+                    component: 'admin.user.profile',
+                    action: 'update',
+                    description: 'Admin updated user profile',
+                    recordTable: 'user_profile',
+                    recordId: userId,
+                })
+
                 return apiResponseOkWrapper(ctx, { data })
             } catch (err) {
                 throw new AppError(
@@ -299,6 +308,18 @@ export const profileRoute = new Hono<THonoInstance>()
                                 })
                                 .where(eq(userProfile.userId, userId))
                         }
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'admin.user.profile',
+                                action: 'update_address',
+                                description: 'Admin updated user address',
+                                recordTable: 'user_profile',
+                                recordId: userId,
+                            },
+                            tx,
+                        )
 
                         return {
                             line1,

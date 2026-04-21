@@ -103,8 +103,8 @@ catalogs:
       specifier: ^4.12.14
       version: 4.12.14
     ky:
-      specifier: ^2.0.1
-      version: 2.0.1
+      specifier: ^2.0.2
+      version: 2.0.2
     layerchart:
       specifier: 2.0.0-next.49
       version: 2.0.0-next.49
@@ -430,7 +430,7 @@ importers:
         version: 4.12.14
       ky:
         specifier: 'catalog:'
-        version: 2.0.1
+        version: 2.0.2
       mode-watcher:
         specifier: 'catalog:'
         version: 1.1.0(svelte@5.55.4(@typescript-eslint/types@8.59.0))
@@ -535,7 +535,7 @@ importers:
         version: 4.12.14
       ky:
         specifier: 'catalog:'
-        version: 2.0.1
+        version: 2.0.2
       mode-watcher:
         specifier: 'catalog:'
         version: 1.1.0(svelte@5.55.4(@typescript-eslint/types@8.59.0))
@@ -3572,8 +3572,8 @@ packages:
   known-css-properties@0.37.0:
     resolution: {integrity: sha512-JCDrsP4Z1Sb9JwG0aJ8Eo2r7k4Ou5MwmThS/6lcIe1ICyb7UBJKGRIUUdqc2ASdE/42lgz6zFUnzAIhtXnBVrQ==}
 
-  ky@2.0.1:
-    resolution: {integrity: sha512-HJPEjEpQPZQ5M3G5eu90/LWZDwysCnvqcfbLvq9FUvfizBZRi58WEixswyyI32LOLcFQd43w7kcfgkCPFxDt/Q==}
+  ky@2.0.2:
+    resolution: {integrity: sha512-/GmXpo9F9W+f8n4Ivr2iH+7h7wL7jLbLKWkMlpflcCRb6kGjBfTlASEXaZ9qUgNTn4VgS0P2pwxxzQ4EM6Ulgg==}
     engines: {node: '>=22'}
 
   kysely@0.28.16:
@@ -7910,7 +7910,7 @@ snapshots:
 
   known-css-properties@0.37.0: {}
 
-  ky@2.0.1: {}
+  ky@2.0.2: {}
 
   kysely@0.28.16: {}
 
