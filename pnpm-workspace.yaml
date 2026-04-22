@@ -3,7 +3,7 @@ packages:
   - packages/**
 
 catalog:
-  '@better-auth/drizzle-adapter': ^1.6.6
+  '@better-auth/drizzle-adapter': ^1.6.7
   '@cloudflare/vitest-pool-workers': ^0.14.9
   '@internationalized/date': ^3.12.1
   '@lucide/svelte': ^1.8.0
@@ -24,7 +24,7 @@ catalog:
   '@vitest/snapshot': ^4.1.5
   '@vitest/ui': ^4.1.5
   aws4fetch: ^1.0.20
-  better-auth: ^1.6.6
+  better-auth: ^1.6.7
   bits-ui: ^2.18.0
   clsx: ^2.1.1
   daisyui: ^5.5.19

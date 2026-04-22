@@ -66,18 +66,21 @@ export const cfTurnstileVerifier = async (
  * @description
  * Utility for logging activities.
  */
+type TAuditRecord = {
+    table: string
+    id: string
+    dataOld?: unknown
+    dataNew?: unknown
+}
+
 export const auditTrailLogger = async (
     ctx: Context<THonoInstance>,
     data: Pick<
         typeof ctx.var.dbSchema.auditTrail.$inferInsert,
         'component' | 'action' | 'description'
-    > &
-        Partial<
-            Pick<
-                typeof ctx.var.dbSchema.auditTrail.$inferInsert,
-                'recordTable' | 'recordId' | 'recordDataOld' | 'recordDataNew'
-            >
-        >,
+    > & {
+        records?: TAuditRecord | TAuditRecord[]
+    },
     client: Pick<typeof ctx.var.dbClient, 'insert'> = ctx.get('dbClient'),
 ) => {
     const { auditTrail } = ctx.get('dbSchema')
@@ -88,10 +91,11 @@ export const auditTrailLogger = async (
         component: data.component,
         action: data.action,
         description: data.description,
-        recordTable: data.recordTable,
-        recordId: data.recordId,
-        recordDataOld: data.recordDataOld,
-        recordDataNew: data.recordDataNew,
+        records: data.records
+            ? Array.isArray(data.records)
+                ? data.records
+                : [data.records]
+            : null,
         ipAddress: ctx.get('ipAddress'),
         userAgent: ctx.get('userAgent'),
     })

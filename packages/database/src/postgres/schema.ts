@@ -78,10 +78,14 @@ export const auditTrail = pgTable(
         component: text('component').notNull(),
         action: text('action').notNull(),
         description: text('description').notNull(),
-        recordTable: text('record_table'),
-        recordId: text('record_id'),
-        recordDataOld: jsonb('record_data_old'),
-        recordDataNew: jsonb('record_data_new'),
+        records: jsonb('records').$type<
+            {
+                table: string
+                id: string
+                dataOld?: unknown
+                dataNew?: unknown
+            }[]
+        >(),
         ipAddress: text('ip_address'),
         userAgent: text('user_agent'),
         loggedAt: timestamp('logged_at', {

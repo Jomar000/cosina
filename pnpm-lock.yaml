@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@better-auth/drizzle-adapter':
-      specifier: ^1.6.6
-      version: 1.6.6
+      specifier: ^1.6.7
+      version: 1.6.7
     '@cloudflare/vitest-pool-workers':
       specifier: ^0.14.9
       version: 0.14.9
@@ -70,8 +70,8 @@ catalogs:
       specifier: ^1.0.20
       version: 1.0.20
     better-auth:
-      specifier: ^1.6.6
-      version: 1.6.6
+      specifier: ^1.6.7
+      version: 1.6.7
     bits-ui:
       specifier: ^2.18.0
       version: 2.18.0
@@ -201,8 +201,8 @@ importers:
         specifier: ^10.1.8
         version: 10.1.8(eslint@10.2.1(jiti@2.6.1))
       eslint-plugin-svelte:
-        specifier: ^3.17.0
-        version: 3.17.0(eslint@10.2.1(jiti@2.6.1))(svelte@5.55.4(@typescript-eslint/types@8.59.0))(ts-node@10.9.2(@types/node@24.12.2)(typescript@6.0.3))
+        specifier: ^3.17.1
+        version: 3.17.1(eslint@10.2.1(jiti@2.6.1))(svelte@5.55.4(@typescript-eslint/types@8.59.0))(ts-node@10.9.2(@types/node@24.12.2)(typescript@6.0.3))
       globals:
         specifier: ^17.5.0
         version: 17.5.0
@@ -251,7 +251,7 @@ importers:
     devDependencies:
       '@better-auth/drizzle-adapter':
         specifier: 'catalog:'
-        version: 1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.30)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6))
+        version: 1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.31)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6))
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
         version: 0.14.9(@vitest/runner@4.1.5)(@vitest/snapshot@4.1.5)(vitest@4.1.5)
@@ -278,13 +278,13 @@ importers:
         version: 1.0.20
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.6(d054b93e5e8819ec6e1f692d04a74933)
+        version: 1.6.7(aa6afde96da4caaed3ac75b459c69cf7)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.20
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.30)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6)
+        version: 1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.31)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6)
       nanoid:
         specifier: 'catalog:'
         version: 5.1.9
@@ -318,7 +318,7 @@ importers:
     devDependencies:
       '@better-auth/drizzle-adapter':
         specifier: 'catalog:'
-        version: 1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.30)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6))
+        version: 1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.31)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6))
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
         version: 0.14.9(@vitest/runner@4.1.5)(@vitest/snapshot@4.1.5)(vitest@4.1.5)
@@ -345,13 +345,13 @@ importers:
         version: 1.0.20
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.6(d054b93e5e8819ec6e1f692d04a74933)
+        version: 1.6.7(aa6afde96da4caaed3ac75b459c69cf7)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.20
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.30)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6)
+        version: 1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.31)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6)
       nanoid:
         specifier: 'catalog:'
         version: 5.1.9
@@ -417,7 +417,7 @@ importers:
         version: 4.1.5(playwright@1.59.1)(vite@8.0.9(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.5)
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.6(d054b93e5e8819ec6e1f692d04a74933)
+        version: 1.6.7(aa6afde96da4caaed3ac75b459c69cf7)
       daisyui:
         specifier: 'catalog:'
         version: 5.5.19
@@ -522,7 +522,7 @@ importers:
         version: 4.1.5(playwright@1.59.1)(vite@8.0.9(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vitest@4.1.5)
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.6(d054b93e5e8819ec6e1f692d04a74933)
+        version: 1.6.7(aa6afde96da4caaed3ac75b459c69cf7)
       daisyui:
         specifier: 'catalog:'
         version: 5.5.19
@@ -582,7 +582,7 @@ importers:
     dependencies:
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.30)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6)
+        version: 1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.31)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6)
       postgres:
         specifier: ^3.4.9
         version: 3.4.9
@@ -836,8 +836,8 @@ packages:
     resolution: {integrity: sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A==}
     engines: {node: '>=6.9.0'}
 
-  '@better-auth/core@1.6.6':
-    resolution: {integrity: sha512-NdG2oTlbkA8TrxvFUL8QDpyTxY3JtCGwuf2qzg1nu9VroSV5ujWZz/N9CGQrZd7k0P41SYuXIl64Ysx3uDIymQ==}
+  '@better-auth/core@1.6.7':
+    resolution: {integrity: sha512-Q0C7wEEs8VUA0y+UrB/nClGSnLCrJ3uER6Ja8Kb5H2hSBmIFOWWYgnFsEX/qCeQcvbX3i20zh1NlFM1qfKxNzA==}
     peerDependencies:
       '@better-auth/utils': 0.4.0
       '@better-fetch/fetch': 1.1.21
@@ -853,46 +853,46 @@ packages:
       '@opentelemetry/api':
         optional: true
 
-  '@better-auth/drizzle-adapter@1.6.6':
-    resolution: {integrity: sha512-guG4pXD7TDo0HWO/orvIvGN+2wpNjXNZ0qywx48IatMJSXqwb09mCeYwX0wOMRopVQu5if9LEQSH977ueKQvgA==}
+  '@better-auth/drizzle-adapter@1.6.7':
+    resolution: {integrity: sha512-x6yL1PXQwxa7tmKfPiCG1yrOvP+8n86FuueY5Cfc0XDMaAWzNt8oBqt+WLo6rkL7BcRiFBUA3r86s7nCwO1xrQ==}
     peerDependencies:
-      '@better-auth/core': ^1.6.6
+      '@better-auth/core': ^1.6.7
       '@better-auth/utils': 0.4.0
       drizzle-orm: 1.0.0-beta.22
     peerDependenciesMeta:
       drizzle-orm:
         optional: true
 
-  '@better-auth/kysely-adapter@1.6.6':
-    resolution: {integrity: sha512-k8IWYk+MnvD/+Oxswbzzc+ujYZFWuadqmh6y/oBHkDOm8Jgf52dwTml0pzNMksIj9tKIexBzXmDTuL7TTPfluw==}
+  '@better-auth/kysely-adapter@1.6.7':
+    resolution: {integrity: sha512-F/anpeWCGYqJkhJ/TPxXA+MlRfNoBPQdzsU3JOZvy8naQR/Qc0fzl2XAPgRsvwbbUJypC3FNNEDvGAhCWt1CVA==}
     peerDependencies:
-      '@better-auth/core': ^1.6.6
+      '@better-auth/core': ^1.6.7
       '@better-auth/utils': 0.4.0
       kysely: ^0.28.14
     peerDependenciesMeta:
       kysely:
         optional: true
 
-  '@better-auth/memory-adapter@1.6.6':
-    resolution: {integrity: sha512-S7TpQYbZwLeEa8mog5dzBGxv5pEhVDMF8J89fMCTb82TIHOOnFkBmStfbJZmPBV0Pwozoc+IV24R6ePxDWfrEA==}
+  '@better-auth/memory-adapter@1.6.7':
+    resolution: {integrity: sha512-oORPgJsJ2ozSaEs/hKC/LALxirZ32cJ6/KDY2XNsGSyNndVoRxFa+iAYU9giJn7ZhNR3yM/ux88JwTP79YfSRg==}
     peerDependencies:
-      '@better-auth/core': ^1.6.6
+      '@better-auth/core': ^1.6.7
       '@better-auth/utils': 0.4.0
 
-  '@better-auth/mongo-adapter@1.6.6':
-    resolution: {integrity: sha512-TngjKM3xdj6odQG2IXIE1bXPnMdzPtzXVGRFI4JNAMLFe932ntrSgZqAcbyl/iroQcScyX+DtI9ttNwdRf2S4w==}
+  '@better-auth/mongo-adapter@1.6.7':
+    resolution: {integrity: sha512-fA0aiwKa/JZ22f4gg6knFusi2W8fhCB/L/3ADCsCPDwMpQHFqTQqBlwTO/3nK7j1J+KYvcZNx3FoeCXm3mo3Tg==}
     peerDependencies:
-      '@better-auth/core': ^1.6.6
+      '@better-auth/core': ^1.6.7
       '@better-auth/utils': 0.4.0
       mongodb: ^6.0.0 || ^7.0.0
     peerDependenciesMeta:
       mongodb:
         optional: true
 
-  '@better-auth/prisma-adapter@1.6.6':
-    resolution: {integrity: sha512-aYuxHrh2WxYwXF1RwWdwz8pqS3aXEIUyxwHrmFRqWQ2cHJcemD2qFgaWTuwomRFU12/oAQTZy1NMmFQLr7crPA==}
+  '@better-auth/prisma-adapter@1.6.7':
+    resolution: {integrity: sha512-DwCzzkcTyCrOgmYROVLxKlIX6OAlsAeMrC4VgIIyUgIlEZij+8rChIxpPFXK/Mc6wq7Zp/clIjFWbhW//2EjvQ==}
     peerDependencies:
-      '@better-auth/core': ^1.6.6
+      '@better-auth/core': ^1.6.7
       '@better-auth/utils': 0.4.0
       '@prisma/client': ^5.0.0 || ^6.0.0 || ^7.0.0
       prisma: ^5.0.0 || ^6.0.0 || ^7.0.0
@@ -902,10 +902,10 @@ packages:
       prisma:
         optional: true
 
-  '@better-auth/telemetry@1.6.6':
-    resolution: {integrity: sha512-yGpy0y6cJCZx7S8TqbgV+eOK1o99cjEParTxaW9uwqxphz/2QzVWgeAe6rSA6C8fXJQmOsVbz/LctqZaGjG+IA==}
+  '@better-auth/telemetry@1.6.7':
+    resolution: {integrity: sha512-CUSvMyyh8SlcQNTf6x8MaOxWdJlKz3xSUYnb3ivJ+FgtAVCarZ+hvYYxjiiosYgX2dwlxo6iTEcofmFvlC9ICQ==}
     peerDependencies:
-      '@better-auth/core': ^1.6.6
+      '@better-auth/core': ^1.6.7
       '@better-auth/utils': 0.4.0
       '@better-fetch/fetch': 1.1.21
 
@@ -2455,8 +2455,8 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-  better-auth@1.6.6:
-    resolution: {integrity: sha512-w8Dtwz2oWzOT6xVrhvin62nn6NA8KMTKm7nOb9vokZuEj1kj70R918hH84ThcP/wTBa8KXXvx0WEsn+R6caGyQ==}
+  better-auth@1.6.7:
+    resolution: {integrity: sha512-YG8k/mMNBQjwcCR22/vqFdR75ljy0No3Rf7sJNleHYraaehfPLrcd/EBOHzV56BOOIKChV3OO0sNlpHQVV2zuw==}
     peerDependencies:
       '@lynx-js/react': '*'
       '@prisma/client': ^5.0.0 || ^6.0.0 || ^7.0.0
@@ -2600,8 +2600,8 @@ packages:
     resolution: {integrity: sha512-8WB3Jcas3swSvjIeA2yvCJ+Miyz5l1ZmB6HFb9R1317dt9LCQoswg/BGrmAmkWVEszSrrg4RwmO46qIm2OEnSA==}
     engines: {node: '>=16'}
 
-  caniuse-lite@1.0.30001788:
-    resolution: {integrity: sha512-6q8HFp+lOQtcf7wBK+uEenxymVWkGKkjFpCvw5W25cmMwEDU45p1xQFBQv8JDlMMry7eNxyBaR+qxgmTUZkIRQ==}
+  caniuse-lite@1.0.30001790:
+    resolution: {integrity: sha512-bOoxfJPyYo+ds6W0YfptaCWbFnJYjh2Y1Eow5lRv+vI2u8ganPZqNm1JwNh0t2ELQCqIWg4B3dWEusgAmsoyOw==}
 
   chai@6.2.2:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
@@ -3101,8 +3101,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-svelte@3.17.0:
-    resolution: {integrity: sha512-sF6wgd5FLS2P8CCaOy2HdYYYEcZ6TwL251dLHUkNmtLnWECk1Dwc+j6VeulmmnFxr7Xs0WNtjweOA+bJ0PnaFw==}
+  eslint-plugin-svelte@3.17.1:
+    resolution: {integrity: sha512-NyiXHtS3Ni7e532RBwS9OXlMKDIrENg3gY+/+ODjZzQx2xhU3NlJ+nIl1a93iUUQeiJL3lS8KLmY+W8hklzweQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.1 || ^9.0.0 || ^10.0.0
@@ -4670,8 +4670,8 @@ packages:
     resolution: {integrity: sha512-8ZiHFm91orbSAe2PSAiSVBVko18pbhbiB3U9GglSzF/zCGkR+rxpHx6sEMCUm4kxY4LjDIUGgCfUMtwfZfjfUA==}
     engines: {node: '>=20'}
 
-  typebox@1.1.30:
-    resolution: {integrity: sha512-BJHODeYjqFTIgNg14X0tHwzYXJueqM2K0UQBgZ+w788hWksNoTrNLu1417Wko1bMg72G8fEqrF2ylsHRdfMjxA==}
+  typebox@1.1.31:
+    resolution: {integrity: sha512-bFTa/YRd11e9a+C+hBlUSmD3DnDRnkcHqaUWX4zoq3q4u5WLnuLPc7yLpO5dRO7Z9VPXcm/GzFkvrH5FkDobeg==}
 
   typed-event-target@4.3.0:
     resolution: {integrity: sha512-21TH+1pkLuMNjwsDDXY5272CWmxgwszWd7kOoTsxgc87kcSkH9wiandsyVQbOXC2e85H8k+xKL3OEfKxt/pwxg==}
@@ -5293,7 +5293,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)':
+  '@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)':
     dependencies:
       '@better-auth/utils': 0.4.0
       '@better-fetch/fetch': 1.1.21
@@ -5307,43 +5307,43 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
 
-  '@better-auth/drizzle-adapter@1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.30)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6))':
+  '@better-auth/drizzle-adapter@1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.31)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6))':
     dependencies:
-      '@better-auth/core': 1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
+      '@better-auth/core': 1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
       '@better-auth/utils': 0.4.0
     optionalDependencies:
-      drizzle-orm: 1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.30)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6)
+      drizzle-orm: 1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.31)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6)
 
-  '@better-auth/kysely-adapter@1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(kysely@0.28.16)':
+  '@better-auth/kysely-adapter@1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(kysely@0.28.16)':
     dependencies:
-      '@better-auth/core': 1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
+      '@better-auth/core': 1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
       '@better-auth/utils': 0.4.0
     optionalDependencies:
       kysely: 0.28.16
 
-  '@better-auth/memory-adapter@1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)':
+  '@better-auth/memory-adapter@1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)':
     dependencies:
-      '@better-auth/core': 1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
+      '@better-auth/core': 1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
       '@better-auth/utils': 0.4.0
 
-  '@better-auth/mongo-adapter@1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(mongodb@7.1.0)':
+  '@better-auth/mongo-adapter@1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(mongodb@7.1.0)':
     dependencies:
-      '@better-auth/core': 1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
+      '@better-auth/core': 1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
       '@better-auth/utils': 0.4.0
     optionalDependencies:
       mongodb: 7.1.0
 
-  '@better-auth/prisma-adapter@1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))(typescript@6.0.3))(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))':
+  '@better-auth/prisma-adapter@1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))(typescript@6.0.3))(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))':
     dependencies:
-      '@better-auth/core': 1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
+      '@better-auth/core': 1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
       '@better-auth/utils': 0.4.0
     optionalDependencies:
       '@prisma/client': 7.4.2(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))(typescript@6.0.3)
       prisma: 7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3)
 
-  '@better-auth/telemetry@1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)':
+  '@better-auth/telemetry@1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)':
     dependencies:
-      '@better-auth/core': 1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
+      '@better-auth/core': 1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
       '@better-auth/utils': 0.4.0
       '@better-fetch/fetch': 1.1.21
 
@@ -6502,7 +6502,7 @@ snapshots:
 
   '@types/mssql@9.1.9(@azure/core-client@1.10.1)':
     dependencies:
-      '@types/node': 24.12.2
+      '@types/node': 25.6.0
       tarn: 3.0.2
       tedious: 19.2.1(@azure/core-client@1.10.1)
     transitivePeerDependencies:
@@ -6533,7 +6533,7 @@ snapshots:
 
   '@types/readable-stream@4.0.23':
     dependencies:
-      '@types/node': 24.12.2
+      '@types/node': 25.6.0
     optional: true
 
   '@types/trusted-types@2.0.7': {}
@@ -6857,15 +6857,15 @@ snapshots:
 
   baseline-browser-mapping@2.10.20: {}
 
-  better-auth@1.6.6(d054b93e5e8819ec6e1f692d04a74933):
+  better-auth@1.6.7(aa6afde96da4caaed3ac75b459c69cf7):
     dependencies:
-      '@better-auth/core': 1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
-      '@better-auth/drizzle-adapter': 1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.30)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6))
-      '@better-auth/kysely-adapter': 1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(kysely@0.28.16)
-      '@better-auth/memory-adapter': 1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)
-      '@better-auth/mongo-adapter': 1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(mongodb@7.1.0)
-      '@better-auth/prisma-adapter': 1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))(typescript@6.0.3))(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))
-      '@better-auth/telemetry': 1.6.6(@better-auth/core@1.6.6(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)
+      '@better-auth/core': 1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0)
+      '@better-auth/drizzle-adapter': 1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.31)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6))
+      '@better-auth/kysely-adapter': 1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(kysely@0.28.16)
+      '@better-auth/memory-adapter': 1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)
+      '@better-auth/mongo-adapter': 1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(mongodb@7.1.0)
+      '@better-auth/prisma-adapter': 1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))(typescript@6.0.3))(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))
+      '@better-auth/telemetry': 1.6.7(@better-auth/core@1.6.7(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.0)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)
       '@better-auth/utils': 0.4.0
       '@better-fetch/fetch': 1.1.21
       '@noble/ciphers': 2.2.0
@@ -6881,7 +6881,7 @@ snapshots:
       '@sveltejs/kit': 2.57.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.4(@typescript-eslint/types@8.59.0))(vite@8.0.9(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)))(svelte@5.55.4(@typescript-eslint/types@8.59.0))(typescript@6.0.3)(vite@8.0.9(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
       better-sqlite3: 12.4.1
       drizzle-kit: 0.31.9
-      drizzle-orm: 1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.30)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6)
+      drizzle-orm: 1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.31)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6)
       mongodb: 7.1.0
       mysql2: 3.15.3
       prisma: 7.4.2(@types/react@19.2.14)(better-sqlite3@12.4.1)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3)
@@ -6960,7 +6960,7 @@ snapshots:
   browserslist@4.28.2:
     dependencies:
       baseline-browser-mapping: 2.10.20
-      caniuse-lite: 1.0.30001788
+      caniuse-lite: 1.0.30001790
       electron-to-chromium: 1.5.343
       node-releases: 2.0.38
       update-browserslist-db: 1.2.3(browserslist@4.28.2)
@@ -7012,7 +7012,7 @@ snapshots:
   camelcase@8.0.0:
     optional: true
 
-  caniuse-lite@1.0.30001788: {}
+  caniuse-lite@1.0.30001790: {}
 
   chai@6.2.2: {}
 
@@ -7293,7 +7293,7 @@ snapshots:
       get-tsconfig: 4.14.0
       jiti: 2.6.1
 
-  drizzle-orm@1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.30)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6):
+  drizzle-orm@1.0.0-beta.22(@electric-sql/pglite@0.3.15)(@libsql/client-wasm@0.14.0)(@opentelemetry/api@1.9.0)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(arktype@2.2.0)(better-sqlite3@12.4.1)(gel@2.0.2)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(postgres@3.4.9)(typebox@1.1.31)(valibot@1.3.1(typescript@6.0.3))(zod@4.3.6):
     optionalDependencies:
       '@electric-sql/pglite': 0.3.15
       '@libsql/client-wasm': 0.14.0
@@ -7305,7 +7305,7 @@ snapshots:
       mssql: 11.0.1(@azure/core-client@1.10.1)
       mysql2: 3.15.3
       postgres: 3.4.9
-      typebox: 1.1.30
+      typebox: 1.1.31
       valibot: 1.3.1(typescript@6.0.3)
       zod: 4.3.6
 
@@ -7410,7 +7410,7 @@ snapshots:
     dependencies:
       eslint: 10.2.1(jiti@2.6.1)
 
-  eslint-plugin-svelte@3.17.0(eslint@10.2.1(jiti@2.6.1))(svelte@5.55.4(@typescript-eslint/types@8.59.0))(ts-node@10.9.2(@types/node@24.12.2)(typescript@6.0.3)):
+  eslint-plugin-svelte@3.17.1(eslint@10.2.1(jiti@2.6.1))(svelte@5.55.4(@typescript-eslint/types@8.59.0))(ts-node@10.9.2(@types/node@24.12.2)(typescript@6.0.3)):
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@10.2.1(jiti@2.6.1))
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -8906,7 +8906,7 @@ snapshots:
       joi: 17.13.3
       json-schema-to-ts: 3.1.1
       superstruct: 2.0.2
-      typebox: 1.1.30
+      typebox: 1.1.31
       valibot: 1.3.1(typescript@6.0.3)
       yup: 1.7.1
       zod: 4.3.6
@@ -8962,7 +8962,7 @@ snapshots:
       '@azure/identity': 4.13.1
       '@azure/keyvault-keys': 4.10.0(@azure/core-client@1.10.1)
       '@js-joda/core': 5.7.0
-      '@types/node': 24.12.2
+      '@types/node': 25.6.0
       bl: 6.1.6
       iconv-lite: 0.6.3
       js-md4: 0.3.2
@@ -8979,7 +8979,7 @@ snapshots:
       '@azure/identity': 4.13.1
       '@azure/keyvault-keys': 4.10.0(@azure/core-client@1.10.1)
       '@js-joda/core': 5.7.0
-      '@types/node': 24.12.2
+      '@types/node': 25.6.0
       bl: 6.1.6
       iconv-lite: 0.7.2
       js-md4: 0.3.2
@@ -9081,7 +9081,7 @@ snapshots:
     dependencies:
       tagged-tag: 1.0.0
 
-  typebox@1.1.30:
+  typebox@1.1.31:
     optional: true
 
   typed-event-target@4.3.0:

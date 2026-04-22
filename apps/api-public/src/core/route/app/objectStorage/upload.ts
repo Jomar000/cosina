@@ -35,14 +35,15 @@ export const uploadRoute = new Hono<THonoInstance>()
                 component: 'object_storage',
                 action: 'upload_create',
                 description: 'Upload session created',
-                recordTable: 'upload',
-                recordId: uploadId,
+                records: { table: 'upload', id: uploadId },
             })
 
             return apiResponseOkWrapper(ctx, {
                 data: { uploadId },
             })
         } catch (err) {
+            if (err instanceof AppError) throw err
+
             throw new AppError(
                 {
                     status: 500,
@@ -139,8 +140,7 @@ export const uploadRoute = new Hono<THonoInstance>()
                                 component: 'object_storage',
                                 action: 'upload_commit',
                                 description: 'Upload committed',
-                                recordTable: 'upload',
-                                recordId: uploadId,
+                                records: { table: 'upload', id: uploadId },
                             },
                             tx,
                         )
@@ -169,6 +169,8 @@ export const uploadRoute = new Hono<THonoInstance>()
                     },
                 })
             } catch (err) {
+                if (err instanceof AppError) throw err
+
                 throw new AppError(
                     {
                         status: 500,

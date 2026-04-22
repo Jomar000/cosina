@@ -48,6 +48,8 @@ export const profileRoute = new Hono<THonoInstance>()
 
                 return apiResponseOkWrapper(ctx, { data })
             } catch (err) {
+                if (err instanceof AppError) throw err
+
                 throw new AppError(
                     {
                         status: 500,
@@ -121,6 +123,8 @@ export const profileRoute = new Hono<THonoInstance>()
 
                 return apiResponseOkWrapper(ctx, { data, count, limit, offset })
             } catch (err) {
+                if (err instanceof AppError) throw err
+
                 throw new AppError(
                     {
                         status: 500,
@@ -203,12 +207,13 @@ export const profileRoute = new Hono<THonoInstance>()
                     component: 'admin.user.profile',
                     action: 'update',
                     description: 'Admin updated user profile',
-                    recordTable: 'user_profile',
-                    recordId: userId,
+                    records: { table: 'user_profile', id: userId },
                 })
 
                 return apiResponseOkWrapper(ctx, { data })
             } catch (err) {
+                if (err instanceof AppError) throw err
+
                 throw new AppError(
                     {
                         status: 500,
@@ -274,7 +279,10 @@ export const profileRoute = new Hono<THonoInstance>()
                                 .where(eq(userProfile.userId, userId))
                         )[0]
 
+                        let resolvedAddressId: number
+
                         if (existingAddressId?.addressId) {
+                            resolvedAddressId = existingAddressId.addressId
                             await tx
                                 .update(address)
                                 .set({
@@ -289,7 +297,7 @@ export const profileRoute = new Hono<THonoInstance>()
                                     eq(address.id, existingAddressId.addressId),
                                 )
                         } else {
-                            const newAddressId = await tx
+                            const [{ id }] = await tx
                                 .insert(address)
                                 .values({
                                     line1,
@@ -301,11 +309,11 @@ export const profileRoute = new Hono<THonoInstance>()
                                 })
                                 .returning({ id: address.id })
 
+                            resolvedAddressId = id
+
                             await tx
                                 .update(userProfile)
-                                .set({
-                                    addressId: newAddressId[0].id,
-                                })
+                                .set({ addressId: id })
                                 .where(eq(userProfile.userId, userId))
                         }
 
@@ -315,8 +323,13 @@ export const profileRoute = new Hono<THonoInstance>()
                                 component: 'admin.user.profile',
                                 action: 'update_address',
                                 description: 'Admin updated user address',
-                                recordTable: 'user_profile',
-                                recordId: userId,
+                                records: [
+                                    { table: 'user_profile', id: userId },
+                                    {
+                                        table: 'address',
+                                        id: String(resolvedAddressId),
+                                    },
+                                ],
                             },
                             tx,
                         )
@@ -333,6 +346,8 @@ export const profileRoute = new Hono<THonoInstance>()
 
                 return apiResponseOkWrapper(ctx, { data })
             } catch (err) {
+                if (err instanceof AppError) throw err
+
                 throw new AppError(
                     {
                         status: 500,

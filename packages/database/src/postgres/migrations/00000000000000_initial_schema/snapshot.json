@@ -1,7 +1,7 @@
 {
     "version": "8",
     "dialect": "postgres",
-    "id": "68a877c0-5aa9-43b3-8845-9fe07bbab102",
+    "id": "f24774ef-1503-47b7-b98f-c95078c8da5f",
     "prevIds": [
         "00000000-0000-0000-0000-000000000000"
     ],
@@ -325,7 +325,7 @@
             "typeSchema": null,
             "notNull": true,
             "dimensions": 0,
-            "default": null,
+            "default": "gen_random_uuid()",
             "generated": null,
             "identity": null,
             "name": "public_id",
@@ -490,7 +490,7 @@
             "typeSchema": null,
             "notNull": true,
             "dimensions": 0,
-            "default": null,
+            "default": "gen_random_uuid()",
             "generated": null,
             "identity": null,
             "name": "public_id",
@@ -564,32 +564,6 @@
             "table": "audit_trail"
         },
         {
-            "type": "text",
-            "typeSchema": null,
-            "notNull": false,
-            "dimensions": 0,
-            "default": null,
-            "generated": null,
-            "identity": null,
-            "name": "record_table",
-            "entityType": "columns",
-            "schema": "public",
-            "table": "audit_trail"
-        },
-        {
-            "type": "text",
-            "typeSchema": null,
-            "notNull": false,
-            "dimensions": 0,
-            "default": null,
-            "generated": null,
-            "identity": null,
-            "name": "record_id",
-            "entityType": "columns",
-            "schema": "public",
-            "table": "audit_trail"
-        },
-        {
             "type": "jsonb",
             "typeSchema": null,
             "notNull": false,
@@ -597,20 +571,7 @@
             "default": null,
             "generated": null,
             "identity": null,
-            "name": "record_data_old",
-            "entityType": "columns",
-            "schema": "public",
-            "table": "audit_trail"
-        },
-        {
-            "type": "jsonb",
-            "typeSchema": null,
-            "notNull": false,
-            "dimensions": 0,
-            "default": null,
-            "generated": null,
-            "identity": null,
-            "name": "record_data_new",
+            "name": "records",
             "entityType": "columns",
             "schema": "public",
             "table": "audit_trail"

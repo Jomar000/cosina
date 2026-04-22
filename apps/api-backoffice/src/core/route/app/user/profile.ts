@@ -39,6 +39,8 @@ export const profileRoute = new Hono<THonoInstance>()
 
             return apiResponseOkWrapper(ctx, { data })
         } catch (err) {
+            if (err instanceof AppError) throw err
+
             throw new AppError(
                 {
                     status: 500,

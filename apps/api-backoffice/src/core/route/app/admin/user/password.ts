@@ -66,6 +66,8 @@ export const passwordRoute = new Hono<THonoInstance>()
                     body: { email: targetUser.email },
                 })
             } catch (err) {
+                if (err instanceof AppError) throw err
+
                 throw new AppError(
                     {
                         status: 500,
@@ -80,8 +82,7 @@ export const passwordRoute = new Hono<THonoInstance>()
                 component: 'admin.user.password',
                 action: 'reset_request',
                 description: 'Admin requested password reset for user',
-                recordTable: 'user',
-                recordId: userId,
+                records: { table: 'user', id: userId },
             })
 
             return apiResponseOkWrapper(ctx, { data: null })
@@ -151,6 +152,8 @@ export const passwordRoute = new Hono<THonoInstance>()
                         ),
                     )
             } catch (err) {
+                if (err instanceof AppError) throw err
+
                 throw new AppError(
                     {
                         status: 500,
@@ -165,8 +168,7 @@ export const passwordRoute = new Hono<THonoInstance>()
                 component: 'admin.user.password',
                 action: 'reset',
                 description: 'Admin reset password for user',
-                recordTable: 'user',
-                recordId: userId,
+                records: { table: 'user', id: userId },
             })
 
             return apiResponseOkWrapper(ctx, { data: null })

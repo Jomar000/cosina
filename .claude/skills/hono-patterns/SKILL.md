@@ -88,4 +88,4 @@ await db.transaction(async (tx) => {
 })
 ```
 
-Required payload fields: `component`, `action`, `description`. Optional: `recordTable`, `recordId`, `recordDataOld`, `recordDataNew`. `organizationId`, `userId`, `ipAddress`, and `userAgent` are sourced automatically from the Hono context.
+Required payload fields: `component`, `action`, `description`. Optional: `records` (`{ table: string; id: string; dataOld?: unknown; dataNew?: unknown }` or an array of the same — pass an array when a single operation touches multiple tables; `dataOld`/`dataNew` capture before/after state per record). `organizationId`, `userId`, `ipAddress`, and `userAgent` are sourced automatically from the Hono context.
