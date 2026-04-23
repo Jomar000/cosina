@@ -13,6 +13,7 @@ import { AppError } from '../../../../errors.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    auditTrailLogger,
     nanoidCustom,
     validatorCallback,
 } from '../../../../utilities.js'
@@ -244,6 +245,17 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                         .insert(uploadAttachment)
                         .values(uploadAttachmentData)
                         .onConflictDoNothing()
+
+                    await auditTrailLogger(
+                        ctx,
+                        {
+                            component: 'objectStorage.uploadAttachment',
+                            action: 'create',
+                            description: 'Attachments added to upload session',
+                            records: { table: 'upload', id: uploadId },
+                        },
+                        tx,
+                    )
                 })
 
                 return apiResponseOkWrapper(ctx, {
@@ -466,6 +478,13 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                         .set({ isUploaded: true })
                         .where(inArray(objectStorage.id, attachmentsToCommit))
                 }
+
+                await auditTrailLogger(ctx, {
+                    component: 'objectStorage.uploadAttachment',
+                    action: 'commit',
+                    description: 'Attachments marked as uploaded',
+                    records: { table: 'upload', id: uploadId },
+                })
 
                 const data = {
                     uploadId,

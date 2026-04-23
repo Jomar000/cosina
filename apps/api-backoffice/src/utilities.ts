@@ -69,8 +69,7 @@ export const cfTurnstileVerifier = async (
 type TAuditRecord = {
     table: string
     id: string
-    dataOld?: unknown
-    dataNew?: unknown
+    oldData?: unknown
 }
 
 export const auditTrailLogger = async (
@@ -96,8 +95,8 @@ export const auditTrailLogger = async (
                 ? data.records
                 : [data.records]
             : null,
-        ipAddress: ctx.get('ipAddress'),
-        userAgent: ctx.get('userAgent'),
+        ipAddress: ctx.get('ipAddress') ?? null,
+        userAgent: ctx.get('userAgent') ?? null,
     })
 }
 

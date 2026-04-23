@@ -80,7 +80,7 @@ export const passwordRoute = new Hono<THonoInstance>()
 
             await auditTrailLogger(ctx, {
                 component: 'admin.user.password',
-                action: 'reset_request',
+                action: 'resetRequest',
                 description: 'Admin requested password reset for user',
                 records: { table: 'user', id: userId },
             })

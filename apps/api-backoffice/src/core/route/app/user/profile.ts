@@ -7,6 +7,7 @@ import { validator } from 'hono/validator'
 import { AppError } from '../../../../errors.js'
 import {
     apiResponseOkWrapper,
+    auditTrailLogger,
     validatorCallback,
 } from '../../../../utilities.js'
 
@@ -71,25 +72,59 @@ export const profileRoute = new Hono<THonoInstance>()
             try {
                 const data = await ctx
                     .get('dbClient')
-                    .update(userProfile)
-                    .set({
-                        firstName,
-                        middleName,
-                        lastName,
-                        nameExtension,
-                        gender,
-                        backupPhoneNumber,
-                    })
-                    .from(member)
-                    .where(eq(userProfile.userId, ctx.get('user')!.id))
-                    .returning({
-                        firstName: userProfile.firstName,
-                        middleName: userProfile.middleName,
-                        lastName: userProfile.lastName,
-                        nameExtension: userProfile.nameExtension,
-                        gender: userProfile.gender,
-                        backupPhoneNumber: userProfile.backupPhoneNumber,
-                        updatedAt: userProfile.updatedAt,
+                    .transaction(async (tx) => {
+                        const [oldData] = await tx
+                            .select({
+                                firstName: userProfile.firstName,
+                                middleName: userProfile.middleName,
+                                lastName: userProfile.lastName,
+                                nameExtension: userProfile.nameExtension,
+                                gender: userProfile.gender,
+                                backupPhoneNumber:
+                                    userProfile.backupPhoneNumber,
+                            })
+                            .from(userProfile)
+                            .where(eq(userProfile.userId, ctx.get('user')!.id))
+
+                        const updated = await tx
+                            .update(userProfile)
+                            .set({
+                                firstName,
+                                middleName,
+                                lastName,
+                                nameExtension,
+                                gender,
+                                backupPhoneNumber,
+                            })
+                            .from(member)
+                            .where(eq(userProfile.userId, ctx.get('user')!.id))
+                            .returning({
+                                firstName: userProfile.firstName,
+                                middleName: userProfile.middleName,
+                                lastName: userProfile.lastName,
+                                nameExtension: userProfile.nameExtension,
+                                gender: userProfile.gender,
+                                backupPhoneNumber:
+                                    userProfile.backupPhoneNumber,
+                                updatedAt: userProfile.updatedAt,
+                            })
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'user.profile',
+                                action: 'update',
+                                description: 'User updated their profile',
+                                records: {
+                                    table: 'user_profile',
+                                    id: ctx.get('user')!.id,
+                                    oldData,
+                                },
+                            },
+                            tx,
+                        )
+
+                        return updated
                     })
 
                 return apiResponseOkWrapper(ctx, { data })
@@ -135,7 +170,33 @@ export const profileRoute = new Hono<THonoInstance>()
                                 )
                         )[0]
 
+                        const oldAddressData = existingAddressId?.addressId
+                            ? (
+                                  await tx
+                                      .select({
+                                          line1: address.line1,
+                                          line2: address.line2,
+                                          cityMunicipality:
+                                              address.cityMunicipality,
+                                          provinceStateRegion:
+                                              address.provinceStateRegion,
+                                          postalCode: address.postalCode,
+                                          countryCode: address.countryCode,
+                                      })
+                                      .from(address)
+                                      .where(
+                                          eq(
+                                              address.id,
+                                              existingAddressId.addressId,
+                                          ),
+                                      )
+                              )[0]
+                            : undefined
+
+                        let resolvedAddressId: number
+
                         if (existingAddressId?.addressId) {
+                            resolvedAddressId = existingAddressId.addressId
                             await tx
                                 .update(address)
                                 .set({
@@ -150,7 +211,7 @@ export const profileRoute = new Hono<THonoInstance>()
                                     eq(address.id, existingAddressId.addressId),
                                 )
                         } else {
-                            const newAddressId = await tx
+                            const [{ id }] = await tx
                                 .insert(address)
                                 .values({
                                     line1,
@@ -162,15 +223,36 @@ export const profileRoute = new Hono<THonoInstance>()
                                 })
                                 .returning({ id: address.id })
 
+                            resolvedAddressId = id
+
                             await tx
                                 .update(userProfile)
-                                .set({
-                                    addressId: newAddressId[0].id,
-                                })
+                                .set({ addressId: id })
                                 .where(
                                     eq(userProfile.userId, ctx.get('user')!.id),
                                 )
                         }
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'user.profile',
+                                action: 'update.address',
+                                description: 'User updated their address',
+                                records: [
+                                    {
+                                        table: 'user_profile',
+                                        id: ctx.get('user')!.id,
+                                    },
+                                    {
+                                        table: 'address',
+                                        id: String(resolvedAddressId),
+                                        oldData: oldAddressData,
+                                    },
+                                ],
+                            },
+                            tx,
+                        )
 
                         return {
                             line1,

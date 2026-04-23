@@ -182,33 +182,60 @@ export const profileRoute = new Hono<THonoInstance>()
             try {
                 const data = await ctx
                     .get('dbClient')
-                    .update(userProfile)
-                    .set({
-                        firstName,
-                        middleName,
-                        lastName,
-                        nameExtension,
-                        gender,
-                        backupPhoneNumber,
-                    })
-                    .from(member)
-                    .where(eq(userProfile.userId, userId))
-                    .returning({
-                        firstName: userProfile.firstName,
-                        middleName: userProfile.middleName,
-                        lastName: userProfile.lastName,
-                        nameExtension: userProfile.nameExtension,
-                        gender: userProfile.gender,
-                        backupPhoneNumber: userProfile.backupPhoneNumber,
-                        updatedAt: userProfile.updatedAt,
-                    })
+                    .transaction(async (tx) => {
+                        const [oldData] = await tx
+                            .select({
+                                firstName: userProfile.firstName,
+                                middleName: userProfile.middleName,
+                                lastName: userProfile.lastName,
+                                nameExtension: userProfile.nameExtension,
+                                gender: userProfile.gender,
+                                backupPhoneNumber:
+                                    userProfile.backupPhoneNumber,
+                            })
+                            .from(userProfile)
+                            .where(eq(userProfile.userId, userId))
 
-                await auditTrailLogger(ctx, {
-                    component: 'admin.user.profile',
-                    action: 'update',
-                    description: 'Admin updated user profile',
-                    records: { table: 'user_profile', id: userId },
-                })
+                        const updated = await tx
+                            .update(userProfile)
+                            .set({
+                                firstName,
+                                middleName,
+                                lastName,
+                                nameExtension,
+                                gender,
+                                backupPhoneNumber,
+                            })
+                            .from(member)
+                            .where(eq(userProfile.userId, userId))
+                            .returning({
+                                firstName: userProfile.firstName,
+                                middleName: userProfile.middleName,
+                                lastName: userProfile.lastName,
+                                nameExtension: userProfile.nameExtension,
+                                gender: userProfile.gender,
+                                backupPhoneNumber:
+                                    userProfile.backupPhoneNumber,
+                                updatedAt: userProfile.updatedAt,
+                            })
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'admin.user.profile',
+                                action: 'update',
+                                description: 'Admin updated user profile',
+                                records: {
+                                    table: 'user_profile',
+                                    id: userId,
+                                    oldData,
+                                },
+                            },
+                            tx,
+                        )
+
+                        return updated[0]
+                    })
 
                 return apiResponseOkWrapper(ctx, { data })
             } catch (err) {
@@ -279,6 +306,29 @@ export const profileRoute = new Hono<THonoInstance>()
                                 .where(eq(userProfile.userId, userId))
                         )[0]
 
+                        const oldAddressData = existingAddressId?.addressId
+                            ? (
+                                  await tx
+                                      .select({
+                                          line1: address.line1,
+                                          line2: address.line2,
+                                          cityMunicipality:
+                                              address.cityMunicipality,
+                                          provinceStateRegion:
+                                              address.provinceStateRegion,
+                                          postalCode: address.postalCode,
+                                          countryCode: address.countryCode,
+                                      })
+                                      .from(address)
+                                      .where(
+                                          eq(
+                                              address.id,
+                                              existingAddressId.addressId,
+                                          ),
+                                      )
+                              )[0]
+                            : undefined
+
                         let resolvedAddressId: number
 
                         if (existingAddressId?.addressId) {
@@ -321,13 +371,14 @@ export const profileRoute = new Hono<THonoInstance>()
                             ctx,
                             {
                                 component: 'admin.user.profile',
-                                action: 'update_address',
+                                action: 'update.address',
                                 description: 'Admin updated user address',
                                 records: [
                                     { table: 'user_profile', id: userId },
                                     {
                                         table: 'address',
                                         id: String(resolvedAddressId),
+                                        oldData: oldAddressData,
                                     },
                                 ],
                             },

@@ -32,8 +32,8 @@ export const uploadRoute = new Hono<THonoInstance>()
                 })
 
             await auditTrailLogger(ctx, {
-                component: 'object_storage',
-                action: 'upload_create',
+                component: 'objectStorage.upload',
+                action: 'create',
                 description: 'Upload session created',
                 records: { table: 'upload', id: uploadId },
             })
@@ -137,8 +137,8 @@ export const uploadRoute = new Hono<THonoInstance>()
                         await auditTrailLogger(
                             ctx,
                             {
-                                component: 'object_storage',
-                                action: 'upload_commit',
+                                component: 'objectStorage.upload',
+                                action: 'commit',
                                 description: 'Upload committed',
                                 records: { table: 'upload', id: uploadId },
                             },

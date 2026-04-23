@@ -88,4 +88,14 @@ await db.transaction(async (tx) => {
 })
 ```
 
-Required payload fields: `component`, `action`, `description`. Optional: `records` (`{ table: string; id: string; dataOld?: unknown; dataNew?: unknown }` or an array of the same — pass an array when a single operation touches multiple tables; `dataOld`/`dataNew` capture before/after state per record). `organizationId`, `userId`, `ipAddress`, and `userAgent` are sourced automatically from the Hono context.
+Required payload fields: `component`, `action`, `description`. Optional: `records` (`{ table: string; id: string; oldData?: unknown }` or an array of the same — pass an array when a single operation touches multiple tables; populate `oldData` with the row's mutable fields fetched before the update, so the audit trail captures what changed). `organizationId`, `userId`, `ipAddress`, and `userAgent` are sourced automatically from the Hono context.
+
+**`component` naming convention:** dot-separated path mirroring the route file's directory structure, with compound filenames in camelCase. Pattern: `<dir>.<dir>.<filename>`. Examples: `auth`, `user.profile`, `admin.user.profile`, `admin.user.password`, `objectStorage.upload`, `objectStorage.uploadAttachment`.
+
+**`action` naming convention:** camelCase derived from the route's endpoint path. Strip leading slash, convert each path segment to camelCase, then concatenate. Kebab-case segments are camelCased. Examples:
+- `/create` → `create`
+- `/commit` → `commit`
+- `/create` → `create`, `/commit` → `commit`, `/update` → `update`, `/reset` → `reset`, `/sign-out` → `signOut`
+- `/reset-request` → `resetRequest` (single segment, kebab-case → camelCase)
+- Path segments joined with `.`, kebab-case segments camelCased: `/update/address` → `update.address`, `/password/change` → `password.change`, `/password/reset` → `password.reset`, `/password/reset-request` → `password.resetRequest`
+- Dot-suffix for sub-variants sharing a handler: `/sign-in/email` → `signIn.email`, `/sign-in/username` → `signIn.username`

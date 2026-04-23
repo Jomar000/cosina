@@ -82,8 +82,7 @@ export const auditTrail = pgTable(
             {
                 table: string
                 id: string
-                dataOld?: unknown
-                dataNew?: unknown
+                oldData?: unknown
             }[]
         >(),
         ipAddress: text('ip_address'),

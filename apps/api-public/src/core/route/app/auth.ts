@@ -145,7 +145,7 @@ const signInHandler = async (
 
     await auditTrailLogger(ctx, {
         component: 'auth',
-        action: 'sign_in',
+        action: `signIn.${credentialType}`,
         description: `User signed in via ${credentialType}`,
     })
 
@@ -202,7 +202,7 @@ export const authRoute = new Hono<THonoInstance>()
 
             await auditTrailLogger(ctx, {
                 component: 'auth',
-                action: 'password_change',
+                action: 'password.change',
                 description: 'User changed their password',
             })
 
@@ -232,7 +232,7 @@ export const authRoute = new Hono<THonoInstance>()
 
             await auditTrailLogger(ctx, {
                 component: 'auth',
-                action: 'password_reset_request',
+                action: 'password.resetRequest',
                 description: 'Password reset requested',
             })
 
@@ -264,7 +264,7 @@ export const authRoute = new Hono<THonoInstance>()
 
             await auditTrailLogger(ctx, {
                 component: 'auth',
-                action: 'password_reset',
+                action: 'password.reset',
                 description: 'Password was reset via token',
             })
 
@@ -301,7 +301,7 @@ export const authRoute = new Hono<THonoInstance>()
 
         await auditTrailLogger(ctx, {
             component: 'auth',
-            action: 'sign_out',
+            action: 'signOut',
             description: 'User signed out',
         })
 
