@@ -3,10 +3,10 @@ packages:
   - packages/**
 
 catalog:
-  '@better-auth/drizzle-adapter': ^1.6.7
+  '@better-auth/drizzle-adapter': ^1.6.8
   '@cloudflare/vitest-pool-workers': ^0.14.9
   '@internationalized/date': ^3.12.1
-  '@lucide/svelte': ^1.8.0
+  '@lucide/svelte': ^1.9.0
   '@noble/hashes': ^2.2.0
   '@playwright/test': ^1.59.1
   '@sveltejs/adapter-static': ^3.0.10
@@ -14,7 +14,7 @@ catalog:
   '@sveltejs/vite-plugin-svelte': ^7.0.0
   '@tailwindcss/vite': ^4.2.4
   '@tanstack/svelte-form': ^1.29.1
-  '@tanstack/svelte-query': ^6.1.18
+  '@tanstack/svelte-query': ^6.1.20
   '@tanstack/table-core': ^8.21.3
   '@types/cloudflare-turnstile': ^0.2.2
   '@vitest/browser': ^4.1.5
@@ -24,7 +24,7 @@ catalog:
   '@vitest/snapshot': ^4.1.5
   '@vitest/ui': ^4.1.5
   aws4fetch: ^1.0.20
-  better-auth: ^1.6.7
+  better-auth: ^1.6.8
   bits-ui: ^2.18.0
   clsx: ^2.1.1
   daisyui: ^5.5.19
