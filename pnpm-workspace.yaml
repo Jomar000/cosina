@@ -3,18 +3,18 @@ packages:
   - packages/**
 
 catalog:
-  '@better-auth/drizzle-adapter': ^1.6.8
+  '@better-auth/drizzle-adapter': ^1.6.9
   '@cloudflare/vitest-pool-workers': ^0.14.9
   '@internationalized/date': ^3.12.1
-  '@lucide/svelte': ^1.9.0
+  '@lucide/svelte': ^1.11.0
   '@noble/hashes': ^2.2.0
   '@playwright/test': ^1.59.1
   '@sveltejs/adapter-static': ^3.0.10
-  '@sveltejs/kit': ^2.57.1
+  '@sveltejs/kit': ^2.58.0
   '@sveltejs/vite-plugin-svelte': ^7.0.0
   '@tailwindcss/vite': ^4.2.4
   '@tanstack/svelte-form': ^1.29.1
-  '@tanstack/svelte-query': ^6.1.20
+  '@tanstack/svelte-query': ^6.1.24
   '@tanstack/table-core': ^8.21.3
   '@types/cloudflare-turnstile': ^0.2.2
   '@vitest/browser': ^4.1.5
@@ -24,7 +24,7 @@ catalog:
   '@vitest/snapshot': ^4.1.5
   '@vitest/ui': ^4.1.5
   aws4fetch: ^1.0.20
-  better-auth: ^1.6.8
+  better-auth: ^1.6.9
   bits-ui: ^2.18.0
   clsx: ^2.1.1
   daisyui: ^5.5.19
@@ -34,7 +34,7 @@ catalog:
   embla-carousel-svelte: ^8.6.0
   file-type: ^22.0.1
   formsnap: ^2.0.1
-  hono: ^4.12.14
+  hono: ^4.12.15
   ky: ^2.0.2
   layerchart: 2.0.0-next.49
   mode-watcher: ^1.1.0
@@ -43,9 +43,9 @@ catalog:
   paneforge: ^1.0.2
   playwright: ^1.59.1
   resend: ^6.12.2
-  svelte: ^5.55.4
+  svelte: ^5.55.5
   svelte-check: ^4.4.6
-  svelte-sonner: ^1.1.0
+  svelte-sonner: ^1.1.1
   sveltekit-superforms: ^2.30.1
   tailwind-merge: ^3.5.0
   tailwind-variants: ^3.2.2
