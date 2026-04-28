@@ -39,7 +39,7 @@ catalog:
   layerchart: 2.0.0-next.49
   mode-watcher: ^1.1.0
   nanoid: ^5.1.9
-  p-queue: ^9.1.2
+  p-queue: ^9.2.0
   paneforge: ^1.0.2
   playwright: ^1.59.1
   resend: ^6.12.2
