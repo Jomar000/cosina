@@ -4,9 +4,9 @@ packages:
 
 catalog:
   '@better-auth/drizzle-adapter': ^1.6.9
-  '@cloudflare/vitest-pool-workers': ^0.14.9
+  '@cloudflare/vitest-pool-workers': ^0.15.1
   '@internationalized/date': ^3.12.1
-  '@lucide/svelte': ^1.11.0
+  '@lucide/svelte': ^1.14.0
   '@noble/hashes': ^2.2.0
   '@playwright/test': ^1.59.1
   '@sveltejs/adapter-static': ^3.0.10
@@ -14,7 +14,7 @@ catalog:
   '@sveltejs/vite-plugin-svelte': ^7.0.0
   '@tailwindcss/vite': ^4.2.4
   '@tanstack/svelte-form': ^1.29.1
-  '@tanstack/svelte-query': ^6.1.24
+  '@tanstack/svelte-query': ^6.1.25
   '@tanstack/table-core': ^8.21.3
   '@types/cloudflare-turnstile': ^0.2.2
   '@vitest/browser': ^4.1.5
@@ -51,13 +51,13 @@ catalog:
   tailwind-variants: ^3.2.2
   tailwindcss: ^4.2.4
   tw-animate-css: ^1.4.0
-  uuid: ^13.0.0
+  uuid: ^14.0.0
   vaul-svelte: 1.0.0-next.7
   vite: ^8.0.10
   vite-imagetools: ^10.0.0
   vitest: ^4.1.5
   vitest-browser-svelte: ^2.1.1
-  zod: ^4.3.6
+  zod: ^4.4.1
 
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
