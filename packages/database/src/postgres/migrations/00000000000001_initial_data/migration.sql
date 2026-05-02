@@ -7,14 +7,24 @@ SET CONSTRAINTS ALL DEFERRED;
 INSERT INTO "permission"
     (component, action, role_id)
 VALUES
-    ('owner', 'ANY', 1),
-    ('admin', 'ANY', 1),
-    ('admin', 'ANY', 2),
-    ('member', 'ANY', 3),
-    ('ws', 'broadcast', 1),
+    /**
+     * OWNER (role_id: 1) - Full access to all components
+     */
+    ('<OWNER>', 'ANY', 1),
+    ('<ADMIN>', 'ANY', 1),
+    ('ws', 'ANY', 1),
     ('ws', 'listen', 1),
-    ('ws', 'broadcast', 2),
+    ('ws', 'broadcast', 1),
+    /**
+     * ADMIN (role_id: 2) - Full access to all components
+     */
+    ('<ADMIN>', 'ANY', 2),
+    ('ws', 'ANY', 2),
     ('ws', 'listen', 2),
+    ('ws', 'broadcast', 2),
+    /**
+     * MEMBER (role_id: 3) - Limited access
+     */
     ('ws', 'listen', 3);
 --> statement-breakpoint
 

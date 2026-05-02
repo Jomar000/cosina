@@ -10,7 +10,7 @@ export const adminRoute = new Hono<THonoInstance>()
      */
     .use(
         isAuthorized({
-            admin: ['ANY'],
+            '<ADMIN>': ['ANY'],
         }),
     )
     /**

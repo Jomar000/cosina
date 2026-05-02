@@ -22,7 +22,11 @@ const createWsChannel = (
                 .get('auth')
                 .api.hasPermission({
                     headers: authHeaders,
-                    body: { permissions: { ws: ['broadcast'] } },
+                    body: {
+                        permissions: {
+                            ws: ['broadcast'],
+                        },
+                    },
                 })
 
             const headers = new Headers(authHeaders)
@@ -38,7 +42,12 @@ const createWsChannel = (
 
 export const wsRoute = new Hono<THonoInstance>().route(
     '/general',
-    createWsChannel('general', isAuthorized({ ws: ['listen'] })),
+    createWsChannel(
+        'general',
+        isAuthorized({
+            ws: ['listen'],
+        }),
+    ),
 )
 
 export default wsRoute
