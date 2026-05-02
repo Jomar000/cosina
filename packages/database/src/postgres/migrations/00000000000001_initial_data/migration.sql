@@ -10,16 +10,14 @@ VALUES
     /**
      * OWNER (role_id: 1) - Full access to all components
      */
-    ('<OWNER>', 'ANY', 1),
-    ('<ADMIN>', 'ANY', 1),
-    ('ws', 'ANY', 1),
+    ('SYSOWNER', 'ANY', 1),
+    ('SYSADMIN', 'ANY', 1),
     ('ws', 'listen', 1),
     ('ws', 'broadcast', 1),
     /**
      * ADMIN (role_id: 2) - Full access to all components
      */
-    ('<ADMIN>', 'ANY', 2),
-    ('ws', 'ANY', 2),
+    ('SYSADMIN', 'ANY', 2),
     ('ws', 'listen', 2),
     ('ws', 'broadcast', 2),
     /**
