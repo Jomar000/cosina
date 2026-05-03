@@ -12,7 +12,7 @@ export default defineConfig({
         password: 'password',
     },
     dialect: 'postgresql',
-    out: './src/postgres/migrations',
+    out: './src/postgres/migrations/default',
     schema: './src/postgres/schema.ts',
     casing: 'snake_case',
     strict: true,

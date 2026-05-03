@@ -9,12 +9,12 @@ const environment = process.env.NODE_ENV ?? ''
 
 // This bootstrapper is purely for DEV & TEST environments
 // Use the drizzle-kit CLI for processing STAGING & PRODUCTION environments
-if (
-    ![
-        'development',
-        'test',
-    ].includes(environment)
-) {
+const isBootstrapped = [
+    'development',
+    'test',
+].includes(environment)
+
+if (!isBootstrapped) {
     throw new Error(
         'Invalid environment provided. Valid values are [development|test]',
     )
@@ -44,8 +44,14 @@ await setupClient.unsafe(
 
 await setupClient.unsafe(`CREATE DATABASE ${migrationClient.options.database};`)
 
+console.log('bootstrap: Applying default migrations...')
 await migrate(drizzle(connectionString), {
-    migrationsFolder: './src/postgres/migrations',
+    migrationsFolder: './src/postgres/migrations/default',
+})
+
+console.log('bootstrap: Applying test migrations...')
+await migrate(drizzle(connectionString), {
+    migrationsFolder: './src/postgres/migrations/test',
 })
 
 await setupClient.end()
