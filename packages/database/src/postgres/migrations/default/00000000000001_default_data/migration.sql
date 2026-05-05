@@ -39,5 +39,5 @@ VALUES
  * Sync identity sequences
  */
 
- SELECT setval(pg_get_serial_sequence('"role"', 'id'), (SELECT MAX(id) FROM "role"));
+SELECT setval(pg_get_serial_sequence('"role"', 'id'), (SELECT MAX(id) FROM "role"));
 --> statement-breakpoint
