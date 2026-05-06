@@ -14,7 +14,6 @@ export default defineConfig({
     dialect: 'postgresql',
     out: './src/postgres/migrations/default',
     schema: './src/postgres/schema.ts',
-    casing: 'snake_case',
     strict: true,
     verbose: true,
 })

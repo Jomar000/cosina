@@ -96,6 +96,7 @@ export const auth = async (opts: {
         baseURL: env.URL_BACKEND,
         database: drizzleAdapter(db, {
             provider: 'pg',
+            schema: dbSchema,
         }),
         databaseHooks: {
             session: {

@@ -1,8 +1,6 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgresJs from 'postgres'
 
-import * as schema from './schema.js'
-
 export const dbClient = (passedConfig: {
     host: string
     port: number
@@ -22,9 +20,6 @@ export const dbClient = (passedConfig: {
                 /* EMPTY */
             },
         }),
-        schema,
-        // https://orm.drizzle.team/docs/sql-schema-declaration#camel-and-snake-casing
-        casing: 'snake_case',
     })
 
 export default dbClient

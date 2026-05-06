@@ -11,7 +11,7 @@ catalog:
   '@playwright/test': ^1.59.1
   '@sveltejs/adapter-static': ^3.0.10
   '@sveltejs/kit': ^2.59.1
-  '@sveltejs/vite-plugin-svelte': ^7.1.0
+  '@sveltejs/vite-plugin-svelte': ^7.1.1
   '@tailwindcss/vite': ^4.2.4
   '@tanstack/svelte-form': ^1.29.1
   '@tanstack/svelte-query': ^6.1.28
@@ -29,8 +29,8 @@ catalog:
   clsx: ^2.1.1
   daisyui: ^5.5.19
   dayjs: ^1.11.20
-  drizzle-kit: 1.0.0-beta.22
-  drizzle-orm: 1.0.0-beta.22
+  drizzle-kit: 1.0.0-rc.2
+  drizzle-orm: 1.0.0-rc.2
   embla-carousel-svelte: ^8.6.0
   file-type: ^22.0.1
   formsnap: ^2.0.1

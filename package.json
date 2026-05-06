@@ -35,7 +35,7 @@
         "tsx": "^4.21.0",
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.59.2",
-        "wrangler": "^4.87.0"
+        "wrangler": "^4.88.0"
     },
     "pnpm": {
         "allowedDeprecatedVersions": {
@@ -44,8 +44,8 @@
             "prebuild-install": "*"
         },
         "overrides": {
-            "@better-auth/drizzle-adapter>drizzle-orm": "1.0.0-beta.22",
-            "better-auth>drizzle-orm": "1.0.0-beta.22",
+            "@better-auth/drizzle-adapter>drizzle-orm": "1.0.0-rc.2",
+            "better-auth>drizzle-orm": "1.0.0-rc.2",
             "esbuild": "^0.28.0",
             "globals": "^17.5.0",
             "uuid@<12": "^11.0.0",
