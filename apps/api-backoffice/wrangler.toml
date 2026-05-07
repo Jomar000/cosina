@@ -1,6 +1,6 @@
 name = "hyperion-backend-backoffice"
 main = "src/core/index.ts"
-compatibility_date = "2026-03-06"
+compatibility_date = "2026-05-07"
 compatibility_flags = ['nodejs_compat']
 
 ##########
