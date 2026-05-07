@@ -42,13 +42,8 @@ export class WebSocketServer extends DurableObject {
         })
     }
 
-    webSocketClose(ws: WebSocket, code: number) {
+    webSocketClose(_ws: WebSocket, code: number) {
         wsLog({ type: 'WS_CLOSE', code })
-        try {
-            ws.close(code)
-        } catch (err) {
-            wsError({ type: 'WS_CLOSE_ERROR', code, ...serializeError(err) })
-        }
     }
 
     webSocketError(ws: WebSocket, error: unknown) {
