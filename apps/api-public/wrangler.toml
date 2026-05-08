@@ -1,4 +1,4 @@
-name = "hyperion-backend-public"
+name = "hyperion-api-public"
 main = "src/core/index.ts"
 compatibility_date = "2026-05-07"
 compatibility_flags = ['nodejs_compat']
@@ -11,10 +11,12 @@ compatibility_flags = ['nodejs_compat']
 enabled = true
 
 [limits]
-cpu_ms = 2000
+cpu_ms = 5000
 
 [placement]
 mode = "smart"
+# https://developers.cloudflare.com/workers/configuration/placement/#provide-placement-hints
+# region = "aws:ap-southeast-1"
 
 [[migrations]]
 tag = "v1"
