@@ -47,6 +47,7 @@
     // Initialization //
     ////////////////////
 
+    let errorCopyLabel = $state('COPY')
     let showPassword = $state(false)
 
     // Query
@@ -113,24 +114,22 @@
                     ? `/app/${session.data.userRoles[0]}/dashboard`
                     : '/app'
             } catch (err) {
+                const message = (err as Error).message
+
                 toast.error('Something went wrong', {
                     class: 'min-w-[360px]',
-                    description: (err as Error).message,
+                    description: message,
                     action: {
-                        label: 'COPY',
-                        onClick: async function (e) {
+                        label: errorCopyLabel,
+                        onClick: async (e) => {
                             e.preventDefault()
 
-                            await navigator.clipboard.writeText(
-                                (err as Error).message,
-                            )
+                            await navigator.clipboard.writeText(message)
 
-                            // @ts-expect-error TS can't narrow 'this'
-                            this.label = 'COPIED'
+                            errorCopyLabel = 'COPIED'
 
                             setTimeout(() => {
-                                // @ts-expect-error TS can't narrow 'this'
-                                this.label = 'COPY'
+                                errorCopyLabel = 'COPY'
                             }, 2000)
                         },
                     },
@@ -214,7 +213,11 @@
                                     id="organizationId"
                                     name={field.name}
                                     onblur={field.handleBlur}
-                                    oninput={(e) =>
+                                    oninput={(
+                                        e: Event & {
+                                            currentTarget: HTMLInputElement
+                                        },
+                                    ) =>
                                         field.handleChange(
                                             e.currentTarget.value,
                                         )}
@@ -255,7 +258,11 @@
                                     id="accountId"
                                     name={field.name}
                                     onblur={field.handleBlur}
-                                    oninput={(e) =>
+                                    oninput={(
+                                        e: Event & {
+                                            currentTarget: HTMLInputElement
+                                        },
+                                    ) =>
                                         field.handleChange(
                                             e.currentTarget.value,
                                         )}
@@ -307,7 +314,11 @@
                                         id="password"
                                         name={field.name}
                                         onblur={field.handleBlur}
-                                        oninput={(e) =>
+                                        oninput={(
+                                            e: Event & {
+                                                currentTarget: HTMLInputElement
+                                            },
+                                        ) =>
                                             field.handleChange(
                                                 e.currentTarget.value,
                                             )}
