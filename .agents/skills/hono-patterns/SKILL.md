@@ -7,7 +7,7 @@ description: Coding rules for Hono API routes, middleware, error handling, valid
 
 1.  **Middleware:** Use middleware to normalize environment variables across runtimes (Cloudflare `env` vs. Node/Bun `process.env`).
 2.  **Context:** Always type the Hono `Context` with the specific environment bindings (e.g., D1 Database, R2 Bucket, KV Namespace).
-3.  **Error Handling:** Use the standardized response wrappers in `apps/api-public/src/utilities.ts`. Do not throw raw exceptions — throw `AppError` (from `apps/api-public/src/errors.ts`) instead, which the global `.onError` handler catches.
+3.  **Error Handling:** Use the standardized response wrappers in `apps/api-{public,backoffice}/src/utilities.ts`. Do not throw raw exceptions — throw `AppError` (from the matching app's `src/errors.ts`) instead, which the global `.onError` handler catches.
     - **Success:** `apiResponseOkWrapper(ctx, { data, count?, limit?, offset? })` → `{ success: true, data, ... }`
     - **Error:** `apiResponseErrorWrapper(ctx, { code, message, validatorIssues?, status? })` → `{ success: false, error: { requestId, code, message, validatorIssues? } }`
     - **Types:** `TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError` from `@hyperion/types/shared`.

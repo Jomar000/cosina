@@ -9,7 +9,7 @@
     - `packages/`: Shared libraries (`types`, `validator`, `database`, `ui`).
 - **Runtime Environment:**
     - **Production:** Cloudflare Workers (Edge).
-    - **Development/Scripting:** Node.js (>=24.14.1).
+    - **Development/Scripting:** Node.js (>=24.15.0).
     - **Constraint:** All shared code must be runtime-agnostic (no Node-specific APIs like `fs` inside Cloudflare-targeted packages).
 
 ## 2. Tech Stack & Standards
@@ -37,7 +37,7 @@
 
 ## 4. Development Workflow
 
-- **Package Management:** pnpm (>=10.33.0) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
+- **Package Management:** pnpm (>=11.0.8) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
 - **Running Apps:** Use `pnpm --filter=<package-name>` to target individual workspaces:
     ```bash
     pnpm --filter=@hyperion/api-public dev     # Hono on :8081 (wrangler dev)

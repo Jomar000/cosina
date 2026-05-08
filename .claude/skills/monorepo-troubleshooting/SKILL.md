@@ -25,7 +25,7 @@ Level 3 (depends on Level 0–2):
   @hyperion/web-backoffice  (depends on api-backoffice + types + validator + ui)
 ```
 
-pnpm resolves this order automatically from `workspace:*` declarations. Packages auto-build on `pnpm install` via `"prepare": "pnpm build"`. No Turborepo/Nx pipeline needed.
+pnpm resolves this order automatically from `workspace:*` declarations. Shared packages (`@hyperion/types`, `@hyperion/database`, `@hyperion/ui`, `@hyperion/validator`) auto-build on install via `"prepare": "pnpm build"`. The root `prepare` script runs Husky, and web app `prepare` scripts run `svelte-kit sync`; do not treat every workspace `prepare` as a package build. No Turborepo/Nx pipeline needed.
 
 ## Dependency Strategy for `api-public` / `api-backoffice`
 

@@ -18,9 +18,12 @@ description: Rules for Drizzle ORM schema changes and queries, and for adding or
     - `field.ts` — Low-level Zod field builders (`vBoolean`, `vInt`, `vNumeric`, `vText`) accepting `{ fieldName, message, min, max }`.
     - `base.ts` — Composed schemas: `addressInputSchema`, `readManyInputSchema` (limit/offset/sort), `outputSchema<Data>`.
     - `refinement.ts` — Custom `.check()` callbacks: `dateString()`, `password()` (uppercase + lowercase + numeric + symbol), `updatedFields()`.
-2.  **Public Validators (`@hyperion/validator/public/*`):** Domain-specific schemas organized by feature (`auth`, `user`, `admin/user`, `objectStorage`).
+2.  **App Validators:** Domain-specific schemas are mirrored by app surface:
+    - `@hyperion/validator/public/*` from `packages/validator/src/public`.
+    - `@hyperion/validator/backoffice/*` from `packages/validator/src/backoffice`.
+    - Current feature groups include `auth`, `user`, `admin/user`, and `objectStorage`.
 3.  **Adding a New Validator:**
-    - Create `*.schema.ts` in the appropriate `public/` subdirectory using shared field builders and refinements.
+    - Create `*.schema.ts` in the appropriate `public/` or `backoffice/` subdirectory using shared field builders and refinements.
     - Re-export from the nearest `index.ts`.
     - Add a named export entry to `packages/validator/package.json` exports map.
     - Rebuild: `pnpm --filter=@hyperion/validator build`.
