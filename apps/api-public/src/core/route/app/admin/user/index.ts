@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 
+import type { THonoInstance } from '../../../../../types.js'
 import { passwordRoute } from './password.js'
 import { profileRoute } from './profile.js'
 

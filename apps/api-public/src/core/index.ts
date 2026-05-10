@@ -4,6 +4,7 @@ import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { v7 as uuidv7 } from 'uuid'
 
 import { AppError } from '../errors.js'
+import type { THonoInstance } from '../types.js'
 import { apiResponseErrorWrapper } from '../utilities.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
 import { requestTimer } from './middleware/requestTimer.js'

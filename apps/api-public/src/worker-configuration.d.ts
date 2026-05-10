@@ -1967,9 +1967,7 @@ declare class FormData {
     entries(): IterableIterator<
         [
             key: string,
-            value:
-                | File
-                | string,
+            value: File | string,
         ]
     >
     /* Returns a list of keys in the list. */
@@ -1988,9 +1986,7 @@ declare class FormData {
     [Symbol.iterator](): IterableIterator<
         [
             key: string,
-            value:
-                | File
-                | string,
+            value: File | string,
         ]
     >
 }

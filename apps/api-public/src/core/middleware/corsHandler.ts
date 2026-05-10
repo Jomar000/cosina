@@ -1,6 +1,8 @@
 import { cors } from 'hono/cors'
 import { createMiddleware } from 'hono/factory'
 
+import type { THonoInstance } from '../../types.js'
+
 export const corsHandler = (mode: 'default' | 'reflect' = 'default') => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
         // Skip CORS on WebSockets Route

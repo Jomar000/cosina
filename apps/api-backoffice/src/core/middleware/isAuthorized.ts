@@ -1,6 +1,7 @@
 import { every } from 'hono/combine'
 import { createMiddleware } from 'hono/factory'
 
+import type { THonoInstance } from '../../types.js'
 import { apiResponseErrorWrapper } from '../../utilities.js'
 import { isAuthenticated } from './isAuthenticated.js'
 

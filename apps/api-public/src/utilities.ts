@@ -8,6 +8,8 @@ import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { customAlphabet } from 'nanoid'
 import type { ZodType } from 'zod'
 
+import type { THonoInstance } from './types.js'
+
 /**
  * NanoID Custom Character Set
  *

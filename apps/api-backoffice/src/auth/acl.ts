@@ -6,6 +6,8 @@ import {
 } from 'better-auth/plugins/organization/access'
 import { eq } from 'drizzle-orm'
 
+import type { THonoVariables } from '../types.js'
+
 /**
  * Define permissions for Components
  * This is the complete set of actions for each component

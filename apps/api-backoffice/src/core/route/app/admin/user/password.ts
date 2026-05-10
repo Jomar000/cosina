@@ -4,6 +4,7 @@ import { Hono } from 'hono'
 import { validator } from 'hono/validator'
 
 import { AppError } from '../../../../../errors.js'
+import type { THonoInstance } from '../../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,

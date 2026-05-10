@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 
+import type { THonoInstance } from '../../../../types.js'
 import { isAuthorized } from '../../../middleware/isAuthorized.js'
 import { userRoute } from './user/index.js'
 

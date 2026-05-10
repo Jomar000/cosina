@@ -1,6 +1,7 @@
 import type { MiddlewareHandler } from 'hono'
 import { Hono } from 'hono'
 
+import type { THonoInstance } from '../../../types.js'
 import { isAuthorized } from '../../middleware/isAuthorized.js'
 
 const createWsChannel = (

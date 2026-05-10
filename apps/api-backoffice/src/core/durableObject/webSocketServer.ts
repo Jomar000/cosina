@@ -7,6 +7,8 @@
 
 import { DurableObject } from 'cloudflare:workers'
 
+import type { THonoBindings } from '../../types.js'
+
 const wsLog = (entry: Record<string, unknown>) =>
     console.log(JSON.stringify(entry))
 

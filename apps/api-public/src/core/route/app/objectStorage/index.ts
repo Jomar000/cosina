@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 
+import type { THonoInstance } from '../../../../types.js'
 import { isAuthenticated } from '../../../middleware/isAuthenticated.js'
 import { downloadRoute } from './download.js'
 import { uploadRoute } from './upload.js'

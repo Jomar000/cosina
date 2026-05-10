@@ -3,13 +3,14 @@ import {
     uploadAttachmentCreateInputSchema,
     uploadAttachmentRetryInputSchema,
 } from '@hyperion/validator/public/objectStorage'
+import { hexToBytes } from '@noble/hashes/utils.js'
 import { and, eq, inArray } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { encodeBase64 } from 'hono/utils/encode'
-import { hexToBytes } from '@noble/hashes/utils.js'
 import { validator } from 'hono/validator'
 
 import { AppError } from '../../../../errors.js'
+import type { THonoInstance } from '../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,

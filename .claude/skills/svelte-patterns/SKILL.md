@@ -10,6 +10,7 @@ description: Coding rules for Svelte/SvelteKit frontend and the shared UI compon
     - Do not use `+page.server.ts` for data loading if the app is purely SPA/static.
     - Fetch data client-side using a typed API client wrapper around the Hono backend.
 3.  **Components:** Keep business logic outside of `.svelte` files; move complex logic to `.ts` utility files.
+4.  **Imports:** Group imports with installed package dependencies first, then external/local file references second. Sort import statements alphabetically by module specifier within each group.
 
 # UI Component Library (`packages/ui`)
 

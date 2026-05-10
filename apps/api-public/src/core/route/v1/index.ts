@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 
+import type { THonoInstance } from '../../../types.js'
 import { corsHandler } from '../../middleware/corsHandler.js'
 import { initContext } from '../../middleware/initContext.js'
 

@@ -1,5 +1,7 @@
 import { createMiddleware } from 'hono/factory'
 
+import type { THonoInstance } from '../../types.js'
+
 export const requestTimer = createMiddleware<THonoInstance>(
     async (ctx, next) => {
         const start = Date.now()

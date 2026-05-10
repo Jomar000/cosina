@@ -13,6 +13,7 @@ description: Coding rules for Hono API routes, middleware, error handling, valid
     - **Types:** `TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError` from `@hyperion/types/shared`.
     - **Zod:** `outputSchema(dataSchema)` from `@hyperion/validator/shared` for RPC type safety. The schema includes the `success` discriminant and `requestId` in error responses, matching the types exactly.
 4.  **Validation:** Use `validatorCallback` from `utilities.ts` which runs `safeParseAsync` and returns `code: "DATA_VALIDATION"` with Zod issues on failure.
+5.  **Imports:** Group imports with installed package dependencies first, then external/local file references second. Sort import statements alphabetically by module specifier within each group. Prefer `import type` for type-only Hono app types such as `THonoInstance`, `THonoBindings`, and `THonoVariables`.
 
 ## Observability & Logging
 

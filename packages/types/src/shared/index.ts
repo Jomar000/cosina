@@ -1,3 +1,7 @@
+/**
+ * Shared Contracts
+ */
+
 export type TValidatorIssue = {
     path?: PropertyKey[]
     code: string
@@ -24,3 +28,19 @@ export type TApiResponseError = {
 }
 
 export type TApiResponse<T> = TApiResponseOk<T> | TApiResponseError
+
+/**
+ * Hono
+ */
+
+export type TBaseHonoBindings<TBindings extends object = object> = TBindings
+
+export type TBaseHonoVariables<TVariables extends object = object> = TVariables
+
+export type TBaseHonoInstance<
+    TBindings extends object = object,
+    TVariables extends object = object,
+> = {
+    Bindings: TBaseHonoBindings<TBindings>
+    Variables: TBaseHonoVariables<TVariables>
+}

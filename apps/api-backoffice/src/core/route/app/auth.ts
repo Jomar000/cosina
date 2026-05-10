@@ -11,6 +11,7 @@ import { validator } from 'hono/validator'
 import type { z } from 'zod'
 
 import { AppError } from '../../../errors.js'
+import type { THonoInstance } from '../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,

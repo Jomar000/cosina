@@ -4,6 +4,7 @@ import { createMiddleware } from 'hono/factory'
 
 import { aclBuilder } from '../../auth/acl.js'
 import { auth } from '../../auth/index.js'
+import type { THonoInstance } from '../../types.js'
 
 export const initContext = () => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
