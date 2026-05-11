@@ -3,3 +3,7 @@
 @plugin 'daisyui/index.js';
 
 @source '../../../packages/ui/dist';
+
+body {
+    font-family: var(--font-sans);
+}
