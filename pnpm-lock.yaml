@@ -40,8 +40,8 @@ catalogs:
       specifier: ^1.32.0
       version: 1.32.0
     '@tanstack/svelte-query':
-      specifier: ^6.1.28
-      version: 6.1.28
+      specifier: ^6.1.29
+      version: 6.1.29
     '@tanstack/table-core':
       specifier: ^8.21.3
       version: 8.21.3
@@ -49,23 +49,23 @@ catalogs:
       specifier: ^0.2.2
       version: 0.2.2
     '@vitest/browser':
-      specifier: ^4.1.5
-      version: 4.1.5
+      specifier: ^4.1.6
+      version: 4.1.6
     '@vitest/browser-playwright':
-      specifier: ^4.1.5
-      version: 4.1.5
+      specifier: ^4.1.6
+      version: 4.1.6
     '@vitest/coverage-istanbul':
-      specifier: ^4.1.5
-      version: 4.1.5
+      specifier: ^4.1.6
+      version: 4.1.6
     '@vitest/runner':
-      specifier: ^4.1.5
-      version: 4.1.5
+      specifier: ^4.1.6
+      version: 4.1.6
     '@vitest/snapshot':
-      specifier: ^4.1.5
-      version: 4.1.5
+      specifier: ^4.1.6
+      version: 4.1.6
     '@vitest/ui':
-      specifier: ^4.1.5
-      version: 4.1.5
+      specifier: ^4.1.6
+      version: 4.1.6
     aws4fetch:
       specifier: ^1.0.20
       version: 1.0.20
@@ -163,8 +163,8 @@ catalogs:
       specifier: ^10.0.0
       version: 10.0.0
     vitest:
-      specifier: ^4.1.5
-      version: 4.1.5
+      specifier: ^4.1.6
+      version: 4.1.6
     vitest-browser-svelte:
       specifier: ^2.1.1
       version: 2.1.1
@@ -206,7 +206,7 @@ importers:
         specifier: ^3.17.1
         version: 3.17.1(eslint@10.3.0(jiti@2.7.0))(svelte@5.55.5(@typescript-eslint/types@8.59.2))
       globals:
-        specifier: ^17.6.0
+        specifier: ^17.5.0
         version: 17.6.0
       husky:
         specifier: ^9.1.7
@@ -218,11 +218,11 @@ importers:
         specifier: ^4.1.8
         version: 4.1.8(prettier@3.8.3)
       prettier-plugin-svelte:
-        specifier: ^3.5.1
-        version: 3.5.1(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.2))
+        specifier: ^3.5.2
+        version: 3.5.2(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.2))
       prettier-plugin-tailwindcss:
         specifier: ^0.8.0
-        version: 0.8.0(prettier-plugin-multiline-arrays@4.1.8(prettier@3.8.3))(prettier-plugin-svelte@3.5.1(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.2)))(prettier@3.8.3)
+        version: 0.8.0(prettier-plugin-multiline-arrays@4.1.8(prettier@3.8.3))(prettier-plugin-svelte@3.5.2(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.2)))(prettier@3.8.3)
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
@@ -233,8 +233,8 @@ importers:
         specifier: ^8.59.2
         version: 8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)
       wrangler:
-        specifier: ^4.90.0
-        version: 4.90.0
+        specifier: ^4.90.1
+        version: 4.90.1
 
   apps/api-backoffice:
     dependencies:
@@ -256,7 +256,7 @@ importers:
         version: 1.6.10(@better-auth/core@1.6.10(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
-        version: 0.16.3(@vitest/runner@4.1.5)(@vitest/snapshot@4.1.5)(vitest@4.1.5)
+        version: 0.16.3(@vitest/runner@4.1.6)(@vitest/snapshot@4.1.6)(vitest@4.1.6)
       '@hyperion/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -265,22 +265,22 @@ importers:
         version: 2.2.0
       '@vitest/coverage-istanbul':
         specifier: 'catalog:'
-        version: 4.1.5(vitest@4.1.5)
+        version: 4.1.6(vitest@4.1.6)
       '@vitest/runner':
         specifier: 'catalog:'
-        version: 4.1.5
+        version: 4.1.6
       '@vitest/snapshot':
         specifier: 'catalog:'
-        version: 4.1.5
+        version: 4.1.6
       '@vitest/ui':
         specifier: 'catalog:'
-        version: 4.1.5(vitest@4.1.5)
+        version: 4.1.6(vitest@4.1.6)
       aws4fetch:
         specifier: 'catalog:'
         version: 1.0.20
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.10(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.5)
+        version: 1.6.10(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.6)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.20
@@ -301,7 +301,7 @@ importers:
         version: 8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+        version: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
 
   apps/api-public:
     dependencies:
@@ -323,7 +323,7 @@ importers:
         version: 1.6.10(@better-auth/core@1.6.10(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
-        version: 0.16.3(@vitest/runner@4.1.5)(@vitest/snapshot@4.1.5)(vitest@4.1.5)
+        version: 0.16.3(@vitest/runner@4.1.6)(@vitest/snapshot@4.1.6)(vitest@4.1.6)
       '@hyperion/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -332,22 +332,22 @@ importers:
         version: 2.2.0
       '@vitest/coverage-istanbul':
         specifier: 'catalog:'
-        version: 4.1.5(vitest@4.1.5)
+        version: 4.1.6(vitest@4.1.6)
       '@vitest/runner':
         specifier: 'catalog:'
-        version: 4.1.5
+        version: 4.1.6
       '@vitest/snapshot':
         specifier: 'catalog:'
-        version: 4.1.5
+        version: 4.1.6
       '@vitest/ui':
         specifier: 'catalog:'
-        version: 4.1.5(vitest@4.1.5)
+        version: 4.1.6(vitest@4.1.6)
       aws4fetch:
         specifier: 'catalog:'
         version: 1.0.20
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.10(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.5)
+        version: 1.6.10(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.6)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.20
@@ -368,7 +368,7 @@ importers:
         version: 8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+        version: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
 
   apps/web-backoffice:
     devDependencies:
@@ -407,19 +407,19 @@ importers:
         version: 1.32.0(svelte@5.55.5(@typescript-eslint/types@8.59.2))
       '@tanstack/svelte-query':
         specifier: 'catalog:'
-        version: 6.1.28(svelte@5.55.5(@typescript-eslint/types@8.59.2))
+        version: 6.1.29(svelte@5.55.5(@typescript-eslint/types@8.59.2))
       '@types/cloudflare-turnstile':
         specifier: 'catalog:'
         version: 0.2.2
       '@vitest/browser':
         specifier: 'catalog:'
-        version: 4.1.5(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.5)
+        version: 4.1.6(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.6)
       '@vitest/browser-playwright':
         specifier: 'catalog:'
-        version: 4.1.5(playwright@1.59.1)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.5)
+        version: 4.1.6(playwright@1.59.1)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.6)
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.10(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.5)
+        version: 1.6.10(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.6)
       daisyui:
         specifier: 'catalog:'
         version: 5.5.19
@@ -467,10 +467,10 @@ importers:
         version: 10.0.0(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+        version: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
       vitest-browser-svelte:
         specifier: 'catalog:'
-        version: 2.1.1(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.5)
+        version: 2.1.1(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.6)
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -512,19 +512,19 @@ importers:
         version: 1.32.0(svelte@5.55.5(@typescript-eslint/types@8.59.2))
       '@tanstack/svelte-query':
         specifier: 'catalog:'
-        version: 6.1.28(svelte@5.55.5(@typescript-eslint/types@8.59.2))
+        version: 6.1.29(svelte@5.55.5(@typescript-eslint/types@8.59.2))
       '@types/cloudflare-turnstile':
         specifier: 'catalog:'
         version: 0.2.2
       '@vitest/browser':
         specifier: 'catalog:'
-        version: 4.1.5(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.5)
+        version: 4.1.6(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.6)
       '@vitest/browser-playwright':
         specifier: 'catalog:'
-        version: 4.1.5(playwright@1.59.1)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.5)
+        version: 4.1.6(playwright@1.59.1)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.6)
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.10(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.5)
+        version: 1.6.10(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.6)
       daisyui:
         specifier: 'catalog:'
         version: 5.5.19
@@ -572,10 +572,10 @@ importers:
         version: 10.0.0(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+        version: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
       vitest-browser-svelte:
         specifier: 'catalog:'
-        version: 2.1.1(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.5)
+        version: 2.1.1(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.6)
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -684,16 +684,16 @@ packages:
   '@ark/util@0.56.0':
     resolution: {integrity: sha512-BghfRC8b9pNs3vBoDJhcta0/c1J1rsoS1+HgVUreMFPdhz/CRAKReAu57YEllNaSy98rWAdY1gE+gFup7OXpgA==}
 
-  '@augment-vir/assert@31.69.0':
-    resolution: {integrity: sha512-Gc/COu3zziKSlJJFlhlDfeazOzlVg4VFPpTaW0IIhBjFu6PZFv+hbXoGPNfyTv6V+t+JUoB0gWtULHiZUq4MLQ==}
+  '@augment-vir/assert@31.70.0':
+    resolution: {integrity: sha512-2Jl25BbP+hgLIygNXKSRTvgAyDWWrzmb/7LLQsw1tvJIFc2ZPDsM0Ga0HX6OshEkYGmiFBjkwoq1XBjRJA8gzA==}
     engines: {node: '>=22'}
 
-  '@augment-vir/common@31.69.0':
-    resolution: {integrity: sha512-hXhKmGQo9cfDV800rUC0YHkQ4RScfpPHDAJt31OBB+rafqqmvK7s0h+uo2EKQuu7eeixNhf73aJ2IXFQtnVTvw==}
+  '@augment-vir/common@31.70.0':
+    resolution: {integrity: sha512-066Zd+EsnFptmRLdKVmPo0qfBaP3psl1lbO5pCg+ZvgWXfnjHhZs44vK8G8uR9okhGl4YrfaZRIFDvivg2RBQg==}
     engines: {node: '>=22'}
 
-  '@augment-vir/core@31.69.0':
-    resolution: {integrity: sha512-FrgvK4TbYgFb/VSrTN4Pam2Po8aDg5aUIqtBmqNVkRPvgL+uFagxkOcS2ELPaMk8d88lDu0DsorNEbYZvnbTCg==}
+  '@augment-vir/core@31.70.0':
+    resolution: {integrity: sha512-cieKG4D1vN9L8N/cyfyAgcHZR76H0XULtlfahpXwOE1AT++uxHpwBNkGlFVslrjaKiw0hMuri1Gbh3eHsejqAw==}
     engines: {node: '>=22'}
 
   '@babel/code-frame@7.29.0':
@@ -933,8 +933,20 @@ packages:
     cpu: [x64]
     os: [darwin]
 
+  '@cloudflare/workerd-darwin-64@1.20260508.1':
+    resolution: {integrity: sha512-IT3r6VgiSwIesL4AJbxjgxvIxwWZqM7BKkhYAzOKHl4GF2M0TxeOahUIXd+CYXVZgHX8ceEg+MXbEehPelJyNg==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [darwin]
+
   '@cloudflare/workerd-darwin-arm64@1.20260507.1':
     resolution: {integrity: sha512-GMEBu8Zp9Q97HLnf7bWJN4KjWpN5MxpeqdvHjBGWNl8UYprJI0k+Jkp89+Wh5S8vIon+HoVbDfOzPa7VwgL6Eg==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@cloudflare/workerd-darwin-arm64@1.20260508.1':
+    resolution: {integrity: sha512-JTVsisOJPcNKw0qovPjqyBWYahfdhUh7/9NICiG5wxaEQ45PYKdoqNq0hOAAIqvqoxsKZBvTgcPTJREPqk7avA==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [darwin]
@@ -945,14 +957,32 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@cloudflare/workerd-linux-64@1.20260508.1':
+    resolution: {integrity: sha512-zO38pCc27YlsZiPYcaZnosy0/t7abXrRU3VEO1oKfUvnaCpHgphDG+VsrmHL+kntda6hrtNwg2jLeMAqqIjnjw==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [linux]
+
   '@cloudflare/workerd-linux-arm64@1.20260507.1':
     resolution: {integrity: sha512-eGbbupEtK2nh9V9Dhcx3vv3GTKeXqSVNgAEYVCCN0NGS9tl9HbMoHRX/4JL181FKXROMigWBCQVL//qPhsAzBQ==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [linux]
 
+  '@cloudflare/workerd-linux-arm64@1.20260508.1':
+    resolution: {integrity: sha512-XhJa780Ia6MNIrtxn/ruZHS79b9pu5EKPfRNReaUqxy8erPT2fs93axMfFoS9kIkcaRRj/1TOUKcTeAMoywY7w==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [linux]
+
   '@cloudflare/workerd-windows-64@1.20260507.1':
     resolution: {integrity: sha512-dmClJ/E0BAcuDetQIZFqbeAXejWrG5pysGRMQ6T83Y0IW/7IAamY2zFEkAJ10I5xwZsdHuYsZtzlOxpEXpJs7A==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [win32]
+
+  '@cloudflare/workerd-windows-64@1.20260508.1':
+    resolution: {integrity: sha512-QdDOK3B/Ul1s3QmIwDrFyx9230to6LsNmWcVR8w+TYjNZuRPzqQBgusp78LO7MlqCoEl9dvIcN00jkJnLtBSfw==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
@@ -1775,8 +1805,8 @@ packages:
     resolution: {integrity: sha512-y/xtNPNt/YeyoVxE/JCx+T7yjEzpezmbb+toK8DDD1P4m7Kzs5YR956+7OKexG3f8aXgC3rLZl7b1V+yNUSy5w==}
     engines: {node: '>=18'}
 
-  '@tanstack/query-core@5.100.9':
-    resolution: {integrity: sha512-SJSFw1S8+kQ0+knv/XGfrbocWoAlT7vDKsSImtLx3ZPQmEcR46hkDjLSvynSy25N8Ms4tIEini1FuBd5k7IscQ==}
+  '@tanstack/query-core@5.100.10':
+    resolution: {integrity: sha512-8UR0yJR+GiQ40m3lPhUr0xbfAupe6GSQiksSBSa9SM2NjezFyxXCIA69/lz8cSoNKZLrw1/PktIyQBJcVeMi3w==}
 
   '@tanstack/store@0.9.3':
     resolution: {integrity: sha512-8reSzl/qGWGGVKhBoxXPMWzATSbZLZFWhwBAFO9NAyp0TxzfBP0mIrGb8CP8KrQTmvzXlR/vFPPUrHTLBGyFyw==}
@@ -1786,8 +1816,8 @@ packages:
     peerDependencies:
       svelte: ^5.0.0
 
-  '@tanstack/svelte-query@6.1.28':
-    resolution: {integrity: sha512-B4uh/fvn+t67LyWzY8Sb+yqyxJS2hc27Nwf+bfz7vy+ilzfJIHORoCm9/6Arsg4pdH8DCBMLMWZTvMgvSUd/pg==}
+  '@tanstack/svelte-query@6.1.29':
+    resolution: {integrity: sha512-qB6hv21JzGvUtKcqUFhbhYEp1qp2/x/PgBaeQVNCkz+BvygLCv/+OMnrzzi5hLoIDJgIbEtQSoX3xW85OYJ9JA==}
     peerDependencies:
       svelte: ^5.25.0
 
@@ -1949,27 +1979,27 @@ packages:
     resolution: {integrity: sha512-ZtvYkYpZOYdvbws3uaOAvTFuvFXoQGAtmzeiXu+XSMGxi5GVsODpoI9Xu9TplEMuD/5fmAtBbKb9cQHkWkLXDQ==}
     engines: {node: '>=18.16.0'}
 
-  '@vitest/browser-playwright@4.1.5':
-    resolution: {integrity: sha512-CWy0lBQJq97nionyJJdnaU4961IXTl43a7UCu5nHy51IoKxAt6PVIJLo+76rVl7KOOgcWHNkG4kbJu/pW7knvA==}
+  '@vitest/browser-playwright@4.1.6':
+    resolution: {integrity: sha512-4csoeyl/qwHyxU2zNL0++WaoDr8YJDXOQPwWPNJoTZ+QzcdO3INYKgF5Zfz730Io7zbkuv914aZmfQ+QE+1Hvw==}
     peerDependencies:
       playwright: '*'
-      vitest: 4.1.5
+      vitest: 4.1.6
 
-  '@vitest/browser@4.1.5':
-    resolution: {integrity: sha512-iCDGI8c4yg+xmjUg2VsygdAUSIIB4x5Rht/P68OXy1hPELKXHDkzh87lkuTcdYmemRChDkEpB426MmDjzC0ziA==}
+  '@vitest/browser@4.1.6':
+    resolution: {integrity: sha512-ynsspTubXGSpa58JFJ24xIQt4z4A25epSbugEyaTmmrV1//Wec9EgE/LtoaC6yxUrXi5P7erGHRrkdZIHaVQuA==}
     peerDependencies:
-      vitest: 4.1.5
+      vitest: 4.1.6
 
-  '@vitest/coverage-istanbul@4.1.5':
-    resolution: {integrity: sha512-X4kQMDEWh9mA0IiLuigtdYv4kXe+W8KLTbucoz15lbyZRPAxT5l+hu0JizI7Am050+G9vQnB7QJNgYi2LnwV4w==}
+  '@vitest/coverage-istanbul@4.1.6':
+    resolution: {integrity: sha512-lOt/VDh+sihAx3OUxCE5CC0qZfAhIzE3Dxw75NJ3P0C6ruUgT9b/jZKECE1ctpbxSVic9OkLdXz5UEX39ks4Sw==}
     peerDependencies:
-      vitest: 4.1.5
+      vitest: 4.1.6
 
-  '@vitest/expect@4.1.5':
-    resolution: {integrity: sha512-PWBaRY5JoKuRnHlUHfpV/KohFylaDZTupcXN1H9vYryNLOnitSw60Mw9IAE2r67NbwwzBw/Cc/8q9BK3kIX8Kw==}
+  '@vitest/expect@4.1.6':
+    resolution: {integrity: sha512-7EHDquPthALSV0jhhjgEW8FXaviMx7rSqu8W6oqCoAuOhKov814P99QDV1pxMA3QPv21YudvJngIhjrNI4opLg==}
 
-  '@vitest/mocker@4.1.5':
-    resolution: {integrity: sha512-/x2EmFC4mT4NNzqvC3fmesuV97w5FC903KPmey4gsnJiMQ3Be1IlDKVaDaG8iqaLFHqJ2FVEkxZk5VmeLjIItw==}
+  '@vitest/mocker@4.1.6':
+    resolution: {integrity: sha512-MCFc63czMjEInOlcY2cpQCvCN+KgbAn+60xu9cMgP4sKaLC5JNAKw7JH8QdAnoAC88hW1IiSNZ+GgVXlN1UcMQ==}
     peerDependencies:
       msw: ^2.4.9
       vite: ^6.0.0 || ^7.0.0 || ^8.0.0
@@ -1979,25 +2009,25 @@ packages:
       vite:
         optional: true
 
-  '@vitest/pretty-format@4.1.5':
-    resolution: {integrity: sha512-7I3q6l5qr03dVfMX2wCo9FxwSJbPdwKjy2uu/YPpU3wfHvIL4QHwVRp57OfGrDFeUJ8/8QdfBKIV12FTtLn00g==}
+  '@vitest/pretty-format@4.1.6':
+    resolution: {integrity: sha512-h5SxD/IzNhZYnrSZRsUZQIC+vD0GY8cUvq0iwsmkFKixRCKLLWqCXa/FIQ4S1R+sI+PGoojkHsdNrbZiM9Qpgw==}
 
-  '@vitest/runner@4.1.5':
-    resolution: {integrity: sha512-2D+o7Pr82IEO46YPpoA/YU0neeyr6FTerQb5Ro7BUnBuv6NQtT/kmVnczngiMEBhzgqz2UZYl5gArejsyERDSQ==}
+  '@vitest/runner@4.1.6':
+    resolution: {integrity: sha512-nOPCmn2+yD0ZNmKdsXGv/UxMMWbMuKeD6GyYncNwdkYDxpQvrPSKYj2rWuDjC2Y4b6w6hjip5dBKFzEUuZe3vA==}
 
-  '@vitest/snapshot@4.1.5':
-    resolution: {integrity: sha512-zypXEt4KH/XgKGPUz4eC2AvErYx0My5hfL8oDb1HzGFpEk1P62bxSohdyOmvz+d9UJwanI68MKwr2EquOaOgMQ==}
+  '@vitest/snapshot@4.1.6':
+    resolution: {integrity: sha512-YhsdE6xAVfTDmzjxL2ZDUvjj+ZsgyOKe+TdQzqkD72wIOmHka8NuGQ6NpTNZv9D2Z63fbwWKJPeVpEw4EQgYxw==}
 
-  '@vitest/spy@4.1.5':
-    resolution: {integrity: sha512-2lNOsh6+R2Idnf1TCZqSwYlKN2E/iDlD8sgU59kYVl+OMDmvldO1VDk39smRfpUNwYpNRVn3w4YfuC7KfbBnkQ==}
+  '@vitest/spy@4.1.6':
+    resolution: {integrity: sha512-JFKxMx6udhwKh/Ldo270e17QX710vgunMkuPAvXjHSvC6oqLWAHhVhjg/I71q0u0CBSErIODV1Kjv0FQNSWjdg==}
 
-  '@vitest/ui@4.1.5':
-    resolution: {integrity: sha512-3Z9HNFiV0IF1fk0JPiK+7kE1GcaIPefQQIBYur6PM5yFIq6agys3uqP/0t966e1wXfmjbRCHDe7qW236Xjwnag==}
+  '@vitest/ui@4.1.6':
+    resolution: {integrity: sha512-wiu5em68DfGv/2HFvI1Njr7JI2CHcBlQvereSzVG8my53PRxjTNOCsD9VOkRKrsJBDHmyuXvosxWZw7T91a2mw==}
     peerDependencies:
-      vitest: 4.1.5
+      vitest: 4.1.6
 
-  '@vitest/utils@4.1.5':
-    resolution: {integrity: sha512-76wdkrmfXfqGjueGgnb45ITPyUi1ycZ4IHgC2bhPDUfWHklY/q3MdLOAB+TF1e6xfl8NxNY0ZYaPCFNWSsw3Ug==}
+  '@vitest/utils@4.1.6':
+    resolution: {integrity: sha512-FxIY+U81R3LGKCxaHHFRQ5+g6/iRgGLmeHWdp2Amj4ljQRrEIWHmZyDfDYBRZlpyqA7qKxtS9DD1dhk8RnRIVQ==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -2638,8 +2668,8 @@ packages:
     resolution: {integrity: sha512-Ap6G0WQwcU/LHsvLwON1fAQX9Zp0A2Y6Y/cJBl9r/JbW90Zyg4/zbG6zzKa2OTALELarYHmKu0GhpM5EO+7T0g==}
     engines: {node: '>=0.10'}
 
-  esrap@2.2.6:
-    resolution: {integrity: sha512-WN0clHt0a4mzC780UBVVBpsj4vSSjOFNRd2WjYtduB9HeKxm1sjHMNUwLEHVjI3FdCQD/Hurgz9ftbKEzP79Ow==}
+  esrap@2.2.7:
+    resolution: {integrity: sha512-Dl7o7btn2YXca1VXx+PVl+lKuZdHBm8oCFuckUxqchMvNMdHMJ/qF31wtPaVyWvFYLQePkbXJrirWzbAP6Yamw==}
     peerDependencies:
       '@typescript-eslint/types': ^8.2.0
     peerDependenciesMeta:
@@ -2959,8 +2989,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  libphonenumber-js@1.13.0:
-    resolution: {integrity: sha512-N12qmdu0BM1wVNkMKYOoJR4fTOZDblrKNsOqGbKoUZrYsYLX2zx1O5X+vhK0WJPBU/+/kh9tCr8x0a7t1puGWg==}
+  libphonenumber-js@1.13.1:
+    resolution: {integrity: sha512-GEw0GLL7YUUA6nv21IsCvVjtI5Ejn84sjbdfQ9KxdbqEVOk1PZh7xejn01EEiniKw+dBeCfim+8MGeuvVuE2BA==}
 
   lightningcss-android-arm64@1.32.0:
     resolution: {integrity: sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==}
@@ -3096,6 +3126,11 @@ packages:
 
   miniflare@4.20260507.1:
     resolution: {integrity: sha512-PSXBiLExTdZ4UGO/raKCHQauUpYL7F880ZRB7j0+78Rv8h7TsdN2E/iEDK9sK2Y+SPQ5wJSeAa+rDeVKoZZoEw==}
+    engines: {node: '>=22.0.0'}
+    hasBin: true
+
+  miniflare@4.20260508.0:
+    resolution: {integrity: sha512-h3aG+PA8jEH76V4ZtBAbs3g7kjMfHJUF8hPvxeeajLTKwir+G+dqfBODg5yF9MT29LqrZKCRQRqzfHPWX4kCIg==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
@@ -3296,8 +3331,8 @@ packages:
     peerDependencies:
       prettier: '>=3.0.0 <4.0.0'
 
-  prettier-plugin-svelte@3.5.1:
-    resolution: {integrity: sha512-65+fr5+cgIKWKiqM1Doum4uX6bY8iFCdztvvp2RcF+AJoieaw9kJOFMNcJo/bkmKYsxFaM9OsVZK/gWauG/5mg==}
+  prettier-plugin-svelte@3.5.2:
+    resolution: {integrity: sha512-ItFouLvzSFE3ulNl4DKoWM3BGcbDCNVpIyy/Y3F2gC3aNiGLxtFUdffVqO5Z5hhYG+DFT5KULWaxmeFFpdbvaQ==}
     peerDependencies:
       prettier: ^3.0.0
       svelte: ^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0
@@ -3877,20 +3912,20 @@ packages:
       svelte: ^3 || ^4 || ^5 || ^5.0.0-next.0
       vitest: ^4.0.0
 
-  vitest@4.1.5:
-    resolution: {integrity: sha512-9Xx1v3/ih3m9hN+SbfkUyy0JAs72ap3r7joc87XL6jwF0jGg6mFBvQ1SrwaX+h8BlkX6Hz9shdd1uo6AF+ZGpg==}
+  vitest@4.1.6:
+    resolution: {integrity: sha512-6lvjbS3p9b4CrdCmguzbh2/4uoXhGE2q71R4OX5sqF9R1bo9Xd6fGrMAfvp5wnCzlBnFVdCOp6onuTQVbo8iUQ==}
     engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@opentelemetry/api': ^1.9.0
       '@types/node': ^20.0.0 || ^22.0.0 || >=24.0.0
-      '@vitest/browser-playwright': 4.1.5
-      '@vitest/browser-preview': 4.1.5
-      '@vitest/browser-webdriverio': 4.1.5
-      '@vitest/coverage-istanbul': 4.1.5
-      '@vitest/coverage-v8': 4.1.5
-      '@vitest/ui': 4.1.5
+      '@vitest/browser-playwright': 4.1.6
+      '@vitest/browser-preview': 4.1.6
+      '@vitest/browser-webdriverio': 4.1.6
+      '@vitest/coverage-istanbul': 4.1.6
+      '@vitest/coverage-v8': 4.1.6
+      '@vitest/ui': 4.1.6
       happy-dom: '*'
       jsdom: '*'
       vite: ^6.0.0 || ^7.0.0 || ^8.0.0
@@ -3937,12 +3972,27 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
+  workerd@1.20260508.1:
+    resolution: {integrity: sha512-VlnjyH3AjVddpSK7J54nsCVgf8i2733pl8GjKttfNi7vN/hEjjAk20d2b1nDToOLKvRQpTewRnVkqaaeGHCaAw==}
+    engines: {node: '>=16'}
+    hasBin: true
+
   wrangler@4.90.0:
     resolution: {integrity: sha512-bmNIykl59TfCUn5xQgU7IWylSsPx3LQaPLMSAq2VQHt89CBrcj9qXQ0eYfjBCWA5XTBVgten391evt7xxtXwcA==}
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
       '@cloudflare/workers-types': ^4.20260507.1
+    peerDependenciesMeta:
+      '@cloudflare/workers-types':
+        optional: true
+
+  wrangler@4.90.1:
+    resolution: {integrity: sha512-u2KrieKSMfRM0toTst/CfDtcRraeoVjmcExcMWgILM/ytq3qcDhuOAULoZSyPHzma43lfLJy1BC544drFyqe1A==}
+    engines: {node: '>=22.0.0'}
+    hasBin: true
+    peerDependencies:
+      '@cloudflare/workers-types': ^4.20260508.1
     peerDependenciesMeta:
       '@cloudflare/workers-types':
         optional: true
@@ -4015,18 +4065,18 @@ snapshots:
   '@ark/util@0.56.0':
     optional: true
 
-  '@augment-vir/assert@31.69.0':
+  '@augment-vir/assert@31.70.0':
     dependencies:
-      '@augment-vir/core': 31.69.0
+      '@augment-vir/core': 31.70.0
       '@date-vir/duration': 8.3.2
       deep-eql: 5.0.2
       expect-type: 1.3.0
       type-fest: 5.6.0
 
-  '@augment-vir/common@31.69.0':
+  '@augment-vir/common@31.70.0':
     dependencies:
-      '@augment-vir/assert': 31.69.0
-      '@augment-vir/core': 31.69.0
+      '@augment-vir/assert': 31.70.0
+      '@augment-vir/core': 31.70.0
       '@date-vir/duration': 8.3.2
       '@paralleldrive/cuid2': 3.3.0
       ansi-styles: 6.2.3
@@ -4035,7 +4085,7 @@ snapshots:
       type-fest: 5.6.0
       typed-event-target: 4.3.0
 
-  '@augment-vir/core@31.69.0':
+  '@augment-vir/core@31.70.0':
     dependencies:
       '@date-vir/duration': 8.3.2
       browser-or-node: 3.0.0
@@ -4353,14 +4403,20 @@ snapshots:
     optionalDependencies:
       workerd: 1.20260507.1
 
-  '@cloudflare/vitest-pool-workers@0.16.3(@vitest/runner@4.1.5)(@vitest/snapshot@4.1.5)(vitest@4.1.5)':
+  '@cloudflare/unenv-preset@2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260508.1)':
     dependencies:
-      '@vitest/runner': 4.1.5
-      '@vitest/snapshot': 4.1.5
+      unenv: 2.0.0-rc.24
+    optionalDependencies:
+      workerd: 1.20260508.1
+
+  '@cloudflare/vitest-pool-workers@0.16.3(@vitest/runner@4.1.6)(@vitest/snapshot@4.1.6)(vitest@4.1.6)':
+    dependencies:
+      '@vitest/runner': 4.1.6
+      '@vitest/snapshot': 4.1.6
       cjs-module-lexer: 1.4.3
       esbuild: 0.28.0
       miniflare: 4.20260507.1
-      vitest: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+      vitest: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
       wrangler: 4.90.0
       zod: 3.25.76
     transitivePeerDependencies:
@@ -4371,16 +4427,31 @@ snapshots:
   '@cloudflare/workerd-darwin-64@1.20260507.1':
     optional: true
 
+  '@cloudflare/workerd-darwin-64@1.20260508.1':
+    optional: true
+
   '@cloudflare/workerd-darwin-arm64@1.20260507.1':
+    optional: true
+
+  '@cloudflare/workerd-darwin-arm64@1.20260508.1':
     optional: true
 
   '@cloudflare/workerd-linux-64@1.20260507.1':
     optional: true
 
+  '@cloudflare/workerd-linux-64@1.20260508.1':
+    optional: true
+
   '@cloudflare/workerd-linux-arm64@1.20260507.1':
     optional: true
 
+  '@cloudflare/workerd-linux-arm64@1.20260508.1':
+    optional: true
+
   '@cloudflare/workerd-windows-64@1.20260507.1':
+    optional: true
+
+  '@cloudflare/workerd-windows-64@1.20260508.1':
     optional: true
 
   '@cspotcode/source-map-support@0.8.1':
@@ -4395,7 +4466,7 @@ snapshots:
 
   '@date-vir/duration@8.3.2':
     dependencies:
-      '@augment-vir/assert': 31.69.0
+      '@augment-vir/assert': 31.70.0
       '@types/luxon': 3.7.1
       luxon: 3.7.2
       type-fest: 5.6.0
@@ -5014,7 +5085,7 @@ snapshots:
 
   '@tanstack/pacer-lite@0.1.1': {}
 
-  '@tanstack/query-core@5.100.9': {}
+  '@tanstack/query-core@5.100.10': {}
 
   '@tanstack/store@0.9.3': {}
 
@@ -5024,9 +5095,9 @@ snapshots:
       '@tanstack/svelte-store': 0.10.3(svelte@5.55.5(@typescript-eslint/types@8.59.2))
       svelte: 5.55.5(@typescript-eslint/types@8.59.2)
 
-  '@tanstack/svelte-query@6.1.28(svelte@5.55.5(@typescript-eslint/types@8.59.2))':
+  '@tanstack/svelte-query@6.1.29(svelte@5.55.5(@typescript-eslint/types@8.59.2))':
     dependencies:
-      '@tanstack/query-core': 5.100.9
+      '@tanstack/query-core': 5.100.10
       svelte: 5.55.5(@typescript-eslint/types@8.59.2)
 
   '@tanstack/svelte-store@0.10.3(svelte@5.55.5(@typescript-eslint/types@8.59.2))':
@@ -5218,29 +5289,29 @@ snapshots:
       validator: 13.15.35
     optional: true
 
-  '@vitest/browser-playwright@4.1.5(playwright@1.59.1)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.5)':
+  '@vitest/browser-playwright@4.1.6(playwright@1.59.1)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.6)':
     dependencies:
-      '@vitest/browser': 4.1.5(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.5)
-      '@vitest/mocker': 4.1.5(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+      '@vitest/browser': 4.1.6(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.6)
+      '@vitest/mocker': 4.1.6(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
       playwright: 1.59.1
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+      vitest: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
     transitivePeerDependencies:
       - bufferutil
       - msw
       - utf-8-validate
       - vite
 
-  '@vitest/browser@4.1.5(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.5)':
+  '@vitest/browser@4.1.6(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.6)':
     dependencies:
       '@blazediff/core': 1.9.1
-      '@vitest/mocker': 4.1.5(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
-      '@vitest/utils': 4.1.5
+      '@vitest/mocker': 4.1.6(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+      '@vitest/utils': 4.1.6
       magic-string: 0.30.21
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+      vitest: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
       ws: 8.20.0
     transitivePeerDependencies:
       - bufferutil
@@ -5248,7 +5319,7 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/coverage-istanbul@4.1.5(vitest@4.1.5)':
+  '@vitest/coverage-istanbul@4.1.6(vitest@4.1.6)':
     dependencies:
       '@babel/core': 7.29.0
       '@istanbuljs/schema': 0.1.6
@@ -5260,59 +5331,59 @@ snapshots:
       magicast: 0.5.2
       obug: 2.1.1
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+      vitest: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/expect@4.1.5':
+  '@vitest/expect@4.1.6':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@types/chai': 5.2.3
-      '@vitest/spy': 4.1.5
-      '@vitest/utils': 4.1.5
+      '@vitest/spy': 4.1.6
+      '@vitest/utils': 4.1.6
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.5(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))':
+  '@vitest/mocker@4.1.6(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))':
     dependencies:
-      '@vitest/spy': 4.1.5
+      '@vitest/spy': 4.1.6
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
       vite: 8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)
 
-  '@vitest/pretty-format@4.1.5':
+  '@vitest/pretty-format@4.1.6':
     dependencies:
       tinyrainbow: 3.1.0
 
-  '@vitest/runner@4.1.5':
+  '@vitest/runner@4.1.6':
     dependencies:
-      '@vitest/utils': 4.1.5
+      '@vitest/utils': 4.1.6
       pathe: 2.0.3
 
-  '@vitest/snapshot@4.1.5':
+  '@vitest/snapshot@4.1.6':
     dependencies:
-      '@vitest/pretty-format': 4.1.5
-      '@vitest/utils': 4.1.5
+      '@vitest/pretty-format': 4.1.6
+      '@vitest/utils': 4.1.6
       magic-string: 0.30.21
       pathe: 2.0.3
 
-  '@vitest/spy@4.1.5': {}
+  '@vitest/spy@4.1.6': {}
 
-  '@vitest/ui@4.1.5(vitest@4.1.5)':
+  '@vitest/ui@4.1.6(vitest@4.1.6)':
     dependencies:
-      '@vitest/utils': 4.1.5
+      '@vitest/utils': 4.1.6
       fflate: 0.8.2
       flatted: 3.4.2
       pathe: 2.0.3
       sirv: 3.0.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+      vitest: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
 
-  '@vitest/utils@4.1.5':
+  '@vitest/utils@4.1.6':
     dependencies:
-      '@vitest/pretty-format': 4.1.5
+      '@vitest/pretty-format': 4.1.6
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
@@ -5367,7 +5438,7 @@ snapshots:
 
   baseline-browser-mapping@2.10.29: {}
 
-  better-auth@1.6.10(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.5):
+  better-auth@1.6.10(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.6):
     dependencies:
       '@better-auth/core': 1.6.10(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0)
       '@better-auth/drizzle-adapter': 1.6.10(@better-auth/core@1.6.10(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.0)(drizzle-orm@1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3))
@@ -5390,7 +5461,7 @@ snapshots:
       '@sveltejs/kit': 2.59.1(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@6.0.3)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
       drizzle-orm: 1.0.0-rc.2(arktype@2.2.0)(postgres@3.4.9)(typebox@1.1.38)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3)
       svelte: 5.55.5(@typescript-eslint/types@8.59.2)
-      vitest: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+      vitest: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
       - '@opentelemetry/api'
@@ -5465,7 +5536,7 @@ snapshots:
   class-validator@0.14.4:
     dependencies:
       '@types/validator': 13.15.10
-      libphonenumber-js: 1.13.0
+      libphonenumber-js: 1.13.1
       validator: 13.15.35
     optional: true
 
@@ -5820,7 +5891,7 @@ snapshots:
     dependencies:
       estraverse: 5.3.0
 
-  esrap@2.2.6(@typescript-eslint/types@8.59.2):
+  esrap@2.2.7(@typescript-eslint/types@8.59.2):
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
     optionalDependencies:
@@ -6128,7 +6199,7 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  libphonenumber-js@1.13.0:
+  libphonenumber-js@1.13.1:
     optional: true
 
   lightningcss-android-arm64@1.32.0:
@@ -6237,6 +6308,18 @@ snapshots:
       sharp: 0.34.5
       undici: 7.24.8
       workerd: 1.20260507.1
+      ws: 8.18.0
+      youch: 4.1.0-beta.10
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  miniflare@4.20260508.0:
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      sharp: 0.34.5
+      undici: 7.24.8
+      workerd: 1.20260508.1
       ws: 8.18.0
       youch: 4.1.0-beta.10
     transitivePeerDependencies:
@@ -6390,22 +6473,22 @@ snapshots:
 
   prettier-plugin-multiline-arrays@4.1.8(prettier@3.8.3):
     dependencies:
-      '@augment-vir/assert': 31.69.0
-      '@augment-vir/common': 31.69.0
+      '@augment-vir/assert': 31.70.0
+      '@augment-vir/common': 31.70.0
       prettier: 3.8.3
       proxy-vir: 2.0.2
 
-  prettier-plugin-svelte@3.5.1(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.2)):
+  prettier-plugin-svelte@3.5.2(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.2)):
     dependencies:
       prettier: 3.8.3
       svelte: 5.55.5(@typescript-eslint/types@8.59.2)
 
-  prettier-plugin-tailwindcss@0.8.0(prettier-plugin-multiline-arrays@4.1.8(prettier@3.8.3))(prettier-plugin-svelte@3.5.1(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.2)))(prettier@3.8.3):
+  prettier-plugin-tailwindcss@0.8.0(prettier-plugin-multiline-arrays@4.1.8(prettier@3.8.3))(prettier-plugin-svelte@3.5.2(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.2)))(prettier@3.8.3):
     dependencies:
       prettier: 3.8.3
     optionalDependencies:
       prettier-plugin-multiline-arrays: 4.1.8(prettier@3.8.3)
-      prettier-plugin-svelte: 3.5.1(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.2))
+      prettier-plugin-svelte: 3.5.2(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.59.2))
 
   prettier@2.8.8: {}
 
@@ -6416,8 +6499,8 @@ snapshots:
 
   proxy-vir@2.0.2:
     dependencies:
-      '@augment-vir/assert': 31.69.0
-      '@augment-vir/common': 31.69.0
+      '@augment-vir/assert': 31.70.0
+      '@augment-vir/common': 31.70.0
 
   punycode@2.3.1: {}
 
@@ -6710,7 +6793,7 @@ snapshots:
       clsx: 2.1.1
       devalue: 5.8.0
       esm-env: 1.2.2
-      esrap: 2.2.6(@typescript-eslint/types@8.59.2)
+      esrap: 2.2.7(@typescript-eslint/types@8.59.2)
       is-reference: 3.0.3
       locate-character: 3.0.0
       magic-string: 0.30.21
@@ -6833,9 +6916,9 @@ snapshots:
 
   typed-event-target@4.3.0:
     dependencies:
-      '@augment-vir/assert': 31.69.0
-      '@augment-vir/common': 31.69.0
-      '@augment-vir/core': 31.69.0
+      '@augment-vir/assert': 31.70.0
+      '@augment-vir/common': 31.70.0
+      '@augment-vir/core': 31.70.0
 
   typescript-eslint@8.59.2(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3):
     dependencies:
@@ -6917,21 +7000,21 @@ snapshots:
     optionalDependencies:
       vite: 8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)
 
-  vitest-browser-svelte@2.1.1(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.5):
+  vitest-browser-svelte@2.1.1(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vitest@4.1.6):
     dependencies:
       '@testing-library/svelte-core': 1.0.0(svelte@5.55.5(@typescript-eslint/types@8.59.2))
       svelte: 5.55.5(@typescript-eslint/types@8.59.2)
-      vitest: 4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+      vitest: 4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
 
-  vitest@4.1.5(@types/node@24.12.3)(@vitest/browser-playwright@4.1.5)(@vitest/coverage-istanbul@4.1.5)(@vitest/ui@4.1.5)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)):
+  vitest@4.1.6(@types/node@24.12.3)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-istanbul@4.1.6)(@vitest/ui@4.1.6)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0)):
     dependencies:
-      '@vitest/expect': 4.1.5
-      '@vitest/mocker': 4.1.5(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
-      '@vitest/pretty-format': 4.1.5
-      '@vitest/runner': 4.1.5
-      '@vitest/snapshot': 4.1.5
-      '@vitest/spy': 4.1.5
-      '@vitest/utils': 4.1.5
+      '@vitest/expect': 4.1.6
+      '@vitest/mocker': 4.1.6(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))
+      '@vitest/pretty-format': 4.1.6
+      '@vitest/runner': 4.1.6
+      '@vitest/snapshot': 4.1.6
+      '@vitest/spy': 4.1.6
+      '@vitest/utils': 4.1.6
       es-module-lexer: 2.1.0
       expect-type: 1.3.0
       magic-string: 0.30.21
@@ -6947,9 +7030,9 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.12.3
-      '@vitest/browser-playwright': 4.1.5(playwright@1.59.1)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.5)
-      '@vitest/coverage-istanbul': 4.1.5(vitest@4.1.5)
-      '@vitest/ui': 4.1.5(vitest@4.1.5)
+      '@vitest/browser-playwright': 4.1.6(playwright@1.59.1)(vite@8.0.12(@types/node@24.12.3)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.21.0))(vitest@4.1.6)
+      '@vitest/coverage-istanbul': 4.1.6(vitest@4.1.6)
+      '@vitest/ui': 4.1.6(vitest@4.1.6)
     transitivePeerDependencies:
       - msw
 
@@ -6972,6 +7055,14 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20260507.1
       '@cloudflare/workerd-windows-64': 1.20260507.1
 
+  workerd@1.20260508.1:
+    optionalDependencies:
+      '@cloudflare/workerd-darwin-64': 1.20260508.1
+      '@cloudflare/workerd-darwin-arm64': 1.20260508.1
+      '@cloudflare/workerd-linux-64': 1.20260508.1
+      '@cloudflare/workerd-linux-arm64': 1.20260508.1
+      '@cloudflare/workerd-windows-64': 1.20260508.1
+
   wrangler@4.90.0:
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.0
@@ -6982,6 +7073,22 @@ snapshots:
       path-to-regexp: 6.3.0
       unenv: 2.0.0-rc.24
       workerd: 1.20260507.1
+    optionalDependencies:
+      fsevents: 2.3.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  wrangler@4.90.1:
+    dependencies:
+      '@cloudflare/kv-asset-handler': 0.5.0
+      '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260508.1)
+      blake3-wasm: 2.1.5
+      esbuild: 0.28.0
+      miniflare: 4.20260508.0
+      path-to-regexp: 6.3.0
+      unenv: 2.0.0-rc.24
+      workerd: 1.20260508.1
     optionalDependencies:
       fsevents: 2.3.3
     transitivePeerDependencies:

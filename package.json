@@ -30,11 +30,11 @@
         "husky": "^9.1.7",
         "prettier": "^3.8.3",
         "prettier-plugin-multiline-arrays": "^4.1.8",
-        "prettier-plugin-svelte": "^3.5.1",
+        "prettier-plugin-svelte": "^3.5.2",
         "prettier-plugin-tailwindcss": "^0.8.0",
         "tsx": "^4.21.0",
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.59.2",
-        "wrangler": "^4.90.0"
+        "wrangler": "^4.90.1"
     }
 }
