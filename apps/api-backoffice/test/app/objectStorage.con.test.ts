@@ -24,7 +24,7 @@ describe('Object Storage Endpoint', () => {
         describe('Authentication Guard', () => {
             it('Unauthenticated request to /upload/create should return 401.', async () => {
                 const response = await app.request(
-                    '/app/objectStorage/upload/create',
+                    '/api/objectStorage/upload/create',
                     {
                         method: 'POST',
                         headers: {
@@ -43,7 +43,7 @@ describe('Object Storage Endpoint', () => {
 
             it('Unauthenticated request to /download/link/create should return 401.', async () => {
                 const response = await app.request(
-                    '/app/objectStorage/download/link/create',
+                    '/api/objectStorage/download/link/create',
                     {
                         method: 'POST',
                         headers: {
@@ -66,7 +66,7 @@ describe('Object Storage Endpoint', () => {
 
             it('Unauthenticated request to /upload/commit should return 401.', async () => {
                 const response = await app.request(
-                    '/app/objectStorage/upload/commit',
+                    '/api/objectStorage/upload/commit',
                     {
                         method: 'POST',
                         headers: {
@@ -89,7 +89,7 @@ describe('Object Storage Endpoint', () => {
 
             it('Unauthenticated request to /upload/attachment/create should return 401.', async () => {
                 const response = await app.request(
-                    '/app/objectStorage/upload/attachment/create',
+                    '/api/objectStorage/upload/attachment/create',
                     {
                         method: 'POST',
                         headers: {
@@ -113,7 +113,7 @@ describe('Object Storage Endpoint', () => {
 
             it('Unauthenticated request to /upload/attachment/retry should return 401.', async () => {
                 const response = await app.request(
-                    '/app/objectStorage/upload/attachment/retry',
+                    '/api/objectStorage/upload/attachment/retry',
                     {
                         method: 'POST',
                         headers: {
@@ -137,7 +137,7 @@ describe('Object Storage Endpoint', () => {
 
             it('Unauthenticated request to /upload/attachment/commit should return 401.', async () => {
                 const response = await app.request(
-                    '/app/objectStorage/upload/attachment/commit',
+                    '/api/objectStorage/upload/attachment/commit',
                     {
                         method: 'POST',
                         headers: {
@@ -167,7 +167,7 @@ describe('Object Storage Endpoint', () => {
         describe('Basic Validation', () => {
             it('Should reject attachment with invalid upload ID.', async () => {
                 const response = await app.request(
-                    '/app/objectStorage/upload/attachment/create',
+                    '/api/objectStorage/upload/attachment/create',
                     {
                         method: 'POST',
                         headers: {
@@ -200,7 +200,7 @@ describe('Object Storage Endpoint', () => {
 
             it('Should reject commit for non-existent upload ID.', async () => {
                 const response = await app.request(
-                    '/app/objectStorage/upload/attachment/commit',
+                    '/api/objectStorage/upload/attachment/commit',
                     {
                         method: 'POST',
                         headers: {
@@ -229,7 +229,7 @@ describe('Object Storage Endpoint', () => {
 
             it('Should fail with non-existent upload ID (Download Link).', async () => {
                 const response = await app.request(
-                    '/app/objectStorage/download/link/create',
+                    '/api/objectStorage/download/link/create',
                     {
                         method: 'POST',
                         headers: {
@@ -253,7 +253,7 @@ describe('Object Storage Endpoint', () => {
 
             it('Should reject invalid upload ID format (Download Link).', async () => {
                 const response = await app.request(
-                    '/app/objectStorage/download/link/create',
+                    '/api/objectStorage/download/link/create',
                     {
                         method: 'POST',
                         headers: {
@@ -285,7 +285,7 @@ describe('Object Storage Endpoint', () => {
             describe('Create Upload', () => {
                 it('Privileged user should be able to create an upload.', async () => {
                     const response = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -309,7 +309,7 @@ describe('Object Storage Endpoint', () => {
 
                 it('Standard user should be able to create an upload.', async () => {
                     const response = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -336,7 +336,7 @@ describe('Object Storage Endpoint', () => {
                 it('Should create attachment with valid input and return signed URLs.', async () => {
                     // Step 1: Create an upload
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -355,7 +355,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Step 2: Create attachment
                     const response = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -409,7 +409,7 @@ describe('Object Storage Endpoint', () => {
 
                 it('Should reject attachment with empty attachments array.', async () => {
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -426,7 +426,7 @@ describe('Object Storage Endpoint', () => {
                         >()
 
                     const response = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -451,7 +451,7 @@ describe('Object Storage Endpoint', () => {
 
                 it('Should reject attachment with invalid SHA-256 hash.', async () => {
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -468,7 +468,7 @@ describe('Object Storage Endpoint', () => {
                         >()
 
                     const response = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -499,7 +499,7 @@ describe('Object Storage Endpoint', () => {
 
                 it('Should reject attachment with duplicate SHA-256 hashes.', async () => {
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -518,7 +518,7 @@ describe('Object Storage Endpoint', () => {
                     const duplicateHash = 'c'.repeat(64)
 
                     const response = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -555,7 +555,7 @@ describe('Object Storage Endpoint', () => {
                 it("Standard user should not access another user's upload.", async () => {
                     // Create upload as privileged user
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -573,7 +573,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Attempt to attach as standard user
                     const response = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -608,7 +608,7 @@ describe('Object Storage Endpoint', () => {
                 it('Should return 409 for already uploaded (deduplicated) attachment.', async () => {
                     // Step 1: Create first upload and add attachment
                     const upload1Response = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -628,7 +628,7 @@ describe('Object Storage Endpoint', () => {
                     const sharedHash = 'e'.repeat(64)
 
                     const attach1Response = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -667,7 +667,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Step 2: Mark the attachment as uploaded
                     await app.request(
-                        '/app/objectStorage/upload/attachment/commit',
+                        '/api/objectStorage/upload/attachment/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -687,7 +687,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Step 3: Create second upload and try the same hash
                     const upload2Response = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -704,7 +704,7 @@ describe('Object Storage Endpoint', () => {
                         >()
 
                     const response = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -752,7 +752,7 @@ describe('Object Storage Endpoint', () => {
                 it('Should regenerate signed URLs for non-uploaded attachments.', async () => {
                     // Create upload and attachment
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -770,7 +770,7 @@ describe('Object Storage Endpoint', () => {
                     const uploadId = uploadData.data.uploadId
 
                     const attachResponse = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -807,7 +807,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Retry the attachment
                     const response = await app.request(
-                        '/app/objectStorage/upload/attachment/retry',
+                        '/api/objectStorage/upload/attachment/retry',
                         {
                             method: 'POST',
                             headers: {
@@ -848,7 +848,7 @@ describe('Object Storage Endpoint', () => {
 
                 it('Should return 404 for non-existent attachment IDs.', async () => {
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -865,7 +865,7 @@ describe('Object Storage Endpoint', () => {
                         >()
 
                     const response = await app.request(
-                        '/app/objectStorage/upload/attachment/retry',
+                        '/api/objectStorage/upload/attachment/retry',
                         {
                             method: 'POST',
                             headers: {
@@ -906,7 +906,7 @@ describe('Object Storage Endpoint', () => {
                 it('Should return 409 for already uploaded attachments.', async () => {
                     // Create upload, attach, and commit
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -924,7 +924,7 @@ describe('Object Storage Endpoint', () => {
                     const uploadId = uploadData.data.uploadId
 
                     const attachResponse = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -961,7 +961,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Mark as uploaded
                     await app.request(
-                        '/app/objectStorage/upload/attachment/commit',
+                        '/api/objectStorage/upload/attachment/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -979,7 +979,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Retry should return 409
                     const response = await app.request(
-                        '/app/objectStorage/upload/attachment/retry',
+                        '/api/objectStorage/upload/attachment/retry',
                         {
                             method: 'POST',
                             headers: {
@@ -1019,7 +1019,7 @@ describe('Object Storage Endpoint', () => {
             describe('Commit Upload Attachment', () => {
                 it('Should mark attachments as uploaded.', async () => {
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1037,7 +1037,7 @@ describe('Object Storage Endpoint', () => {
                     const uploadId = uploadData.data.uploadId
 
                     const attachResponse = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1073,7 +1073,7 @@ describe('Object Storage Endpoint', () => {
                     const attachmentId = attachData.data.signedUrls[0].id
 
                     const response = await app.request(
-                        '/app/objectStorage/upload/attachment/commit',
+                        '/api/objectStorage/upload/attachment/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1109,7 +1109,7 @@ describe('Object Storage Endpoint', () => {
                 it('Should commit an upload with attachments.', async () => {
                     // Full flow: create → attach → attachment commit → upload commit
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1127,7 +1127,7 @@ describe('Object Storage Endpoint', () => {
                     const uploadId = uploadData.data.uploadId
 
                     const attachResponse = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1164,7 +1164,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Mark attachment as uploaded
                     await app.request(
-                        '/app/objectStorage/upload/attachment/commit',
+                        '/api/objectStorage/upload/attachment/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1182,7 +1182,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Commit the upload
                     const response = await app.request(
-                        '/app/objectStorage/upload/commit',
+                        '/api/objectStorage/upload/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1216,7 +1216,7 @@ describe('Object Storage Endpoint', () => {
                 it('Should reject commit for already committed upload.', async () => {
                     // Create and commit an upload first
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1235,7 +1235,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Commit with no attachments
                     await app.request(
-                        '/app/objectStorage/upload/commit',
+                        '/api/objectStorage/upload/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1250,7 +1250,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Try to commit again
                     const response = await app.request(
-                        '/app/objectStorage/upload/commit',
+                        '/api/objectStorage/upload/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1275,7 +1275,7 @@ describe('Object Storage Endpoint', () => {
 
                 it('Should purge unselected attachments on commit.', async () => {
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1294,7 +1294,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Add two attachments
                     const attachResponse = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1336,7 +1336,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Commit with only the first attachment (purge the second)
                     const response = await app.request(
-                        '/app/objectStorage/upload/commit',
+                        '/api/objectStorage/upload/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1369,7 +1369,7 @@ describe('Object Storage Endpoint', () => {
                 it("Standard user should not commit another user's upload.", async () => {
                     // Create upload as privileged user
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1387,7 +1387,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Attempt commit as standard user
                     const response = await app.request(
-                        '/app/objectStorage/upload/commit',
+                        '/api/objectStorage/upload/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1423,7 +1423,7 @@ describe('Object Storage Endpoint', () => {
                 it('Should create download links for own upload.', async () => {
                     // Full upload flow first
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1441,7 +1441,7 @@ describe('Object Storage Endpoint', () => {
                     const uploadId = uploadData.data.uploadId
 
                     const attachResponse = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1478,7 +1478,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Mark as uploaded and commit
                     await app.request(
-                        '/app/objectStorage/upload/attachment/commit',
+                        '/api/objectStorage/upload/attachment/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1495,7 +1495,7 @@ describe('Object Storage Endpoint', () => {
                     )
 
                     await app.request(
-                        '/app/objectStorage/upload/commit',
+                        '/api/objectStorage/upload/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1513,7 +1513,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Request download links
                     const response = await app.request(
-                        '/app/objectStorage/download/link/create',
+                        '/api/objectStorage/download/link/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1547,7 +1547,7 @@ describe('Object Storage Endpoint', () => {
                 it("Standard user should not access another user's upload download links.", async () => {
                     // Create upload as privileged user
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1565,7 +1565,7 @@ describe('Object Storage Endpoint', () => {
                     const uploadId = uploadData.data.uploadId
 
                     const attachResponse = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1601,7 +1601,7 @@ describe('Object Storage Endpoint', () => {
                     const attachmentId = attachData.data.signedUrls[0].id
 
                     await app.request(
-                        '/app/objectStorage/upload/attachment/commit',
+                        '/api/objectStorage/upload/attachment/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1618,7 +1618,7 @@ describe('Object Storage Endpoint', () => {
                     )
 
                     await app.request(
-                        '/app/objectStorage/upload/commit',
+                        '/api/objectStorage/upload/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1636,7 +1636,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Standard user tries to get download links
                     const response = await app.request(
-                        '/app/objectStorage/download/link/create',
+                        '/api/objectStorage/download/link/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1662,7 +1662,7 @@ describe('Object Storage Endpoint', () => {
                 it("Privileged user should access any user's upload download links.", async () => {
                     // Create upload as standard user
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1680,7 +1680,7 @@ describe('Object Storage Endpoint', () => {
                     const uploadId = uploadData.data.uploadId
 
                     const attachResponse = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1716,7 +1716,7 @@ describe('Object Storage Endpoint', () => {
                     const attachmentId = attachData.data.signedUrls[0].id
 
                     await app.request(
-                        '/app/objectStorage/upload/attachment/commit',
+                        '/api/objectStorage/upload/attachment/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1733,7 +1733,7 @@ describe('Object Storage Endpoint', () => {
                     )
 
                     await app.request(
-                        '/app/objectStorage/upload/commit',
+                        '/api/objectStorage/upload/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1751,7 +1751,7 @@ describe('Object Storage Endpoint', () => {
 
                     // Privileged user requests download links
                     const response = await app.request(
-                        '/app/objectStorage/download/link/create',
+                        '/api/objectStorage/download/link/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1784,7 +1784,7 @@ describe('Object Storage Endpoint', () => {
 
                 it('Should return public URL for public objects.', async () => {
                     const uploadResponse = await app.request(
-                        '/app/objectStorage/upload/create',
+                        '/api/objectStorage/upload/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1802,7 +1802,7 @@ describe('Object Storage Endpoint', () => {
                     const uploadId = uploadData.data.uploadId
 
                     const attachResponse = await app.request(
-                        '/app/objectStorage/upload/attachment/create',
+                        '/api/objectStorage/upload/attachment/create',
                         {
                             method: 'POST',
                             headers: {
@@ -1838,7 +1838,7 @@ describe('Object Storage Endpoint', () => {
                     const attachmentId = attachData.data.signedUrls[0].id
 
                     await app.request(
-                        '/app/objectStorage/upload/attachment/commit',
+                        '/api/objectStorage/upload/attachment/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1855,7 +1855,7 @@ describe('Object Storage Endpoint', () => {
                     )
 
                     await app.request(
-                        '/app/objectStorage/upload/commit',
+                        '/api/objectStorage/upload/commit',
                         {
                             method: 'POST',
                             headers: {
@@ -1872,7 +1872,7 @@ describe('Object Storage Endpoint', () => {
                     )
 
                     const response = await app.request(
-                        '/app/objectStorage/download/link/create',
+                        '/api/objectStorage/download/link/create',
                         {
                             method: 'POST',
                             headers: {

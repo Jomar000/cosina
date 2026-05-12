@@ -99,7 +99,7 @@ export const interceptPasswordResetToken = async (
 export const setTestingCookies = async () => {
     const response = await Promise.all([
         app.request(
-            '/app/auth/sign-in/username',
+            '/api/auth/sign-in/username',
             {
                 method: 'POST',
                 headers: {
@@ -115,7 +115,7 @@ export const setTestingCookies = async () => {
             env,
         ),
         app.request(
-            '/app/auth/sign-in/username',
+            '/api/auth/sign-in/username',
             {
                 method: 'POST',
                 headers: {

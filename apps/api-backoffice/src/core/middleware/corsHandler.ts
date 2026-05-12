@@ -7,7 +7,7 @@ export const corsHandler = (mode: 'default' | 'reflect' = 'default') => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
         // Skip CORS on WebSockets Route
         // https://github.com/honojs/hono/issues/3206#issuecomment-2410593981
-        if (ctx.req.path.startsWith('/app/ws')) {
+        if (ctx.req.path.startsWith('/api/ws')) {
             await next()
             return
         }

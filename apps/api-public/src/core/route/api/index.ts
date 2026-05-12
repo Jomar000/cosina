@@ -10,7 +10,7 @@ import { objectStorageRoute } from './objectStorage/index.js'
 import { userRoute } from './user/index.js'
 import { wsRoute } from './ws.js'
 
-export const appRoute = new Hono<THonoInstance>()
+export const apiRoute = new Hono<THonoInstance>()
     /**
      * @description
      * Middleware
@@ -28,4 +28,4 @@ export const appRoute = new Hono<THonoInstance>()
     .route('/user', userRoute)
     .route('/ws', wsRoute)
 
-export default appRoute
+export default apiRoute

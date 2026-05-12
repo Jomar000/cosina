@@ -1,7 +1,7 @@
-import type { AdminRouteType } from '@hyperion/api-backoffice/app/admin'
-import type { AuthRouteType } from '@hyperion/api-backoffice/app/auth'
-import type { ObjectStorageRouteType } from '@hyperion/api-backoffice/app/objectStorage'
-import type { UserRouteType } from '@hyperion/api-backoffice/app/user'
+import type { AdminRouteType } from '@hyperion/api-backoffice/api/admin'
+import type { AuthRouteType } from '@hyperion/api-backoffice/api/auth'
+import type { ObjectStorageRouteType } from '@hyperion/api-backoffice/api/objectStorage'
+import type { UserRouteType } from '@hyperion/api-backoffice/api/user'
 import type { HeartbeatRouteType } from '@hyperion/api-backoffice/root/heartbeat'
 import { hc } from 'hono/client'
 import ky from 'ky'
@@ -43,7 +43,7 @@ const kyClient = ky.extend({
  * @description
  * Admin RPC Client
  */
-export const adminClient = hc<AdminRouteType>(`${PUBLIC_API_URL}/app/admin`, {
+export const adminClient = hc<AdminRouteType>(`${PUBLIC_API_URL}/api/admin`, {
     init: { credentials: 'include' },
     fetch: kyClient,
 })
@@ -52,7 +52,7 @@ export const adminClient = hc<AdminRouteType>(`${PUBLIC_API_URL}/app/admin`, {
  * @description
  * Auth RPC Client
  */
-export const authClient = hc<AuthRouteType>(`${PUBLIC_API_URL}/app/auth`, {
+export const authClient = hc<AuthRouteType>(`${PUBLIC_API_URL}/api/auth`, {
     init: { credentials: 'include' },
     fetch: kyClient,
 })
@@ -74,7 +74,7 @@ export const heartbeatClient = hc<HeartbeatRouteType>(
  * Object Storage RPC Client
  */
 export const objectStorageClient = hc<ObjectStorageRouteType>(
-    `${PUBLIC_API_URL}/app/objectStorage`,
+    `${PUBLIC_API_URL}/api/objectStorage`,
     {
         init: { credentials: 'include' },
         fetch: kyClient,
@@ -85,7 +85,7 @@ export const objectStorageClient = hc<ObjectStorageRouteType>(
  * @description
  * User RPC Client
  */
-export const userClient = hc<UserRouteType>(`${PUBLIC_API_URL}/app/user`, {
+export const userClient = hc<UserRouteType>(`${PUBLIC_API_URL}/api/user`, {
     init: { credentials: 'include' },
     fetch: kyClient,
 })
@@ -99,6 +99,6 @@ export const userClient = hc<UserRouteType>(`${PUBLIC_API_URL}/app/user`, {
  * socket.addEventListener('message', (e) => console.log(e.data))
  */
 export function wsNativeClient(channel: string): WebSocket {
-    const wsBase = PUBLIC_API_URL.replace(/^https?/, 'wss')
-    return new WebSocket(`${wsBase}/app/ws/${channel}`)
+    const wsBase = PUBLIC_API_URL.replace(/^http/, 'ws')
+    return new WebSocket(`${wsBase}/api/ws/${channel}`)
 }

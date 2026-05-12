@@ -26,7 +26,7 @@ describe('WebSocket Endpoint', () => {
         describe('Authentication Guard', () => {
             it('Unauthenticated request should return 401.', async () => {
                 const response = await app.request(
-                    '/app/ws/general',
+                    '/api/ws/general',
                     {
                         method: 'GET',
                         headers: {
@@ -55,7 +55,7 @@ describe('WebSocket Endpoint', () => {
         describe('Unregistered Channel', () => {
             it('Request to an unregistered channel should return 404.', async () => {
                 const response = await app.request(
-                    '/app/ws/nonexistent-channel',
+                    '/api/ws/nonexistent-channel',
                     {
                         method: 'GET',
                         headers: {
@@ -80,7 +80,7 @@ describe('WebSocket Endpoint', () => {
         describe('WebSocket Upgrade Guard', () => {
             it('Request without Upgrade header should return 426.', async () => {
                 const response = await app.request(
-                    '/app/ws/general',
+                    '/api/ws/general',
                     {
                         method: 'GET',
                         headers: {
@@ -96,7 +96,7 @@ describe('WebSocket Endpoint', () => {
 
             it('Request with incorrect Upgrade value should return 426.', async () => {
                 const response = await app.request(
-                    '/app/ws/general',
+                    '/api/ws/general',
                     {
                         method: 'GET',
                         headers: {
@@ -123,7 +123,7 @@ describe('WebSocket Endpoint', () => {
         describe('Permission Guard', () => {
             it('Owner (ws.broadcast + ws.listen) connecting should return 101.', async () => {
                 const response = await app.request(
-                    '/app/ws/general',
+                    '/api/ws/general',
                     {
                         method: 'GET',
                         headers: {
@@ -140,7 +140,7 @@ describe('WebSocket Endpoint', () => {
 
             it('Member (ws.listen only) connecting should return 101.', async () => {
                 const response = await app.request(
-                    '/app/ws/general',
+                    '/api/ws/general',
                     {
                         method: 'GET',
                         headers: {
@@ -157,7 +157,7 @@ describe('WebSocket Endpoint', () => {
 
             it('Admin (ws.broadcast + ws.listen) connecting should return 101.', async () => {
                 const signInResponse = await app.request(
-                    '/app/auth/sign-in/username',
+                    '/api/auth/sign-in/username',
                     {
                         method: 'POST',
                         headers: {
@@ -178,7 +178,7 @@ describe('WebSocket Endpoint', () => {
                     .join('; ')
 
                 const response = await app.request(
-                    '/app/ws/general',
+                    '/api/ws/general',
                     {
                         method: 'GET',
                         headers: {

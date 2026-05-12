@@ -35,7 +35,7 @@ export class AuthState {
 
     #auth = $derived(
         createAuthClient({
-            baseURL: `${PUBLIC_API_URL}/app/auth`,
+            baseURL: `${PUBLIC_API_URL}/api/auth`,
             plugins: [
                 usernameClient(),
                 organizationClient({

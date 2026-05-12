@@ -53,21 +53,21 @@
         "vitest": "catalog:"
     },
     "exports": {
-        "./app/admin": {
-            "types": "./dist/core/route/app/admin/index.d.ts",
-            "default": "./dist/core/route/app/admin/index.js"
+        "./api/admin": {
+            "types": "./dist/core/route/api/admin/index.d.ts",
+            "default": "./dist/core/route/api/admin/index.js"
         },
-        "./app/auth": {
-            "types": "./dist/core/route/app/auth.d.ts",
-            "default": "./dist/core/route/app/auth.js"
+        "./api/auth": {
+            "types": "./dist/core/route/api/auth.d.ts",
+            "default": "./dist/core/route/api/auth.js"
         },
-        "./app/objectStorage": {
-            "types": "./dist/core/route/app/objectStorage/index.d.ts",
-            "default": "./dist/core/route/app/objectStorage/index.js"
+        "./api/objectStorage": {
+            "types": "./dist/core/route/api/objectStorage/index.d.ts",
+            "default": "./dist/core/route/api/objectStorage/index.js"
         },
-        "./app/user": {
-            "types": "./dist/core/route/app/user/index.d.ts",
-            "default": "./dist/core/route/app/user/index.js"
+        "./api/user": {
+            "types": "./dist/core/route/api/user/index.d.ts",
+            "default": "./dist/core/route/api/user/index.js"
         },
         "./root/heartbeat": {
             "types": "./dist/core/route/root/heartbeat.d.ts",

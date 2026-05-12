@@ -27,7 +27,7 @@ describe('Auth Endpoint', () => {
             describe('Username', () => {
                 it('Sign-in with valid credentials should pass.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/username',
+                        '/api/auth/sign-in/username',
                         {
                             method: 'POST',
                             headers: {
@@ -53,7 +53,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with missing Organization ID should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/username',
+                        '/api/auth/sign-in/username',
                         {
                             method: 'POST',
                             headers: {
@@ -77,7 +77,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with invalid Organization ID should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/username',
+                        '/api/auth/sign-in/username',
                         {
                             method: 'POST',
                             headers: {
@@ -105,7 +105,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with invalid username should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/username',
+                        '/api/auth/sign-in/username',
                         {
                             method: 'POST',
                             headers: {
@@ -133,7 +133,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with invalid password should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/username',
+                        '/api/auth/sign-in/username',
                         {
                             method: 'POST',
                             headers: {
@@ -161,7 +161,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with weak password should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/username',
+                        '/api/auth/sign-in/username',
                         {
                             method: 'POST',
                             headers: {
@@ -186,7 +186,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with locked account should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/username',
+                        '/api/auth/sign-in/username',
                         {
                             method: 'POST',
                             headers: {
@@ -216,7 +216,7 @@ describe('Auth Endpoint', () => {
             describe('E-mail', () => {
                 it('Sign-in with valid credentials should pass.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/email',
+                        '/api/auth/sign-in/email',
                         {
                             method: 'POST',
                             headers: {
@@ -242,7 +242,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with missing Organization ID should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/email',
+                        '/api/auth/sign-in/email',
                         {
                             method: 'POST',
                             headers: {
@@ -266,7 +266,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with invalid Organization ID should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/email',
+                        '/api/auth/sign-in/email',
                         {
                             method: 'POST',
                             headers: {
@@ -294,7 +294,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with invalid e-mail should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/email',
+                        '/api/auth/sign-in/email',
                         {
                             method: 'POST',
                             headers: {
@@ -322,7 +322,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with invalid password should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/email',
+                        '/api/auth/sign-in/email',
                         {
                             method: 'POST',
                             headers: {
@@ -350,7 +350,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with weak password should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/email',
+                        '/api/auth/sign-in/email',
                         {
                             method: 'POST',
                             headers: {
@@ -375,7 +375,7 @@ describe('Auth Endpoint', () => {
 
                 it('Sign-in with locked account should fail.', async () => {
                     const response = await app.request(
-                        '/app/auth/sign-in/email',
+                        '/api/auth/sign-in/email',
                         {
                             method: 'POST',
                             headers: {
@@ -407,7 +407,7 @@ describe('Auth Endpoint', () => {
             it('Sign-out with valid session should pass.', async () => {
                 // Sign in first to get a session cookie
                 const signInResponse = await app.request(
-                    '/app/auth/sign-in/username',
+                    '/api/auth/sign-in/username',
                     {
                         method: 'POST',
                         headers: {
@@ -428,7 +428,7 @@ describe('Auth Endpoint', () => {
                     .join('; ')
 
                 const response = await app.request(
-                    '/app/auth/sign-out',
+                    '/api/auth/sign-out',
                     {
                         method: 'POST',
                         headers: {
@@ -451,7 +451,7 @@ describe('Auth Endpoint', () => {
         describe('Password Change Validations', () => {
             it('Unauthenticated request should return 401.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/change',
+                    '/api/auth/password/change',
                     {
                         method: 'POST',
                         headers: {
@@ -475,7 +475,7 @@ describe('Auth Endpoint', () => {
 
             it('Missing currentPassword should return 400.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/change',
+                    '/api/auth/password/change',
                     {
                         method: 'POST',
                         headers: {
@@ -498,7 +498,7 @@ describe('Auth Endpoint', () => {
 
             it('Missing newPassword should return 400.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/change',
+                    '/api/auth/password/change',
                     {
                         method: 'POST',
                         headers: {
@@ -521,7 +521,7 @@ describe('Auth Endpoint', () => {
 
             it('Weak newPassword should return 400.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/change',
+                    '/api/auth/password/change',
                     {
                         method: 'POST',
                         headers: {
@@ -545,7 +545,7 @@ describe('Auth Endpoint', () => {
 
             it('Incorrect currentPassword should return 422.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/change',
+                    '/api/auth/password/change',
                     {
                         method: 'POST',
                         headers: {
@@ -574,7 +574,7 @@ describe('Auth Endpoint', () => {
         describe('Password Reset Request', () => {
             it('Missing email should return 400.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/reset-request',
+                    '/api/auth/password/reset-request',
                     {
                         method: 'POST',
                         headers: {
@@ -594,7 +594,7 @@ describe('Auth Endpoint', () => {
 
             it('Invalid email format should return 400.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/reset-request',
+                    '/api/auth/password/reset-request',
                     {
                         method: 'POST',
                         headers: {
@@ -616,7 +616,7 @@ describe('Auth Endpoint', () => {
 
             it('Valid email should return 200.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/reset-request',
+                    '/api/auth/password/reset-request',
                     {
                         method: 'POST',
                         headers: {
@@ -639,7 +639,7 @@ describe('Auth Endpoint', () => {
 
             it('Non-existent email should silently succeed with 200.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/reset-request',
+                    '/api/auth/password/reset-request',
                     {
                         method: 'POST',
                         headers: {
@@ -664,7 +664,7 @@ describe('Auth Endpoint', () => {
         describe('Password Reset Validations', () => {
             it('Missing token should return 400.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/reset',
+                    '/api/auth/password/reset',
                     {
                         method: 'POST',
                         headers: {
@@ -686,7 +686,7 @@ describe('Auth Endpoint', () => {
 
             it('Missing newPassword should return 400.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/reset',
+                    '/api/auth/password/reset',
                     {
                         method: 'POST',
                         headers: {
@@ -708,7 +708,7 @@ describe('Auth Endpoint', () => {
 
             it('Weak newPassword should return 400.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/reset',
+                    '/api/auth/password/reset',
                     {
                         method: 'POST',
                         headers: {
@@ -731,7 +731,7 @@ describe('Auth Endpoint', () => {
 
             it('Invalid token should return 422.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/reset',
+                    '/api/auth/password/reset',
                     {
                         method: 'POST',
                         headers: {
@@ -761,7 +761,7 @@ describe('Auth Endpoint', () => {
         describe('Password Change Flow', () => {
             it('Valid password change should pass.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/change',
+                    '/api/auth/password/change',
                     {
                         method: 'POST',
                         headers: {
@@ -786,7 +786,7 @@ describe('Auth Endpoint', () => {
 
             it('Sign-in with the new password should pass.', async () => {
                 const response = await app.request(
-                    '/app/auth/sign-in/username',
+                    '/api/auth/sign-in/username',
                     {
                         method: 'POST',
                         headers: {
@@ -812,7 +812,7 @@ describe('Auth Endpoint', () => {
 
             it('Sign-in with the old password should fail.', async () => {
                 const response = await app.request(
-                    '/app/auth/sign-in/username',
+                    '/api/auth/sign-in/username',
                     {
                         method: 'POST',
                         headers: {
@@ -844,7 +844,7 @@ describe('Auth Endpoint', () => {
                  * then change back to original.
                  */
                 const signInResponse = await app.request(
-                    '/app/auth/sign-in/username',
+                    '/api/auth/sign-in/username',
                     {
                         method: 'POST',
                         headers: {
@@ -865,7 +865,7 @@ describe('Auth Endpoint', () => {
                     .join('; ')
 
                 const response = await app.request(
-                    '/app/auth/password/change',
+                    '/api/auth/password/change',
                     {
                         method: 'POST',
                         headers: {
@@ -907,7 +907,7 @@ describe('Auth Endpoint', () => {
 
             beforeAll(async () => {
                 const response = await app.request(
-                    '/app/auth/password/reset-request',
+                    '/api/auth/password/reset-request',
                     {
                         method: 'POST',
                         headers: {
@@ -933,7 +933,7 @@ describe('Auth Endpoint', () => {
 
             it('Step 1: Complete password reset using the intercepted token.', async () => {
                 const response = await app.request(
-                    '/app/auth/password/reset',
+                    '/api/auth/password/reset',
                     {
                         method: 'POST',
                         headers: {
@@ -957,7 +957,7 @@ describe('Auth Endpoint', () => {
 
             it('Step 2: Sign-in with the new password should pass.', async () => {
                 const response = await app.request(
-                    '/app/auth/sign-in/username',
+                    '/api/auth/sign-in/username',
                     {
                         method: 'POST',
                         headers: {
@@ -983,7 +983,7 @@ describe('Auth Endpoint', () => {
 
             it('Step 3: Sign-in with the old password should fail.', async () => {
                 const response = await app.request(
-                    '/app/auth/sign-in/username',
+                    '/api/auth/sign-in/username',
                     {
                         method: 'POST',
                         headers: {
@@ -1015,7 +1015,7 @@ describe('Auth Endpoint', () => {
                  * then use password change to restore original.
                  */
                 const signInResponse = await app.request(
-                    '/app/auth/sign-in/username',
+                    '/api/auth/sign-in/username',
                     {
                         method: 'POST',
                         headers: {
@@ -1036,7 +1036,7 @@ describe('Auth Endpoint', () => {
                     .join('; ')
 
                 const response = await app.request(
-                    '/app/auth/password/change',
+                    '/api/auth/password/change',
                     {
                         method: 'POST',
                         headers: {
