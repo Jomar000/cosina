@@ -12,9 +12,9 @@ import type { WebSocketServer } from './core/durableObject/webSocketServer.js'
 
 export type THonoBindings = TBaseHonoBindings<
     {
-        BHCORPPOSBOFC_DO_WSS: DurableObjectNamespace<WebSocketServer>
-        BHCORPPOSBOFC_HD: Hyperdrive
-        BHCORPPOSBOFC_KV: KVNamespace
+        HYPERIONPUB_DO_WSS: DurableObjectNamespace<WebSocketServer>
+        HYPERIONPUB_HD: Hyperdrive
+        HYPERIONPUB_KV: KVNamespace
     } & Env
 >
 
