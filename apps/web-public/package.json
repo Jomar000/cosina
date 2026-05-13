@@ -40,7 +40,6 @@
         "@vitest/browser": "catalog:",
         "@vitest/browser-playwright": "catalog:",
         "better-auth": "catalog:",
-        "daisyui": "catalog:",
         "dayjs": "catalog:",
         "file-type": "catalog:",
         "hono": "catalog:",

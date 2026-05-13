@@ -18,7 +18,7 @@ catalog:
   '@internationalized/date': ^3.12.1
   '@lucide/svelte': ^1.14.0
   '@noble/hashes': ^2.2.0
-  '@playwright/test': ^1.59.1
+  '@playwright/test': ^1.60.0
   '@sveltejs/adapter-static': ^3.0.10
   '@sveltejs/kit': ^2.59.1
   '@sveltejs/vite-plugin-svelte': ^7.1.2
@@ -37,7 +37,6 @@ catalog:
   better-auth: ^1.6.10
   bits-ui: ^2.18.1
   clsx: ^2.1.1
-  daisyui: ^5.5.19
   dayjs: ^1.11.20
   drizzle-kit: 1.0.0-rc.2
   drizzle-orm: 1.0.0-rc.2
@@ -51,7 +50,7 @@ catalog:
   nanoid: ^5.1.11
   p-queue: ^9.2.0
   paneforge: ^1.0.2
-  playwright: ^1.59.1
+  playwright: ^1.60.0
   resend: ^6.12.3
   svelte: ^5.55.5
   svelte-check: ^4.4.8
@@ -75,7 +74,7 @@ overrides:
   '@better-auth/drizzle-adapter>drizzle-orm': 1.0.0-rc.2
   'better-auth>drizzle-orm': 1.0.0-rc.2
   esbuild: ^0.28.0
-  globals: ^17.5.0
+  globals: ^17.6.0
   'uuid@<12': ^11.0.0
   'uuid@>=12': ^14.0.0
 
