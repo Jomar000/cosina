@@ -274,7 +274,7 @@ export const authRoute = new Hono<THonoInstance>()
     )
     .post(
         '/sign-in/email',
-        captchaHandler(),
+        captchaHandler('sign-in-email'),
         validator('json', async (value, ctx) =>
             validatorCallback(value, ctx, signInInputSchema),
         ),
@@ -282,7 +282,7 @@ export const authRoute = new Hono<THonoInstance>()
     )
     .post(
         '/sign-in/username',
-        captchaHandler(),
+        captchaHandler('sign-in-username'),
         validator('json', async (value, ctx) =>
             validatorCallback(value, ctx, signInInputSchema),
         ),

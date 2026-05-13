@@ -63,10 +63,15 @@
             // Wait for DOM update
             await tick()
 
+            const action = data.accountId.includes('@')
+                ? 'sign-in-email'
+                : 'sign-in-username'
+
             // Retrieve CAPTCHA Token
             const captchaToken = await new Promise<string>((resolve) => {
                 turnstile.execute('#captchaRenderArea', {
                     sitekey: PUBLIC_CF_TURNSTILE_SITE_KEY,
+                    action,
                     callback: (token: string) => {
                         showCaptchaModal = false
                         turnstile.remove('#captchaRenderArea')
@@ -77,9 +82,10 @@
 
             // Submit Form Data
             try {
-                const endpoint = data.accountId.includes('@')
-                    ? authClient['sign-in'].email
-                    : authClient['sign-in'].username
+                const endpoint =
+                    action === 'sign-in-email'
+                        ? authClient['sign-in'].email
+                        : authClient['sign-in'].username
 
                 const response = await endpoint.$post(
                     {

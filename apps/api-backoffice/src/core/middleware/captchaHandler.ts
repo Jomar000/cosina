@@ -3,30 +3,35 @@ import { createMiddleware } from 'hono/factory'
 import type { THonoInstance } from '../../types.js'
 import {
     apiResponseErrorWrapper,
-    cfTurnstileVerifier,
+    CfTurnstileVerifier,
 } from '../../utilities.js'
 
 /**
  * @description
- * Validates the Cloudflare Turnstile CAPTCHA token from the `x-captcha-response` header.
+ * Validates the Cloudflare Turnstile CAPTCHA token and expected action.
  */
-export const captchaHandler = () => {
+export const captchaHandler = (action: string) => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
-        if (ctx.env.ENVIRONMENT === 'test') {
+        const cfTurnstileVerifier = new CfTurnstileVerifier(ctx)
+
+        if (cfTurnstileVerifier.isBypassed()) {
             await next()
             return
         }
 
-        const captchaToken = ctx.req.header('x-captcha-response')
+        const token = ctx.req.header('x-captcha-response')
 
-        if (!captchaToken) {
+        if (!token) {
             return apiResponseErrorWrapper(ctx, {
                 code: 'BAD_REQUEST',
                 message: 'Missing CAPTCHA response.',
             })
         }
 
-        const isValid = await cfTurnstileVerifier(ctx, captchaToken)
+        const isValid = await cfTurnstileVerifier.validate({
+            token,
+            action,
+        })
 
         if (!isValid) {
             return apiResponseErrorWrapper(ctx, {
