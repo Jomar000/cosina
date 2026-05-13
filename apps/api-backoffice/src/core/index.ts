@@ -5,7 +5,7 @@ import { v7 as uuidv7 } from 'uuid'
 
 import { AppError } from '../errors.js'
 import type { THonoInstance } from '../types.js'
-import { apiResponseErrorWrapper } from '../utilities.js'
+import { apiResponseErrorWrapper } from '../utilities/helpers.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
 import { requestTimer } from './middleware/requestTimer.js'
 import { apiRoute } from './route/api/index.js'

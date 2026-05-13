@@ -4,7 +4,7 @@ import { createMiddleware } from 'hono/factory'
 import { nanoid } from 'nanoid'
 
 import type { THonoInstance } from '../../types.js'
-import { apiResponseErrorWrapper } from '../../utilities.js'
+import { apiResponseErrorWrapper } from '../../utilities/helpers.js'
 
 /**
  * @description

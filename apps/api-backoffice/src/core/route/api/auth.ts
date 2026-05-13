@@ -17,7 +17,7 @@ import {
     apiResponseOkWrapper,
     auditTrailLogger,
     validatorCallback,
-} from '../../../utilities.js'
+} from '../../../utilities/helpers.js'
 import { captchaHandler } from '../../middleware/captchaHandler.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 

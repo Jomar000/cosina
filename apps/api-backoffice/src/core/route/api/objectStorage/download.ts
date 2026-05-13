@@ -8,7 +8,7 @@ import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     validatorCallback,
-} from '../../../../utilities.js'
+} from '../../../../utilities/helpers.js'
 
 export const downloadRoute = new Hono<THonoInstance>()
     /**

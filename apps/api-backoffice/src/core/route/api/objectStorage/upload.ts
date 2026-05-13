@@ -11,7 +11,7 @@ import {
     auditTrailLogger,
     nanoidCustom,
     validatorCallback,
-} from '../../../../utilities.js'
+} from '../../../../utilities/helpers.js'
 
 export const uploadRoute = new Hono<THonoInstance>()
     /**

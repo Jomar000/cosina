@@ -10,7 +10,7 @@ import {
     apiResponseOkWrapper,
     auditTrailLogger,
     validatorCallback,
-} from '../../../../utilities.js'
+} from '../../../../utilities/helpers.js'
 
 export const profileRoute = new Hono<THonoInstance>()
     /**

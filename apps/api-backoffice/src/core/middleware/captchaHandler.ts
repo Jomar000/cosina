@@ -1,10 +1,8 @@
 import { createMiddleware } from 'hono/factory'
 
 import type { THonoInstance } from '../../types.js'
-import {
-    apiResponseErrorWrapper,
-    CfTurnstileVerifier,
-} from '../../utilities.js'
+import { CfTurnstileVerifier } from '../../utilities/cfTurnstileVerifier.js'
+import { apiResponseErrorWrapper } from '../../utilities/helpers.js'
 
 /**
  * @description

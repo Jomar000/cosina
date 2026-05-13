@@ -1,7 +1,7 @@
 import { createMiddleware } from 'hono/factory'
 
 import type { THonoInstance } from '../../types.js'
-import { apiResponseErrorWrapper } from '../../utilities.js'
+import { apiResponseErrorWrapper } from '../../utilities/helpers.js'
 
 export const isAuthenticated = () => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
