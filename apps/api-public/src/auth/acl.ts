@@ -8,6 +8,27 @@ import { eq } from 'drizzle-orm'
 
 import type { THonoVariables } from '../types.js'
 
+type TAclStatements = Record<string, string[]>
+type TAclRoles = Record<string, TAclStatements>
+
+const cloneStatements = (
+    statements: Record<string, readonly string[]>,
+): TAclStatements => {
+    return Object.fromEntries(
+        Object.entries(statements).map(
+            ([
+                component,
+                actions,
+            ]) => [
+                component,
+                [
+                    ...actions,
+                ],
+            ],
+        ),
+    )
+}
+
 /**
  * Define permissions for Components
  * This is the complete set of actions for each component
@@ -20,7 +41,7 @@ const buildPermissions = async (
     dbSchema: THonoVariables['dbSchema'],
     kv: THonoVariables['kvClient'],
 ) => {
-    let permissions: Record<string, string[]> | null = null
+    let permissions: TAclStatements | null = null
 
     try {
         permissions = JSON.parse(`${await kv.get('cache:aclPermissions')}`)
@@ -50,7 +71,7 @@ const buildPermissions = async (
                 }
                 return accumulator
             },
-            { ...defaultStatements } as unknown as Record<string, string[]>,
+            cloneStatements(defaultStatements),
         )
 
         await kv.put('cache:aclPermissions', JSON.stringify(permissions), {
@@ -73,7 +94,7 @@ const buildRoles = async (
     dbSchema: THonoVariables['dbSchema'],
     kv: THonoVariables['kvClient'],
 ) => {
-    let roles: Record<string, Record<string, string[]>> | null = null
+    let roles: TAclRoles | null = null
 
     try {
         roles = JSON.parse(`${await kv.get('cache:aclRoles')}`)
@@ -84,6 +105,12 @@ const buildRoles = async (
     if (!roles) {
         const { permission, role } = dbSchema
 
+        const defaultRoles: TAclRoles = {
+            admin: cloneStatements(adminAc.statements),
+            owner: cloneStatements(ownerAc.statements),
+            member: cloneStatements(memberAc.statements),
+        }
+
         const dbRoles = await db
             .select({
                 component: permission.component,
@@ -93,25 +120,18 @@ const buildRoles = async (
             .from(permission)
             .innerJoin(role, eq(permission.roleId, role.id))
 
-        roles = dbRoles.reduce(
-            (accumulator, { action, component, role }) => {
-                if (!accumulator[role]) {
-                    accumulator[role] = {}
-                }
-                if (!accumulator[role][component]) {
-                    accumulator[role][component] = []
-                }
-                if (!accumulator[role][component].includes(action)) {
-                    accumulator[role][component].push(action)
-                }
-                return accumulator
-            },
-            {
-                admin: adminAc.statements,
-                owner: ownerAc.statements,
-                member: memberAc.statements,
-            } as Record<string, Record<string, string[]>>,
-        )
+        roles = dbRoles.reduce((accumulator, { action, component, role }) => {
+            if (!accumulator[role]) {
+                accumulator[role] = {}
+            }
+            if (!accumulator[role][component]) {
+                accumulator[role][component] = []
+            }
+            if (!accumulator[role][component].includes(action)) {
+                accumulator[role][component].push(action)
+            }
+            return accumulator
+        }, defaultRoles)
 
         await kv.put('cache:aclRoles', JSON.stringify(roles), {
             expirationTtl: 86400,
