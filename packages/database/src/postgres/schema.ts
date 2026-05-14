@@ -110,6 +110,31 @@ export const auditTrail = pgTable(
     ],
 )
 
+export const keyValue = pgTable('key_value', {
+    id: bigint('id', { mode: 'number' })
+        .generatedByDefaultAsIdentity()
+        .primaryKey(),
+    publicId: uuid('public_id')
+        .unique()
+        .notNull()
+        .default(sql`gen_random_uuid()`)
+        .$defaultFn(() => uuidv7()),
+    key: text('key').unique().notNull(),
+    value: text('value'),
+    createdAt: timestamp('created_at', {
+        withTimezone: true,
+        mode: 'date',
+    })
+        .notNull()
+        .defaultNow(),
+    updatedAt: timestamp('updated_at', {
+        withTimezone: true,
+        mode: 'date',
+    })
+        .notNull()
+        .defaultNow(),
+})
+
 export const objectStorage = pgTable('object_storage', {
     id: text('id').primaryKey(),
     size: bigint('size', { mode: 'number' }).notNull(),
