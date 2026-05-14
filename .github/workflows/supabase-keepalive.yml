@@ -20,7 +20,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { setTimeout } = require('timers/promises');
+            const { setTimeout } = await import('node:timers/promises');
             const url = '${{ secrets.SUPABASE_URL }}/rest/v1/rpc/keepalive_version';
             const apiKey = '${{ secrets.SUPABASE_ANON_KEY }}';
 
