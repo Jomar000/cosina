@@ -7,7 +7,7 @@ import { hc } from 'hono/client'
 import ky from 'ky'
 
 import { PUBLIC_API_URL } from '$env/static/public'
-import { getCookie } from './utilities'
+import { getCookie } from './utilities/helper'
 
 /**
  * @description

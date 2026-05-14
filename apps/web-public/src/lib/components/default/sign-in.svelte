@@ -27,7 +27,7 @@
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
     import { authClient } from '$lib/clients'
     import type { SessionState } from '$lib/states/session/context.svelte'
-    import { getCookie } from '$lib/utilities'
+    import { getCookie } from '$lib/utilities/helper'
 
     ////////////////
     // Properties //

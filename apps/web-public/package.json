@@ -39,7 +39,6 @@
         "@types/cloudflare-turnstile": "catalog:",
         "@vitest/browser": "catalog:",
         "@vitest/browser-playwright": "catalog:",
-        "better-auth": "catalog:",
         "dayjs": "catalog:",
         "file-type": "catalog:",
         "hono": "catalog:",

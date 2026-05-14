@@ -9,7 +9,6 @@
 
     import { heartbeatClient } from '$lib/clients'
     import LoadingScreen from '$lib/components/default/loading-screen.svelte'
-    import { AuthProvider } from '$lib/states/auth'
     import { SessionProvider } from '$lib/states/session'
     import '../app.css'
 
@@ -53,14 +52,12 @@
     {:else if heartbeatQuery.isSuccess}
         <QueryClientProvider client={queryClient}>
             <SessionProvider>
-                <AuthProvider>
-                    <Sonner
-                        closeButton={true}
-                        duration={30000}
-                        position="top-center"
-                    />
-                    {@render children()}
-                </AuthProvider>
+                <Sonner
+                    closeButton={true}
+                    duration={30000}
+                    position="top-center"
+                />
+                {@render children()}
             </SessionProvider>
         </QueryClientProvider>
     {:else}

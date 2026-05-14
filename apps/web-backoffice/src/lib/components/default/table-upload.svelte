@@ -18,7 +18,7 @@
     import { onMount } from 'svelte'
 
     import { objectStorageClient } from '$lib/clients'
-    import { formatBytes, getCookie } from '$lib/utilities'
+    import { formatBytes, getCookie } from '$lib/utilities/helper'
 
     ////////////////
     // Properties //
