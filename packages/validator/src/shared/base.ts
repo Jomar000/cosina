@@ -38,7 +38,7 @@ export const outputSchema = <Data extends z.ZodType = z.ZodType>(data: Data) =>
 
 export const readManyInputSchema = z.object({
     limit: z.coerce
-        .number<number>({
+        .number({
             error: 'Limit must be a number or a string that can be cast as a number.',
         })
         .check((ctx) => {
@@ -55,7 +55,7 @@ export const readManyInputSchema = z.object({
         .optional()
         .default(100),
     offset: z.coerce
-        .number<number>({
+        .number({
             error: 'Offset must be a number or a string that can be cast as a number.',
         })
         .check((ctx) => {
