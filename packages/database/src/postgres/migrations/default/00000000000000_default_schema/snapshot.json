@@ -45,6 +45,12 @@
         },
         {
             "isRlsEnabled": false,
+            "name": "key_counter",
+            "entityType": "tables",
+            "schema": "public"
+        },
+        {
+            "isRlsEnabled": false,
             "name": "key_value",
             "entityType": "tables",
             "schema": "public"
@@ -741,6 +747,93 @@
             "entityType": "columns",
             "schema": "public",
             "table": "invitation"
+        },
+        {
+            "type": "bigint",
+            "typeSchema": null,
+            "notNull": true,
+            "dimensions": 0,
+            "default": null,
+            "generated": null,
+            "identity": {
+                "type": "byDefault",
+                "name": "key_counter_id_seq",
+                "increment": "1",
+                "startWith": "1",
+                "minValue": "1",
+                "maxValue": "9223372036854775807",
+                "cache": 1,
+                "cycle": false
+            },
+            "name": "id",
+            "entityType": "columns",
+            "schema": "public",
+            "table": "key_counter"
+        },
+        {
+            "type": "uuid",
+            "typeSchema": null,
+            "notNull": true,
+            "dimensions": 0,
+            "default": "gen_random_uuid()",
+            "generated": null,
+            "identity": null,
+            "name": "public_id",
+            "entityType": "columns",
+            "schema": "public",
+            "table": "key_counter"
+        },
+        {
+            "type": "text",
+            "typeSchema": null,
+            "notNull": true,
+            "dimensions": 0,
+            "default": null,
+            "generated": null,
+            "identity": null,
+            "name": "key",
+            "entityType": "columns",
+            "schema": "public",
+            "table": "key_counter"
+        },
+        {
+            "type": "bigint",
+            "typeSchema": null,
+            "notNull": true,
+            "dimensions": 0,
+            "default": "0",
+            "generated": null,
+            "identity": null,
+            "name": "counter",
+            "entityType": "columns",
+            "schema": "public",
+            "table": "key_counter"
+        },
+        {
+            "type": "timestamp with time zone",
+            "typeSchema": null,
+            "notNull": true,
+            "dimensions": 0,
+            "default": "now()",
+            "generated": null,
+            "identity": null,
+            "name": "created_at",
+            "entityType": "columns",
+            "schema": "public",
+            "table": "key_counter"
+        },
+        {
+            "type": "timestamp with time zone",
+            "typeSchema": null,
+            "notNull": true,
+            "dimensions": 0,
+            "default": "now()",
+            "generated": null,
+            "identity": null,
+            "name": "updated_at",
+            "entityType": "columns",
+            "schema": "public",
+            "table": "key_counter"
         },
         {
             "type": "bigint",
@@ -3048,6 +3141,16 @@
                 "id"
             ],
             "nameExplicit": false,
+            "name": "key_counter_pkey",
+            "schema": "public",
+            "table": "key_counter",
+            "entityType": "pks"
+        },
+        {
+            "columns": [
+                "id"
+            ],
+            "nameExplicit": false,
             "name": "key_value_pkey",
             "schema": "public",
             "table": "key_value",
@@ -3264,6 +3367,28 @@
             "name": "audit_trail_public_id_key",
             "schema": "public",
             "table": "audit_trail",
+            "entityType": "uniques"
+        },
+        {
+            "nameExplicit": false,
+            "columns": [
+                "public_id"
+            ],
+            "nullsNotDistinct": false,
+            "name": "key_counter_public_id_key",
+            "schema": "public",
+            "table": "key_counter",
+            "entityType": "uniques"
+        },
+        {
+            "nameExplicit": false,
+            "columns": [
+                "key"
+            ],
+            "nullsNotDistinct": false,
+            "name": "key_counter_key_key",
+            "schema": "public",
+            "table": "key_counter",
             "entityType": "uniques"
         },
         {

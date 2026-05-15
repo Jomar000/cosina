@@ -3,6 +3,8 @@ import type {
     TApiResponseError,
     TValidatorIssue,
 } from '@hyperion/types/shared'
+import { dbSchema } from '@hyperion/database/postgres'
+import { sql } from 'drizzle-orm'
 import type { Context } from 'hono'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { customAlphabet } from 'nanoid'
@@ -61,6 +63,39 @@ export const auditTrailLogger = async (
         ipAddress: ctx.get('ipAddress') ?? null,
         userAgent: ctx.get('userAgent') ?? null,
     })
+}
+
+/**
+ * Atomic Key Counter Incrementer
+ *
+ * @description
+ * Creates a key counter at the increment step when missing, otherwise atomically increments it.
+ * Wrap this helper and the counter consumer in the same transaction for maximum atomicity.
+ */
+export const incrementKeyCounter = async (
+    client: Pick<THonoInstance['Variables']['dbClient'], 'insert'>,
+    counterKey: string,
+    incrementStep = 1,
+) => {
+    const { keyCounter } = dbSchema
+
+    const [row] = await client
+        .insert(keyCounter)
+        .values({
+            key: counterKey,
+            counter: incrementStep,
+        })
+        .onConflictDoUpdate({
+            target: keyCounter.key,
+            set: {
+                counter: sql<number>`${keyCounter.counter} + ${incrementStep}`,
+            },
+        })
+        .returning({
+            counter: keyCounter.counter,
+        })
+
+    return row.counter
 }
 
 /**

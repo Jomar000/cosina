@@ -14,10 +14,10 @@ autoInstallPeers: true
 
 catalog:
   '@better-auth/drizzle-adapter': ^1.6.11
-  '@cloudflare/vitest-pool-workers': ^0.16.4
+  '@cloudflare/vitest-pool-workers': ^0.16.5
   '@hono/zod-validator': ^0.8.0
   '@internationalized/date': ^3.12.1
-  '@lucide/svelte': ^1.14.0
+  '@lucide/svelte': ^1.16.0
   '@noble/hashes': ^2.2.0
   '@playwright/test': ^1.60.0
   '@sveltejs/adapter-static': ^3.0.10
