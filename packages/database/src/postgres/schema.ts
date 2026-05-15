@@ -9,6 +9,7 @@ import {
     jsonb,
     numeric,
     pgEnum,
+    pgSchema,
     pgTable,
     smallint,
     text,
@@ -17,6 +18,12 @@ import {
     uuid,
 } from 'drizzle-orm/pg-core'
 import { v7 as uuidv7 } from 'uuid'
+
+/////////////
+// Schemas //
+/////////////
+
+export const archiveSchema = pgSchema('archive')
 
 ///////////
 // Enums //

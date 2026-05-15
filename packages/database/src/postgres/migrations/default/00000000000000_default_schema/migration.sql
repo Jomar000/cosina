@@ -1,3 +1,5 @@
+CREATE SCHEMA "archive";
+--> statement-breakpoint
 CREATE TYPE "gender" AS ENUM('MALE', 'FEMALE');--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY,
@@ -268,6 +270,11 @@ ALTER TABLE "user_relationship" ADD CONSTRAINT "user_relationship_address_id_add
  * CUSTOM SQL STATEMENTS
  */
 
+--
+-- Add triggers to tables containing updated_at columns so
+-- the timestamp is refreshed whenever a row is modified
+--
+
 CREATE OR REPLACE FUNCTION set_updated_at_fn()
     RETURNS trigger
     LANGUAGE "plpgsql"
@@ -279,8 +286,6 @@ BEGIN
 END;
 $$;
 --> statement-breakpoint
-
---
 
 CREATE OR REPLACE FUNCTION add_updated_at_triggers_fn()
     RETURNS void
@@ -312,6 +317,8 @@ $$;
 SELECT "public".add_updated_at_triggers_fn();--> statement-breakpoint
 DROP FUNCTION "public".add_updated_at_triggers_fn();--> statement-breakpoint
 
+--
+-- Make foreign key constraints deferrable
 --
 
 CREATE OR REPLACE FUNCTION set_deferrable_fk_constraints_fn()
@@ -363,3 +370,61 @@ AS $$
     SELECT version();
 $$;
 --> statement-breakpoint
+
+--
+-- Create an archive schema to retain selected rows deleted from the public schema
+-- Will only add the triggers if both tables exist in the `public` and `archive` schema
+--
+
+CREATE OR REPLACE FUNCTION archive_deleted_row_fn()
+    RETURNS trigger
+    LANGUAGE "plpgsql"
+    SET search_path = ''
+AS $$
+BEGIN
+    EXECUTE format(
+        'INSERT INTO %I.%I SELECT * FROM jsonb_populate_record(NULL::%I.%I, to_jsonb($1))',
+        'archive',
+        TG_TABLE_NAME,
+        'archive',
+        TG_TABLE_NAME
+    );
+
+    RETURN OLD;
+END;
+$$;--> statement-breakpoint
+
+CREATE OR REPLACE FUNCTION add_archive_delete_triggers_fn()
+    RETURNS void
+    LANGUAGE "plpgsql"
+    SET search_path = ''
+AS $$
+DECLARE
+    record RECORD;
+BEGIN
+    FOR record IN
+        SELECT
+            source.table_name
+        FROM
+            information_schema.tables source
+        INNER JOIN information_schema.tables archive
+            ON archive.table_schema = 'archive'
+            AND archive.table_name = source.table_name
+            AND archive.table_type = 'BASE TABLE'
+        WHERE
+            source.table_schema = 'public'
+            AND source.table_type = 'BASE TABLE'
+    LOOP
+        EXECUTE format(
+            'CREATE OR REPLACE TRIGGER %I AFTER DELETE ON %I.%I FOR EACH ROW EXECUTE FUNCTION %I.archive_deleted_row_fn();',
+            record.table_name || '_ad_trig',
+            'public',
+            record.table_name,
+            'public'
+        );
+    END LOOP;
+END;
+$$;--> statement-breakpoint
+
+SELECT "public".add_archive_delete_triggers_fn();--> statement-breakpoint
+DROP FUNCTION "public".add_archive_delete_triggers_fn();--> statement-breakpoint

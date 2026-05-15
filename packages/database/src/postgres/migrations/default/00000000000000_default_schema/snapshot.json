@@ -7,6 +7,10 @@
     ],
     "ddl": [
         {
+            "name": "archive",
+            "entityType": "schemas"
+        },
+        {
             "values": [
                 "MALE",
                 "FEMALE"
