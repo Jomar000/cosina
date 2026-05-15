@@ -36,6 +36,7 @@
     "devDependencies": {
         "@better-auth/drizzle-adapter": "catalog:",
         "@cloudflare/vitest-pool-workers": "catalog:",
+        "@hono/zod-validator": "catalog:",
         "@hyperion/database": "workspace:*",
         "@noble/hashes": "catalog:",
         "@vitest/coverage-istanbul": "catalog:",

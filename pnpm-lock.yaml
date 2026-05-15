@@ -12,6 +12,9 @@ catalogs:
     '@cloudflare/vitest-pool-workers':
       specifier: ^0.16.4
       version: 0.16.4
+    '@hono/zod-validator':
+      specifier: ^0.8.0
+      version: 0.8.0
     '@internationalized/date':
       specifier: ^3.12.1
       version: 3.12.1
@@ -254,6 +257,9 @@ importers:
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
         version: 0.16.4(@vitest/runner@4.1.6)(@vitest/snapshot@4.1.6)(vitest@4.1.6)
+      '@hono/zod-validator':
+        specifier: 'catalog:'
+        version: 0.8.0(hono@4.12.18)(zod@4.4.3)
       '@hyperion/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -321,6 +327,9 @@ importers:
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
         version: 0.16.4(@vitest/runner@4.1.6)(@vitest/snapshot@4.1.6)(vitest@4.1.6)
+      '@hono/zod-validator':
+        specifier: 'catalog:'
+        version: 0.8.0(hono@4.12.18)(zod@4.4.3)
       '@hyperion/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -1219,6 +1228,12 @@ packages:
 
   '@hapi/topo@5.1.0':
     resolution: {integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==}
+
+  '@hono/zod-validator@0.8.0':
+    resolution: {integrity: sha512-5uS4S1/LKtZQYvD4BtpPUFkOv8d1wNxHHrChm26buMiEYc1FrHWvDUaKVBwkiVtvSExHSpLGDvcnpI2Copyj9w==}
+    peerDependencies:
+      hono: '>=4.10.0'
+      zod: ^3.25.0 || ^4.0.0
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -4610,6 +4625,11 @@ snapshots:
     dependencies:
       '@hapi/hoek': 9.3.0
     optional: true
+
+  '@hono/zod-validator@0.8.0(hono@4.12.18)(zod@4.4.3)':
+    dependencies:
+      hono: 4.12.18
+      zod: 4.4.3
 
   '@humanfs/core@0.19.2':
     dependencies:

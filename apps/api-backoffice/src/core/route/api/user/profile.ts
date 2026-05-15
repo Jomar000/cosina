@@ -2,15 +2,14 @@ import { profile } from '@hyperion/validator/backoffice/user'
 import { and, eq } from 'drizzle-orm'
 import { getColumns } from 'drizzle-orm/utils'
 import { Hono } from 'hono'
-import { validator } from 'hono/validator'
 
 import { AppError } from '../../../../errors.js'
 import type { THonoInstance } from '../../../../types.js'
 import {
     apiResponseOkWrapper,
     auditTrailLogger,
-    validatorCallback,
 } from '../../../../utilities/helpers.js'
+import { validateRequest } from '../../../middleware/validateRequest.js'
 
 export const profileRoute = new Hono<THonoInstance>()
     /**
@@ -55,9 +54,7 @@ export const profileRoute = new Hono<THonoInstance>()
     })
     .post(
         '/update',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, profile.updateInputSchema),
-        ),
+        validateRequest('json', profile.updateInputSchema),
         async (ctx) => {
             const {
                 firstName,
@@ -145,9 +142,7 @@ export const profileRoute = new Hono<THonoInstance>()
     )
     .post(
         '/update/address',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, profile.updateAddressInputSchema),
-        ),
+        validateRequest('json', profile.updateAddressInputSchema),
         async (ctx) => {
             const {
                 line1,

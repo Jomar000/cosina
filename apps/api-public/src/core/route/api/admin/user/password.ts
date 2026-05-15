@@ -1,7 +1,6 @@
 import { password } from '@hyperion/validator/public/admin/user'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
-import { validator } from 'hono/validator'
 
 import { AppError } from '../../../../../errors.js'
 import type { THonoInstance } from '../../../../../types.js'
@@ -9,8 +8,8 @@ import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     auditTrailLogger,
-    validatorCallback,
 } from '../../../../../utilities/helpers.js'
+import { validateRequest } from '../../../../middleware/validateRequest.js'
 
 export const passwordRoute = new Hono<THonoInstance>()
     /**
@@ -19,9 +18,7 @@ export const passwordRoute = new Hono<THonoInstance>()
      */
     .post(
         '/reset-request',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, password.resetRequestInputSchema),
-        ),
+        validateRequest('json', password.resetRequestInputSchema),
         async (ctx) => {
             const { userId } = ctx.req.valid('json')
 
@@ -91,9 +88,7 @@ export const passwordRoute = new Hono<THonoInstance>()
     )
     .post(
         '/reset',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, password.resetInputSchema),
-        ),
+        validateRequest('json', password.resetInputSchema),
         async (ctx) => {
             const { userId, newPassword } = ctx.req.valid('json')
 

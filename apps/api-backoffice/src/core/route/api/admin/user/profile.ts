@@ -2,7 +2,6 @@ import { profile } from '@hyperion/validator/backoffice/admin/user'
 import { and, asc, count as countFn, desc, eq } from 'drizzle-orm'
 import { getColumns } from 'drizzle-orm/utils'
 import { Hono } from 'hono'
-import { validator } from 'hono/validator'
 
 import { AppError } from '../../../../../errors.js'
 import type { THonoInstance } from '../../../../../types.js'
@@ -10,8 +9,8 @@ import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     auditTrailLogger,
-    validatorCallback,
 } from '../../../../../utilities/helpers.js'
+import { validateRequest } from '../../../../middleware/validateRequest.js'
 
 export const profileRoute = new Hono<THonoInstance>()
     /**
@@ -20,9 +19,7 @@ export const profileRoute = new Hono<THonoInstance>()
      */
     .get(
         '/read',
-        validator('query', async (value, ctx) =>
-            validatorCallback(value, ctx, profile.readInputSchema),
-        ),
+        validateRequest('query', profile.readInputSchema),
         async (ctx) => {
             const { userId } = ctx.req.valid('query')
 
@@ -64,9 +61,7 @@ export const profileRoute = new Hono<THonoInstance>()
     )
     .get(
         '/readMany',
-        validator('query', async (value, ctx) =>
-            validatorCallback(value, ctx, profile.readManyInputSchema),
-        ),
+        validateRequest('query', profile.readManyInputSchema),
         async (ctx) => {
             const { limit, offset, sortOrder } = ctx.req.valid('query')
 
@@ -139,9 +134,7 @@ export const profileRoute = new Hono<THonoInstance>()
     )
     .post(
         '/update',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, profile.updateInputSchema),
-        ),
+        validateRequest('json', profile.updateInputSchema),
         async (ctx) => {
             const {
                 userId,
@@ -255,9 +248,7 @@ export const profileRoute = new Hono<THonoInstance>()
     )
     .post(
         '/update/address',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, profile.updateAddressInputSchema),
-        ),
+        validateRequest('json', profile.updateAddressInputSchema),
         async (ctx) => {
             const {
                 userId,

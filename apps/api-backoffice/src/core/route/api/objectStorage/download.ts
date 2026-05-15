@@ -1,14 +1,13 @@
 import { downloadLinkCreateInputSchema } from '@hyperion/validator/backoffice/objectStorage'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
-import { validator } from 'hono/validator'
 
 import type { THonoInstance } from '../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
-    validatorCallback,
 } from '../../../../utilities/helpers.js'
+import { validateRequest } from '../../../middleware/validateRequest.js'
 
 export const downloadRoute = new Hono<THonoInstance>()
     /**
@@ -17,9 +16,7 @@ export const downloadRoute = new Hono<THonoInstance>()
      */
     .post(
         '/link/create',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, downloadLinkCreateInputSchema),
-        ),
+        validateRequest('json', downloadLinkCreateInputSchema),
         async (ctx) => {
             const { uploadId } = ctx.req.valid('json')
 

@@ -7,7 +7,6 @@ import { hexToBytes } from '@noble/hashes/utils.js'
 import { and, eq, inArray } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { encodeBase64 } from 'hono/utils/encode'
-import { validator } from 'hono/validator'
 
 import { AppError } from '../../../../errors.js'
 import type { THonoInstance } from '../../../../types.js'
@@ -16,8 +15,8 @@ import {
     apiResponseOkWrapper,
     auditTrailLogger,
     nanoidCustom,
-    validatorCallback,
 } from '../../../../utilities/helpers.js'
+import { validateRequest } from '../../../middleware/validateRequest.js'
 
 export const uploadAttachmentRoute = new Hono<THonoInstance>()
     /**
@@ -26,9 +25,7 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
      */
     .post(
         '/create',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, uploadAttachmentCreateInputSchema),
-        ),
+        validateRequest('json', uploadAttachmentCreateInputSchema),
         async (ctx) => {
             const { attachments, uploadId } = ctx.req.valid('json')
 
@@ -278,9 +275,7 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
     )
     .post(
         '/retry',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, uploadAttachmentRetryInputSchema),
-        ),
+        validateRequest('json', uploadAttachmentRetryInputSchema),
         async (ctx) => {
             const { attachments, uploadId } = ctx.req.valid('json')
 
@@ -419,9 +414,7 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
     )
     .post(
         '/commit',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, uploadAttachmentCommitInputSchema),
-        ),
+        validateRequest('json', uploadAttachmentCommitInputSchema),
         async (ctx) => {
             const { attachments, uploadId } = ctx.req.valid('json')
 

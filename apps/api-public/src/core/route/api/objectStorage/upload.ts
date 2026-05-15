@@ -1,7 +1,6 @@
 import { uploadCommitInputSchema } from '@hyperion/validator/public/objectStorage'
 import { and, eq, inArray, notInArray } from 'drizzle-orm'
 import { Hono } from 'hono'
-import { validator } from 'hono/validator'
 
 import { AppError } from '../../../../errors.js'
 import type { THonoInstance } from '../../../../types.js'
@@ -10,8 +9,8 @@ import {
     apiResponseOkWrapper,
     auditTrailLogger,
     nanoidCustom,
-    validatorCallback,
 } from '../../../../utilities/helpers.js'
+import { validateRequest } from '../../../middleware/validateRequest.js'
 
 export const uploadRoute = new Hono<THonoInstance>()
     /**
@@ -57,9 +56,7 @@ export const uploadRoute = new Hono<THonoInstance>()
     })
     .post(
         '/commit',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, uploadCommitInputSchema),
-        ),
+        validateRequest('json', uploadCommitInputSchema),
         async (ctx) => {
             const { attachments, uploadId } = ctx.req.valid('json')
 

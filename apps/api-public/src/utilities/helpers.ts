@@ -6,7 +6,6 @@ import type {
 import type { Context } from 'hono'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { customAlphabet } from 'nanoid'
-import type { ZodType } from 'zod'
 
 import type { THonoInstance } from '../types.js'
 
@@ -62,30 +61,6 @@ export const auditTrailLogger = async (
         ipAddress: ctx.get('ipAddress') ?? null,
         userAgent: ctx.get('userAgent') ?? null,
     })
-}
-
-/**
- * Validator Callback Function
- *
- * @description
- * Callback function for the built-in Hono Validator Middleware.
- */
-export const validatorCallback = async <TSchema extends ZodType>(
-    value: unknown,
-    ctx: Context<THonoInstance>,
-    schema: TSchema,
-) => {
-    const validator = await schema.safeParseAsync(value)
-
-    if (!validator.success) {
-        return apiResponseErrorWrapper(ctx, {
-            code: 'DATA_VALIDATION',
-            message: 'An error occurred while validating input data.',
-            validatorIssues: validator.error?.issues,
-        })
-    }
-
-    return validator.data
 }
 
 /**

@@ -7,7 +7,6 @@ import {
 import { and, eq } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { Hono } from 'hono'
-import { validator } from 'hono/validator'
 import type { z } from 'zod'
 
 import { AppError } from '../../../errors.js'
@@ -16,10 +15,10 @@ import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     auditTrailLogger,
-    validatorCallback,
 } from '../../../utilities/helpers.js'
 import { captchaHandler } from '../../middleware/captchaHandler.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
+import { validateRequest } from '../../middleware/validateRequest.js'
 
 const signInHandler = async (
     ctx: Context<THonoInstance>,
@@ -175,9 +174,7 @@ export const authRoute = new Hono<THonoInstance>()
     .post(
         '/password/change',
         isAuthenticated(),
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, passwordChangeInputSchema),
-        ),
+        validateRequest('json', passwordChangeInputSchema),
         async (ctx) => {
             const { currentPassword, newPassword } = ctx.req.valid('json')
 
@@ -212,9 +209,7 @@ export const authRoute = new Hono<THonoInstance>()
     )
     .post(
         '/password/reset-request',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, passwordResetRequestInputSchema),
-        ),
+        validateRequest('json', passwordResetRequestInputSchema),
         async (ctx) => {
             const { email } = ctx.req.valid('json')
 
@@ -242,9 +237,7 @@ export const authRoute = new Hono<THonoInstance>()
     )
     .post(
         '/password/reset',
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, passwordResetInputSchema),
-        ),
+        validateRequest('json', passwordResetInputSchema),
         async (ctx) => {
             const { token, newPassword } = ctx.req.valid('json')
 
@@ -275,17 +268,13 @@ export const authRoute = new Hono<THonoInstance>()
     .post(
         '/sign-in/email',
         captchaHandler('sign-in-email'),
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, signInInputSchema),
-        ),
+        validateRequest('json', signInInputSchema),
         async (ctx) => signInHandler(ctx, ctx.req.valid('json'), 'email'),
     )
     .post(
         '/sign-in/username',
         captchaHandler('sign-in-username'),
-        validator('json', async (value, ctx) =>
-            validatorCallback(value, ctx, signInInputSchema),
-        ),
+        validateRequest('json', signInInputSchema),
         async (ctx) => signInHandler(ctx, ctx.req.valid('json'), 'username'),
     )
     .post('/sign-out', async (ctx) => {
