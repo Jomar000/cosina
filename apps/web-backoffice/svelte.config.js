@@ -5,7 +5,7 @@ import { loadEnv } from 'vite'
 const mode =
     process.argv.find((arg) => arg.startsWith('--mode='))?.split('=')[1] || ''
 
-const env = loadEnv(mode, import.meta.dirname, '')
+const env = loadEnv(mode, import.meta.dirname, 'PUBLIC_')
 
 /**
  * @type {import('@sveltejs/kit').Config}
@@ -73,7 +73,6 @@ const config = {
         },
     },
     compilerOptions: {
-        hmr: process.env.NODE_ENV === 'development',
         modernAst: true,
         warningFilter: (warning) => {
             /**
