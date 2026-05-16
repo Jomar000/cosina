@@ -1,7 +1,6 @@
 <!-- https://shadcn-svelte.com/blocks/login#login-03 -->
 
 <script lang="ts">
-    import type { TApiResponse } from '@hyperion/types/shared'
     import { auth as authValidator } from '@hyperion/validator/public'
     import { Button } from '@hyperion/ui/components/button'
     import * as Card from '@hyperion/ui/components/card'
@@ -56,14 +55,14 @@
             'authSignIn',
         ],
         mutationFn: async (
-            data: z.input<typeof authValidator.signInInputSchema>,
+            payload: z.input<typeof authValidator.signInInputSchema>,
         ) => {
             showCaptchaModal = true
 
             // Wait for DOM update
             await tick()
 
-            const action = data.accountId.includes('@')
+            const action = payload.accountId.includes('@')
                 ? 'sign-in-email'
                 : 'sign-in-username'
 
@@ -90,9 +89,9 @@
                 const response = await endpoint.$post(
                     {
                         json: {
-                            organizationId: data.organizationId,
-                            accountId: data.accountId,
-                            password: data.password,
+                            organizationId: payload.organizationId,
+                            accountId: payload.accountId,
+                            password: payload.password,
                         },
                     },
                     {
@@ -103,14 +102,13 @@
                     },
                 )
 
-                const responseData =
-                    (await response.json()) as TApiResponse<TSessionData>
+                const { data, error, success } = await response.json()
 
-                if (!responseData.success) {
-                    throw new Error(responseData.error.message)
+                if (!success) {
+                    throw new Error(error.message)
                 }
 
-                session.set(responseData.data)
+                session.set(data)
 
                 if (!session.isValid()) {
                     throw new Error('Invalid session data.')

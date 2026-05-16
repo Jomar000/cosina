@@ -12,6 +12,7 @@ export type TValidatorIssue = {
 export type TApiResponseOk<T> = {
     success: true
     data: T
+    error?: null
     count?: number
     limit?: number
     offset?: number
@@ -19,6 +20,7 @@ export type TApiResponseOk<T> = {
 
 export type TApiResponseError = {
     success: false
+    data?: null
     error: {
         requestId: string
         code: string

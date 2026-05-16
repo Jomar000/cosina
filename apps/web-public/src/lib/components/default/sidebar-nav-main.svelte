@@ -11,8 +11,8 @@
             title: string
             url: string
             icon: Component
-            isActive: boolean
-            items: {
+            isActive?: boolean
+            items?: {
                 title: string
                 url: string
             }[]
@@ -24,7 +24,7 @@
     <Sidebar.GroupLabel>Platform</Sidebar.GroupLabel>
     <Sidebar.Menu>
         {#each items as item (item.title)}
-            {#if item.items?.length > 0}
+            {#if (item.items?.length ?? 0) > 0}
                 <Collapsible.Root
                     open={item.isActive}
                     class="group/collapsible"
@@ -73,7 +73,7 @@
             {:else}
                 <Sidebar.MenuItem>
                     <Sidebar.MenuButton
-                        isActive={item.isActive}
+                        isActive={item.isActive ?? false}
                         tooltipContent={item.title}
                     >
                         {#snippet child({ props })}

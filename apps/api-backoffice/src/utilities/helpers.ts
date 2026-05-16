@@ -1,6 +1,6 @@
 import type {
-    TApiResponse,
     TApiResponseError,
+    TApiResponseOk,
     TValidatorIssue,
 } from '@hyperion/types/shared'
 import { dbSchema } from '@hyperion/database/postgres'
@@ -154,7 +154,7 @@ export const apiResponseOkWrapper = <T = unknown>(
         status?: ContentfulStatusCode
     },
 ) => {
-    return ctx.json<TApiResponse<T>>(
+    return ctx.json<TApiResponseOk<T>>(
         {
             success: true,
             data,

@@ -15,7 +15,8 @@ description: Coding rules for Svelte/SvelteKit frontend and the shared UI compon
 ## TanStack Query
 
 - Use `createQuery(() => ({ queryKey, queryFn }))` and `createMutation(() => ({ mutationKey, mutationFn }))` with typed Hono clients from `src/lib/clients.ts`.
-- Do not typecast `await response.json()` results from Hono typed clients; destructure `{ data, error, success }` directly and throw `new Error(error.message)` when `success` is false.
+- Do not typecast `await response.json()` results from Hono typed clients. Destructure `{ data, error, success }`, throw `new Error(error.message)` when `success` is false, then return `data`.
+- `TApiResponse` branches intentionally expose the inactive side as `null` (`error?: null` on success, `data?: null` on error) to support this destructuring pattern.
 - Keep query and mutation keys stable arrays. Add dynamic values to mutation keys as needed, such as record IDs or action variants.
 
 ```typescript

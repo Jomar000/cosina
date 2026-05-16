@@ -11,7 +11,8 @@
         $props()
     const sidebar = useSidebar()
 
-    let activeTeam = $state(teams[0])
+    let activeTeamIndex = $state(0)
+    const activeTeam = $derived(teams[activeTeamIndex])
 </script>
 
 <Sidebar.Menu>
@@ -24,21 +25,23 @@
                         size="lg"
                         class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     >
-                        <div
-                            class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
-                        >
-                            <activeTeam.logo class="size-4" />
-                        </div>
-                        <div
-                            class="grid flex-1 text-left text-sm leading-tight"
-                        >
-                            <span class="truncate font-medium">
-                                {activeTeam.name}
-                            </span>
-                            <span class="truncate text-xs"
-                                >{activeTeam.plan}</span
+                        {#if activeTeam}
+                            <div
+                                class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
                             >
-                        </div>
+                                <activeTeam.logo class="size-4" />
+                            </div>
+                            <div
+                                class="grid flex-1 text-left text-sm leading-tight"
+                            >
+                                <span class="truncate font-medium">
+                                    {activeTeam.name}
+                                </span>
+                                <span class="truncate text-xs"
+                                    >{activeTeam.plan}</span
+                                >
+                            </div>
+                        {/if}
                         <ChevronsUpDownIcon class="ml-auto" />
                     </Sidebar.MenuButton>
                 {/snippet}
@@ -54,7 +57,7 @@
                 >
                 {#each teams as team, index (team.name)}
                     <DropdownMenu.Item
-                        onSelect={() => (activeTeam = team)}
+                        onSelect={() => (activeTeamIndex = index)}
                         class="gap-2 p-2"
                     >
                         <div

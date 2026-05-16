@@ -153,9 +153,7 @@ const signInHandler = async (
         data: {
             name: orgMemberData.user.username,
             email: orgMemberData.user.email,
-            ...(orgMemberData.user.image
-                ? { avatar: orgMemberData.user.image }
-                : {}),
+            avatar: orgMemberData.user.image ?? '',
             permissions,
             roles,
             userRoles: orgMemberData.role.name.split(','),

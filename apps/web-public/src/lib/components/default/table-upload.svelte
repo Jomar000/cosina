@@ -336,11 +336,6 @@
 
             const responseData = await response.json()
 
-            if (!responseData.success) {
-                console.error(`[table-upload] ${responseData.error.message}`)
-                return
-            }
-
             uploadId = responseData.data.uploadId
         } else {
             // TODO: Populate fileList with existing data
