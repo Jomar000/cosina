@@ -27,6 +27,8 @@ Level 3 (depends on Level 0–2):
 
 pnpm resolves this order automatically from `workspace:*` declarations. Shared packages (`@hyperion/types`, `@hyperion/database`, `@hyperion/ui`, `@hyperion/validator`) auto-build on install via `"prepare": "pnpm build"`. The root `prepare` script runs Husky, and web app `prepare` scripts run `svelte-kit sync`; do not treat every workspace `prepare` as a package build. No Turborepo/Nx pipeline needed.
 
+Workspace dependency versions are centralized through the root `pnpm-workspace.yaml` catalog, with `engineStrict: true` enforcing the root `package.json` Node and pnpm engine ranges. Prefer `catalog:` for shared third-party dependencies and `workspace:*` for internal packages.
+
 ## Dependency Strategy for `api-public` / `api-backoffice`
 
 These are private packages bundled by wrangler — the `dependencies` vs `devDependencies` split has no effect on their own builds. `dependencies` lists only what consumers (e.g., `web-public`) need for type resolution of the exported Hono routes. Server-only packages live in `devDependencies` to avoid leaking them transitively into frontend apps. See the `README` key in each app's `package.json`.

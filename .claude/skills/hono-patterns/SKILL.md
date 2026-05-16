@@ -6,13 +6,13 @@ description: Coding rules for Hono API routes, middleware, error handling, valid
 # Hono (Backend)
 
 1.  **Middleware:** Use middleware to normalize environment variables across runtimes (Cloudflare `env` vs. Node/Bun `process.env`).
-2.  **Context:** Always type the Hono `Context` with the specific environment bindings (e.g., D1 Database, R2 Bucket, KV Namespace).
-3.  **Error Handling:** Use the standardized response wrappers in `apps/api-{public,backoffice}/src/utilities.ts`. Do not throw raw exceptions — throw `AppError` (from the matching app's `src/errors.ts`) instead, which the global `.onError` handler catches.
+2.  **Context:** Use the app-specific `THonoInstance`, `THonoBindings`, and `THonoVariables` types from `apps/api-{public,backoffice}/src/types.ts`. Bindings include Hyperdrive, KV, R2, and the WebSocket Durable Object namespace.
+3.  **Error Handling:** Use the standardized response wrappers in `apps/api-{public,backoffice}/src/utilities/helpers.ts`. Do not throw raw exceptions — throw `AppError` (from the matching app's `src/errors.ts`) instead, which the global `.onError` handler catches.
     - **Success:** `apiResponseOkWrapper(ctx, { data, count?, limit?, offset? })` → `{ success: true, data, ... }`
     - **Error:** `apiResponseErrorWrapper(ctx, { code, message, validatorIssues?, status? })` → `{ success: false, error: { requestId, code, message, validatorIssues? } }`
     - **Types:** `TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError` from `@hyperion/types/shared`.
     - **Zod:** `outputSchema(dataSchema)` from `@hyperion/validator/shared` for RPC type safety. The schema includes the `success` discriminant and `requestId` in error responses, matching the types exactly.
-4.  **Validation:** Use `validatorCallback` from `utilities.ts` which runs `safeParseAsync` and returns `code: "DATA_VALIDATION"` with Zod issues on failure.
+4.  **Validation:** Use `validateRequest(target, schema)` from `apps/api-{public,backoffice}/src/core/middleware/validateRequest.ts`. It wraps `@hono/zod-validator` and returns `code: "DATA_VALIDATION"` with Zod issues on failure.
 5.  **Imports:** Group imports with installed package dependencies first, then external/local file references second. Sort import statements alphabetically by module specifier within each group. Prefer `import type` for type-only Hono app types such as `THonoInstance`, `THonoBindings`, and `THonoVariables`.
 
 ## Observability & Logging
@@ -73,7 +73,7 @@ Every `WebSocketServer` must implement the `webSocketError(ws, error)` lifecycle
 
 ### Audit Trail
 
-`auditTrailLogger(ctx, payload, client?)` in `apps/api-{public,backoffice}/src/utilities.ts`.
+`auditTrailLogger(ctx, payload, client?)` in `apps/api-{public,backoffice}/src/utilities/helpers.ts`.
 
 - **Standalone call** (no surrounding transaction): omit the third argument — it defaults to `ctx.get('dbClient')`.
 - **Inside a Drizzle `.transaction()` callback**: pass the transaction object `tx` as the third argument so the audit row rolls back atomically if the business write fails.

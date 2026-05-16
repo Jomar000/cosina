@@ -7,8 +7,10 @@ description: Rules for Drizzle ORM schema changes and queries, and for adding or
 
 1.  **Schema Changes:** Strictly modify schema in `packages/database/src/postgres/schema.ts`.
 2.  **Queries:**
-    - Use the query builder syntax (`db.query.users.findMany(...)`) for readability.
-    - Avoid raw SQL (`sql` template tag) unless absolutely necessary for performance.
+    - Follow the existing typed Drizzle builder style in the API apps: `ctx.get('dbClient').select(...).from(...).where(...)`, `insert`, `update`, `delete`, and `.transaction(...)`.
+    - Use `ctx.get('dbSchema')` inside Hono request handlers so table references come from the initialized request context.
+    - Use the relational `db.query.*` API only where it is already configured and materially improves readability.
+    - Avoid raw SQL (`sql` template tag) except for schema defaults/checks, atomic expressions, or cases where the typed builder cannot express the query cleanly.
 
 # Validators (`packages/validator`)
 
