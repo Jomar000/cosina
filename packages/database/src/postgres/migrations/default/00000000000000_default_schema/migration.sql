@@ -397,7 +397,7 @@ BEGIN
         TG_TABLE_NAME,
         'archive',
         TG_TABLE_NAME
-    );
+    ) USING OLD;
 
     RETURN OLD;
 END;
