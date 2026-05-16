@@ -14,18 +14,19 @@ description: Rules for Drizzle ORM schema changes and queries, and for adding or
 
 # Validators (`packages/validator`)
 
-- **Depends on:** `@hyperion/types` (tsconfig project reference + workspace dependency).
+- **Depends on:** `@PROJECT_NAME/types` (tsconfig project reference + workspace dependency).
 
-1.  **Shared Validators (`@hyperion/validator/shared`):**
+1.  **Shared Validators (`@PROJECT_NAME/validator/shared`):**
     - `field.ts` — Low-level Zod field builders (`vBoolean`, `vInt`, `vNumeric`, `vText`) accepting `{ fieldName, message, min, max }`.
     - `base.ts` — Composed schemas: `addressInputSchema`, `readManyInputSchema` (limit/offset/sort), `outputSchema<Data>`.
     - `refinement.ts` — Custom `.check()` callbacks: `dateString()`, `password()` (uppercase + lowercase + numeric + symbol), `updatedFields()`.
 2.  **App Validators:** Domain-specific schemas are mirrored by app surface:
-    - `@hyperion/validator/public/*` from `packages/validator/src/public`.
-    - `@hyperion/validator/backoffice/*` from `packages/validator/src/backoffice`.
+    - `@PROJECT_NAME/validator/public/*` from `packages/validator/src/public`.
+    - `@PROJECT_NAME/validator/backoffice/*` from `packages/validator/src/backoffice`.
     - Current feature groups include `auth`, `user`, `admin/user`, and `objectStorage`.
 3.  **Adding a New Validator:**
     - Create `*.schema.ts` in the appropriate `public/` or `backoffice/` subdirectory using shared field builders and refinements.
+    - Prefer composing schemas from shared base fields (`vBoolean`, `vInt`, `vNumeric`, `vText`) and shared composed schemas from `base.ts` wherever they fit. Reach for raw `z.*` primitives only when the validator needs behavior not covered by the shared builders.
     - Re-export from the nearest `index.ts`.
     - Add a named export entry to `packages/validator/package.json` exports map.
-    - Rebuild: `pnpm --filter=@hyperion/validator build`.
+    - Rebuild: `pnpm --filter=@PROJECT_NAME/validator build`.

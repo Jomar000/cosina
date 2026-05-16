@@ -16,6 +16,7 @@ description: Coding rules for Svelte/SvelteKit frontend and the shared UI compon
 
 - Use `createQuery(() => ({ queryKey, queryFn }))` and `createMutation(() => ({ mutationKey, mutationFn }))` with typed Hono clients from `src/lib/clients.ts`.
 - Do not typecast `await response.json()` results from Hono typed clients. Destructure `{ data, error, success }`, throw `new Error(error.message)` when `success` is false, then return `data`.
+- Exception: endpoints that intentionally return no data/body, such as `204 No Content` heartbeat or liveness checks, may return the typed client response directly from the query function. Do not force those endpoints into the `TApiResponse` JSON envelope just to satisfy this pattern.
 - `TApiResponse` branches intentionally expose the inactive side as `null` (`error?: null` on success, `data?: null` on error) to support this destructuring pattern.
 - Keep query and mutation keys stable arrays. Add dynamic values to mutation keys as needed, such as record IDs or action variants.
 
@@ -54,7 +55,7 @@ const updateResourceMutation = createMutation(() => ({
 - **Built with:** `@sveltejs/package` (`svelte-package`).
 - **Components:** shadcn-svelte (backed by bits-ui). See `packages/ui/src/components/` for the full list.
 - **Config:** `components.json` at `packages/ui/` root defines aliases and paths.
-- **Utility:** `@hyperion/ui/utils` exports the `cn()` helper (`clsx` + `tailwind-merge`).
-- **Styling:** Tailwind CSS v4 via `@tailwindcss/vite`, with theme CSS (zinc, oklch) and `tw-animate-css` in `src/styles/globals.css`. Import shared styles via `@hyperion/ui/styles`.
+- **Utility:** `@PROJECT_NAME/ui/utils` exports the `cn()` helper (`clsx` + `tailwind-merge`).
+- **Styling:** Tailwind CSS v4 via `@tailwindcss/vite`, with theme CSS (zinc, oklch) and `tw-animate-css` in `src/styles/globals.css`. Import shared styles via `@PROJECT_NAME/ui/styles`.
 - **Icons:** `@lucide/svelte`.
 - **Note:** `tsconfig.json` intentionally does not extend `tsconfig.base.json` — it uses `bundler` module resolution required by Svelte tooling, which conflicts with the root config's `nodenext` resolution.

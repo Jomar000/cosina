@@ -10,9 +10,9 @@ description: Coding rules for Hono API routes, middleware, error handling, valid
 3.  **Error Handling:** Use the standardized response wrappers in `apps/api-{public,backoffice}/src/utilities/helpers.ts`. Do not throw raw exceptions — throw `AppError` (from the matching app's `src/errors.ts`) instead, which the global `.onError` handler catches.
     - **Success:** `apiResponseOkWrapper(ctx, { data, count?, limit?, offset? })` → `{ success: true, data, ... }`
     - **Error:** `apiResponseErrorWrapper(ctx, { code, message, validatorIssues?, status? })` → `{ success: false, error: { requestId, code, message, validatorIssues? } }`
-    - **Types:** `TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError` from `@hyperion/types/shared`.
+    - **Types:** `TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError` from `@PROJECT_NAME/types/shared`.
     - **Discriminated unions:** `TApiResponseOk<T>` uses `error?: null` and `TApiResponseError` uses `data?: null` so Hono client responses can be destructured before checking `success`.
-    - **Zod:** `outputSchema(dataSchema)` from `@hyperion/validator/shared` for RPC type safety. The schema includes the `success` discriminant and `requestId` in error responses, matching the types exactly.
+    - **Zod:** `outputSchema(dataSchema)` from `@PROJECT_NAME/validator/shared` for RPC type safety. The schema includes the `success` discriminant and `requestId` in error responses, matching the types exactly.
 4.  **Validation:** Use `validateRequest(target, schema)` from `apps/api-{public,backoffice}/src/core/middleware/validateRequest.ts`. It wraps `@hono/zod-validator` and returns `code: "DATA_VALIDATION"` with Zod issues on failure.
 5.  **Imports:** Group imports with installed package dependencies first, then external/local file references second. Sort import statements alphabetically by module specifier within each group. Prefer `import type` for type-only Hono app types such as `THonoInstance`, `THonoBindings`, and `THonoVariables`.
 

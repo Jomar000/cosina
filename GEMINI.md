@@ -19,8 +19,8 @@
 - **Database:** Drizzle ORM. Schema in `packages/database/src/postgres/schema.ts`. Direct DB calls only in backend apps.
 - **Language:** TypeScript (Strict mode).
 - **Types (`packages/types`):**
-    - `@hyperion/types/shared` — shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError`).
-    - `@hyperion/types/public` — public-app specific types.
+    - `@PROJECT_NAME/types/shared` — shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError`).
+    - `@PROJECT_NAME/types/public` — public-app specific types.
     - Type definitions only — no runtime code beyond type references.
 
 ## 3. File Structure & Naming
@@ -40,12 +40,12 @@
 - **Package Management:** pnpm (>=11.1.2) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
 - **Running Apps:** Use `pnpm --filter=<package-name>` to target individual workspaces:
     ```bash
-    pnpm --filter=@hyperion/api-public dev     # Hono on :8081 (wrangler dev)
-    pnpm --filter=@hyperion/web-public dev     # SvelteKit on :5174 (vite dev)
-    pnpm --filter=@hyperion/database migrate:dev  # Run DB migrations (dev)
+    pnpm --filter=@PROJECT_NAME/api-public dev     # Hono on :8081 (wrangler dev)
+    pnpm --filter=@PROJECT_NAME/web-public dev     # SvelteKit on :5174 (vite dev)
+    pnpm --filter=@PROJECT_NAME/database migrate:dev  # Run DB migrations (dev)
     ```
 - **Environment Variables:**
-    - `apps/api-{public,backoffice}/wrangler.toml` — non-secret `[vars]` (CORS, cookie, URLs, etc.) and CF bindings (`HYPERION{PUB|BOFC}_KV`, `HYPERION{PUB|BOFC}_HD`, `HYPERION{PUB|BOFC}_R2`, `HYPERION{PUB|BOFC}_DO_WSS`).
+    - `apps/api-{public,backoffice}/wrangler.toml` — non-secret `[vars]` (CORS, cookie, URLs, etc.) and CF bindings (`PROJECT_NAME{PUB|BOFC}_KV`, `PROJECT_NAME{PUB|BOFC}_HD`, `PROJECT_NAME{PUB|BOFC}_R2`, `PROJECT_NAME{PUB|BOFC}_DO_WSS`).
     - `apps/api-public/.dev.vars` — secrets (not committed). Copy from `.dev.vars.example` which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 keys, OAuth keys).
     - `packages/database/.env` / `.env.test` — Postgres connection strings for local dev and test migrations.
 
@@ -59,7 +59,6 @@ Project skills live in `.agents/skills/`. Each skill covers a focused domain wit
 - `auth-implementation` — Implementing auth logic or fixing auth bugs
 - `cloudflare-worker-testing` — Debugging or writing vitest tests targeting Cloudflare Workers
 - `monorepo-troubleshooting` — Fixing build errors, setting up new packages, or understanding the build graph
-- `ai-model-selection` — Selecting the appropriate AI model tier for a task
 
 ## 6. Permissions & Command Boundaries
 
