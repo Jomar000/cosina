@@ -4,7 +4,7 @@
     import { goto } from '$app/navigation'
     import { authClient } from '$lib/clients'
     import { useSessionContext } from '$lib/states/session'
-    import { getCookie } from '$lib/utilities/helper'
+    import { getCookie } from '$lib/utilities/helpers'
 
     ////////////////
     // Properties //

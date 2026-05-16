@@ -7,7 +7,7 @@ import { hc } from 'hono/client'
 import ky from 'ky'
 
 import { PUBLIC_API_URL } from '$env/static/public'
-import { getCookie } from './utilities/helper'
+import { getCookie } from './utilities/helpers'
 
 /**
  * @description
@@ -89,16 +89,3 @@ export const userClient = hc<UserRouteType>(`${PUBLIC_API_URL}/api/user`, {
     init: { credentials: 'include' },
     fetch: kyClient,
 })
-
-/**
- * @description
- * Native WebSocket Client
- *
- * @example
- * const socket = wsNativeClient('general')
- * socket.addEventListener('message', (e) => console.log(e.data))
- */
-export function wsNativeClient(channel: string): WebSocket {
-    const wsBase = PUBLIC_API_URL.replace(/^http/, 'ws')
-    return new WebSocket(`${wsBase}/api/ws/${channel}`)
-}
