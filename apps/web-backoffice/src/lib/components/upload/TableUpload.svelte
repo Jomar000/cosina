@@ -95,10 +95,7 @@
              * STEP 1: Preprocessing of files to be signed
              */
 
-            for (const [
-                _index,
-                file,
-            ] of Array.from(selectedFiles).entries()) {
+            for (const file of Array.from(selectedFiles)) {
                 const fileBuffer = await file.arrayBuffer()
 
                 const mimeType =

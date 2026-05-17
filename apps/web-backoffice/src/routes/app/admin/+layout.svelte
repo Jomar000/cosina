@@ -5,7 +5,7 @@
     import { onMount } from 'svelte'
 
     import { goto } from '$app/navigation'
-    import AppSidebar from '$lib/components/default/sidebar.svelte'
+    import AppSidebar from '$lib/components/sidebar/Sidebar.svelte'
     import { useSessionContext } from '$lib/states/session'
 
     ////////////////

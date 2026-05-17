@@ -25,7 +25,7 @@
     import { goto } from '$app/navigation'
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
     import { authClient } from '$lib/clients'
-    import type { SessionState } from '$lib/states/session/context.svelte'
+    import type { SessionState } from '$lib/states/session'
     import { getCookie } from '$lib/utilities/helpers'
 
     ////////////////

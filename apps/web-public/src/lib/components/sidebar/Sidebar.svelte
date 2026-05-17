@@ -7,11 +7,10 @@
     import GalleryVerticalEndIcon from '@lucide/svelte/icons/gallery-vertical-end'
     import { type Component, type ComponentProps } from 'svelte'
 
-    import type { SessionState } from '$lib/states/session/context.svelte'
-    import NavMain from './sidebar-nav-main.svelte'
-    // import NavProjects from './sidebar-nav-projects.svelte'
-    import NavUser from './sidebar-nav-user.svelte'
-    import TeamSwitcher from './sidebar-team-switcher.svelte'
+    import type { SessionState } from '$lib/states/session'
+    import NavMain from './SidebarNavMain.svelte'
+    import NavUser from './SidebarNavUser.svelte'
+    import TeamSwitcher from './SidebarTeamSwitcher.svelte'
 
     let {
         ref = $bindable(null),
@@ -33,7 +32,6 @@
         }[]
     } = $props()
 
-    // This is sample data.
     const data = {
         teams: [
             {
@@ -52,27 +50,11 @@
                 plan: 'Free',
             },
         ],
-        // projects: [
-        //     {
-        //         name: 'Design Engineering',
-        //         url: '#',
-        //         icon: FrameIcon,
-        //     },
-        //     {
-        //         name: 'Sales & Marketing',
-        //         url: '#',
-        //         icon: ChartPieIcon,
-        //     },
-        //     {
-        //         name: 'Travel',
-        //         url: '#',
-        //         icon: MapIcon,
-        //     },
-        // ],
     }
 </script>
 
 <Sidebar.Root
+    bind:ref
     {collapsible}
     {...restProps}
 >
@@ -81,7 +63,6 @@
     </Sidebar.Header>
     <Sidebar.Content>
         <NavMain items={navItems} />
-        <!-- <NavProjects projects={data.projects} /> -->
     </Sidebar.Content>
     <Sidebar.Footer>
         <NavUser user={session.data} />

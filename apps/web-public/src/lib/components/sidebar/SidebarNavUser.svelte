@@ -11,8 +11,6 @@
     import SparklesIcon from '@lucide/svelte/icons/sparkles'
     import { getContext } from 'svelte'
 
-    // let { user }: { user: { name: string; email: string; avatar: string } } =
-    //     $props()
     let { user }: { user: { name: string; email: string } } = $props()
 
     const sidebar = useSidebar()

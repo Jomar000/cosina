@@ -8,7 +8,7 @@
     import { ModeWatcher } from 'mode-watcher'
 
     import { heartbeatClient } from '$lib/clients'
-    import LoadingScreen from '$lib/components/default/loading-screen.svelte'
+    import LoadingScreen from '$lib/components/loader/LoadingScreen.svelte'
     import { SessionProvider } from '$lib/states/session'
     import '../app.css'
 

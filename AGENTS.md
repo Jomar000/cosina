@@ -1,4 +1,4 @@
-> **Sync note:** This is the Claude Code version of the shared project guidelines. Any changes to project context, tech stack, file structure, dev workflow, permissions, or command boundaries must be reflected in `AGENTS.md` and `GEMINI.md`. When adding or modifying skills, update `.claude/skills/` for Claude Code and `.agents/skills/` for Codex/Gemini.
+> **Sync note:** This is the Codex version of the shared project guidelines. Any changes to project context, tech stack, file structure, dev workflow, permissions, or command boundaries must be reflected in `CLAUDE.md` and `GEMINI.md`. When adding or modifying skills, update `.agents/skills/` for Codex/Gemini and `.claude/skills/` for Claude Code.
 
 # Agentic Guidelines: Svelte & Hono Monorepo
 
@@ -15,13 +15,13 @@
 ## 2. Tech Stack & Standards
 
 - **Frontend:** Svelte (SvelteKit), SPA mode (`adapter-static`). CSP via `kit.csp` in `svelte.config.js` (hash mode, build-time).
-- **Backend:** Hono. BFF pattern — separate instances for `public` (client-facing) and `admin` (dashboard) APIs. Use Hono RPC or shared Zod validators for contract safety.
+- **Backend:** Hono. BFF pattern -- separate instances for `public` (client-facing) and `admin` (dashboard) APIs. Use Hono RPC or shared Zod validators for contract safety.
 - **Database:** Drizzle ORM. Schema in `packages/database/src/postgres/schema.ts`. Direct DB calls only in backend apps.
 - **Language:** TypeScript (Strict mode).
 - **Types (`packages/types`):**
-    - `@PROJECT_NAME/types/shared` — shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError`).
-    - `@PROJECT_NAME/types/public` — public-app specific types.
-    - Type definitions only — no runtime code beyond type references.
+    - `@PROJECT_NAME/types/shared` -- shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError`).
+    - `@PROJECT_NAME/types/public` -- public-app specific types.
+    - Type definitions only -- no runtime code beyond type references.
 
 ## 3. File Structure & Naming
 
@@ -45,26 +45,24 @@
     pnpm --filter=@PROJECT_NAME/database migrate:dev  # Run DB migrations (dev)
     ```
 - **Environment Variables:**
-    - `apps/api-{public,backoffice}/wrangler.toml` — non-secret `[vars]` (CORS, cookie, URLs, etc.) and CF bindings (`PROJECT_NAME{PUB|BOFC}_KV`, `PROJECT_NAME{PUB|BOFC}_HD`, `PROJECT_NAME{PUB|BOFC}_R2`, `PROJECT_NAME{PUB|BOFC}_DO_WSS`).
-    - `apps/api-public/.dev.vars` — secrets (not committed). Copy from `.dev.vars.example` which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 keys, OAuth keys).
-    - `packages/database/.env` / `.env.test` — Postgres connection strings for local dev and test migrations.
+    - `apps/api-{public,backoffice}/wrangler.toml` -- non-secret `[vars]` (CORS, cookie, URLs, etc.) and CF bindings (`PROJECT_NAME{PUB|BOFC}_KV`, `PROJECT_NAME{PUB|BOFC}_HD`, `PROJECT_NAME{PUB|BOFC}_R2`, `PROJECT_NAME{PUB|BOFC}_DO_WSS`).
+    - `apps/api-public/.dev.vars` -- secrets (not committed). Copy from `.dev.vars.example` which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 keys, OAuth keys).
+    - `packages/database/.env` / `.env.test` -- Postgres connection strings for local dev and test migrations.
 
-## 5. Available Skills
+## 5. Project Skills
 
-Use the Skill tool to load the relevant skill before starting any task in these areas:
+Project skills live in `.agents/skills/`. Load the relevant skill before starting any task in these areas:
 
-| Skill                         | When to use                                                                     |
-| ----------------------------- | ------------------------------------------------------------------------------- |
-| `svelte-patterns`             | Working on frontend Svelte/SvelteKit code or UI components                      |
-| `hono-patterns`               | Implementing or modifying Hono API routes, middleware, or error handling        |
-| `database-validator-patterns` | Modifying DB schema, writing Drizzle queries, or adding/updating Zod validators |
-| `auth-implementation`         | Implementing auth logic or fixing auth bugs                                     |
-| `cloudflare-worker-testing`   | Debugging or writing vitest tests targeting Cloudflare Workers                  |
-| `monorepo-troubleshooting`    | Fixing build errors, setting up new packages, or understanding the build graph  |
+- `svelte-patterns` -- Working on frontend Svelte/SvelteKit code or UI components
+- `hono-patterns` -- Implementing or modifying Hono API routes, middleware, or error handling
+- `database-validator-patterns` -- Modifying DB schema, writing Drizzle queries, or adding/updating Zod validators
+- `auth-implementation` -- Implementing auth logic or fixing auth bugs
+- `cloudflare-worker-testing` -- Debugging or writing vitest tests targeting Cloudflare Workers
+- `monorepo-troubleshooting` -- Fixing build errors, setting up new packages, or understanding the build graph
 
 ## 6. Permissions & Command Boundaries
 
-> **Note for agents and developers:** For Claude Code, these rules are **hard-enforced** by `.claude/settings.json` at the tool level — this section is a human-readable mirror of those settings. For Codex and Gemini, this section is the **project-level guidance** for safe operation. If you tighten or change `.claude/settings.json`, update this section in all root agent docs to match.
+> **Note for agents and developers:** For Claude Code, these rules are **hard-enforced** by `.claude/settings.json` at the tool level -- this section is a human-readable mirror of those settings. For Codex and Gemini, this section is the **project-level guidance** for safe operation. If you tighten or change `.claude/settings.json`, update this section in all root agent docs to match.
 
 To ensure project safety, strictly adhere to the following file access and command execution boundaries (mirrored from `.claude/settings.json`):
 
@@ -79,7 +77,7 @@ To ensure project safety, strictly adhere to the following file access and comma
 
 ---
 
-> **TODO — Future Iterations:** Add a **Deployment & CI/CD** section covering:
+> **TODO -- Future Iterations:** Add a **Deployment & CI/CD** section covering:
 >
 > - `wrangler deploy` workflows for staging/production (scripts already exist per app).
 > - Environment-specific wrangler configs (`wrangler-staging.toml`, `wrangler-production.toml`).

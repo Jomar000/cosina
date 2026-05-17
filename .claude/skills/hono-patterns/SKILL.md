@@ -15,6 +15,7 @@ description: Coding rules for Hono API routes, middleware, error handling, valid
     - **Zod:** `outputSchema(dataSchema)` from `@PROJECT_NAME/validator/shared` for RPC type safety. The schema includes the `success` discriminant and `requestId` in error responses, matching the types exactly.
 4.  **Validation:** Use `validateRequest(target, schema)` from `apps/api-{public,backoffice}/src/core/middleware/validateRequest.ts`. It wraps `@hono/zod-validator` and returns `code: "DATA_VALIDATION"` with Zod issues on failure.
 5.  **Imports:** Group imports with installed package dependencies first, then external/local file references second. Sort import statements alphabetically by module specifier within each group. Prefer `import type` for type-only Hono app types such as `THonoInstance`, `THonoBindings`, and `THonoVariables`.
+6.  **Tests:** When adding or changing API behavior, add or update the matching Cloudflare Worker Vitest coverage under `apps/api-{public,backoffice}/test/`. Use `*.con.test.ts` for independent guard, validation, and read-only cases. Use `*.seq.test.ts` for stateful flows that depend on previous steps, mutate shared database state, or need ordered setup. Cover the success path, auth/permission guards, validation failures, and important domain errors introduced by the change. If a code-only refactor does not need new tests, say why in the final response.
 
 ## Observability & Logging
 
