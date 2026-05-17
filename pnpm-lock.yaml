@@ -101,8 +101,8 @@ catalogs:
       specifier: ^2.0.1
       version: 2.0.1
     hono:
-      specifier: ^4.12.18
-      version: 4.12.18
+      specifier: ^4.12.19
+      version: 4.12.19
     ky:
       specifier: ^2.0.2
       version: 2.0.2
@@ -247,7 +247,7 @@ importers:
         version: link:../../packages/validator
       hono:
         specifier: 'catalog:'
-        version: 4.12.18
+        version: 4.12.19
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -260,7 +260,7 @@ importers:
         version: 0.16.6(@vitest/runner@4.1.6)(@vitest/snapshot@4.1.6)(vitest@4.1.6)
       '@hono/zod-validator':
         specifier: 'catalog:'
-        version: 0.8.0(hono@4.12.18)(zod@4.4.3)
+        version: 0.8.0(hono@4.12.19)(zod@4.4.3)
       '@hyperion/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -317,7 +317,7 @@ importers:
         version: link:../../packages/validator
       hono:
         specifier: 'catalog:'
-        version: 4.12.18
+        version: 4.12.19
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -330,7 +330,7 @@ importers:
         version: 0.16.6(@vitest/runner@4.1.6)(@vitest/snapshot@4.1.6)(vitest@4.1.6)
       '@hono/zod-validator':
         specifier: 'catalog:'
-        version: 0.8.0(hono@4.12.18)(zod@4.4.3)
+        version: 0.8.0(hono@4.12.19)(zod@4.4.3)
       '@hyperion/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -432,7 +432,7 @@ importers:
         version: 22.0.1
       hono:
         specifier: 'catalog:'
-        version: 4.12.18
+        version: 4.12.19
       ky:
         specifier: 'catalog:'
         version: 2.0.2
@@ -531,7 +531,7 @@ importers:
         version: 22.0.1
       hono:
         specifier: 'catalog:'
-        version: 4.12.18
+        version: 4.12.19
       ky:
         specifier: 'catalog:'
         version: 2.0.2
@@ -2060,8 +2060,8 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
-  baseline-browser-mapping@2.10.29:
-    resolution: {integrity: sha512-Asa2krT+XTPZINCS+2QcyS8WTkObE77RwkydwF7h6DmnKqbvlalz93m/dnphUyCa6SWSP51VgtEUf2FN+gelFQ==}
+  baseline-browser-mapping@2.10.30:
+    resolution: {integrity: sha512-xjOFN16Ha1+Rz4nFYKqHU/LSB+gx/Vi3yQLX7r7sAW+Wa+8hhF2h4pvqTrTMc8+WcDBEunnUurr46Jvv0jk3Vg==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -2789,8 +2789,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hono@4.12.18:
-    resolution: {integrity: sha512-RWzP96k/yv0PQfyXnWjs6zot20TqfpfsNXhOnev8d1InAxubW93L11/oNUc3tQqn2G0bSdAOBpX+2uDFHV7kdQ==}
+  hono@4.12.19:
+    resolution: {integrity: sha512-xa3eYXYXx68XTT4hZ7dRzsXBhaq85ToSrlUJNoR0gwz/1Ap/CNwX47wfvV7pc/xWhjKVVkLT7zBJy8chhNguqQ==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@2.0.2:
@@ -4556,9 +4556,9 @@ snapshots:
       '@hapi/hoek': 9.3.0
     optional: true
 
-  '@hono/zod-validator@0.8.0(hono@4.12.18)(zod@4.4.3)':
+  '@hono/zod-validator@0.8.0(hono@4.12.19)(zod@4.4.3)':
     dependencies:
-      hono: 4.12.18
+      hono: 4.12.19
       zod: 4.4.3
 
   '@humanfs/core@0.19.2':
@@ -5368,7 +5368,7 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  baseline-browser-mapping@2.10.29: {}
+  baseline-browser-mapping@2.10.30: {}
 
   better-auth@1.6.11(@sveltejs/kit@2.60.1)(drizzle-orm@1.0.0-rc.2)(svelte@5.55.7)(vitest@4.1.6):
     dependencies:
@@ -5440,7 +5440,7 @@ snapshots:
 
   browserslist@4.28.2:
     dependencies:
-      baseline-browser-mapping: 2.10.29
+      baseline-browser-mapping: 2.10.30
       caniuse-lite: 1.0.30001792
       electron-to-chromium: 1.5.357
       node-releases: 2.0.44
@@ -5965,7 +5965,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hono@4.12.18: {}
+  hono@4.12.19: {}
 
   html-escaper@2.0.2: {}
 

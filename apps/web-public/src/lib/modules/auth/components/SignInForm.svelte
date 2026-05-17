@@ -28,9 +28,9 @@
     import type { SessionState } from '$lib/states/session'
     import { getCookie } from '$lib/utilities/helpers'
 
-    ////////////////
-    // Properties //
-    ////////////////
+    ////////////////////
+    // 01. Properties //
+    ////////////////////
 
     let {
         class: className,
@@ -42,14 +42,16 @@
         showCaptchaModal: boolean
     } = $props()
 
-    ////////////////////
-    // Initialization //
-    ////////////////////
+    ///////////////
+    // 03. State //
+    ///////////////
 
     let errorCopyLabel = $state('COPY')
     let showPassword = $state(false)
 
-    // Query
+    //////////////////
+    // 06. Mutations //
+    //////////////////
     const authSignInQuery = createMutation(() => ({
         mutationKey: [
             'authSignIn',
@@ -142,7 +144,9 @@
         },
     }))
 
-    // Form
+    ///////////////
+    // 07. Forms //
+    ///////////////
     const {
         Field: AuthSignInFormField,
         Subscribe: AuthSignInFormSubscribe,

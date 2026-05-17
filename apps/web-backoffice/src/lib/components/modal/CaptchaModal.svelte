@@ -4,9 +4,9 @@
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
     import { IMG_default } from '$lib/assets/image'
 
-    ////////////////
-    // Properties //
-    ////////////////
+    ////////////////////
+    // 01. Properties //
+    ////////////////////
 
     let {
         open,

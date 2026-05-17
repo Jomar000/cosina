@@ -1,15 +1,15 @@
 <script lang="ts">
     import { SessionState, setSessionContext } from './context.svelte'
 
-    ////////////////
-    // Properties //
-    ////////////////
+    ////////////////////
+    // 01. Properties //
+    ////////////////////
 
     let { children } = $props()
 
-    //////////////
-    // Contexts //
-    //////////////
+    ///////////////
+    // 03. State //
+    ///////////////
 
     const session = new SessionState()
 

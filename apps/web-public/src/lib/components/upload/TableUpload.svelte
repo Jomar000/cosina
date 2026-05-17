@@ -20,9 +20,9 @@
     import { objectStorageClient } from '$lib/clients'
     import { formatBytes, getCookie } from '$lib/utilities/helpers'
 
-    ////////////////
-    // Properties //
-    ////////////////
+    ////////////////////
+    // 01. Properties //
+    ////////////////////
 
     let {
         allowedMimeTypes = [],
@@ -34,9 +34,9 @@
         uploadId?: string
     } = $props()
 
-    ////////////////////
-    // Initialization //
-    ////////////////////
+    ///////////////////
+    // 02. Constants //
+    ///////////////////
 
     type Metadata = {
         file: File
@@ -46,9 +46,6 @@
         hashSha256: string
         status: 'QUEUED' | 'UPLOADED' | 'FAILED'
     }
-
-    let fileList: Metadata[] = $state([])
-    let addedToList: Metadata[] = $state([])
 
     const uploadQueue = new PQueue({ concurrency: 3 })
 
@@ -69,11 +66,18 @@
      */
     const opMode: 'NEW' | 'UPDATE' = uploadId === '' ? 'NEW' : 'UPDATE'
 
-    //////////////
-    // Handlers //
-    //////////////
+    ///////////////
+    // 03. State //
+    ///////////////
 
-    const handleFileInputChange = async (event: Event) => {
+    let fileList: Metadata[] = $state([])
+    let addedToList: Metadata[] = $state([])
+
+    //////////////////
+    // 09. Handlers //
+    //////////////////
+
+    async function handleFileInputChange(event: Event) {
         if (fileList.length >= maxItems) {
             // TODO: Add alert banner or modal here.
             alert('Maximum of 10 files only.')
@@ -257,7 +261,7 @@
         }
     }
 
-    const handleFileRetry = async (index: number) => {
+    async function handleFileRetry(index: number) {
         const retryResponse =
             await objectStorageClient.upload.attachment.retry.$post(
                 {
@@ -323,9 +327,9 @@
         }
     }
 
-    ///////////////
-    // Lifecycle //
-    ///////////////
+    /////////////////
+    // 08. Effects //
+    /////////////////
 
     onMount(async () => {
         if (opMode === 'NEW') {
