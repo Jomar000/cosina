@@ -11,6 +11,7 @@ export type TWebSocketListenerRecord = {
 }[keyof WebSocketEventMap]
 
 export type TWebSocketChannel = {
+    disconnectIdleTimer: ReturnType<typeof setTimeout> | null
     listeners: Set<TWebSocketListenerRecord>
     reconnectAttempts: number
     reconnectTimer: ReturnType<typeof setTimeout> | null
@@ -21,6 +22,7 @@ export type TWebSocketChannel = {
 
 export type TWsClientManagerOptions = {
     getUrl: (channel: string) => string
+    disconnectIdleDelayMs?: number
     reconnectBaseDelayMs?: number
     reconnectMaxDelayMs?: number
 }
@@ -29,8 +31,9 @@ export type TWsClientManagerOptions = {
  * Handle returned by `wsClientManager.connect(channel)`.
  *
  * Each handle represents one consumer of a shared channel socket. Multiple
- * handles for the same channel reuse the same underlying WebSocket until every
- * handle calls `release()`.
+ * handles for the same channel reuse the same underlying WebSocket. After every
+ * handle calls `release()`, the manager keeps the socket idle briefly so route
+ * handoffs can reuse it before it is closed.
  */
 export type TManagedWebSocketClient = {
     /**
@@ -65,7 +68,7 @@ export type TManagedWebSocketClient = {
      *
      * This removes all listeners registered through this handle. When the last
      * active handle is released, the manager cancels any pending reconnect and
-     * closes the shared socket.
+     * schedules the shared socket to close after the idle disconnect delay.
      */
     release: () => void
     /**

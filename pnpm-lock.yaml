@@ -116,8 +116,8 @@ catalogs:
       specifier: ^5.1.11
       version: 5.1.11
     p-queue:
-      specifier: ^9.2.0
-      version: 9.2.0
+      specifier: ^9.3.0
+      version: 9.3.0
     paneforge:
       specifier: ^1.0.2
       version: 1.0.2
@@ -444,7 +444,7 @@ importers:
         version: 5.1.11
       p-queue:
         specifier: 'catalog:'
-        version: 9.2.0
+        version: 9.3.0
       playwright:
         specifier: 'catalog:'
         version: 1.60.0
@@ -543,7 +543,7 @@ importers:
         version: 5.1.11
       p-queue:
         specifier: 'catalog:'
-        version: 9.2.0
+        version: 9.3.0
       playwright:
         specifier: 'catalog:'
         version: 1.60.0
@@ -3178,8 +3178,8 @@ packages:
     resolution: {integrity: sha512-y3b8Kpd8OAN444hxfBbFfj1FY/RjtTd8tzYwhUqNYXx0fXx2iX4maP4Qr6qhIKbQXI02wTLAda4fYUbDagTUFw==}
     engines: {node: '>=6'}
 
-  p-queue@9.2.0:
-    resolution: {integrity: sha512-dWgLE8AH0HjQ9fe74pUkKkvzzYT18Inp4zra3lKHnnwqGvcfcUBrvF2EAVX+envufDNBOzpPq/IBUONDbI7+3g==}
+  p-queue@9.3.0:
+    resolution: {integrity: sha512-7NED7xhQ74Ngp4JP/2e0VZHp7vSWfJfqeiR92jPgxsz6m0Se4P03YoTKa9dDXyZ3r6P616gUXttrB6nnHYKang==}
     engines: {node: '>=20'}
 
   p-timeout@7.0.1:
@@ -6310,7 +6310,7 @@ snapshots:
 
   p-map@2.1.0: {}
 
-  p-queue@9.2.0:
+  p-queue@9.3.0:
     dependencies:
       eventemitter3: 5.0.4
       p-timeout: 7.0.1

@@ -1,4 +1,5 @@
 import {
+    DEFAULT_DISCONNECT_IDLE_DELAY_MS,
     DEFAULT_RECONNECT_BASE_DELAY_MS,
     DEFAULT_RECONNECT_MAX_DELAY_MS,
 } from './constants'
@@ -10,6 +11,8 @@ import type {
 } from './types'
 
 export function createWsClientManager(options: TWsClientManagerOptions) {
+    const disconnectIdleDelayMs =
+        options.disconnectIdleDelayMs ?? DEFAULT_DISCONNECT_IDLE_DELAY_MS
     const reconnectBaseDelayMs =
         options.reconnectBaseDelayMs ?? DEFAULT_RECONNECT_BASE_DELAY_MS
     const reconnectMaxDelayMs =
@@ -47,7 +50,15 @@ export function createWsClientManager(options: TWsClientManagerOptions) {
     }
 
     function scheduleReconnect(channel: string, entry: TWebSocketChannel) {
-        if (entry.refs <= 0 || entry.userClosed || entry.reconnectTimer) return
+        if (
+            entry.refs <= 0 ||
+            entry.userClosed ||
+            entry.reconnectTimer ||
+            entry.socket?.readyState === WebSocket.CONNECTING ||
+            entry.socket?.readyState === WebSocket.OPEN
+        ) {
+            return
+        }
 
         const delay = getReconnectDelay(entry.reconnectAttempts)
         entry.reconnectAttempts += 1
@@ -55,6 +66,28 @@ export function createWsClientManager(options: TWsClientManagerOptions) {
             entry.reconnectTimer = null
             connectChannel(channel, entry)
         }, delay)
+    }
+
+    function clearDisconnectIdle(entry: TWebSocketChannel) {
+        if (!entry.disconnectIdleTimer) return
+
+        clearTimeout(entry.disconnectIdleTimer)
+        entry.disconnectIdleTimer = null
+    }
+
+    function scheduleDisconnectIdle(channel: string, entry: TWebSocketChannel) {
+        if (entry.disconnectIdleTimer) return
+
+        entry.disconnectIdleTimer = setTimeout(() => {
+            entry.disconnectIdleTimer = null
+
+            if (entry.refs > 0) return
+
+            entry.userClosed = true
+            entry.socket?.close()
+            entry.socket = null
+            channels.delete(channel)
+        }, disconnectIdleDelayMs)
     }
 
     function connectChannel(channel: string, entry: TWebSocketChannel) {
@@ -97,6 +130,7 @@ export function createWsClientManager(options: TWsClientManagerOptions) {
      */
     function connect(channel: string): TManagedWebSocketClient {
         const entry = channels.get(channel) ?? {
+            disconnectIdleTimer: null,
             listeners: new Set<TWebSocketListenerRecord>(),
             reconnectAttempts: 0,
             reconnectTimer: null,
@@ -109,6 +143,7 @@ export function createWsClientManager(options: TWsClientManagerOptions) {
 
         entry.refs += 1
         entry.userClosed = false
+        clearDisconnectIdle(entry)
         channels.set(channel, entry)
         connectChannel(channel, entry)
 
@@ -146,12 +181,9 @@ export function createWsClientManager(options: TWsClientManagerOptions) {
 
                 if (entry.refs > 0) return
 
-                entry.userClosed = true
                 if (entry.reconnectTimer) clearTimeout(entry.reconnectTimer)
                 entry.reconnectTimer = null
-                entry.socket?.close()
-                entry.socket = null
-                channels.delete(channel)
+                scheduleDisconnectIdle(channel, entry)
             },
             removeEventListener: (type, listener) => {
                 clientListeners.forEach((record) => {
