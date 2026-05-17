@@ -12,6 +12,10 @@
     import NavUser from './SidebarNavUser.svelte'
     import TeamSwitcher from './SidebarTeamSwitcher.svelte'
 
+    ////////////////////
+    // 01. Properties //
+    ////////////////////
+
     let {
         ref = $bindable(null),
         collapsible = 'icon',
@@ -31,6 +35,10 @@
             }[]
         }[]
     } = $props()
+
+    ///////////////////
+    // 02. Constants //
+    ///////////////////
 
     const data = {
         teams: [

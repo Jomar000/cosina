@@ -6,12 +6,30 @@
     import PlusIcon from '@lucide/svelte/icons/plus'
     import type { Component } from 'svelte'
 
+    ////////////////////
+    // 01. Properties //
+    ////////////////////
+
     let {
         teams,
     }: { teams: { name: string; logo: Component; plan: string }[] } = $props()
+
+    ///////////////////
+    // 02. Constants //
+    ///////////////////
+
     const sidebar = useSidebar()
 
+    ///////////////
+    // 03. State //
+    ///////////////
+
     let activeTeamIndex = $state(0)
+
+    /////////////////
+    // 04. Derived //
+    /////////////////
+
     const activeTeam = $derived(teams[activeTeamIndex])
 </script>
 

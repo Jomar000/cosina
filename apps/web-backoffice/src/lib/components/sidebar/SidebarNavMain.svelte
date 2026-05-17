@@ -4,6 +4,10 @@
     import ChevronRightIcon from '@lucide/svelte/icons/chevron-right'
     import type { Component } from 'svelte'
 
+    ////////////////////
+    // 01. Properties //
+    ////////////////////
+
     let {
         items,
     }: {

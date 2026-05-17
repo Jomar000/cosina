@@ -49,9 +49,10 @@
     let errorCopyLabel = $state('COPY')
     let showPassword = $state(false)
 
-    //////////////////
+    ///////////////////
     // 06. Mutations //
-    //////////////////
+    ///////////////////
+
     const authSignInQuery = createMutation(() => ({
         mutationKey: [
             'authSignIn',
@@ -147,6 +148,7 @@
     ///////////////
     // 07. Forms //
     ///////////////
+
     const {
         Field: AuthSignInFormField,
         Subscribe: AuthSignInFormSubscribe,

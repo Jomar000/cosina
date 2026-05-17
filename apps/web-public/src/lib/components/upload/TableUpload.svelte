@@ -73,6 +73,22 @@
     let fileList: Metadata[] = $state([])
     let addedToList: Metadata[] = $state([])
 
+    /////////////////
+    // 08. Effects //
+    /////////////////
+
+    onMount(async () => {
+        if (opMode === 'NEW') {
+            const response = await objectStorageClient.upload.create.$post()
+
+            const responseData = await response.json()
+
+            uploadId = responseData.data.uploadId
+        } else {
+            // TODO: Populate fileList with existing data
+        }
+    })
+
     //////////////////
     // 09. Handlers //
     //////////////////
@@ -326,22 +342,6 @@
             }
         }
     }
-
-    /////////////////
-    // 08. Effects //
-    /////////////////
-
-    onMount(async () => {
-        if (opMode === 'NEW') {
-            const response = await objectStorageClient.upload.create.$post()
-
-            const responseData = await response.json()
-
-            uploadId = responseData.data.uploadId
-        } else {
-            // TODO: Populate fileList with existing data
-        }
-    })
 </script>
 
 <div class="p-4 sm:p-6 lg:p-8">

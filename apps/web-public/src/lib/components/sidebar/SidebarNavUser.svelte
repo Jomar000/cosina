@@ -11,7 +11,15 @@
     import SparklesIcon from '@lucide/svelte/icons/sparkles'
     import { getContext } from 'svelte'
 
+    ////////////////////
+    // 01. Properties //
+    ////////////////////
+
     let { user }: { user: { name: string; email: string } } = $props()
+
+    ///////////////////
+    // 02. Constants //
+    ///////////////////
 
     const sidebar = useSidebar()
     const signOut = getContext<() => void>('signOut')

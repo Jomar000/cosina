@@ -8,6 +8,10 @@
     import Trash2Icon from '@lucide/svelte/icons/trash-2'
     import type { Component } from 'svelte'
 
+    ////////////////////
+    // 01. Properties //
+    ////////////////////
+
     let {
         projects,
     }: {
@@ -17,6 +21,10 @@
             icon: Component
         }[]
     } = $props()
+
+    ///////////////////
+    // 02. Constants //
+    ///////////////////
 
     const sidebar = useSidebar()
 </script>
