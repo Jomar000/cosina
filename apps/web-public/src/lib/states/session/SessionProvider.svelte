@@ -7,9 +7,9 @@
 
     let { children } = $props()
 
-    ///////////////
-    // 03. State //
-    ///////////////
+    ///////////////////
+    // 02. Constants //
+    ///////////////////
 
     const session = new SessionState()
 

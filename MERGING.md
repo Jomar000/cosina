@@ -36,7 +36,6 @@ This repository is a global template. Downstream projects may have local product
 6. Normalize the lockfile from the repo root after dependency conflicts are resolved.
 
     ```bash
-    pnpm dedupe
     pnpm install
     ```
 
@@ -66,7 +65,7 @@ This repository is a global template. Downstream projects may have local product
 - Preserve fork-specific routes, API calls, copy, branding, permissions, database behavior, and business logic.
 - Prefer template changes for shared structure, tooling, agent guidelines, and framework conventions.
 - Do not overwrite fork-specific environment files such as `.dev.vars`, `.env`, or deployment configs unless the fork intentionally wants the template defaults.
-- Keep `pnpm-lock.yaml` from the merge result, then run `pnpm dedupe` and `pnpm install` once from the repo root.
+- Keep `pnpm-lock.yaml` from the merge result, then run `pnpm install` once from the repo root.
 - Keep `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/skills/`, and `.claude/skills/` synchronized when resolving agent guideline conflicts.
 
 ## Hono API Merging
