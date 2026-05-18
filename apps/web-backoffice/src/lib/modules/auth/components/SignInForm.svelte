@@ -26,7 +26,6 @@
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
     import { authClient } from '$lib/clients'
     import type { SessionState } from '$lib/states/session'
-    import { getCookie } from '$lib/utilities/helpers'
 
     ////////////////////
     // 01. Properties //
@@ -100,7 +99,6 @@
                     {
                         headers: {
                             'x-captcha-response': captchaToken,
-                            'x-csrf-token': getCookie('csrf_token') ?? '',
                         },
                     },
                 )

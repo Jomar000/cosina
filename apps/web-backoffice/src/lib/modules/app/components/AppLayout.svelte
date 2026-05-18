@@ -4,7 +4,6 @@
     import { goto } from '$app/navigation'
     import { authClient } from '$lib/clients'
     import { useSessionContext } from '$lib/states/session'
-    import { getCookie } from '$lib/utilities/helpers'
 
     ////////////////////
     // 01. Properties //
@@ -48,14 +47,7 @@
     /////////////////
 
     async function signOut() {
-        await authClient['sign-out'].$post(
-            {},
-            {
-                headers: {
-                    'x-csrf-token': getCookie('csrf_token') ?? '',
-                },
-            },
-        )
+        await authClient['sign-out'].$post()
         clearSessionDataAndRedirect()
     }
 </script>

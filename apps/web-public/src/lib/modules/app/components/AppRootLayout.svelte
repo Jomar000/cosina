@@ -40,7 +40,10 @@
             queryKey: [
                 'heartbeat',
             ],
-            queryFn: async () => await heartbeatClient.index.$get({}),
+            queryFn: async () => {
+                await heartbeatClient.index.$get()
+                return null
+            },
         }),
         () => queryClient,
     )

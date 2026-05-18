@@ -18,7 +18,7 @@
     import { onMount } from 'svelte'
 
     import { objectStorageClient } from '$lib/clients'
-    import { formatBytes, getCookie } from '$lib/utilities/helpers'
+    import { formatBytes } from '$lib/utilities/helpers'
 
     ////////////////////
     // 01. Properties //
@@ -189,24 +189,17 @@
             ]
 
             const signingResponse =
-                await objectStorageClient.upload.attachment.create.$post(
-                    {
-                        json: {
-                            uploadId,
-                            attachments: addedToList.map((atl) => ({
-                                size: atl.file.size as unknown as string,
-                                hashSha256: atl.hashSha256,
-                                isPublic: atl.isPublic,
-                                mimeType: atl.mimeType,
-                            })),
-                        },
+                await objectStorageClient.upload.attachment.create.$post({
+                    json: {
+                        uploadId,
+                        attachments: addedToList.map((atl) => ({
+                            size: atl.file.size as unknown as string,
+                            hashSha256: atl.hashSha256,
+                            isPublic: atl.isPublic,
+                            mimeType: atl.mimeType,
+                        })),
                     },
-                    {
-                        headers: {
-                            'x-csrf-token': getCookie('csrf_token') ?? '',
-                        },
-                    },
-                )
+                })
 
             const signingResponseData = await signingResponse.json()
 
@@ -248,13 +241,6 @@
                                                 attachments: [su.id],
                                             },
                                         },
-                                        {
-                                            headers: {
-                                                'x-csrf-token':
-                                                    getCookie('csrf_token') ??
-                                                    '',
-                                            },
-                                        },
                                     )
 
                                 const commitResponseData =
@@ -279,19 +265,12 @@
 
     async function handleFileRetry(index: number) {
         const retryResponse =
-            await objectStorageClient.upload.attachment.retry.$post(
-                {
-                    json: {
-                        uploadId,
-                        attachments: [fileList[index].objectId],
-                    },
+            await objectStorageClient.upload.attachment.retry.$post({
+                json: {
+                    uploadId,
+                    attachments: [fileList[index].objectId],
                 },
-                {
-                    headers: {
-                        'x-csrf-token': getCookie('csrf_token') ?? '',
-                    },
-                },
-            )
+            })
 
         const retryResponseData = await retryResponse.json()
 
@@ -318,12 +297,6 @@
                                     json: {
                                         uploadId,
                                         attachments: [fileList[index].objectId],
-                                    },
-                                },
-                                {
-                                    headers: {
-                                        'x-csrf-token':
-                                            getCookie('csrf_token') ?? '',
                                     },
                                 },
                             )
