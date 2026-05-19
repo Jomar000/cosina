@@ -32,9 +32,9 @@
         "prettier-plugin-multiline-arrays": "^4.1.8",
         "prettier-plugin-svelte": "^3.5.2",
         "prettier-plugin-tailwindcss": "^0.8.0",
-        "tsx": "^4.22.1",
+        "tsx": "^4.22.2",
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.59.3",
-        "wrangler": "^4.92.0"
+        "wrangler": "^4.93.0"
     }
 }
