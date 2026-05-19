@@ -479,13 +479,6 @@ export const invitation = pgTable(
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index().on(t.role),
-        foreignKey({
-            columns: [t.role],
-            foreignColumns: [role.name],
-        })
-            .onDelete('no action')
-            .onUpdate('no action'),
     ],
 )
 
@@ -522,13 +515,6 @@ export const member = pgTable(
         foreignKey({
             columns: [t.organizationId],
             foreignColumns: [organization.id],
-        })
-            .onDelete('no action')
-            .onUpdate('no action'),
-        index().on(t.role),
-        foreignKey({
-            columns: [t.role],
-            foreignColumns: [role.name],
         })
             .onDelete('no action')
             .onUpdate('no action'),
