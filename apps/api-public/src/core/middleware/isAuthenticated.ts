@@ -2,7 +2,10 @@ import { createMiddleware } from 'hono/factory'
 
 import type { THonoInstance } from '../../types.js'
 import { assertUserUnlocked } from '../../utilities/assertUserUnlocked.js'
-import { apiResponseErrorWrapper } from '../../utilities/helpers.js'
+import {
+    apiResponseErrorWrapper,
+    hasPrivilegedAuthRole,
+} from '../../utilities/helpers.js'
 
 export const isAuthenticated = () => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
@@ -43,13 +46,7 @@ export const isAuthenticated = () => {
             headers: ctx.req.raw.headers,
         })
 
-        ctx.set(
-            'isPrivilegedRole',
-            [
-                'admin',
-                'owner',
-            ].includes(role),
-        )
+        ctx.set('isPrivilegedRole', hasPrivilegedAuthRole(role))
         ctx.set('role', role)
         ctx.set('session', authData.session)
         ctx.set('user', authData.user)

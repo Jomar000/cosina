@@ -10,6 +10,10 @@ import { interceptPasswordResetToken, setTestingCookies } from '../utilities.js'
 let privilegedCookie: string // eslint-disable-line @typescript-eslint/no-unused-vars
 let standardCookie: string
 
+type TSignInResponseData = {
+    userRoles: string[]
+}
+
 const getDb = () =>
     dbClient({
         host: env.HYPERIONBOFC_HD.host,
@@ -261,6 +265,36 @@ describe('Auth Endpoint', () => {
                     expect(responseData.error.message).toBe(
                         'Account is currently locked.',
                     )
+                })
+
+                it('Sign-in with multi-role membership should return parsed user roles.', async () => {
+                    const response = await app.request(
+                        '/api/auth/sign-in/username',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: 'vitest-pool-worker',
+                                'content-type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                organizationId: 'superorganization',
+                                accountId: 'multirole',
+                                password: 'P@ssw0rd1234',
+                            }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<
+                            TApiResponseOk<TSignInResponseData>
+                        >()
+
+                    expect(response.status).toBe(200)
+                    expect(responseData.data.userRoles).toEqual([
+                        'homeowner',
+                        'board_member',
+                    ])
                 })
             })
 

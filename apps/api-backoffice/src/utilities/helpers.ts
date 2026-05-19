@@ -165,3 +165,27 @@ export const apiResponseOkWrapper = <T = unknown>(
         status,
     )
 }
+
+/**
+ * Parse Better Auth organization role strings.
+ *
+ * @description
+ * Better Auth may store one or more organization roles as a comma-separated
+ * string in `member.role`.
+ */
+export const parseAuthRoles = (role: string) =>
+    role
+        .split(',')
+        .map((value) => value.trim())
+        .filter((value) => value.length > 0)
+
+/**
+ * Checks whether any parsed Better Auth organization role is privileged.
+ */
+export const hasPrivilegedAuthRole = (role: string) =>
+    parseAuthRoles(role).some((value) =>
+        [
+            'admin',
+            'owner',
+        ].includes(value),
+    )

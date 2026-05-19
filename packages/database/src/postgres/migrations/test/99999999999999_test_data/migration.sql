@@ -11,6 +11,7 @@ VALUES
     ('ACCOUNT_001', 'USER_001', 'USER_001', 'credential', 'ZLdlpfqhiPOY5tot3wc5Iq3xt-N8eHrB:691f4315a32bb67e45572fdfa8d0556076062d63e3402844bfb8eed3f7a09a5460ee6553fe751d79e076bcf00fece142d5b4315df8475f15c9acf46c4897412e'),
     ('ACCOUNT_002', 'USER_002', 'USER_002', 'credential', 'ZLdlpfqhiPOY5tot3wc5Iq3xt-N8eHrB:691f4315a32bb67e45572fdfa8d0556076062d63e3402844bfb8eed3f7a09a5460ee6553fe751d79e076bcf00fece142d5b4315df8475f15c9acf46c4897412e'),
     ('ACCOUNT_003', 'USER_003', 'USER_003', 'credential', 'ZLdlpfqhiPOY5tot3wc5Iq3xt-N8eHrB:691f4315a32bb67e45572fdfa8d0556076062d63e3402844bfb8eed3f7a09a5460ee6553fe751d79e076bcf00fece142d5b4315df8475f15c9acf46c4897412e'),
+    ('ACCOUNT_MULTI_ROLE', 'USER_MULTI_ROLE', 'USER_MULTI_ROLE', 'credential', 'ZLdlpfqhiPOY5tot3wc5Iq3xt-N8eHrB:691f4315a32bb67e45572fdfa8d0556076062d63e3402844bfb8eed3f7a09a5460ee6553fe751d79e076bcf00fece142d5b4315df8475f15c9acf46c4897412e'),
     ('ACCOUNT_999', 'USER_999', 'USER_999', 'credential', 'ZLdlpfqhiPOY5tot3wc5Iq3xt-N8eHrB:691f4315a32bb67e45572fdfa8d0556076062d63e3402844bfb8eed3f7a09a5460ee6553fe751d79e076bcf00fece142d5b4315df8475f15c9acf46c4897412e');
 --> statement-breakpoint
 
@@ -21,6 +22,7 @@ VALUES
     ('MEMBER_001', 'USER_001', 'ORGANIZATION_001', 'owner'),
     ('MEMBER_002', 'USER_002', 'ORGANIZATION_001', 'admin'),
     ('MEMBER_003', 'USER_003', 'ORGANIZATION_001', 'member'),
+    ('MEMBER_MULTI_ROLE', 'USER_MULTI_ROLE', 'ORGANIZATION_001', 'homeowner,board_member'),
     ('MEMBER_999', 'USER_999', 'ORGANIZATION_001', 'member');
 --> statement-breakpoint
 
@@ -38,6 +40,7 @@ VALUES
     ('USER_001', 'SUPER ADMINISTRATOR', 'superadministrator@hyperion.app', 'superadministrator'),
     ('USER_002', 'ADMINISTRATOR', 'administrator@hyperion.app', 'administrator'),
     ('USER_003', 'MEMBER', 'member@hyperion.app', 'member'),
+    ('USER_MULTI_ROLE', 'MULTI ROLE MEMBER', 'multi.role@hyperion.app', 'multirole'),
     ('USER_999', 'LOCKED', 'locked@hyperion.app', 'locked');
 --> statement-breakpoint
 
@@ -48,5 +51,6 @@ VALUES
     ('USER_001', false),
     ('USER_002', false),
     ('USER_003', false),
+    ('USER_MULTI_ROLE', false),
     ('USER_999', true);
 --> statement-breakpoint

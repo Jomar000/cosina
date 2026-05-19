@@ -10,12 +10,13 @@ import { Hono } from 'hono'
 import type { z } from 'zod'
 
 import type { THonoInstance } from '../../../types.js'
+import { assertUserUnlocked } from '../../../utilities/assertUserUnlocked.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     auditTrailLogger,
+    parseAuthRoles,
 } from '../../../utilities/helpers.js'
-import { assertUserUnlocked } from '../../../utilities/assertUserUnlocked.js'
 import { captchaHandler } from '../../middleware/captchaHandler.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 import { validateRequest } from '../../middleware/validateRequest.js'
@@ -31,7 +32,6 @@ const signInHandler = async (
     const {
         member,
         organization: organizationTable,
-        role,
         user,
     } = ctx.get('dbSchema')
 
@@ -42,14 +42,13 @@ const signInHandler = async (
     const orgMemberData =
         (
             await db
-                .select()
+                .select({ member, user })
                 .from(user)
                 .innerJoin(member, eq(user.id, member.userId))
                 .innerJoin(
                     organizationTable,
                     eq(member.organizationId, organizationTable.id),
                 )
-                .innerJoin(role, eq(member.role, role.name))
                 .where(
                     and(
                         credentialType === 'email'
@@ -132,7 +131,7 @@ const signInHandler = async (
             avatar: orgMemberData.user.image ?? '',
             permissions,
             roles,
-            userRoles: orgMemberData.role.name.split(','),
+            userRoles: parseAuthRoles(orgMemberData.member.role),
             expiresAt:
                 Math.floor(new Date().getTime() / 1000) +
                 Number(ctx.env.SESSION_EXPIRATION),
