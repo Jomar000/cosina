@@ -234,20 +234,14 @@ CREATE INDEX "invitation_email_index" ON "invitation" ("email");--> statement-br
 CREATE INDEX "invitation_inviter_id_index" ON "invitation" ("inviter_id");--> statement-breakpoint
 CREATE INDEX "invitation_organization_id_index" ON "invitation" ("organization_id");--> statement-breakpoint
 CREATE INDEX "member_user_id_index" ON "member" ("user_id");--> statement-breakpoint
-CREATE INDEX "member_organization_id_index" ON "member" ("organization_id");--> statement-breakpoint
-CREATE INDEX "object_storage_acl_object_storage_id_index" ON "object_storage_acl" ("object_storage_id");--> statement-breakpoint
 CREATE INDEX "object_storage_acl_user_id_index" ON "object_storage_acl" ("user_id");--> statement-breakpoint
 CREATE INDEX "permission_role_id_index" ON "permission" ("role_id");--> statement-breakpoint
 CREATE INDEX "session_user_id_index" ON "session" ("user_id");--> statement-breakpoint
 CREATE INDEX "session_active_organization_id_index" ON "session" ("active_organization_id");--> statement-breakpoint
 CREATE INDEX "two_factor_user_id_index" ON "two_factor" ("user_id");--> statement-breakpoint
 CREATE INDEX "upload_user_id_index" ON "upload" ("user_id");--> statement-breakpoint
-CREATE INDEX "upload_attachment_upload_id_index" ON "upload_attachment" ("upload_id");--> statement-breakpoint
 CREATE INDEX "upload_attachment_object_storage_id_index" ON "upload_attachment" ("object_storage_id");--> statement-breakpoint
-CREATE INDEX "user_attribute_user_id_index" ON "user_attribute" ("user_id");--> statement-breakpoint
-CREATE INDEX "user_profile_user_id_index" ON "user_profile" ("user_id");--> statement-breakpoint
 CREATE INDEX "user_profile_address_id_index" ON "user_profile" ("address_id");--> statement-breakpoint
-CREATE INDEX "user_relationship_user_id_index" ON "user_relationship" ("user_id");--> statement-breakpoint
 CREATE INDEX "user_relationship_address_id_index" ON "user_relationship" ("address_id");--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id");--> statement-breakpoint
 ALTER TABLE "audit_trail" ADD CONSTRAINT "audit_trail_organization_id_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "organization"("id");--> statement-breakpoint

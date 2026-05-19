@@ -200,7 +200,6 @@ export const objectStorageAcl = pgTable(
         mode: integer('mode').notNull().default(1),
     },
     (t) => [
-        index().on(t.objectStorageId),
         foreignKey({
             columns: [t.objectStorageId],
             foreignColumns: [objectStorage.id],
@@ -255,7 +254,6 @@ export const uploadAttachment = pgTable(
         objectStorageId: text('object_storage_id').notNull(),
     },
     (t) => [
-        index().on(t.uploadId),
         foreignKey({
             columns: [t.uploadId],
             foreignColumns: [upload.id],
@@ -292,7 +290,6 @@ export const userAttribute = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index().on(t.userId),
         foreignKey({
             columns: [t.userId],
             foreignColumns: [user.id],
@@ -327,7 +324,6 @@ export const userProfile = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index().on(t.userId),
         foreignKey({
             columns: [t.userId],
             foreignColumns: [user.id],
@@ -371,7 +367,6 @@ export const userRelationship = pgTable(
             .defaultNow(),
     },
     (t) => [
-        index().on(t.userId),
         foreignKey({
             columns: [t.userId],
             foreignColumns: [user.id],
@@ -511,7 +506,6 @@ export const member = pgTable(
         })
             .onDelete('no action')
             .onUpdate('no action'),
-        index().on(t.organizationId),
         foreignKey({
             columns: [t.organizationId],
             foreignColumns: [organization.id],

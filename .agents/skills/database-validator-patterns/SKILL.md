@@ -11,6 +11,17 @@ description: Rules for Drizzle ORM schema changes and queries, and for adding or
     - Use `ctx.get('dbSchema')` inside Hono request handlers so table references come from the initialized request context.
     - Use the relational `db.query.*` API only where it is already configured and materially improves readability.
     - Avoid raw SQL (`sql` template tag) except for schema defaults/checks, atomic expressions, or cases where the typed builder cannot express the query cleanly.
+3.  **Constraints & Indexes:**
+    - Before adding a table or ownership column, classify the record as `global`, `identity-owned`, `user-owned`, or `organization-owned`; only organization-owned domain records should default to `organization_id`.
+    - Keep shared identity/auth/system tables global unless a concrete product requirement makes them tenant-specific. Current examples include `user`, `account`, `verification`, `two_factor`, `role`, `permission`, `key_counter`, and `key_value`.
+    - Organization-owned domain records should carry `organization_id`, scope common reads/writes through the active organization, and use tenant-aware uniqueness/indexes such as `(organization_id, slug)` or `(organization_id, created_at)` when those are the real access patterns.
+    - User-owned records may stay keyed by `user_id` when the data is intentionally shared across the user's organizations. If the data can differ per organization, model it as organization-owned, usually keyed or constrained by `(organization_id, user_id)`.
+    - Tenant-scoped actor references such as `created_by`, `updated_by`, `approved_by`, or `deleted_by` should include `organization_id` and use composite foreign keys to the tenant membership relationship, currently `member(organization_id, user_id)`.
+    - Treat `_by` as actor-reference guidance only when the field represents a user actor, not domain/display text fields such as `posted_by`, `filed_by`, or `requested_by` unless they are intentionally modeled as user references.
+    - Add matching composite indexes only when they support common tenant-scoped queries or foreign-key maintenance paths.
+    - Do not add a separate index for a primary key column.
+    - Do not add duplicate single-column indexes when a primary key, unique constraint, or existing index already covers the access pattern.
+    - Before adding an index, check whether an existing composite index or unique constraint already provides left-prefix coverage, such as `(organization_id, user_id)` covering filters by `organization_id`.
 
 # Validators (`packages/validator`)
 
