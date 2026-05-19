@@ -1,5 +1,7 @@
+import { dbClient, dbSchema } from '@hyperion/database/postgres'
 import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
 import { env } from 'cloudflare:workers'
+import { eq } from 'drizzle-orm'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../src/core/index.js'
@@ -7,6 +9,55 @@ import { interceptPasswordResetToken, setTestingCookies } from '../utilities.js'
 
 let privilegedCookie: string // eslint-disable-line @typescript-eslint/no-unused-vars
 let standardCookie: string
+
+const getDb = () =>
+    dbClient({
+        host: env.HYPERIONBOFC_HD.host,
+        port: Number(env.HYPERIONBOFC_HD.port) || 5432,
+        database: env.HYPERIONBOFC_HD.database,
+        user: env.HYPERIONBOFC_HD.user,
+        pass: env.HYPERIONBOFC_HD.password,
+    })
+
+const restoreAdministratorAttribute = async () => {
+    const db = getDb()
+    const { userAttribute } = dbSchema
+
+    try {
+        await db
+            .delete(userAttribute)
+            .where(eq(userAttribute.userId, 'USER_002'))
+        await db.insert(userAttribute).values({
+            userId: 'USER_002',
+            isLocked: false,
+        })
+    } finally {
+        await db.$client.end()
+    }
+}
+
+const signInAdministrator = async () => {
+    const response = await app.request(
+        '/api/auth/sign-in/username',
+        {
+            method: 'POST',
+            headers: {
+                origin: 'vitest-pool-worker',
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                organizationId: 'superorganization',
+                accountId: 'administrator',
+                password: 'P@ssw0rd1234',
+            }),
+        },
+        env,
+    )
+
+    expect(response.status).toBe(200)
+
+    return response.headers.getSetCookie().join('; ')
+}
 
 beforeAll(async () => {
     ;[
@@ -758,6 +809,223 @@ describe('Auth Endpoint', () => {
     })
 
     describe('Sequential Tests', () => {
+        describe('User Attribute Lock Enforcement', () => {
+            it('Sign-in by username with missing user attribute should fail closed.', async () => {
+                await restoreAdministratorAttribute()
+
+                const db = getDb()
+                const { userAttribute } = dbSchema
+
+                try {
+                    await db
+                        .delete(userAttribute)
+                        .where(eq(userAttribute.userId, 'USER_002'))
+
+                    const response = await app.request(
+                        '/api/auth/sign-in/username',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: 'vitest-pool-worker',
+                                'content-type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                organizationId: 'superorganization',
+                                accountId: 'administrator',
+                                password: 'P@ssw0rd1234',
+                            }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(423)
+                    expect(responseData.error.code).toBe('LOCKED')
+                    expect(responseData.error.message).toBe(
+                        'Account is currently locked.',
+                    )
+                } finally {
+                    await db.$client.end()
+                    await restoreAdministratorAttribute()
+                }
+            })
+
+            it('Sign-in by email with missing user attribute should fail closed.', async () => {
+                await restoreAdministratorAttribute()
+
+                const db = getDb()
+                const { userAttribute } = dbSchema
+
+                try {
+                    await db
+                        .delete(userAttribute)
+                        .where(eq(userAttribute.userId, 'USER_002'))
+
+                    const response = await app.request(
+                        '/api/auth/sign-in/email',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: 'vitest-pool-worker',
+                                'content-type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                organizationId: 'superorganization',
+                                accountId: 'administrator@hyperion.app',
+                                password: 'P@ssw0rd1234',
+                            }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(423)
+                    expect(responseData.error.code).toBe('LOCKED')
+                    expect(responseData.error.message).toBe(
+                        'Account is currently locked.',
+                    )
+                } finally {
+                    await db.$client.end()
+                    await restoreAdministratorAttribute()
+                }
+            })
+
+            it('Authenticated session should fail after user is locked.', async () => {
+                await restoreAdministratorAttribute()
+
+                const [
+                    firstSessionCookie,
+                    secondSessionCookie,
+                ] = await Promise.all([
+                    signInAdministrator(),
+                    signInAdministrator(),
+                ])
+                const db = getDb()
+                const { userAttribute } = dbSchema
+
+                try {
+                    await db
+                        .update(userAttribute)
+                        .set({ isLocked: true })
+                        .where(eq(userAttribute.userId, 'USER_002'))
+
+                    const response = await app.request(
+                        '/api/user/profile/read',
+                        {
+                            method: 'GET',
+                            headers: {
+                                origin: 'vitest-pool-worker',
+                                cookie: firstSessionCookie,
+                            },
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(423)
+                    expect(responseData.error.code).toBe('LOCKED')
+                    expect(responseData.error.message).toBe(
+                        'Account is currently locked.',
+                    )
+                    expect(response.headers.get('set-cookie')).toBeTruthy()
+
+                    const revokedSessionResponse = await app.request(
+                        '/api/user/profile/read',
+                        {
+                            method: 'GET',
+                            headers: {
+                                origin: 'vitest-pool-worker',
+                                cookie: secondSessionCookie,
+                            },
+                        },
+                        env,
+                    )
+
+                    const revokedSessionResponseData =
+                        await revokedSessionResponse.json<TApiResponseError>()
+
+                    expect(revokedSessionResponse.status).toBe(401)
+                    expect(revokedSessionResponseData.error.code).toBe(
+                        'UNAUTHORIZED',
+                    )
+                } finally {
+                    await db.$client.end()
+                    await restoreAdministratorAttribute()
+                }
+            })
+
+            it('Authenticated session should fail after user attribute is removed.', async () => {
+                await restoreAdministratorAttribute()
+
+                const [
+                    firstSessionCookie,
+                    secondSessionCookie,
+                ] = await Promise.all([
+                    signInAdministrator(),
+                    signInAdministrator(),
+                ])
+                const db = getDb()
+                const { userAttribute } = dbSchema
+
+                try {
+                    await db
+                        .delete(userAttribute)
+                        .where(eq(userAttribute.userId, 'USER_002'))
+
+                    const response = await app.request(
+                        '/api/user/profile/read',
+                        {
+                            method: 'GET',
+                            headers: {
+                                origin: 'vitest-pool-worker',
+                                cookie: firstSessionCookie,
+                            },
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(423)
+                    expect(responseData.error.code).toBe('LOCKED')
+                    expect(responseData.error.message).toBe(
+                        'Account is currently locked.',
+                    )
+                    expect(response.headers.get('set-cookie')).toBeTruthy()
+
+                    const revokedSessionResponse = await app.request(
+                        '/api/user/profile/read',
+                        {
+                            method: 'GET',
+                            headers: {
+                                origin: 'vitest-pool-worker',
+                                cookie: secondSessionCookie,
+                            },
+                        },
+                        env,
+                    )
+
+                    const revokedSessionResponseData =
+                        await revokedSessionResponse.json<TApiResponseError>()
+
+                    expect(revokedSessionResponse.status).toBe(401)
+                    expect(revokedSessionResponseData.error.code).toBe(
+                        'UNAUTHORIZED',
+                    )
+                } finally {
+                    await db.$client.end()
+                    await restoreAdministratorAttribute()
+                }
+            })
+        })
+
         describe('Password Change Flow', () => {
             it('Valid password change should pass.', async () => {
                 const response = await app.request(

@@ -9,13 +9,13 @@ import type { Context } from 'hono'
 import { Hono } from 'hono'
 import type { z } from 'zod'
 
-import { AppError } from '../../../errors.js'
 import type { THonoInstance } from '../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     auditTrailLogger,
 } from '../../../utilities/helpers.js'
+import { assertUserUnlocked } from '../../../utilities/assertUserUnlocked.js'
 import { captchaHandler } from '../../middleware/captchaHandler.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 import { validateRequest } from '../../middleware/validateRequest.js'
@@ -33,7 +33,6 @@ const signInHandler = async (
         organization: organizationTable,
         role,
         user,
-        userAttribute,
     } = ctx.get('dbSchema')
 
     /**
@@ -69,30 +68,7 @@ const signInHandler = async (
         })
     }
 
-    /**
-     * @description
-     * Verify account lock status
-     */
-    const isLocked =
-        (
-            await db
-                .select({ isLocked: userAttribute.isLocked })
-                .from(userAttribute)
-                .innerJoin(user, eq(user.id, userAttribute.userId))
-                .where(
-                    credentialType === 'email'
-                        ? eq(user.email, accountId)
-                        : eq(user.username, accountId),
-                )
-        )[0]?.isLocked ?? false
-
-    if (isLocked) {
-        throw new AppError({
-            code: 'LOCKED',
-            message: 'Account is currently locked.',
-            status: 423,
-        })
-    }
+    await assertUserUnlocked(ctx, orgMemberData.user.id)
 
     /**
      * @description
