@@ -57,12 +57,20 @@ export const nanoidCustom = customAlphabet(
 
 /**
  * @description
- * Strip properties with values considered as empty such as '', null & undefined.
+ * Strip properties with values considered empty: '', null, and undefined.
+ * Pass allowEmptyString to preserve '' while still stripping null and undefined.
  */
-export const stripEmptyProps = <T = unknown>(obj: Record<string, unknown>) => {
+export const stripEmptyProps = <T = unknown>(
+    obj: Record<string, unknown>,
+    options: { allowEmptyString?: boolean } = {},
+) => {
     return JSON.parse(
         JSON.stringify(obj, (_k, v) =>
-            v !== null && v !== undefined && v !== '' ? v : undefined,
+            v !== null &&
+            v !== undefined &&
+            (options.allowEmptyString || v !== '')
+                ? v
+                : undefined,
         ),
     ) as T
 }
