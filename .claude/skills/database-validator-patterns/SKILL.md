@@ -19,6 +19,7 @@ description: Rules for Drizzle ORM schema changes and queries, and for adding or
     - Tenant-scoped actor references such as `created_by`, `updated_by`, `approved_by`, or `deleted_by` should include `organization_id` and use composite foreign keys to the tenant membership relationship, currently `member(organization_id, user_id)`.
     - Treat `_by` as actor-reference guidance only when the field represents a user actor, not domain/display text fields such as `posted_by`, `filed_by`, or `requested_by` unless they are intentionally modeled as user references.
     - Add matching composite indexes only when they support common tenant-scoped queries or foreign-key maintenance paths.
+    - When a predicted Drizzle/Postgres constraint or index name would exceed 64 characters, generate and pass an explicit name instead of relying on default naming. Use `table_name_<INDEX_TYPE>_<random_12_alphanumeric>`, where `<INDEX_TYPE>` matches the construct (`idx`, `unique`, `fk`, `pk`, or `check`) and `<random_12_alphanumeric>` is 12 random lowercase `a-z`/`0-9` characters.
     - Do not add a separate index for a primary key column.
     - Do not add duplicate single-column indexes when a primary key, unique constraint, or existing index already covers the access pattern.
     - Before adding an index, check whether an existing composite index or unique constraint already provides left-prefix coverage, such as `(organization_id, user_id)` covering filters by `organization_id`.

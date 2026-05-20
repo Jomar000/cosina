@@ -101,6 +101,7 @@ export const postTestingRequest = async (
         env,
     )
 }
+
 /**
  * @description
  * Intercepts a password reset token for the given user ID.
@@ -225,6 +226,7 @@ export const setTestingCookies = async () => {
         response[1].headers.getSetCookie().join('; '),
     ] as const
 }
+
 /**
  * @description
  * Extract the first error message from validatorIssues for DATA_VALIDATION errors.
