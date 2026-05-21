@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { onMount, setContext } from 'svelte'
+    import { useQueryClient } from '@tanstack/svelte-query'
+    import { onMount, setContext, tick } from 'svelte'
 
     import { goto } from '$app/navigation'
     import { authClient } from '$lib/clients'
@@ -17,6 +18,8 @@
 
     const session = useSessionContext()
 
+    const queryClient = useQueryClient()
+
     let render = $state(false)
 
     /////////////////
@@ -29,7 +32,7 @@
         if (session.isValid()) {
             render = true
         } else {
-            clearSessionDataAndRedirect()
+            void clearSessionDataAndRedirect()
         }
     })
 
@@ -37,9 +40,11 @@
     // 09. Handlers //
     //////////////////
 
-    function clearSessionDataAndRedirect() {
+    async function clearSessionDataAndRedirect() {
+        await queryClient.cancelQueries()
+        queryClient.clear()
         session.clear()
-        goto('/sign-in')
+        await goto('/sign-in')
     }
 
     /////////////////
@@ -47,8 +52,15 @@
     /////////////////
 
     async function signOut() {
-        await authClient['sign-out'].$post()
-        clearSessionDataAndRedirect()
+        // Unmount rendered children before sign-out as cleanup procedure
+        render = false
+        await tick()
+
+        try {
+            await authClient['sign-out'].$post()
+        } finally {
+            await clearSessionDataAndRedirect()
+        }
     }
 </script>
 

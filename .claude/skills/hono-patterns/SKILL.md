@@ -6,6 +6,17 @@ description: Coding rules for Hono API routes, middleware, error handling, valid
 # Hono (Backend)
 
 1.  **Middleware:** Use middleware to normalize environment variables across runtimes (Cloudflare `env` vs. Node/Bun `process.env`).
+    - For auth, permission, validation-adjacent, or route-specific guards in single-endpoint child route files, attach middleware directly to the route handler:
+      ```typescript
+      new Hono<THonoInstance>().get(
+          '/read',
+          isAuthorized({ order: ['read'] }),
+          validateRequest('query', schema),
+          async (ctx) => { ... },
+      )
+      ```
+    - Avoid unscoped `.use(middleware)` inside child route apps that are mounted with `.route('/', childRoute)`. In Hono, unscoped middleware can apply to sibling mounted routes depending on mount order.
+    - If a middleware is intentionally shared by every endpoint in a child app, either mount that child app at a unique path or scope the middleware with `.use('/exactPath', middleware)` / `.use('/prefix/*', middleware)` so its reach is explicit.
 2.  **Context:** Use the app-specific `THonoInstance`, `THonoBindings`, and `THonoVariables` types from `apps/api-{public,backoffice}/src/types.ts`. Bindings include Hyperdrive, KV, R2, and the WebSocket Durable Object namespace.
 3.  **Error Handling:** Use the standardized response wrappers in `apps/api-{public,backoffice}/src/utilities/helpers.ts`. Do not throw raw exceptions — throw `AppError` (from the matching app's `src/errors.ts`) instead, which the global `.onError` handler catches.
     - **Success:** `apiResponseOkWrapper(ctx, { data, count?, limit?, offset? })` → `{ success: true, data, ... }`
