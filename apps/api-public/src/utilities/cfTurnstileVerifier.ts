@@ -29,13 +29,26 @@ export class CfTurnstileVerifier {
         return Number(this.ctx.env.CF_TURNSTILE_BYPASS) === 1
     }
 
-    private logResult(result: boolean, message: string, data?: unknown) {
-        const logFn = result ? console.info : console.error
+    private logResult(result: boolean, message: string, cause?: unknown) {
+        const entry = {
+            type: 'CF_TURNSTILE',
+            requestId: this.ctx.get('requestId'),
+            success: result,
+            message,
+            cause:
+                cause instanceof Error
+                    ? {
+                          name: cause.name,
+                          message: cause.message,
+                          stack: cause.stack,
+                      }
+                    : cause,
+        }
 
-        if (data === undefined) {
-            logFn(`[CfTurnstileVerifier] ${message}`)
+        if (result) {
+            console.log(JSON.stringify(entry))
         } else {
-            logFn(`[CfTurnstileVerifier] ${message}`, data)
+            console.error(JSON.stringify(entry))
         }
 
         return result

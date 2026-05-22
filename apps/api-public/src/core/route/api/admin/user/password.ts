@@ -135,7 +135,11 @@ export const passwordRoute = new Hono<THonoInstance>()
                     )
 
                 if (!hashedPassword) {
-                    throw new Error('Password hashing failed.')
+                    throw new AppError({
+                        status: 500,
+                        code: 'PASSWORD_HASH_FAILED',
+                        message: 'Password hashing failed.',
+                    })
                 }
 
                 await db

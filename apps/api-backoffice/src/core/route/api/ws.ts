@@ -2,6 +2,7 @@ import type { MiddlewareHandler } from 'hono'
 import { Hono } from 'hono'
 
 import type { THonoInstance } from '../../../types.js'
+import { apiResponseErrorWrapper } from '../../../utilities/helpers.js'
 import { isAuthorized } from '../../middleware/isAuthorized.js'
 
 const createWsChannel = (
@@ -14,7 +15,11 @@ const createWsChannel = (
             const upgradeHeader = ctx.req.header('Upgrade')
 
             if (!upgradeHeader || upgradeHeader !== 'websocket') {
-                return ctx.text('Expected Upgrade: websocket', 426)
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'WEBSOCKET_UPGRADE_REQUIRED',
+                    message: 'Expected Upgrade: websocket',
+                    status: 426,
+                })
             }
 
             const authHeaders = ctx.req.raw.headers

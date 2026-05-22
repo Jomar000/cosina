@@ -21,13 +21,16 @@ export const app = new Hono<THonoInstance>()
         // CloudFlare Workers Observability Logs
         // https://developers.cloudflare.com/workers/observability/logs/
 
-        console.error({
-            requestId: ctx.get('requestId'),
-            name: err.name,
-            message: err.message,
-            stack: err.stack,
-            cause: err.cause,
-        })
+        console.error(
+            JSON.stringify({
+                type: 'ERROR',
+                requestId: ctx.get('requestId'),
+                name: err.name,
+                message: err.message,
+                stack: err.stack,
+                cause: err.cause,
+            }),
+        )
 
         let code = 'INTERNAL_SERVER_ERROR'
         let message = 'An unknown error occurred, please try again later.'

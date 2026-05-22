@@ -90,7 +90,14 @@ describe.concurrent('WebSocket Endpoint', () => {
                 env,
             )
 
+            const responseData = await response.json<TApiResponseError>()
+
             expect(response.status).toBe(426)
+            expect(responseData).toHaveProperty('error')
+            expect(responseData.error.code).toBe('WEBSOCKET_UPGRADE_REQUIRED')
+            expect(responseData.error.message).toBe(
+                'Expected Upgrade: websocket',
+            )
         })
 
         it('Request with incorrect Upgrade value should return 426.', async () => {
@@ -107,7 +114,14 @@ describe.concurrent('WebSocket Endpoint', () => {
                 env,
             )
 
+            const responseData = await response.json<TApiResponseError>()
+
             expect(response.status).toBe(426)
+            expect(responseData).toHaveProperty('error')
+            expect(responseData.error.code).toBe('WEBSOCKET_UPGRADE_REQUIRED')
+            expect(responseData.error.message).toBe(
+                'Expected Upgrade: websocket',
+            )
         })
     })
 
