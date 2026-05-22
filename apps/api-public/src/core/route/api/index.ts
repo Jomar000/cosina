@@ -15,9 +15,9 @@ export const apiRoute = new Hono<THonoInstance>()
      * @description
      * Middleware
      */
-    .use(corsHandler('default'))
-    .use(csrfHandler())
-    .use(initContext())
+    .use('/*', corsHandler('default'))
+    .use('/*', csrfHandler())
+    .use('/*', initContext())
     /**
      * @description
      * Routes

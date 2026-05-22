@@ -22,7 +22,7 @@ VALUES
     ('MEMBER_001', 'USER_001', 'ORGANIZATION_001', 'owner'),
     ('MEMBER_002', 'USER_002', 'ORGANIZATION_001', 'admin'),
     ('MEMBER_003', 'USER_003', 'ORGANIZATION_001', 'member'),
-    ('MEMBER_MULTI_ROLE', 'USER_MULTI_ROLE', 'ORGANIZATION_001', 'homeowner,board_member'),
+    ('MEMBER_MULTI_ROLE', 'USER_MULTI_ROLE', 'ORGANIZATION_001', 'owner,admin,member'),
     ('MEMBER_999', 'USER_999', 'ORGANIZATION_001', 'member');
 --> statement-breakpoint
 

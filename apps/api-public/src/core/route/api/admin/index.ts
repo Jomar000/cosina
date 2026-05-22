@@ -10,6 +10,7 @@ export const adminRoute = new Hono<THonoInstance>()
      * Middleware
      */
     .use(
+        '/user/*',
         isAuthorized({
             SYSADMIN: ['ANY'],
         }),

@@ -292,8 +292,9 @@ describe('Auth Endpoint', () => {
 
                     expect(response.status).toBe(200)
                     expect(responseData.data.userRoles).toEqual([
-                        'homeowner',
-                        'board_member',
+                        'owner',
+                        'admin',
+                        'member',
                     ])
                 })
             })

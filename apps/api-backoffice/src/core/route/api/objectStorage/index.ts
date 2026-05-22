@@ -11,7 +11,8 @@ export const objectStorageRoute = new Hono<THonoInstance>()
      * @description
      * Middleware
      */
-    .use(isAuthenticated())
+    .use('/download/*', isAuthenticated())
+    .use('/upload/*', isAuthenticated())
     /**
      * @description
      * Routes

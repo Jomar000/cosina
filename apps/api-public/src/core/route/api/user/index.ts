@@ -9,7 +9,7 @@ export const userRoute = new Hono<THonoInstance>()
      * @description
      * Middleware
      */
-    .use(isAuthenticated())
+    .use('/profile/*', isAuthenticated())
     /**
      * @description
      * Routes
