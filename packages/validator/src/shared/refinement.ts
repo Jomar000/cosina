@@ -1,5 +1,24 @@
 import { z } from 'zod'
 
+type CheckContext<TInput> = {
+    issues: {
+        push: (issue: {
+            code: 'custom'
+            input: unknown
+            message: string
+            path?: (number | string)[]
+        }) => unknown
+    }
+    value: TInput
+}
+
+type UniqueArrayOptions = {
+    key?: string
+    message: string
+    path?: (number | string)[]
+    values: readonly unknown[]
+}
+
 export const dateString = (fieldName: string) => {
     const callbackFn: Parameters<z.ZodType<string | undefined>['check']>[0] = (
         ctx,
@@ -49,6 +68,35 @@ export const password = () => {
     }
 
     return callbackFn
+}
+
+export const uniqueArrayValues = <TInput>(
+    ctx: CheckContext<TInput>,
+    options: UniqueArrayOptions,
+) => {
+    const seen = new Set<unknown>()
+
+    for (const value of options.values) {
+        const checkedValue =
+            options.key === undefined
+                ? value
+                : value !== null && typeof value === 'object'
+                  ? (value as Record<string, unknown>)[options.key]
+                  : undefined
+
+        if (!seen.has(checkedValue)) {
+            seen.add(checkedValue)
+            continue
+        }
+
+        ctx.issues.push({
+            path: options.path,
+            code: 'custom',
+            message: options.message,
+            input: ctx.value,
+        })
+        break
+    }
 }
 
 export const updatedFields = (

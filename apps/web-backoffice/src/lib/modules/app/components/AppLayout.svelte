@@ -56,6 +56,9 @@
         render = false
         await tick()
 
+        // Cancel ongoing queries before signing-out
+        await queryClient.cancelQueries()
+
         try {
             await authClient['sign-out'].$post()
         } finally {

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import * as field from '../shared/field.js'
+import * as refinement from '../shared/refinement.js'
 
 export const downloadLinkCreateInputSchema = z.object({
     uploadId: field
@@ -50,26 +51,11 @@ export const uploadAttachmentCreateInputSchema = z.object({
         .min(1, { error: 'At least one attachment must be provided.' })
         .max(25, { error: 'A maximum of 25 attachments can be provided.' })
         .check((ctx) => {
-            if (ctx.value.length > 1) {
-                const allHashes = ctx.value.map(({ hashSha256 }) => hashSha256)
-                const duplicateHashes = Array.from(
-                    new Set(
-                        // If the current value being filtered is found
-                        // in a different index, it is a duplicate :D
-                        allHashes.filter(
-                            (hash, index) => allHashes.indexOf(hash) !== index,
-                        ),
-                    ),
-                )
-
-                if (duplicateHashes.length > 0) {
-                    ctx.issues.push({
-                        code: 'custom',
-                        message: `Duplicate SHA-256 hashes detected. [${duplicateHashes.toString()}]`,
-                        input: duplicateHashes,
-                    })
-                }
-            }
+            refinement.uniqueArrayValues(ctx, {
+                values: ctx.value,
+                key: 'hashSha256',
+                message: 'Duplicate SHA-256 hashes detected.',
+            })
         }),
 })
 
