@@ -5,7 +5,7 @@ description: Checklist and rules for debugging or writing vitest tests targeting
 
 # Testing: Cloudflare Workers (vitest-pool-workers)
 
-- **Storage Isolation:** `@cloudflare/vitest-pool-workers` is managed through the root `pnpm-workspace.yaml` catalog (currently `^0.16.5`) and isolates storage **per test file** (not per `it()` block). All writes to KV, R2, Durable Objects, Caches, and any local worker storage persist across `it()` blocks within the same file and are reset between files.
+- **Storage Isolation:** `@cloudflare/vitest-pool-workers` is managed through the root `pnpm-workspace.yaml` catalog (currently `^0.16.5`) and isolates Cloudflare-bound local storage **per test file** (not per `it()` block). All writes to KV, Durable Objects, Caches, and any local worker storage persist across `it()` blocks within the same file and are reset between files. Object storage is accessed through `aws4fetch`-signed S3-compatible R2 HTTP requests, not a direct R2 binding, so it is not covered by local pool storage isolation unless a test explicitly stubs or intercepts it.
     - Data seeded in `beforeAll()` persists across all `it()` blocks within the file.
     - Data written inside an `it()` block **is visible** in subsequent `it()` blocks within the same file.
     - Database writes (Postgres via Hyperdrive) are **never** covered by storage isolation — they persist globally.

@@ -45,8 +45,8 @@
     pnpm --filter=@PROJECT_NAME/database migrate:dev  # Run DB migrations (dev)
     ```
 - **Environment Variables:**
-    - `apps/api-{public,backoffice}/wrangler.toml` — non-secret `[vars]` (CORS, cookie, URLs, etc.) and CF bindings (`PROJECT_NAME{PUB|BOFC}_KV`, `PROJECT_NAME{PUB|BOFC}_HD`, `PROJECT_NAME{PUB|BOFC}_R2`, `PROJECT_NAME{PUB|BOFC}_DO_WSS`).
-    - `apps/api-public/.dev.vars` — secrets (not committed). Copy from `.dev.vars.example` which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 keys, OAuth keys).
+    - `apps/api-{public,backoffice}/wrangler.toml` — non-secret `[vars]` (CORS, cookie, URLs, R2 bucket names/public URL/presign expiry, etc.) and CF bindings (`PROJECT_NAME{PUB|BOFC}_KV`, `PROJECT_NAME{PUB|BOFC}_HD`, `PROJECT_NAME{PUB|BOFC}_DO_WSS`). Object storage uses S3-compatible R2 requests signed with `aws4fetch`; do not add direct R2 bucket bindings.
+    - `apps/api-public/.dev.vars` — secrets (not committed). Copy from `.dev.vars.example` which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
     - `packages/database/.env` / `.env.test` — Postgres connection strings for local dev and test migrations.
 
 ## 5. Project Skills

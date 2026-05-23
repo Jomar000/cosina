@@ -29,7 +29,6 @@ export type THonoVariables = TBaseHonoVariables<{
     ipAddress: string
     isPrivilegedRole: boolean
     kvClient: KVNamespace
-    r2Client: R2Bucket
     role: string
     session:
         | Awaited<ReturnType<typeof auth>>['$Infer']['Session']['session']

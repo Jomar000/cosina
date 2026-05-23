@@ -36,7 +36,7 @@ const createWsChannel = (
         const headers = new Headers(authHeaders)
         headers.set('X-WS-Can-Broadcast', canBroadcast ? 'true' : 'false')
 
-        // README: WebSocket logic is implemented in src/app/durableObject/webSocketServer.ts
+        // README: WebSocket logic is implemented in src/core/durableObject/webSocketServer.ts
         const id = ctx.get('doWssClient').idFromName(channel)
         const stub = ctx.get('doWssClient').get(id)
 

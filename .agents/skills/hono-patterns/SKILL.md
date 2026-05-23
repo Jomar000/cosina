@@ -17,7 +17,7 @@ description: Coding rules for Hono API routes, middleware, error handling, valid
       ```
     - Avoid unscoped `.use(middleware)` inside child route apps that are mounted with `.route('/', childRoute)`. In Hono, unscoped middleware can apply to sibling mounted routes depending on mount order.
     - If a middleware is intentionally shared by every endpoint in a child app, either mount that child app at a unique path or scope the middleware with `.use('/exactPath', middleware)` / `.use('/prefix/*', middleware)` so its reach is explicit.
-2.  **Context:** Use the app-specific `THonoInstance`, `THonoBindings`, and `THonoVariables` types from `apps/api-{public,backoffice}/src/types.ts`. Bindings include Hyperdrive, KV, R2, and the WebSocket Durable Object namespace.
+2.  **Context:** Use the app-specific `THonoInstance`, `THonoBindings`, and `THonoVariables` types from `apps/api-{public,backoffice}/src/types.ts`. Bindings include Hyperdrive, KV, and the WebSocket Durable Object namespace. Object storage does not use a direct R2 bucket binding; use the `aws4FetchClient` Hono variable to sign S3-compatible R2 requests from the configured `CF_R2_*` vars/secrets.
 3.  **Error Handling:** Use the standardized response wrappers in `apps/api-{public,backoffice}/src/utilities/helpers.ts`. Do not throw raw exceptions — throw `AppError` (from the matching app's `src/errors.ts`) instead, which the global `.onError` handler catches.
     - **Success:** `apiResponseOkWrapper(ctx, { data, count?, limit?, offset? })` → `{ success: true, data, ... }`
     - **Error:** `apiResponseErrorWrapper(ctx, { code, message, validatorIssues?, status? })` → `{ success: false, error: { requestId, code, message, validatorIssues? } }`
