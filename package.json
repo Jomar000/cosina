@@ -8,7 +8,7 @@
     "license": "ISC",
     "engines": {
         "node": ">=24.15.0",
-        "pnpm": ">=11.2.2"
+        "pnpm": ">=11.5.0"
     },
     "scripts": {
         "dev": "pnpm run --recursive --parallel --if-present dev",
@@ -23,9 +23,9 @@
         "@eslint/compat": "^2.1.0",
         "@eslint/js": "^10.0.1",
         "@types/node": "^24.12.4",
-        "eslint": "^10.4.0",
+        "eslint": "^10.4.1",
         "eslint-config-prettier": "^10.1.8",
-        "eslint-plugin-svelte": "^3.18.0",
+        "eslint-plugin-svelte": "^3.19.0",
         "globals": "^17.6.0",
         "husky": "^9.1.7",
         "prettier": "^3.8.3",
