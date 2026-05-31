@@ -19,12 +19,14 @@ export const outputSchema = <Data extends z.ZodType = z.ZodType>(data: Data) =>
         z.object({
             success: z.literal(true),
             data,
+            error: z.null().optional(),
             count: z.number().optional(),
             limit: z.number().optional(),
             offset: z.number().optional(),
         }),
         z.object({
             success: z.literal(false),
+            data: z.null().optional(),
             error: z.object({
                 requestId: z.string(),
                 code: z.string(),

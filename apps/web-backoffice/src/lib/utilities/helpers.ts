@@ -1,45 +1,17 @@
 import { customAlphabet } from 'nanoid'
-
-/**
- * Debounce Function
- *
- * @link
- * https://www.freecodecamp.org/news/javascript-debounce-example
- *
- * @link
- * https://stackoverflow.com/questions/72205837/safe-type-debounce-function-in-typescript
- */
+import { debounce as createDebounce } from 'perfect-debounce'
 
 export const debounce = <T extends (...args: Parameters<T>) => ReturnType<T>>(
     callback: T,
     interval = 1000,
-) => {
-    let timer: ReturnType<typeof setTimeout>
-    return function (this: T, ...args: Parameters<T>) {
-        clearTimeout(timer)
-        timer = setTimeout(() => {
-            callback.apply(this, args)
-        }, interval)
-    }
-}
+) => createDebounce(callback, interval)
 
 export const debounceLeading = <
     T extends (...args: Parameters<T>) => ReturnType<T>,
 >(
     callback: T,
     interval = 1000,
-) => {
-    let timer: ReturnType<typeof setTimeout> | undefined = undefined
-    return function (this: T, ...args: Parameters<T>) {
-        if (!timer) {
-            callback.apply(this, args)
-        }
-        clearTimeout(timer)
-        timer = setTimeout(() => {
-            timer = undefined
-        }, interval)
-    }
-}
+) => createDebounce(callback, interval, { leading: true, trailing: false })
 
 /**
  * NanoID Custom Character Set

@@ -46,6 +46,7 @@
         "mode-watcher": "catalog:",
         "nanoid": "catalog:",
         "p-queue": "catalog:",
+        "perfect-debounce": "catalog:",
         "playwright": "catalog:",
         "svelte": "catalog:",
         "svelte-check": "catalog:",
