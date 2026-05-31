@@ -21,6 +21,7 @@ const SAFE_METHODS = [
 ]
 
 const kyClient = ky.extend({
+    throwHttpErrors: false,
     hooks: {
         beforeRequest: [
             ({ request }) => {

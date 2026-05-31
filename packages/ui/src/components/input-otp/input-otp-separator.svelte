@@ -17,7 +17,7 @@
     data-slot="input-otp-separator"
     role="separator"
     class={cn(
-        "flex items-center [&_svg:not([class*='size-'])]:size-4",
+        "[&_svg:not([class*='size-'])]:size-4 flex items-center",
         className,
     )}
     {...restProps}

@@ -124,7 +124,7 @@
     <div
         bind:this={ref}
         class={cn(
-            'grid min-w-[9rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl',
+            'border-border/50 bg-background grid min-w-[9rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl',
             className,
         )}
         {...restProps}
@@ -145,7 +145,7 @@
                     color || item.config?.color || item.color}
                 <div
                     class={cn(
-                        'flex w-full flex-wrap items-stretch gap-2 [&>svg]:size-2.5 [&>svg]:text-muted-foreground',
+                        '[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:size-2.5',
                         indicator === 'dot' && 'items-center',
                     )}
                 >
@@ -192,7 +192,7 @@
                             </div>
                             {#if item.value !== undefined}
                                 <span
-                                    class="font-mono font-medium text-foreground tabular-nums"
+                                    class="text-foreground font-mono font-medium tabular-nums"
                                 >
                                     {item.value.toLocaleString()}
                                 </span>

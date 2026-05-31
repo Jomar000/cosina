@@ -15,6 +15,94 @@ beforeAll(async () => {
     ] = await setTestingCookies()
 })
 
+const createUpload = async () => {
+    const response = await app.request(
+        '/api/objectStorage/upload/create',
+        {
+            method: 'POST',
+            headers: {
+                origin: 'vitest-pool-worker',
+                cookie: privilegedCookie,
+            },
+        },
+        env,
+    )
+
+    const responseData =
+        await response.json<TApiResponseOk<{ uploadId: string }>>()
+    expect(response.status).toBe(200)
+    return responseData.data.uploadId
+}
+
+const createUploadAttachment = async (uploadId: string) => {
+    const response = await app.request(
+        '/api/objectStorage/upload/attachment/create',
+        {
+            method: 'POST',
+            headers: {
+                origin: 'vitest-pool-worker',
+                'content-type': 'application/json',
+                cookie: privilegedCookie,
+            },
+            body: JSON.stringify({
+                uploadId,
+                attachments: [
+                    {
+                        size: 1024,
+                        hashSha256: crypto
+                            .randomUUID()
+                            .replaceAll('-', '')
+                            .repeat(2),
+                        isPublic: false,
+                    },
+                ],
+            }),
+        },
+        env,
+    )
+
+    const responseData = await response.json<
+        TApiResponseOk<{
+            signedUrls: { id: string }[]
+        }>
+    >()
+    expect(response.status).toBe(200)
+    return responseData.data.signedUrls[0].id
+}
+
+const commitUploadAttachment = async (uploadId: string, attachmentId: string) =>
+    await app.request(
+        '/api/objectStorage/upload/attachment/commit',
+        {
+            method: 'POST',
+            headers: {
+                origin: 'vitest-pool-worker',
+                'content-type': 'application/json',
+                cookie: privilegedCookie,
+            },
+            body: JSON.stringify({
+                uploadId,
+                attachments: [attachmentId],
+            }),
+        },
+        env,
+    )
+
+const commitUpload = async (uploadId: string) =>
+    await app.request(
+        '/api/objectStorage/upload/commit',
+        {
+            method: 'POST',
+            headers: {
+                origin: 'vitest-pool-worker',
+                'content-type': 'application/json',
+                cookie: privilegedCookie,
+            },
+            body: JSON.stringify({ uploadId }),
+        },
+        env,
+    )
+
 describe('Object Storage Endpoint', () => {
     describe.concurrent('Concurrent Tests', () => {
         /**
@@ -1103,6 +1191,45 @@ describe('Object Storage Endpoint', () => {
                         attachmentId,
                     )
                 })
+
+                it('Should reject repeated attachment commit.', async () => {
+                    const uploadId = await createUpload()
+                    const attachmentId = await createUploadAttachment(uploadId)
+
+                    expect(
+                        (await commitUploadAttachment(uploadId, attachmentId))
+                            .status,
+                    ).toBe(200)
+
+                    const response = await commitUploadAttachment(
+                        uploadId,
+                        attachmentId,
+                    )
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(409)
+                    expect(responseData.error.code).toBe(
+                        'UPLOAD_ATTACHMENTS_ALREADY_COMMITTED',
+                    )
+                })
+
+                it('Should allow only one concurrent attachment commit.', async () => {
+                    const uploadId = await createUpload()
+                    const attachmentId = await createUploadAttachment(uploadId)
+
+                    const responses = await Promise.all([
+                        commitUploadAttachment(uploadId, attachmentId),
+                        commitUploadAttachment(uploadId, attachmentId),
+                    ])
+
+                    expect(
+                        responses.map(({ status }) => status).sort(),
+                    ).toEqual([
+                        200,
+                        409,
+                    ])
+                })
             })
 
             describe('Commit Upload', () => {
@@ -1266,11 +1393,27 @@ describe('Object Storage Endpoint', () => {
                     const responseData =
                         await response.json<TApiResponseError>()
 
-                    expect(response.status).toBe(404)
+                    expect(response.status).toBe(409)
                     expect(responseData).toHaveProperty('error')
-                    expect(responseData.error.message).toBe(
-                        'Upload ID not found or is already committed.',
+                    expect(responseData.error.code).toBe(
+                        'UPLOAD_ALREADY_COMMITTED',
                     )
+                })
+
+                it('Should allow only one concurrent upload commit.', async () => {
+                    const uploadId = await createUpload()
+
+                    const responses = await Promise.all([
+                        commitUpload(uploadId),
+                        commitUpload(uploadId),
+                    ])
+
+                    expect(
+                        responses.map(({ status }) => status).sort(),
+                    ).toEqual([
+                        200,
+                        409,
+                    ])
                 })
 
                 it('Should purge unselected attachments on commit.', async () => {

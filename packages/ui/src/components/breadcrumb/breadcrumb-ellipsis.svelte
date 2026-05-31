@@ -22,7 +22,7 @@
     role="presentation"
     aria-hidden="true"
     class={cn(
-        'flex size-5 items-center justify-center [&>svg]:size-4',
+        'size-5 [&>svg]:size-4 flex items-center justify-center',
         className,
     )}
     {...restProps}

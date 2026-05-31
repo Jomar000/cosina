@@ -70,7 +70,6 @@ export const uploadRoute = new Hono<THonoInstance>()
                 .where(
                     and(
                         eq(upload.id, uploadId),
-                        eq(upload.isCommitted, false),
                         ctx.get('isPrivilegedRole')
                             ? undefined
                             : eq(upload.userId, ctx.get('user')!.id),
@@ -85,34 +84,63 @@ export const uploadRoute = new Hono<THonoInstance>()
                 })
             }
 
-            const attachmentsToPurge = (
-                await ctx
-                    .get('dbClient')
-                    .select({ id: objectStorage.id })
-                    .from(upload)
-                    .innerJoin(
-                        uploadAttachment,
-                        eq(upload.id, uploadAttachment.uploadId),
-                    )
-                    .innerJoin(
-                        objectStorage,
-                        eq(objectStorage.id, uploadAttachment.objectStorageId),
-                    )
-                    .where(
-                        and(
-                            eq(upload.id, uploadId),
-                            eq(upload.isCommitted, false),
-                            attachments.length > 0
-                                ? notInArray(objectStorage.id, attachments)
-                                : undefined,
-                        ),
-                    )
-            ).map(({ id }) => id)
-
             try {
                 const committedAttachments = await ctx
                     .get('dbClient')
                     .transaction(async (tx) => {
+                        const [committedUpload] = await tx
+                            .update(upload)
+                            .set({ isCommitted: true })
+                            .where(
+                                and(
+                                    eq(upload.id, uploadId),
+                                    eq(upload.isCommitted, false),
+                                    ctx.get('isPrivilegedRole')
+                                        ? undefined
+                                        : eq(
+                                              upload.userId,
+                                              ctx.get('user')!.id,
+                                          ),
+                                ),
+                            )
+                            .returning({ id: upload.id })
+
+                        if (!committedUpload) {
+                            throw new AppError({
+                                status: 409,
+                                code: 'UPLOAD_ALREADY_COMMITTED',
+                                message: 'Upload is already committed.',
+                            })
+                        }
+
+                        const attachmentsToPurge = (
+                            await tx
+                                .select({ id: objectStorage.id })
+                                .from(upload)
+                                .innerJoin(
+                                    uploadAttachment,
+                                    eq(upload.id, uploadAttachment.uploadId),
+                                )
+                                .innerJoin(
+                                    objectStorage,
+                                    eq(
+                                        objectStorage.id,
+                                        uploadAttachment.objectStorageId,
+                                    ),
+                                )
+                                .where(
+                                    and(
+                                        eq(upload.id, uploadId),
+                                        attachments.length > 0
+                                            ? notInArray(
+                                                  objectStorage.id,
+                                                  attachments,
+                                              )
+                                            : undefined,
+                                    ),
+                                )
+                        ).map(({ id }) => id)
+
                         if (attachmentsToPurge.length > 0) {
                             await tx
                                 .delete(uploadAttachment)
@@ -127,18 +155,29 @@ export const uploadRoute = new Hono<THonoInstance>()
                                 )
                         }
 
-                        await tx
-                            .update(upload)
-                            .set({ isCommitted: true })
-                            .where(eq(upload.id, uploadId))
-
                         await auditTrailLogger(
                             ctx,
                             {
                                 component: 'objectStorage.upload',
                                 action: 'commit',
                                 description: 'Upload committed',
-                                records: { table: 'upload', id: uploadId },
+                                records: [
+                                    {
+                                        table: 'upload',
+                                        id: uploadId,
+                                        oldData: { isCommitted: false },
+                                    },
+                                    ...attachmentsToPurge.map(
+                                        (objectStorageId) => ({
+                                            table: 'upload_attachment',
+                                            id: `${uploadId}:${objectStorageId}`,
+                                            oldData: {
+                                                uploadId,
+                                                objectStorageId,
+                                            },
+                                        }),
+                                    ),
+                                ],
                             },
                             tx,
                         )

@@ -15,7 +15,7 @@
     import { fileTypeFromBuffer } from 'file-type'
     import ky from 'ky'
     import PQueue from 'p-queue'
-    import { onMount } from 'svelte'
+    import { onDestroy, onMount } from 'svelte'
 
     import { objectStorageClient } from '$lib/clients'
     import { formatBytes } from '$lib/utilities/helpers'
@@ -43,6 +43,7 @@
         objectId: string
         isPublic: boolean
         mimeType: string
+        previewUrl: string | null
         hashSha256: string
         status: 'QUEUED' | 'UPLOADED' | 'FAILED'
     }
@@ -81,13 +82,16 @@
         if (opMode === 'NEW') {
             const response = await objectStorageClient.upload.create.$post()
 
-            const responseData = await response.json()
+            const { data, error, success } = await response.json()
+            if (!success) throw new Error(error.message)
 
-            uploadId = responseData.data.uploadId
+            uploadId = data.uploadId
         } else {
             // TODO: Populate fileList with existing data
         }
     })
+
+    onDestroy(() => revokePreviewUrls(fileList))
 
     //////////////////
     // 09. Handlers //
@@ -96,7 +100,7 @@
     async function handleFileInputChange(event: Event) {
         if (fileList.length >= maxItems) {
             // TODO: Add alert banner or modal here.
-            alert('Maximum of 10 files only.')
+            alert(`Maximum of ${maxItems} files only.`)
             return
         }
 
@@ -104,12 +108,6 @@
         addedToList = []
 
         if (selectedFiles) {
-            if (selectedFiles.length > maxItems) {
-                // TODO: Add alert banner or modal here.
-                alert('Maximum of 10 files only.')
-                return
-            }
-
             /**
              * @description
              * STEP 1: Preprocessing of files to be signed
@@ -160,6 +158,12 @@
                     continue
                 }
 
+                if (fileList.length + addedToList.length >= maxItems) {
+                    // TODO: Add alert banner or modal here.
+                    alert(`Maximum of ${maxItems} files only.`)
+                    break
+                }
+
                 addedToList = [
                     ...addedToList,
                     {
@@ -168,6 +172,9 @@
                         hashSha256,
                         isPublic: false,
                         mimeType,
+                        previewUrl: mimeType.startsWith('image/')
+                            ? URL.createObjectURL(file)
+                            : null,
                         status: 'QUEUED',
                     },
                 ]
@@ -193,7 +200,7 @@
                     json: {
                         uploadId,
                         attachments: addedToList.map((atl) => ({
-                            size: atl.file.size as unknown as string,
+                            size: `${atl.file.size}`,
                             hashSha256: atl.hashSha256,
                             isPublic: atl.isPublic,
                             mimeType: atl.mimeType,
@@ -201,65 +208,62 @@
                     },
                 })
 
-            const signingResponseData = await signingResponse.json()
+            const { data, error, success } = await signingResponse.json()
+            if (!success) throw new Error(error.message)
 
             /**
              * @description
              * STEP 3: Upload
              */
 
-            if (signingResponseData.success) {
-                for (const su of signingResponseData.data.signedUrls) {
-                    const queuedFn = async () => {
-                        const hashIndex = addedToList.findIndex(
-                            (q) => q.hashSha256 === su.hashSha256,
-                        )
+            for (const su of data.signedUrls) {
+                const queuedFn = async () => {
+                    const hashIndex = addedToList.findIndex(
+                        (q) => q.hashSha256 === su.hashSha256,
+                    )
 
-                        addedToList[hashIndex].objectId = su.id
+                    addedToList[hashIndex].objectId = su.id
 
-                        if (su.status === 409) {
-                            // File already exists, just set status to UPLOADED.
-                            addedToList[hashIndex].status = 'UPLOADED'
-                        } else {
-                            try {
-                                // Upload the file.
-                                await ky(su.signedUrl!, {
-                                    method: 'PUT',
-                                    headers: {
-                                        'x-amz-checksum-sha256':
-                                            su.encodedHash!,
-                                    },
-                                    body: addedToList[hashIndex].file,
-                                })
+                    if (su.status === 409) {
+                        // File already exists, just set status to UPLOADED.
+                        addedToList[hashIndex].status = 'UPLOADED'
+                    } else {
+                        try {
+                            // Upload the file.
+                            await ky(su.signedUrl!, {
+                                method: 'PUT',
+                                headers: {
+                                    'x-amz-checksum-sha256': su.encodedHash!,
+                                },
+                                body: addedToList[hashIndex].file,
+                            })
 
-                                // Report back that file is successfully uploaded.
-                                const commitResponse =
-                                    await objectStorageClient.upload.attachment.commit.$post(
-                                        {
-                                            json: {
-                                                uploadId,
-                                                attachments: [su.id],
-                                            },
+                            // Report back that file is successfully uploaded.
+                            const commitResponse =
+                                await objectStorageClient.upload.attachment.commit.$post(
+                                    {
+                                        json: {
+                                            uploadId,
+                                            attachments: [su.id],
                                         },
-                                    )
+                                    },
+                                )
 
-                                const commitResponseData =
-                                    await commitResponse.json()
+                            const { error, success } =
+                                await commitResponse.json()
+                            if (!success) throw new Error(error.message)
 
-                                if (commitResponseData.success) {
-                                    addedToList[hashIndex].status = 'UPLOADED'
-                                }
-                            } catch {
-                                addedToList[hashIndex].status = 'FAILED'
-                            }
+                            addedToList[hashIndex].status = 'UPLOADED'
+                        } catch {
+                            addedToList[hashIndex].status = 'FAILED'
                         }
                     }
-
-                    uploadQueue.add(queuedFn).catch(() => {})
                 }
 
-                await uploadQueue.onIdle()
+                uploadQueue.add(queuedFn).catch(() => {})
             }
+
+            await uploadQueue.onIdle()
         }
     }
 
@@ -272,46 +276,69 @@
                 },
             })
 
-        const retryResponseData = await retryResponse.json()
+        const { data, error, success } = await retryResponse.json()
+        if (!success) throw new Error(error.message)
 
-        if (retryResponseData.success) {
-            for (const su of retryResponseData.data.signedUrls) {
-                if (su.status === 409) {
-                    // File already exists, just set status to UPLOADED.
-                    fileList[index].status = 'UPLOADED'
-                } else if (su.status === 200) {
-                    try {
-                        // Upload the file.
-                        await ky(su.signedUrl!, {
-                            method: 'PUT',
-                            headers: {
-                                'x-amz-checksum-sha256': su.encodedHash!,
-                            },
-                            body: fileList[index].file,
-                        })
+        for (const su of data.signedUrls) {
+            if (su.status === 409) {
+                // File already exists, just set status to UPLOADED.
+                fileList[index].status = 'UPLOADED'
+            } else if (su.status === 200) {
+                try {
+                    // Upload the file.
+                    await ky(su.signedUrl!, {
+                        method: 'PUT',
+                        headers: {
+                            'x-amz-checksum-sha256': su.encodedHash!,
+                        },
+                        body: fileList[index].file,
+                    })
 
-                        // Report back that file is successfully uploaded.
-                        const commitResponse =
-                            await objectStorageClient.upload.attachment.commit.$post(
-                                {
-                                    json: {
-                                        uploadId,
-                                        attachments: [fileList[index].objectId],
-                                    },
+                    // Report back that file is successfully uploaded.
+                    const commitResponse =
+                        await objectStorageClient.upload.attachment.commit.$post(
+                            {
+                                json: {
+                                    uploadId,
+                                    attachments: [fileList[index].objectId],
                                 },
-                            )
+                            },
+                        )
 
-                        const commitResponseData = await commitResponse.json()
+                    const { error, success } = await commitResponse.json()
+                    if (!success) throw new Error(error.message)
 
-                        if (commitResponseData.success) {
-                            fileList[index].status = 'UPLOADED'
-                        }
-                    } catch {
-                        fileList[index].status = 'FAILED'
-                    }
-                } else {
+                    fileList[index].status = 'UPLOADED'
+                } catch {
                     fileList[index].status = 'FAILED'
                 }
+            } else {
+                fileList[index].status = 'FAILED'
+            }
+        }
+    }
+
+    /////////////////
+    // 10. Helpers //
+    /////////////////
+
+    function clearFiles() {
+        revokePreviewUrls(fileList)
+        fileList = []
+    }
+
+    function removeFile(hashSha256: string) {
+        revokePreviewUrls(
+            fileList.filter((file) => file.hashSha256 === hashSha256),
+        )
+        fileList = fileList.filter((file) => file.hashSha256 !== hashSha256)
+    }
+
+    function revokePreviewUrls(files: Metadata[]) {
+        for (const file of files) {
+            if (file.previewUrl) {
+                URL.revokeObjectURL(file.previewUrl)
+                file.previewUrl = null
             }
         }
     }
@@ -329,9 +356,7 @@
             <div class="flex items-center gap-x-4">
                 <Button
                     disabled={fileList.length === 0}
-                    onclick={() => {
-                        fileList = []
-                    }}
+                    onclick={clearFiles}
                     variant="outline"
                 >
                     <Trash2 class="mr-2 h-4 w-4" />
@@ -358,13 +383,13 @@
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                    {#each fileList as p, i (i)}
+                    {#each fileList as p, i (p.hashSha256)}
                         <Table.Row>
                             <Table.Cell>
                                 <Avatar.Root class="h-10 w-10 rounded-md">
-                                    {#if p.mimeType.startsWith('image/')}
+                                    {#if p.previewUrl}
                                         <Avatar.Image
-                                            src={URL.createObjectURL(p.file)}
+                                            src={p.previewUrl}
                                             alt={p.file.name}
                                             class="rounded-md object-cover"
                                         />
@@ -427,13 +452,8 @@
                                             </DropdownMenu.Item>
                                         {/if}
                                         <DropdownMenu.Item
-                                            onclick={() => {
-                                                fileList = fileList.filter(
-                                                    (fl) =>
-                                                        fl.hashSha256 !==
-                                                        p.hashSha256,
-                                                )
-                                            }}
+                                            onclick={() =>
+                                                removeFile(p.hashSha256)}
                                         >
                                             <Trash2 class="mr-2 h-4 w-4" />
                                             Delete

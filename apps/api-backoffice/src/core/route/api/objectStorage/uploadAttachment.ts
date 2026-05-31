@@ -230,6 +230,28 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
 
             try {
                 await ctx.get('dbClient').transaction(async (tx) => {
+                    const [activeUpload] = await tx
+                        .update(upload)
+                        .set({ isCommitted: false })
+                        .where(
+                            and(
+                                eq(upload.id, uploadId),
+                                eq(upload.isCommitted, false),
+                                ctx.get('isPrivilegedRole')
+                                    ? undefined
+                                    : eq(upload.userId, ctx.get('user')!.id),
+                            ),
+                        )
+                        .returning({ id: upload.id })
+
+                    if (!activeUpload) {
+                        throw new AppError({
+                            status: 409,
+                            code: 'UPLOAD_ALREADY_COMMITTED',
+                            message: 'Upload is already committed.',
+                        })
+                    }
+
                     if (objectStorageData.length > 0) {
                         await tx.insert(objectStorage).values(objectStorageData)
                     }
@@ -428,7 +450,6 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                 .where(
                     and(
                         eq(upload.id, uploadId),
-                        eq(upload.isCommitted, false),
                         ctx.get('isPrivilegedRole')
                             ? undefined
                             : eq(upload.userId, ctx.get('user')!.id),
@@ -443,47 +464,107 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                 })
             }
 
-            const attachmentsToCommit = (
-                await ctx
-                    .get('dbClient')
-                    .select({ id: objectStorage.id })
-                    .from(upload)
-                    .innerJoin(
-                        uploadAttachment,
-                        eq(upload.id, uploadAttachment.uploadId),
-                    )
-                    .innerJoin(
-                        objectStorage,
-                        eq(objectStorage.id, uploadAttachment.objectStorageId),
-                    )
-                    .where(
-                        and(
-                            eq(upload.id, uploadId),
-                            inArray(objectStorage.id, attachments),
-                        ),
-                    )
-            ).map(({ id }) => id)
-
             try {
-                if (attachmentsToCommit.length > 0) {
-                    await ctx
-                        .get('dbClient')
-                        .update(objectStorage)
-                        .set({ isUploaded: true })
-                        .where(inArray(objectStorage.id, attachmentsToCommit))
-                }
+                const data = await ctx
+                    .get('dbClient')
+                    .transaction(async (tx) => {
+                        const [activeUpload] = await tx
+                            .update(upload)
+                            .set({ isCommitted: false })
+                            .where(
+                                and(
+                                    eq(upload.id, uploadId),
+                                    eq(upload.isCommitted, false),
+                                    ctx.get('isPrivilegedRole')
+                                        ? undefined
+                                        : eq(
+                                              upload.userId,
+                                              ctx.get('user')!.id,
+                                          ),
+                                ),
+                            )
+                            .returning({ id: upload.id })
 
-                await auditTrailLogger(ctx, {
-                    component: 'objectStorage.uploadAttachment',
-                    action: 'commit',
-                    description: 'Attachments marked as uploaded',
-                    records: { table: 'upload', id: uploadId },
-                })
+                        if (!activeUpload) {
+                            throw new AppError({
+                                status: 409,
+                                code: 'UPLOAD_ALREADY_COMMITTED',
+                                message: 'Upload is already committed.',
+                            })
+                        }
 
-                const data = {
-                    uploadId,
-                    attachments: attachmentsToCommit,
-                }
+                        const attachmentsToCommit = (
+                            await tx
+                                .select({ id: objectStorage.id })
+                                .from(uploadAttachment)
+                                .innerJoin(
+                                    objectStorage,
+                                    eq(
+                                        objectStorage.id,
+                                        uploadAttachment.objectStorageId,
+                                    ),
+                                )
+                                .where(
+                                    and(
+                                        eq(uploadAttachment.uploadId, uploadId),
+                                        inArray(objectStorage.id, attachments),
+                                    ),
+                                )
+                        ).map(({ id }) => id)
+
+                        if (attachmentsToCommit.length === 0) {
+                            throw new AppError({
+                                status: 404,
+                                code: 'UPLOAD_ATTACHMENTS_NOT_FOUND',
+                                message: 'Upload attachments not found.',
+                            })
+                        }
+
+                        const committedAttachments = await tx
+                            .update(objectStorage)
+                            .set({ isUploaded: true })
+                            .where(
+                                and(
+                                    eq(objectStorage.isUploaded, false),
+                                    inArray(
+                                        objectStorage.id,
+                                        attachmentsToCommit,
+                                    ),
+                                ),
+                            )
+                            .returning({ id: objectStorage.id })
+
+                        if (committedAttachments.length === 0) {
+                            throw new AppError({
+                                status: 409,
+                                code: 'UPLOAD_ATTACHMENTS_ALREADY_COMMITTED',
+                                message:
+                                    'Upload attachments are already committed.',
+                            })
+                        }
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'objectStorage.uploadAttachment',
+                                action: 'commit',
+                                description: 'Attachments marked as uploaded',
+                                records: committedAttachments.map(({ id }) => ({
+                                    table: 'object_storage',
+                                    id,
+                                    oldData: { isUploaded: false },
+                                })),
+                            },
+                            tx,
+                        )
+
+                        return {
+                            uploadId,
+                            attachments: committedAttachments.map(
+                                ({ id }) => id,
+                            ),
+                        }
+                    })
 
                 return apiResponseOkWrapper(ctx, { data })
             } catch (err) {

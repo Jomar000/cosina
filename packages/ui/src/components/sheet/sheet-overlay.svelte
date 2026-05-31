@@ -13,7 +13,7 @@
     bind:ref
     data-slot="sheet-overlay"
     class={cn(
-        'fixed inset-0 z-50 bg-black/10 supports-backdrop-filter:backdrop-blur-xs',
+        'bg-black/10 supports-backdrop-filter:backdrop-blur-xs fixed inset-0 z-50',
         className,
     )}
     {...restProps}

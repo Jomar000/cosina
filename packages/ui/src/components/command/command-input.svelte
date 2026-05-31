@@ -17,7 +17,7 @@
     class="p-1 pb-0"
 >
     <InputGroup.Root
-        class="h-8! rounded-lg! border-input/30 bg-input/30 shadow-none! *:data-[slot=input-group-addon]:pl-2!"
+        class="bg-input/30 border-input/30 h-8! rounded-lg! shadow-none! *:data-[slot=input-group-addon]:pl-2!"
     >
         <CommandPrimitive.Input
             {value}

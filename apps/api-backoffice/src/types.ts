@@ -3,8 +3,13 @@ import type {
     TBaseHonoBindings,
     TBaseHonoInstance,
     TBaseHonoVariables,
+    TApiResponseError,
 } from '@hyperion/types/shared'
 import type { AwsClient } from 'aws4fetch'
+import type {
+    ClientErrorStatusCode,
+    ServerErrorStatusCode,
+} from 'hono/utils/http-status'
 
 import type { aclBuilder } from './auth/acl.js'
 import type { auth } from './auth/index.js'
@@ -38,3 +43,9 @@ export type THonoVariables = TBaseHonoVariables<{
 }>
 
 export type THonoInstance = TBaseHonoInstance<THonoBindings, THonoVariables>
+
+export type TGlobalApiResponses = {
+    [status in ClientErrorStatusCode | ServerErrorStatusCode]: {
+        json: TApiResponseError
+    }
+}

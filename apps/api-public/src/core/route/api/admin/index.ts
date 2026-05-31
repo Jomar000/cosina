@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
 
-import type { THonoInstance } from '../../../../types.js'
+import type { TGlobalApiResponses, THonoInstance } from '../../../../types.js'
 import { isAuthorized } from '../../../middleware/isAuthorized.js'
 import { userRoute } from './user/index.js'
 
@@ -22,4 +23,7 @@ export const adminRoute = new Hono<THonoInstance>()
     .route('/user', userRoute)
 
 export default adminRoute
-export type AdminRouteType = typeof adminRoute
+export type AdminRouteType = ApplyGlobalResponse<
+    typeof adminRoute,
+    TGlobalApiResponses
+>

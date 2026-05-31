@@ -7,9 +7,10 @@ import {
 import { and, eq } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
 import type { z } from 'zod'
 
-import type { THonoInstance } from '../../../types.js'
+import type { TGlobalApiResponses, THonoInstance } from '../../../types.js'
 import { assertUserUnlocked } from '../../../utilities/assertUserUnlocked.js'
 import {
     apiResponseErrorWrapper,
@@ -272,4 +273,7 @@ export const authRoute = new Hono<THonoInstance>()
     })
 
 export default authRoute
-export type AuthRouteType = typeof authRoute
+export type AuthRouteType = ApplyGlobalResponse<
+    typeof authRoute,
+    TGlobalApiResponses
+>

@@ -34,7 +34,7 @@
                 },
             )
 
-            content += color.join('\n') + '\n}'
+            content += `${color.join('\n')}\n}`
 
             themeContents.push(content)
         }
@@ -45,7 +45,7 @@
 
 {#if themeContents}
     {#key id}
-        <svelte:element this={'style'}>
+        <svelte:element this={"style"}>
             {themeContents}
         </svelte:element>
     {/key}
