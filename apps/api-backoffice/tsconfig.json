@@ -1,0 +1,29 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        /* Modules */
+        "rootDir": "./",
+        "types": [
+            "@cloudflare/vitest-pool-workers",
+            "node"
+        ],
+
+        /* Emit */
+        "outDir": "./dist/"
+    },
+    "references": [
+        {
+            "path": "../../packages/types/tsconfig.json"
+        },
+        {
+            "path": "../../packages/validator/tsconfig.json"
+        },
+        {
+            "path": "../../packages/database/tsconfig.build.json"
+        }
+    ],
+    "include": [
+        "./src/**/*",
+        "./test/**/*"
+    ]
+}

@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        /* Modules */
+        "rootDir": "./src/",
+
+        /* Emit */
+        "outDir": "./dist/"
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "exclude": [
+        "./src/postgres/bootstrap.ts",
+        "./src/postgres/migrations/*"
+    ]
+}
