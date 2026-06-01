@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+echo
+echo ==============================
+echo = BEGIN: git pre-commit hook =
+echo ==============================
+echo
+
+# Create a list of non-deleted staged files
+stagedFiles=$(git diff --name-only --diff-filter=d --staged)
+
+if [ -n "$stagedFiles" ]; then
+    echo 'Linting and formatting staged files...'
+
+    # Use ESLint to do syntax checking of staged files
+    echo "$stagedFiles" | xargs -n 50 ./node_modules/.bin/eslint --no-warn-ignored --no-error-on-unmatched-pattern &
+    ESLINT_PID=$!
+
+    # Use prettier to format code style of staged files
+    echo "$stagedFiles" | xargs -n 50 ./node_modules/.bin/prettier --write --ignore-unknown --no-error-on-unmatched-pattern &
+    PRETTIER_PID=$!
+
+    wait $ESLINT_PID
+    ESLINT_EXIT=$?
+
+    wait $PRETTIER_PID
+    PRETTIER_EXIT=$?
+
+    # Re-stage any files reformatted by Prettier
+    if [ $PRETTIER_EXIT -eq 0 ]; then
+        echo "$stagedFiles" | xargs -n 50 git add
+    fi
+
+    # Abort commit if ESLint found errors
+    if [ $ESLINT_EXIT -ne 0 ]; then
+        echo 'ESLint found errors. Commit aborted.'
+        exit 1
+    fi
+fi
+
+echo
+echo ============================
+echo = END: git pre-commit hook =
+echo ============================
+echo
+
+exit 0

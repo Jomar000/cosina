@@ -1,0 +1,36 @@
+name: Supabase Keepalive
+
+# DISABLED: This workflow is kept as a placeholder template for forked projects.
+# To enable, remove the `if: false` condition on the job below and configure
+# the required secrets: SUPABASE_URL and SUPABASE_ANON_KEY.
+
+on:
+  schedule:
+    # Runs every 5 days to prevent Supabase free tier from pausing (7-day inactivity limit)
+    - cron: '0 0 */5 * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  supabase-keepalive:
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query Supabase to keep database active
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/rpc/version" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+
+          status=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -n -1)
+
+          echo "Response status: $status"
+          echo "Response body: $body"
+
+          if [ "$status" -ge 200 ] && [ "$status" -lt 300 ]; then
+            echo "Supabase database is alive!"
+          else
+            echo "Unexpected status code: $status"
+            exit 1
+          fi

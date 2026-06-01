@@ -1,0 +1,211 @@
+name = "hyperion-backend-backoffice"
+main = "src/core/index.ts"
+compatibility_date = "2026-03-06"
+compatibility_flags = ['nodejs_compat']
+
+##########
+# Global #
+##########
+
+[observability]
+enabled = true
+
+[limits]
+cpu_ms = 2000
+
+[placement]
+mode = "smart"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["WebSocketServer"]
+
+[build]
+# Used only to generate build artifacts used in project references
+command = "tsc --build ./tsconfig.build.json"
+watch_dir = [
+    "./src/",
+    "../../packages/types/src/",
+    "../../packages/validator/src/",
+    "../../packages/database/src/",
+]
+
+[dev]
+port = 8080
+
+########################
+# DEV (no environment) #
+########################
+
+[vars]
+ENVIRONMENT = "development"
+STATUS = "up"
+CF_R2_BUCKET_PRIVATE = "hyperion-development-prv"
+CF_R2_BUCKET_PUBLIC = "hyperion-development-pub"
+CF_R2_BUCKET_PUBLIC_URL = "https://hyperion-development-r2.4thdevision.tech"
+CF_R2_PRESIGN_EXPIRY = 300 # 5 minutes (seconds)
+CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+COOKIE_DOMAIN = "localhost"
+CORS_ALLOW_CREDENTIALS = 1 # (0|1)
+CORS_ALLOW_HEADERS = "Content-Type,User-Agent,X-CAPTCHA-Response,X-CSRF-Token"
+CORS_ALLOW_METHODS = "GET,POST"
+CORS_EXPOSE_HEADERS = "Content-Length"
+CORS_MAX_AGE = 7200 # 2 hours (seconds)
+MAILER_ACCOUNT = "no-reply@hyperion.app"
+SESSION_EXPIRATION = 604800 # 7 days (seconds)
+SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
+URL_FRONTEND = "http://localhost:5173"
+URL_BACKEND = "http://localhost:8080"
+
+[[kv_namespaces]]
+binding = "HYPERIONBOFC_KV"
+id = "00000000000000000000000000000000"
+
+[[hyperdrive]]
+binding = "HYPERIONBOFC_HD"
+id = "00000000000000000000000000000000"
+localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion"
+
+[[durable_objects.bindings]]
+name = "HYPERIONBOFC_DO_WSS"
+class_name = "WebSocketServer"
+
+[[r2_buckets]]
+binding = 'HYPERIONBOFC_R2'
+bucket_name = 'hyperion-development'
+
+########
+# TEST #
+########
+
+[env.test]
+workers_dev = false
+preview_urls = false
+route = { custom_domain = true, pattern = "" }
+
+[env.test.vars]
+ENVIRONMENT = "test"
+STATUS = "up"
+CF_R2_BUCKET_PRIVATE = "hyperion-test-prv"
+CF_R2_BUCKET_PUBLIC = "hyperion-test-pub"
+CF_R2_BUCKET_PUBLIC_URL = "https://hyperion-development-r2.4thdevision.tech"
+CF_R2_PRESIGN_EXPIRY = 300 # 5 minutes (seconds)
+CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+COOKIE_DOMAIN = "localhost"
+CORS_ALLOW_CREDENTIALS = 1 # (0|1)
+CORS_ALLOW_HEADERS = "Content-Type,User-Agent,X-CAPTCHA-Response,X-CSRF-Token"
+CORS_ALLOW_METHODS = "GET,POST"
+CORS_EXPOSE_HEADERS = "Content-Length"
+CORS_MAX_AGE = 7200 # 2 hours (seconds)
+MAILER_ACCOUNT = "no-reply@hyperion.app"
+SESSION_EXPIRATION = 604800 # 7 days (seconds)
+SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
+URL_FRONTEND = "http://localhost:5173"
+URL_BACKEND = "http://localhost:8080"
+
+[[env.test.kv_namespaces]]
+binding = "HYPERIONBOFC_KV"
+id = "00000000000000000000000000000001"
+
+[[env.test.hyperdrive]]
+binding = "HYPERIONBOFC_HD"
+id = "00000000000000000000000000000001"
+localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion_test"
+
+[[env.test.durable_objects.bindings]]
+name = "HYPERIONBOFC_DO_WSS"
+class_name = "WebSocketServer"
+
+[[env.test.r2_buckets]]
+binding = 'HYPERIONBOFC_R2'
+bucket_name = 'hyperion-test'
+
+###########
+# STAGING #
+###########
+
+[env.staging]
+workers_dev = false
+preview_urls = false
+route = { custom_domain = true, pattern = "" }
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+STATUS = "up"
+CF_R2_BUCKET_PRIVATE = "hyperion-staging-prv"
+CF_R2_BUCKET_PUBLIC = "hyperion-staging-pub"
+CF_R2_BUCKET_PUBLIC_URL = ""
+CF_R2_PRESIGN_EXPIRY = 300 # 5 minutes (seconds)
+CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+COOKIE_DOMAIN = "localhost"
+CORS_ALLOW_CREDENTIALS = 1 # (0|1)
+CORS_ALLOW_HEADERS = "Content-Type,User-Agent,X-CAPTCHA-Response,X-CSRF-Token"
+CORS_ALLOW_METHODS = "GET,POST"
+CORS_EXPOSE_HEADERS = "Content-Length"
+CORS_MAX_AGE = 7200 # 2 hours (seconds)
+MAILER_ACCOUNT = "no-reply@hyperion.app"
+SESSION_EXPIRATION = 604800 # 7 days (seconds)
+SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
+URL_FRONTEND = "http://localhost:5173"
+URL_BACKEND = "http://localhost:8080"
+
+[[env.staging.kv_namespaces]]
+binding = "HYPERIONBOFC_KV"
+id = "00000000000000000000000000000002"
+
+[[env.staging.hyperdrive]]
+binding = "HYPERIONBOFC_HD"
+id = "00000000000000000000000000000002"
+
+[[env.staging.durable_objects.bindings]]
+name = "HYPERIONBOFC_DO_WSS"
+class_name = "WebSocketServer"
+
+[[env.staging.r2_buckets]]
+binding = 'HYPERIONBOFC_R2'
+bucket_name = 'hyperion-staging'
+
+##############
+# PRODUCTION #
+##############
+
+[env.production]
+workers_dev = false
+preview_urls = false
+route = { custom_domain = true, pattern = "" }
+
+[env.production.vars]
+ENVIRONMENT = "production"
+STATUS = "up"
+CF_R2_BUCKET_PRIVATE = "hyperion-production-prv"
+CF_R2_BUCKET_PUBLIC = "hyperion-production-pub"
+CF_R2_BUCKET_PUBLIC_URL = ""
+CF_R2_PRESIGN_EXPIRY = 300 # 5 minutes (seconds)
+CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+COOKIE_DOMAIN = "localhost"
+CORS_ALLOW_CREDENTIALS = 1 # (0|1)
+CORS_ALLOW_HEADERS = "Content-Type,User-Agent,X-CAPTCHA-Response,X-CSRF-Token"
+CORS_ALLOW_METHODS = "GET,POST"
+CORS_EXPOSE_HEADERS = "Content-Length"
+CORS_MAX_AGE = 7200 # 2 hours (seconds)
+MAILER_ACCOUNT = "no-reply@hyperion.app"
+SESSION_EXPIRATION = 604800 # 7 days (seconds)
+SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
+URL_FRONTEND = "http://localhost:5173"
+URL_BACKEND = "http://localhost:8080"
+
+[[env.production.kv_namespaces]]
+binding = "HYPERIONBOFC_KV"
+id = "00000000000000000000000000000003"
+
+[[env.production.hyperdrive]]
+binding = "HYPERIONBOFC_HD"
+id = "00000000000000000000000000000003"
+
+[[env.production.durable_objects.bindings]]
+name = "HYPERIONBOFC_DO_WSS"
+class_name = "WebSocketServer"
+
+[[env.production.r2_buckets]]
+binding = 'HYPERIONBOFC_R2'
+bucket_name = 'hyperion-production'

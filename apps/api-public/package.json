@@ -1,0 +1,77 @@
+{
+    "name": "@hyperion/api-public",
+    "version": "0.0.1",
+    "author": "4thDEVisionTech",
+    "description": "Hyperion Public API Component",
+    "type": "module",
+    "private": true,
+    "license": "ISC",
+    "engines": {
+        "node": ">=24.14.1",
+        "pnpm": ">=10.33.0"
+    },
+    "scripts": {
+        "build": "wrangler deploy --outdir=./dist/$worker --dry-run --env=",
+        "deploy:prod": "wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
+        "deploy:staging": "wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
+        "dev": "wrangler dev",
+        "format": "prettier --write .",
+        "lint": "prettier --check . && eslint .",
+        "secret:prod": "wrangler secret bulk .dev.vars.production --env=production --config=wrangler-production.toml",
+        "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging --config=wrangler-staging.toml",
+        "test": "pnpm run test:con && pnpm run test:seq",
+        "test:con": "pnpm --filter=@hyperion/database run migrate:test && vitest run --project=concurrent-test-files",
+        "test:seq": "pnpm --filter=@hyperion/database run migrate:test && vitest run --project=sequential-test-files",
+        "test:ui": "echo Use `test:ui:con` or `test:ui:seq` instead",
+        "test:ui:con": "pnpm --filter=@hyperion/database run migrate:test && vitest --ui --project=concurrent-test-files",
+        "test:ui:seq": "pnpm --filter=@hyperion/database run migrate:test && vitest --ui --project=sequential-test-files"
+    },
+    "README": "This is a private package bundled by wrangler — the deps/devDeps split has no effect on its own build. dependencies lists only what consumers need for type resolution of the exported Hono routes. Server-only packages live in devDependencies to avoid leaking them transitively into frontend apps.",
+    "dependencies": {
+        "@hyperion/types": "workspace:*",
+        "@hyperion/validator": "workspace:*",
+        "hono": "catalog:",
+        "zod": "catalog:"
+    },
+    "devDependencies": {
+        "@better-auth/drizzle-adapter": "catalog:",
+        "@cloudflare/vitest-pool-workers": "catalog:",
+        "@hyperion/database": "workspace:*",
+        "@noble/hashes": "catalog:",
+        "@vitest/coverage-istanbul": "catalog:",
+        "@vitest/runner": "catalog:",
+        "@vitest/snapshot": "catalog:",
+        "@vitest/ui": "catalog:",
+        "aws4fetch": "catalog:",
+        "better-auth": "catalog:",
+        "dayjs": "catalog:",
+        "drizzle-orm": "catalog:",
+        "nanoid": "catalog:",
+        "resend": "catalog:",
+        "uuid": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    },
+    "exports": {
+        "./app/admin": {
+            "types": "./dist/core/route/app/admin/index.d.ts",
+            "default": "./dist/core/route/app/admin/index.js"
+        },
+        "./app/auth": {
+            "types": "./dist/core/route/app/auth.d.ts",
+            "default": "./dist/core/route/app/auth.js"
+        },
+        "./app/objectStorage": {
+            "types": "./dist/core/route/app/objectStorage/index.d.ts",
+            "default": "./dist/core/route/app/objectStorage/index.js"
+        },
+        "./app/user": {
+            "types": "./dist/core/route/app/user/index.d.ts",
+            "default": "./dist/core/route/app/user/index.js"
+        },
+        "./root/heartbeat": {
+            "types": "./dist/core/route/root/heartbeat.d.ts",
+            "default": "./dist/core/route/root/heartbeat.js"
+        }
+    }
+}

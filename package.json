@@ -1,0 +1,57 @@
+{
+    "name": "hyperion",
+    "version": "0.0.1",
+    "author": "4thDEVisionTech",
+    "description": "Hyperion",
+    "type": "module",
+    "private": true,
+    "license": "ISC",
+    "engines": {
+        "node": ">=24.14.1",
+        "pnpm": ">=10.33.0"
+    },
+    "scripts": {
+        "dev": "pnpm run --recursive --parallel --if-present dev",
+        "build": "pnpm run --recursive --stream --if-present build",
+        "format": "pnpm run --recursive --stream --if-present format",
+        "lint": "pnpm run --recursive --stream --if-present lint",
+        "prepare": "pnpm exec husky",
+        "test": "echo 'Tests must be run per-app to ensure a clean DB state per session'"
+    },
+    "devDependencies": {
+        "@changesets/cli": "^2.30.0",
+        "@eslint/compat": "^2.0.5",
+        "@eslint/js": "^10.0.1",
+        "@types/node": "^24.12.2",
+        "eslint": "^10.2.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-svelte": "^3.17.0",
+        "globals": "^17.4.0",
+        "husky": "^9.1.7",
+        "prettier": "^3.8.2",
+        "prettier-plugin-multiline-arrays": "^4.1.5",
+        "prettier-plugin-svelte": "^3.5.1",
+        "prettier-plugin-tailwindcss": "^0.7.2",
+        "tsx": "^4.21.0",
+        "typescript": "^6.0.2",
+        "typescript-eslint": "^8.58.1",
+        "wrangler": "^4.81.1"
+    },
+    "pnpm": {
+        "allowedDeprecatedVersions": {
+            "@esbuild-kit/core-utils": "*",
+            "@esbuild-kit/esm-loader": "*",
+            "prebuild-install": "*"
+        },
+        "overrides": {
+            "globals": "^17.4.0",
+            "esbuild": "^0.27.3"
+        },
+        "peerDependencyRules": {
+            "allowedVersions": {
+                "typescript": "^6.0.0"
+            },
+            "ignoreMissing": []
+        }
+    }
+}

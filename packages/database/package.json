@@ -1,0 +1,37 @@
+{
+    "name": "@hyperion/database",
+    "version": "0.0.1",
+    "author": "4thDEVisionTech",
+    "description": "Hyperion Database Component",
+    "type": "module",
+    "private": true,
+    "license": "ISC",
+    "engines": {
+        "node": ">=24.14.1",
+        "pnpm": ">=10.33.0"
+    },
+    "scripts": {
+        "build": "tsc --build ./tsconfig.build.json",
+        "format": "prettier --write .",
+        "lint": "prettier --check . && eslint .",
+        "migrate:dev": "tsx --env-file=.env ./src/postgres/bootstrap.ts",
+        "migrate:prod": "drizzle-kit migrate --config=drizzle-production.config.ts",
+        "migrate:staging": "drizzle-kit migrate --config=drizzle-staging.config.ts",
+        "migrate:test": "tsx --env-file=.env.test ./src/postgres/bootstrap.ts",
+        "prepare": "pnpm build"
+    },
+    "dependencies": {
+        "drizzle-orm": "catalog:",
+        "postgres": "^3.4.9",
+        "uuid": "catalog:"
+    },
+    "devDependencies": {
+        "drizzle-kit": "catalog:"
+    },
+    "exports": {
+        "./postgres": {
+            "types": "./dist/postgres/index.d.ts",
+            "default": "./dist/postgres/index.js"
+        }
+    }
+}
