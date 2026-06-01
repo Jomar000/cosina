@@ -3,7 +3,12 @@ import { Hono } from 'hono'
 import type { THonoInstance } from '../../../types.js'
 import { corsHandler } from '../../middleware/corsHandler.js'
 import { csrfHandler } from '../../middleware/csrfHandler.js'
-import { initContext } from '../../middleware/initContext.js'
+import {
+    initAuthContext,
+    initDatabaseContext,
+    initObjectStorageContext,
+    initRequestContext,
+} from '../../middleware/initContext.js'
 import { wsOriginGuard } from '../../middleware/wsOriginGuard.js'
 import { adminRoute } from './admin/index.js'
 import { authRoute } from './auth.js'
@@ -16,10 +21,13 @@ export const apiRoute = new Hono<THonoInstance>()
      * @description
      * Middleware
      */
+    .use('/ws/*', wsOriginGuard())
     .use('/*', corsHandler('default'))
     .use('/*', csrfHandler())
-    .use('/ws/*', wsOriginGuard())
-    .use('/*', initContext())
+    .use('/*', initRequestContext())
+    .use('/*', initDatabaseContext())
+    .use('/*', initAuthContext())
+    .use('/objectStorage/*', initObjectStorageContext())
     /**
      * @description
      * Routes

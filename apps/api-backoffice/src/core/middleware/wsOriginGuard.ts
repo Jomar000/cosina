@@ -14,18 +14,7 @@ export const wsOriginGuard = () => {
             })
         }
 
-        try {
-            const expectedOrigin = new URL(ctx.env.URL_FRONTEND).origin
-            const receivedOrigin = new URL(origin).origin
-
-            if (receivedOrigin !== expectedOrigin) {
-                return apiResponseErrorWrapper(ctx, {
-                    code: 'FORBIDDEN',
-                    message: 'Invalid request origin.',
-                    status: 403,
-                })
-            }
-        } catch {
+        if (ctx.env.URL_FRONTEND !== origin) {
             return apiResponseErrorWrapper(ctx, {
                 code: 'FORBIDDEN',
                 message: 'Invalid request origin.',

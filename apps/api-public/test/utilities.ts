@@ -52,8 +52,8 @@ export const generateUniqueName = (prefix: string): string =>
 
 /**
  * @description
- * Sends a GET request against the backoffice app with the standard Vitest
- * Worker origin header and optional session cookie.
+ * Sends a GET request against the public app with the configured frontend
+ * origin header and optional session cookie.
  */
 export const getTestingRequest = async (
     path: string,
@@ -77,8 +77,8 @@ export const getTestingRequest = async (
 
 /**
  * @description
- * Sends a JSON POST request against the backoffice app with the standard
- * Vitest Worker origin header and optional session cookie.
+ * Sends a JSON POST request against the public app with the configured
+ * frontend origin header and optional session cookie.
  */
 export const postTestingRequest = async (
     path: string,

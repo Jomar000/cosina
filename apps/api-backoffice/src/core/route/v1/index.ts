@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 
 import type { THonoInstance } from '../../../types.js'
 import { corsHandler } from '../../middleware/corsHandler.js'
-import { initContext } from '../../middleware/initContext.js'
+import { initRequestContext } from '../../middleware/initContext.js'
 
 export const v1Route = new Hono<THonoInstance>()
     /**
@@ -16,7 +16,7 @@ export const v1Route = new Hono<THonoInstance>()
      * to reflect mode to allow any origin, and credentials are never permitted
      * in reflect mode, so the browser-based CSRF attack vector does not apply.
      */
-    .use(initContext())
+    .use(initRequestContext())
 /**
  * @description
  * Routes
