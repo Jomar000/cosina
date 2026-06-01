@@ -4,6 +4,7 @@ import type { THonoInstance } from '../../../types.js'
 import { corsHandler } from '../../middleware/corsHandler.js'
 import { csrfHandler } from '../../middleware/csrfHandler.js'
 import { initContext } from '../../middleware/initContext.js'
+import { wsOriginGuard } from '../../middleware/wsOriginGuard.js'
 import { adminRoute } from './admin/index.js'
 import { authRoute } from './auth.js'
 import { objectStorageRoute } from './objectStorage/index.js'
@@ -17,6 +18,7 @@ export const apiRoute = new Hono<THonoInstance>()
      */
     .use('/*', corsHandler('default'))
     .use('/*', csrfHandler())
+    .use('/ws/*', wsOriginGuard())
     .use('/*', initContext())
     /**
      * @description

@@ -21,7 +21,7 @@ const createUpload = async () => {
         {
             method: 'POST',
             headers: {
-                origin: 'vitest-pool-worker',
+                origin: env.URL_FRONTEND,
                 cookie: privilegedCookie,
             },
         },
@@ -40,7 +40,7 @@ const createUploadAttachment = async (uploadId: string) => {
         {
             method: 'POST',
             headers: {
-                origin: 'vitest-pool-worker',
+                origin: env.URL_FRONTEND,
                 'content-type': 'application/json',
                 cookie: privilegedCookie,
             },
@@ -76,7 +76,7 @@ const commitUploadAttachment = async (uploadId: string, attachmentId: string) =>
         {
             method: 'POST',
             headers: {
-                origin: 'vitest-pool-worker',
+                origin: env.URL_FRONTEND,
                 'content-type': 'application/json',
                 cookie: privilegedCookie,
             },
@@ -94,7 +94,7 @@ const commitUpload = async (uploadId: string) =>
         {
             method: 'POST',
             headers: {
-                origin: 'vitest-pool-worker',
+                origin: env.URL_FRONTEND,
                 'content-type': 'application/json',
                 cookie: privilegedCookie,
             },
@@ -116,7 +116,7 @@ describe('Object Storage Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                         },
                     },
                     env,
@@ -135,7 +135,7 @@ describe('Object Storage Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -158,7 +158,7 @@ describe('Object Storage Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -181,7 +181,7 @@ describe('Object Storage Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -205,7 +205,7 @@ describe('Object Storage Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -229,7 +229,7 @@ describe('Object Storage Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -259,7 +259,7 @@ describe('Object Storage Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -292,7 +292,7 @@ describe('Object Storage Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -321,7 +321,7 @@ describe('Object Storage Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -345,7 +345,7 @@ describe('Object Storage Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -377,7 +377,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -401,7 +401,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: standardCookie,
                             },
                         },
@@ -428,7 +428,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -447,7 +447,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -501,7 +501,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -518,7 +518,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -543,7 +543,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -560,7 +560,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -591,7 +591,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -610,7 +610,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -647,7 +647,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -665,7 +665,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -700,7 +700,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -720,7 +720,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -759,7 +759,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -779,7 +779,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -796,7 +796,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -844,7 +844,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -862,7 +862,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -899,7 +899,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -940,7 +940,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -957,7 +957,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -998,7 +998,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -1016,7 +1016,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1053,7 +1053,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1071,7 +1071,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1111,7 +1111,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -1129,7 +1129,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1165,7 +1165,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1240,7 +1240,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -1258,7 +1258,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1295,7 +1295,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1313,7 +1313,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1347,7 +1347,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -1366,7 +1366,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1381,7 +1381,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1422,7 +1422,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -1441,7 +1441,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1483,7 +1483,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1516,7 +1516,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -1534,7 +1534,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -1570,7 +1570,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: standardCookie,
                             },
                         },
@@ -1588,7 +1588,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -1625,7 +1625,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -1642,7 +1642,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -1660,7 +1660,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -1694,7 +1694,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: privilegedCookie,
                             },
                         },
@@ -1712,7 +1712,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1748,7 +1748,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1765,7 +1765,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1783,7 +1783,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -1809,7 +1809,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: standardCookie,
                             },
                         },
@@ -1827,7 +1827,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -1863,7 +1863,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -1880,7 +1880,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -1898,7 +1898,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
@@ -1931,7 +1931,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 cookie: standardCookie,
                             },
                         },
@@ -1949,7 +1949,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -1985,7 +1985,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -2002,7 +2002,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
@@ -2019,7 +2019,7 @@ describe('Object Storage Endpoint', () => {
                         {
                             method: 'POST',
                             headers: {
-                                origin: 'vitest-pool-worker',
+                                origin: env.URL_FRONTEND,
                                 'content-type': 'application/json',
                                 cookie: standardCookie,
                             },

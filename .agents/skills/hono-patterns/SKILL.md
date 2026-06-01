@@ -7,14 +7,14 @@ description: Coding rules for Hono API routes, middleware, error handling, valid
 
 1.  **Middleware:** Use middleware to normalize environment variables across runtimes (Cloudflare `env` vs. Node/Bun `process.env`).
     - For auth, permission, validation-adjacent, or route-specific guards in single-endpoint child route files, attach middleware directly to the route handler:
-      ```typescript
-      new Hono<THonoInstance>().get(
-          '/read',
-          isAuthorized({ order: ['read'] }),
-          validateRequest('query', schema),
-          async (ctx) => { ... },
-      )
-      ```
+        ```typescript
+        new Hono<THonoInstance>().get(
+            '/read',
+            isAuthorized({ order: ['read'] }),
+            validateRequest('query', schema),
+            async (ctx) => { ... },
+        )
+        ```
     - Avoid unscoped `.use(middleware)` inside child route apps that are mounted with `.route('/', childRoute)`. In Hono, unscoped middleware can apply to sibling mounted routes depending on mount order.
     - If a middleware is intentionally shared by every endpoint in a child app, either mount that child app at a unique path or scope the middleware with `.use('/exactPath', middleware)` / `.use('/prefix/*', middleware)` so its reach is explicit.
 2.  **Context:** Use the app-specific `THonoInstance`, `THonoBindings`, and `THonoVariables` types from `apps/api-{public,backoffice}/src/types.ts`. Bindings include Hyperdrive, KV, and the WebSocket Durable Object namespace. Object storage does not use a direct R2 bucket binding; use the `aws4FetchClient` Hono variable to sign S3-compatible R2 requests from the configured `CF_R2_*` vars/secrets.
@@ -46,23 +46,37 @@ console.error(JSON.stringify({ type: 'MY_ERROR', ...serializeError(err) }))
 
 `apps/api-{public,backoffice}/src/core/middleware/requestTimer.ts` — already registered in `core/index.ts` immediately after the `requestId` middleware. Do not re-register it.
 
-It uses `createMiddleware<THonoInstance>` and reads `correlationId` **after** `await next()` so that `initContext` (which sets `correlationId`) has already run:
+It uses `createMiddleware<THonoInstance>` and logs in a `finally` block so thrown requests still emit timing logs. Read `correlationId` after `await next()` where possible so that `initContext` (which sets `correlationId`) has already run; thrown requests that fail before `initContext` should log `N/A`.
 
 ```typescript
-export const requestTimer = createMiddleware<THonoInstance>(async (ctx, next) => {
-    const start = Date.now()
-    await next()
-    console.log(JSON.stringify({
-        type: 'REQUEST',
-        requestId: ctx.get('requestId'),
-        correlationId: ctx.get('correlationId') ?? 'N/A',
-        method: ctx.req.method,
-        path: new URL(ctx.req.url).pathname,
-        status: ctx.res.status,
-        durationMs: Date.now() - start,
-        environment: ctx.env.ENVIRONMENT,
-    }))
-})
+import { AppError } from '../../errors.js'
+
+export const requestTimer = createMiddleware<THonoInstance>(
+    async (ctx, next) => {
+        const start = Date.now()
+        let thrownStatus: number | undefined
+
+        try {
+            await next()
+        } catch (err) {
+            thrownStatus = err instanceof AppError ? err.status : 500
+            throw err
+        } finally {
+            console.log(
+                JSON.stringify({
+                    type: 'REQUEST',
+                    requestId: ctx.get('requestId'),
+                    correlationId: ctx.get('correlationId') ?? 'N/A',
+                    method: ctx.req.method,
+                    path: new URL(ctx.req.url).pathname,
+                    status: thrownStatus ?? ctx.res.status,
+                    durationMs: Date.now() - start,
+                    environment: ctx.env.ENVIRONMENT,
+                }),
+            )
+        }
+    },
+)
 ```
 
 The middleware registration order in `core/index.ts` is: `requestId` → `requestTimer` → status-check → routes.
@@ -72,12 +86,14 @@ The middleware registration order in `core/index.ts` is: `requestId` → `reques
 `apps/api-{public,backoffice}/src/core/durableObject/webSocketServer.ts` provides three module-level helpers — use them for all WebSocket logging, do not inline `console.*` calls:
 
 ```typescript
-const wsLog   = (entry: Record<string, unknown>) => console.log(JSON.stringify(entry))
-const wsError = (entry: Record<string, unknown>) => console.error(JSON.stringify(entry))
+const wsLog = (entry: Record<string, unknown>) =>
+    console.log(JSON.stringify(entry))
+const wsError = (entry: Record<string, unknown>) =>
+    console.error(JSON.stringify(entry))
 const serializeError = (err: unknown) => ({
-    name:    err instanceof Error ? err.name    : 'UNKNOWN_ERROR',
+    name: err instanceof Error ? err.name : 'UNKNOWN_ERROR',
     message: err instanceof Error ? err.message : String(err),
-    stack:   err instanceof Error ? err.stack   : undefined,
+    stack: err instanceof Error ? err.stack : undefined,
 })
 ```
 
@@ -108,6 +124,7 @@ Required payload fields: `component`, `action`, `description`. Optional: `record
 **`component` naming convention:** dot-separated path mirroring the route file's directory structure, with compound filenames in camelCase. Pattern: `<dir>.<dir>.<filename>`. Examples: `auth`, `user.profile`, `admin.user.profile`, `admin.user.password`, `objectStorage.upload`, `objectStorage.uploadAttachment`.
 
 **`action` naming convention:** camelCase derived from the route's endpoint path. Strip leading slash, convert each path segment to camelCase, then concatenate. Kebab-case segments are camelCased. Examples:
+
 - `/create` → `create`
 - `/commit` → `commit`
 - `/create` → `create`, `/commit` → `commit`, `/update` → `update`, `/reset` → `reset`, `/sign-out` → `signOut`

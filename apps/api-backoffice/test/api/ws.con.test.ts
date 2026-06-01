@@ -30,7 +30,7 @@ describe('WebSocket Endpoint', () => {
                     {
                         method: 'GET',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             upgrade: 'websocket',
                         },
                     },
@@ -59,7 +59,7 @@ describe('WebSocket Endpoint', () => {
                     {
                         method: 'GET',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             cookie: privilegedCookie,
                             upgrade: 'websocket',
                         },
@@ -84,7 +84,7 @@ describe('WebSocket Endpoint', () => {
                     {
                         method: 'GET',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             cookie: privilegedCookie,
                         },
                     },
@@ -109,7 +109,7 @@ describe('WebSocket Endpoint', () => {
                     {
                         method: 'GET',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             cookie: privilegedCookie,
                             upgrade: 'h2c',
                         },
@@ -132,6 +132,61 @@ describe('WebSocket Endpoint', () => {
 
         /**
          * @description
+         * WebSocket Origin Guard
+         *
+         * WebSocket upgrade requests must come from the configured frontend origin.
+         */
+        describe('WebSocket Origin Guard', () => {
+            it('Request without Origin header should return 400.', async () => {
+                const response = await app.request(
+                    '/api/ws/general',
+                    {
+                        method: 'GET',
+                        headers: {
+                            cookie: privilegedCookie,
+                            upgrade: 'websocket',
+                        },
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(400)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.code).toBe('BAD_REQUEST')
+                expect(responseData.error.message).toBe(
+                    'Missing Origin request header.',
+                )
+            })
+
+            it('Request with invalid Origin header should return 403.', async () => {
+                const response = await app.request(
+                    '/api/ws/general',
+                    {
+                        method: 'GET',
+                        headers: {
+                            origin: 'https://example.invalid',
+                            cookie: privilegedCookie,
+                            upgrade: 'websocket',
+                        },
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(403)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.code).toBe('FORBIDDEN')
+                expect(responseData.error.message).toBe(
+                    'Invalid request origin.',
+                )
+            })
+        })
+
+        /**
+         * @description
          * Permission Guard & WebSocket Connection
          *
          * - Owners and admins receive ws.broadcast + ws.listen.
@@ -145,7 +200,7 @@ describe('WebSocket Endpoint', () => {
                     {
                         method: 'GET',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             cookie: privilegedCookie,
                             upgrade: 'websocket',
                         },
@@ -162,7 +217,7 @@ describe('WebSocket Endpoint', () => {
                     {
                         method: 'GET',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             cookie: standardCookie,
                             upgrade: 'websocket',
                         },
@@ -179,7 +234,7 @@ describe('WebSocket Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -200,7 +255,7 @@ describe('WebSocket Endpoint', () => {
                     {
                         method: 'GET',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             cookie: adminCookie,
                             upgrade: 'websocket',
                         },

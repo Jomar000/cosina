@@ -44,7 +44,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -67,7 +67,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -91,7 +91,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: standardCookie,
                         },
@@ -115,7 +115,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: standardCookie,
                         },
@@ -146,7 +146,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -167,7 +167,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -190,7 +190,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -213,7 +213,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -243,7 +243,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -273,7 +273,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -306,7 +306,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -336,7 +336,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -361,7 +361,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -387,7 +387,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -414,7 +414,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -456,7 +456,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
@@ -483,7 +483,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -507,7 +507,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -533,7 +533,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -565,7 +565,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },

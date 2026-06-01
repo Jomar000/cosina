@@ -67,7 +67,7 @@ export const getTestingRequest = async (
         {
             method: 'GET',
             headers: {
-                origin: 'vitest-pool-worker',
+                origin: env.URL_FRONTEND,
                 ...(options.cookie ? { cookie: options.cookie } : {}),
             },
         },
@@ -92,7 +92,7 @@ export const postTestingRequest = async (
         {
             method: 'POST',
             headers: {
-                origin: 'vitest-pool-worker',
+                origin: env.URL_FRONTEND,
                 'content-type': 'application/json',
                 ...(options.cookie ? { cookie: options.cookie } : {}),
             },
@@ -192,7 +192,7 @@ export const setTestingCookies = async () => {
             {
                 method: 'POST',
                 headers: {
-                    origin: 'vitest-pool-worker',
+                    origin: env.URL_FRONTEND,
                     'content-type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -208,7 +208,7 @@ export const setTestingCookies = async () => {
             {
                 method: 'POST',
                 headers: {
-                    origin: 'vitest-pool-worker',
+                    origin: env.URL_FRONTEND,
                     'content-type': 'application/json',
                 },
                 body: JSON.stringify({
