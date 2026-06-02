@@ -147,6 +147,19 @@ const updateResourceMutation = createMutation(() => ({
 }))
 ```
 
+## Submission Guards
+
+- For non-idempotent create/update/remove flows, add an explicit component-local lock such as `isSubmitting`, `isSaving`, or `isConfirming`, even when TanStack mutation pending state exists.
+- Start guarded submit or confirm handlers with an early return such as `if (isSubmitting) return`.
+- Set the local lock before awaiting mutation work and release it in `finally`.
+- Prefer `mutateAsync` for guarded create/update flows so success, error, and cleanup behavior stay inside one `try/catch/finally`.
+- Disable submit, confirm, cancel, abort, back, and close controls while the local lock or relevant mutation pending state is active.
+- Do not show success modals or close into success UI from error callbacks.
+- If persistence succeeds but a UI-side follow-up fails, show a saved-record warning instead of inviting duplicate retry.
+- Clear or reset completed create state immediately after confirmed persistence when leaving it visible could enable resubmission.
+- For components with several create/update/remove actions behind one modal, use a shared local action lock so overlapping confirm actions cannot interleave.
+- Include the shared action lock in every modal action's disabled state.
+
 ## Fonts
 
 - Load web fonts from each SvelteKit app's `static/fonts/` directory and reference them with root-relative URLs such as `/fonts/inter-variable.woff2`.
