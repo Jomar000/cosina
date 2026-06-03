@@ -7,7 +7,6 @@ const prettierConfig = {
     plugins: [
         'prettier-plugin-svelte',
         'prettier-plugin-tailwindcss',
-        'prettier-plugin-tailwindcss-canonical-classes',
         'prettier-plugin-multiline-arrays',
     ],
     semi: false,
