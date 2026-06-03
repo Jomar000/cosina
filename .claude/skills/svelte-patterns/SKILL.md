@@ -173,5 +173,6 @@ const updateResourceMutation = createMutation(() => ({
 - **Config:** `components.json` at `packages/ui/` root defines aliases and paths.
 - **Utility:** `@PROJECT_NAME/ui/utils` exports the `cn()` helper (`clsx` + `tailwind-merge`).
 - **Styling:** Tailwind CSS v4 via `@tailwindcss/vite`, with theme CSS (zinc, oklch) and `tw-animate-css` in `src/styles/globals.css`. Import shared styles via `@PROJECT_NAME/ui/styles`.
-- **Icons:** `@lucide/svelte`.
+- **Icons:** Prefer deep imports from `@lucide/svelte/icons/*`, such as `import SearchIcon from '@lucide/svelte/icons/search'`, instead of barrel imports from `@lucide/svelte`.
+- **Icon naming:** Always add an `Icon` suffix to lucide icon import names and markup usage, such as `SearchIcon` and `<SearchIcon />`.
 - **Note:** `tsconfig.json` intentionally does not extend `tsconfig.base.json` — it uses `bundler` module resolution required by Svelte tooling, which conflicts with the root config's `nodenext` resolution.
