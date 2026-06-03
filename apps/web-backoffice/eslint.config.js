@@ -1,4 +1,5 @@
 import betterTailwindcss from 'eslint-plugin-better-tailwindcss'
+
 import rootConfig from '../../eslint.config.js'
 import svelteConfig from './svelte.config.js'
 
