@@ -5,20 +5,26 @@
     import * as Card from '@hyperion/ui/components/card'
     import * as DropdownMenu from '@hyperion/ui/components/dropdown-menu'
     import * as Table from '@hyperion/ui/components/table'
-    import CircleCheck from '@lucide/svelte/icons/circle-check'
-    import CircleX from '@lucide/svelte/icons/circle-x'
-    import CloudUpload from '@lucide/svelte/icons/cloud-upload'
-    import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical'
+    import CircleCheckIcon from '@lucide/svelte/icons/circle-check'
+    import CircleXIcon from '@lucide/svelte/icons/circle-x'
+    import CloudUploadIcon from '@lucide/svelte/icons/cloud-upload'
+    import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical'
     import FileIcon from '@lucide/svelte/icons/file'
-    import RefreshCw from '@lucide/svelte/icons/refresh-cw'
-    import Trash2 from '@lucide/svelte/icons/trash-2'
-    import { fileTypeFromBuffer } from 'file-type'
-    import ky from 'ky'
-    import PQueue from 'p-queue'
+    import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw'
+    import Trash2Icon from '@lucide/svelte/icons/trash-2'
     import { onDestroy, onMount } from 'svelte'
 
-    import { objectStorageClient } from '$lib/clients'
     import { formatBytes } from '$lib/utilities/helpers'
+    import {
+        createUploadId,
+        getUploadMode,
+        prepareUploadFiles,
+        removeUploadFile,
+        retryUploadFile,
+        revokePreviewUrls,
+        uploadQueuedFiles,
+        type UploadMetadata,
+    } from './utilities/tableUpload'
 
     ////////////////////
     // 01. Properties //
@@ -38,18 +44,6 @@
     // 02. Constants //
     ///////////////////
 
-    type Metadata = {
-        file: File
-        objectId: string
-        isPublic: boolean
-        mimeType: string
-        previewUrl: string | null
-        hashSha256: string
-        status: 'QUEUED' | 'UPLOADED' | 'FAILED'
-    }
-
-    const uploadQueue = new PQueue({ concurrency: 3 })
-
     /**
      * @description
      * When an uploadId is passed to this component,
@@ -65,14 +59,14 @@
      * Otherwise, opMode is NEW.
      * Generate a new uploadId and propagate to the parent component.
      */
-    const opMode: 'NEW' | 'UPDATE' = uploadId === '' ? 'NEW' : 'UPDATE'
+    const opMode = getUploadMode(uploadId)
 
     ///////////////
     // 03. State //
     ///////////////
 
-    let fileList: Metadata[] = $state([])
-    let addedToList: Metadata[] = $state([])
+    let fileList: UploadMetadata[] = $state([])
+    let addedToList: UploadMetadata[] = $state([])
 
     /////////////////
     // 08. Effects //
@@ -80,12 +74,7 @@
 
     onMount(async () => {
         if (opMode === 'NEW') {
-            const response = await objectStorageClient.upload.create.$post()
-
-            const { data, error, success } = await response.json()
-            if (!success) throw new Error(error.message)
-
-            uploadId = data.uploadId
+            uploadId = await createUploadId()
         } else {
             // TODO: Populate fileList with existing data
         }
@@ -98,223 +87,57 @@
     //////////////////
 
     async function handleFileInputChange(event: Event) {
-        if (fileList.length >= maxItems) {
-            // TODO: Add alert banner or modal here.
-            alert(`Maximum of ${maxItems} files only.`)
-            return
-        }
-
         const selectedFiles = (event.target as HTMLInputElement)?.files
         addedToList = []
 
-        if (selectedFiles) {
-            /**
-             * @description
-             * STEP 1: Preprocessing of files to be signed
-             */
+        if (!selectedFiles) return
 
-            for (const file of Array.from(selectedFiles)) {
-                const fileBuffer = await file.arrayBuffer()
+        const result = await prepareUploadFiles({
+            allowedMimeTypes,
+            existingFiles: fileList,
+            maxItems,
+            selectedFiles,
+        })
 
-                const mimeType =
-                    (await fileTypeFromBuffer(fileBuffer))?.mime ??
-                    'application/octet-stream'
-
-                // Check if the detected MIME Type matches the allowed MIME types
-                // Full matches & wildcard subtypes are supported
-                const matchedMimeTypes = allowedMimeTypes.filter((amt) => {
-                    return (
-                        mimeType === amt ||
-                        (amt.includes('*') &&
-                            mimeType.startsWith(
-                                amt.substring(0, amt.indexOf('*')),
-                            ))
-                    )
-                })
-
-                if (
-                    allowedMimeTypes.length > 0 &&
-                    matchedMimeTypes.length === 0
-                ) {
-                    // Skip invalid files
-                    continue
-                }
-
-                // Compute SHA-256 checksum
-                const hashBuffer = await crypto.subtle.digest(
-                    'SHA-256',
-                    fileBuffer,
-                )
-
-                const hashSha256 = Array.from(new Uint8Array(hashBuffer))
-                    .map((b) => b.toString(16).padStart(2, '0'))
-                    .join('')
-
-                if (
-                    fileList.find((pf) => pf.hashSha256 === hashSha256) ||
-                    addedToList.find((qf) => qf.hashSha256 === hashSha256)
-                ) {
-                    // Skip duplicate hashes
-                    continue
-                }
-
-                if (fileList.length + addedToList.length >= maxItems) {
-                    // TODO: Add alert banner or modal here.
-                    alert(`Maximum of ${maxItems} files only.`)
-                    break
-                }
-
-                addedToList = [
-                    ...addedToList,
-                    {
-                        file,
-                        objectId: '',
-                        hashSha256,
-                        isPublic: false,
-                        mimeType,
-                        previewUrl: mimeType.startsWith('image/')
-                            ? URL.createObjectURL(file)
-                            : null,
-                        status: 'QUEUED',
-                    },
-                ]
-            }
-
-            /**
-             * @description
-             * STEP 2: Signing Request
-             */
-
-            if (addedToList.length === 0) {
-                return
-            }
-
-            // Update the table
-            fileList = [
-                ...fileList,
-                ...addedToList,
-            ]
-
-            const signingResponse =
-                await objectStorageClient.upload.attachment.create.$post({
-                    json: {
-                        uploadId,
-                        attachments: addedToList.map((atl) => ({
-                            size: `${atl.file.size}`,
-                            hashSha256: atl.hashSha256,
-                            isPublic: atl.isPublic,
-                            mimeType: atl.mimeType,
-                        })),
-                    },
-                })
-
-            const { data, error, success } = await signingResponse.json()
-            if (!success) throw new Error(error.message)
-
-            /**
-             * @description
-             * STEP 3: Upload
-             */
-
-            for (const su of data.signedUrls) {
-                const queuedFn = async () => {
-                    const hashIndex = addedToList.findIndex(
-                        (q) => q.hashSha256 === su.hashSha256,
-                    )
-
-                    addedToList[hashIndex].objectId = su.id
-
-                    if (su.status === 409) {
-                        // File already exists, just set status to UPLOADED.
-                        addedToList[hashIndex].status = 'UPLOADED'
-                    } else {
-                        try {
-                            // Upload the file.
-                            await ky(su.signedUrl!, {
-                                method: 'PUT',
-                                headers: {
-                                    'x-amz-checksum-sha256': su.encodedHash!,
-                                },
-                                body: addedToList[hashIndex].file,
-                            })
-
-                            // Report back that file is successfully uploaded.
-                            const commitResponse =
-                                await objectStorageClient.upload.attachment.commit.$post(
-                                    {
-                                        json: {
-                                            uploadId,
-                                            attachments: [su.id],
-                                        },
-                                    },
-                                )
-
-                            const { error, success } =
-                                await commitResponse.json()
-                            if (!success) throw new Error(error.message)
-
-                            addedToList[hashIndex].status = 'UPLOADED'
-                        } catch {
-                            addedToList[hashIndex].status = 'FAILED'
-                        }
-                    }
-                }
-
-                uploadQueue.add(queuedFn).catch(() => {})
-            }
-
-            await uploadQueue.onIdle()
+        if (result.maxItemsReached) {
+            // TODO: Add alert banner or modal here.
+            alert(`Maximum of ${maxItems} files only.`)
         }
+
+        addedToList = result.queuedFiles
+        if (addedToList.length === 0) return
+
+        fileList = [
+            ...fileList,
+            ...addedToList,
+        ]
+
+        await uploadQueuedFiles({
+            queuedFiles: addedToList,
+            uploadId,
+        })
     }
 
     async function handleFileRetry(index: number) {
-        const retryResponse =
-            await objectStorageClient.upload.attachment.retry.$post({
-                json: {
-                    uploadId,
-                    attachments: [fileList[index].objectId],
-                },
-            })
+        await retryUploadFile({
+            file: fileList[index],
+            uploadId,
+        })
+    }
 
-        const { data, error, success } = await retryResponse.json()
-        if (!success) throw new Error(error.message)
+    function handleOpenFileInput() {
+        document.getElementById('fileInput')?.click()
+    }
 
-        for (const su of data.signedUrls) {
-            if (su.status === 409) {
-                // File already exists, just set status to UPLOADED.
-                fileList[index].status = 'UPLOADED'
-            } else if (su.status === 200) {
-                try {
-                    // Upload the file.
-                    await ky(su.signedUrl!, {
-                        method: 'PUT',
-                        headers: {
-                            'x-amz-checksum-sha256': su.encodedHash!,
-                        },
-                        body: fileList[index].file,
-                    })
+    function handleFileRetrySelect(event: Event) {
+        const index = Number((event.currentTarget as HTMLElement).dataset.index)
+        void handleFileRetry(index)
+    }
 
-                    // Report back that file is successfully uploaded.
-                    const commitResponse =
-                        await objectStorageClient.upload.attachment.commit.$post(
-                            {
-                                json: {
-                                    uploadId,
-                                    attachments: [fileList[index].objectId],
-                                },
-                            },
-                        )
-
-                    const { error, success } = await commitResponse.json()
-                    if (!success) throw new Error(error.message)
-
-                    fileList[index].status = 'UPLOADED'
-                } catch {
-                    fileList[index].status = 'FAILED'
-                }
-            } else {
-                fileList[index].status = 'FAILED'
-            }
+    function handleRemoveFileSelect(event: Event) {
+        const hashSha256 = (event.currentTarget as HTMLElement).dataset.hash
+        if (hashSha256) {
+            removeFile(hashSha256)
         }
     }
 
@@ -328,19 +151,7 @@
     }
 
     function removeFile(hashSha256: string) {
-        revokePreviewUrls(
-            fileList.filter((file) => file.hashSha256 === hashSha256),
-        )
-        fileList = fileList.filter((file) => file.hashSha256 !== hashSha256)
-    }
-
-    function revokePreviewUrls(files: Metadata[]) {
-        for (const file of files) {
-            if (file.previewUrl) {
-                URL.revokeObjectURL(file.previewUrl)
-                file.previewUrl = null
-            }
-        }
+        fileList = removeUploadFile(fileList, hashSha256)
     }
 </script>
 
@@ -359,14 +170,11 @@
                     onclick={clearFiles}
                     variant="outline"
                 >
-                    <Trash2 class="mr-2 h-4 w-4" />
+                    <Trash2Icon class="mr-2 h-4 w-4" />
                     Clear All</Button
                 >
-                <Button
-                    onclick={() =>
-                        document.getElementById('fileInput')?.click()}
-                >
-                    <CloudUpload class="mr-2 h-4 w-4" />
+                <Button onclick={handleOpenFileInput}>
+                    <CloudUploadIcon class="mr-2 h-4 w-4" />
                     Upload
                 </Button>
             </div>
@@ -415,14 +223,16 @@
                                         variant="default"
                                         class="bg-green-500 hover:bg-green-600"
                                     >
-                                        <CircleCheck
+                                        <CircleCheckIcon
                                             class="mr-1.5 h-3.5 w-3.5"
                                         />
                                         UPLOADED
                                     </Badge>
                                 {:else if p.status === 'FAILED'}
                                     <Badge variant="destructive">
-                                        <CircleX class="mr-1.5 h-3.5 w-3.5" />
+                                        <CircleXIcon
+                                            class="mr-1.5 h-3.5 w-3.5"
+                                        />
                                         FAILED
                                     </Badge>
                                 {:else}
@@ -436,26 +246,28 @@
                                             variant="ghost"
                                             size="icon"
                                         >
-                                            <EllipsisVertical class="h-4 w-4" />
+                                            <EllipsisVerticalIcon
+                                                class="h-4 w-4"
+                                            />
                                         </Button>
                                     </DropdownMenu.Trigger>
                                     <DropdownMenu.Content>
                                         {#if p.status === 'FAILED'}
                                             <DropdownMenu.Item
-                                                onclick={() =>
-                                                    handleFileRetry(i)}
+                                                data-index={i}
+                                                onclick={handleFileRetrySelect}
                                             >
-                                                <RefreshCw
+                                                <RefreshCwIcon
                                                     class="mr-2 h-4 w-4"
                                                 />
                                                 Retry
                                             </DropdownMenu.Item>
                                         {/if}
                                         <DropdownMenu.Item
-                                            onclick={() =>
-                                                removeFile(p.hashSha256)}
+                                            data-hash={p.hashSha256}
+                                            onclick={handleRemoveFileSelect}
                                         >
-                                            <Trash2 class="mr-2 h-4 w-4" />
+                                            <Trash2Icon class="mr-2 h-4 w-4" />
                                             Delete
                                         </DropdownMenu.Item>
                                     </DropdownMenu.Content>

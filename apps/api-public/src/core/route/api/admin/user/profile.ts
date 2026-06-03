@@ -366,7 +366,15 @@ export const profileRoute = new Hono<THonoInstance>()
                                 action: 'update.address',
                                 description: 'Admin updated user address',
                                 records: [
-                                    { table: 'user_profile', id: userId },
+                                    {
+                                        table: 'user_profile',
+                                        id: userId,
+                                        oldData: {
+                                            addressId:
+                                                existingAddressId?.addressId ??
+                                                null,
+                                        },
+                                    },
                                     {
                                         table: 'address',
                                         id: String(resolvedAddressId),

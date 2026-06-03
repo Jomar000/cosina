@@ -142,15 +142,61 @@ export const passwordRoute = new Hono<THonoInstance>()
                     })
                 }
 
-                await db
-                    .update(account)
-                    .set({ password: hashedPassword })
-                    .where(
-                        and(
-                            eq(account.userId, userId),
-                            eq(account.providerId, 'credential'),
-                        ),
+                await db.transaction(async (tx) => {
+                    const [previousCredential] = await tx
+                        .select({
+                            id: account.id,
+                            password: account.password,
+                        })
+                        .from(account)
+                        .where(
+                            and(
+                                eq(account.userId, userId),
+                                eq(account.providerId, 'credential'),
+                            ),
+                        )
+
+                    if (!previousCredential) {
+                        throw new AppError({
+                            status: 404,
+                            code: 'ACCOUNT_CREDENTIAL_NOT_FOUND',
+                            message: 'Credential account not found.',
+                        })
+                    }
+
+                    const [updatedCredential] = await tx
+                        .update(account)
+                        .set({ password: hashedPassword })
+                        .where(eq(account.id, previousCredential.id))
+                        .returning({ id: account.id })
+
+                    if (!updatedCredential) {
+                        throw new AppError({
+                            status: 409,
+                            code: 'ACCOUNT_CREDENTIAL_UPDATE_CONFLICT',
+                            message: 'Credential account was not updated.',
+                        })
+                    }
+
+                    await auditTrailLogger(
+                        ctx,
+                        {
+                            component: 'admin.user.password',
+                            action: 'reset',
+                            description: 'Admin reset password for user',
+                            records: {
+                                table: 'account',
+                                id: updatedCredential.id,
+                                oldData: {
+                                    password: previousCredential.password
+                                        ? '[REDACTED]'
+                                        : null,
+                                },
+                            },
+                        },
+                        tx,
                     )
+                })
             } catch (err) {
                 if (err instanceof AppError) throw err
 
@@ -163,13 +209,6 @@ export const passwordRoute = new Hono<THonoInstance>()
                     err instanceof Error ? err : undefined,
                 )
             }
-
-            await auditTrailLogger(ctx, {
-                component: 'admin.user.password',
-                action: 'reset',
-                description: 'Admin reset password for user',
-                records: { table: 'user', id: userId },
-            })
 
             return apiResponseOkWrapper(ctx, { data: null })
         },

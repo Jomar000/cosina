@@ -12,6 +12,7 @@
     },
     "scripts": {
         "build": "wrangler deploy --outdir=./dist/$worker --dry-run --env=",
+        "check": "tsc --noEmit",
         "deploy:prod": "wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
         "deploy:staging": "wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
         "dev": "wrangler dev",

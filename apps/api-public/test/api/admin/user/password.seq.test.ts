@@ -1,5 +1,7 @@
+import { dbClient, dbSchema } from '@hyperion/database/postgres'
 import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
 import { env } from 'cloudflare:workers'
+import { and, desc, eq } from 'drizzle-orm'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../../../src/core/index.js'
@@ -10,6 +12,15 @@ import {
 
 let privilegedCookie: string
 let standardCookie: string
+
+const getDb = () =>
+    dbClient({
+        host: env.HYPERIONPUB_HD.host,
+        port: Number(env.HYPERIONPUB_HD.port) || 5432,
+        database: env.HYPERIONPUB_HD.database,
+        user: env.HYPERIONPUB_HD.user,
+        pass: env.HYPERIONPUB_HD.password,
+    })
 
 beforeAll(async () => {
     ;[
@@ -355,6 +366,48 @@ describe('Admin User Password Endpoint', () => {
                 expect(responseData.data).toBeNull()
             })
 
+            it('Direct password reset should write a redacted account audit trail record.', async () => {
+                const db = getDb()
+                const { account, auditTrail } = dbSchema
+
+                try {
+                    const [credential] = await db
+                        .select({ id: account.id })
+                        .from(account)
+                        .where(
+                            and(
+                                eq(account.userId, 'USER_003'),
+                                eq(account.providerId, 'credential'),
+                            ),
+                        )
+
+                    const [auditTrailEntry] = await db
+                        .select({ records: auditTrail.records })
+                        .from(auditTrail)
+                        .where(
+                            and(
+                                eq(auditTrail.component, 'admin.user.password'),
+                                eq(auditTrail.action, 'reset'),
+                            ),
+                        )
+                        .orderBy(desc(auditTrail.id))
+                        .limit(1)
+
+                    expect(credential).toBeTruthy()
+                    expect(auditTrailEntry.records).toEqual([
+                        {
+                            table: 'account',
+                            id: credential.id,
+                            oldData: {
+                                password: '[REDACTED]',
+                            },
+                        },
+                    ])
+                } finally {
+                    await db.$client.end()
+                }
+            })
+
             it('Sign-in with the new password after direct reset should pass.', async () => {
                 const response = await app.request(
                     '/api/auth/sign-in/username',
@@ -430,6 +483,57 @@ describe('Admin User Password Endpoint', () => {
 
                 expect(response.status).toBe(200)
                 expect(responseData.success).toBe(true)
+            })
+
+            it('Direct password reset for a user without credential account should return 404.', async () => {
+                const db = getDb()
+                const { account } = dbSchema
+
+                const [credential] = await db
+                    .select()
+                    .from(account)
+                    .where(
+                        and(
+                            eq(account.userId, 'USER_999'),
+                            eq(account.providerId, 'credential'),
+                        ),
+                    )
+
+                expect(credential).toBeTruthy()
+
+                try {
+                    await db
+                        .delete(account)
+                        .where(eq(account.id, credential.id))
+
+                    const response = await app.request(
+                        '/api/admin/user/password/reset',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({
+                                userId: 'USER_999',
+                                newPassword: 'N3wP@ssw0rd1234',
+                            }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(404)
+                    expect(responseData.error.code).toBe(
+                        'ACCOUNT_CREDENTIAL_NOT_FOUND',
+                    )
+                } finally {
+                    await db.insert(account).values(credential)
+                    await db.$client.end()
+                }
             })
         })
 

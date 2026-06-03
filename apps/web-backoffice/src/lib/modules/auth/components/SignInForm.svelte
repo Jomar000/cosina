@@ -13,19 +13,18 @@
     import { Input } from '@hyperion/ui/components/input'
     import { cn } from '@hyperion/ui/utils'
     import { auth as authValidator } from '@hyperion/validator/backoffice'
-    import Eye from '@lucide/svelte/icons/eye'
-    import EyeOff from '@lucide/svelte/icons/eye-off'
+    import EyeIcon from '@lucide/svelte/icons/eye'
+    import EyeOffIcon from '@lucide/svelte/icons/eye-off'
     import { createForm } from '@tanstack/svelte-form'
     import { createMutation } from '@tanstack/svelte-query'
     import { tick } from 'svelte'
     import { toast } from 'svelte-sonner'
     import type { HTMLAttributes } from 'svelte/elements'
-    import type { z } from 'zod'
 
     import { goto } from '$app/navigation'
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
-    import { authClient } from '$lib/clients'
     import type { SessionState } from '$lib/states/session'
+    import { signInWithCaptcha, type SignInPayload } from '../utilities/signIn'
 
     ////////////////////
     // 01. Properties //
@@ -46,6 +45,7 @@
     ///////////////
 
     let errorCopyLabel = $state('COPY')
+    let isSubmitting = $state(false)
     let showPassword = $state(false)
 
     ///////////////////
@@ -56,90 +56,24 @@
         mutationKey: [
             'authSignIn',
         ],
-        mutationFn: async (
-            payload: z.input<typeof authValidator.signInInputSchema>,
-        ) => {
+        mutationFn: async (payload: SignInPayload) => {
             showCaptchaModal = true
 
             // Wait for DOM update
             await tick()
 
-            const action = payload.accountId.includes('@')
-                ? 'sign-in-email'
-                : 'sign-in-username'
-
-            // Retrieve CAPTCHA Token
-            const captchaToken = await new Promise<string>((resolve) => {
-                turnstile.execute('#captchaRenderArea', {
-                    sitekey: PUBLIC_CF_TURNSTILE_SITE_KEY,
-                    action,
-                    callback: (token: string) => {
-                        showCaptchaModal = false
-                        turnstile.remove('#captchaRenderArea')
-                        resolve(token)
-                    },
-                })
+            return signInWithCaptcha({
+                errorCopyLabel,
+                onCaptchaResolved: () => {
+                    showCaptchaModal = false
+                },
+                payload,
+                session,
+                setErrorCopyLabel: (label) => {
+                    errorCopyLabel = label
+                },
+                siteKey: PUBLIC_CF_TURNSTILE_SITE_KEY,
             })
-
-            // Submit Form Data
-            try {
-                const endpoint =
-                    action === 'sign-in-email'
-                        ? authClient['sign-in'].email
-                        : authClient['sign-in'].username
-
-                const response = await endpoint.$post(
-                    {
-                        json: {
-                            organizationId: payload.organizationId,
-                            accountId: payload.accountId,
-                            password: payload.password,
-                        },
-                    },
-                    {
-                        headers: {
-                            'x-captcha-response': captchaToken,
-                        },
-                    },
-                )
-
-                const { data, error, success } = await response.json()
-
-                if (!success) {
-                    throw new Error(error.message)
-                }
-
-                session.set(data)
-
-                if (!session.isValid()) {
-                    throw new Error('Invalid session data.')
-                }
-
-                return session.data.userRoles.length === 1
-                    ? `/app/${session.data.userRoles[0]}/dashboard`
-                    : '/app'
-            } catch (err) {
-                const message = (err as Error).message
-
-                toast.error('Something went wrong', {
-                    class: 'min-w-[360px]',
-                    description: message,
-                    action: {
-                        label: errorCopyLabel,
-                        onClick: async (e) => {
-                            e.preventDefault()
-
-                            await navigator.clipboard.writeText(message)
-
-                            errorCopyLabel = 'COPIED'
-
-                            setTimeout(() => {
-                                errorCopyLabel = 'COPY'
-                            }, 2000)
-                        },
-                    },
-                })
-            }
         },
     }))
 
@@ -153,11 +87,7 @@
         handleSubmit: authSignInFormHandleSubmit,
     } = createForm(() => ({
         onSubmit: async ({ value }) => {
-            toast.dismiss()
-            const redirect = await authSignInMutation.mutateAsync(value)
-            if (redirect) {
-                goto(redirect)
-            }
+            await handleSignInSubmit(value)
         },
         validators: {
             // Make sure form is valid everytime it changes.
@@ -174,6 +104,35 @@
             password: '',
         },
     }))
+
+    //////////////////
+    // 09. Handlers //
+    //////////////////
+
+    async function handleSignInSubmit(value: SignInPayload) {
+        if (isSubmitting) return
+
+        isSubmitting = true
+        try {
+            toast.dismiss()
+            const redirect = await authSignInMutation.mutateAsync(value)
+            if (redirect) {
+                goto(redirect)
+            }
+        } finally {
+            isSubmitting = false
+        }
+    }
+
+    function handleSignInFormSubmit(event: SubmitEvent) {
+        event.preventDefault()
+        event.stopPropagation()
+        authSignInFormHandleSubmit()
+    }
+
+    function togglePasswordVisibility() {
+        showPassword = !showPassword
+    }
 </script>
 
 <div
@@ -186,13 +145,7 @@
             <Card.Description>Sign-in with your credentials</Card.Description>
         </Card.Header>
         <Card.Content>
-            <form
-                onsubmit={(e: SubmitEvent) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    authSignInFormHandleSubmit()
-                }}
-            >
+            <form onsubmit={handleSignInFormSubmit}>
                 <FieldGroup>
                     <AuthSignInFormField
                         name="organizationId"
@@ -340,16 +293,15 @@
                                     <Button
                                         type="button"
                                         class="pointer-events-auto absolute top-0 right-0 z-20 cursor-pointer bg-transparent hover:bg-transparent focus:outline-none dark:hover:bg-transparent"
-                                        onclick={() =>
-                                            (showPassword = !showPassword)}
+                                        onclick={togglePasswordVisibility}
                                         tabindex={-1}
                                     >
                                         {#if showPassword}
-                                            <Eye
+                                            <EyeIcon
                                                 class="font-extrabold text-black"
                                             />
                                         {:else}
-                                            <EyeOff
+                                            <EyeOffIcon
                                                 class="font-extrabold text-black"
                                             />
                                         {/if}
@@ -370,10 +322,14 @@
                             https://github.com/TanStack/form/discussions/623
                         -->
                         {#snippet children(form)}
+                            {@const isSigningIn =
+                                isSubmitting ||
+                                form.isSubmitting ||
+                                authSignInMutation.isPending}
                             {@const isDisabled =
                                 !form.canSubmit ||
                                 form.isPristine ||
-                                form.isSubmitting}
+                                isSigningIn}
                             <Field>
                                 <Button
                                     class={isDisabled
@@ -382,7 +338,7 @@
                                     disabled={isDisabled}
                                     id="signIn"
                                     type="submit"
-                                    >{form.isSubmitting
+                                    >{isSigningIn
                                         ? 'Signing-in...'
                                         : 'Sign-in'}</Button
                                 >

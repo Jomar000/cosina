@@ -241,6 +241,11 @@ export const profileRoute = new Hono<THonoInstance>()
                                     {
                                         table: 'user_profile',
                                         id: ctx.get('user')!.id,
+                                        oldData: {
+                                            addressId:
+                                                existingAddressId?.addressId ??
+                                                null,
+                                        },
                                     },
                                     {
                                         table: 'address',

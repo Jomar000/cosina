@@ -3,7 +3,7 @@
     import * as Card from '@hyperion/ui/components/card'
     import * as Select from '@hyperion/ui/components/select'
     import GalleryVerticalEndIcon from '@lucide/svelte/icons/gallery-vertical-end'
-    import UserStar from '@lucide/svelte/icons/user-star'
+    import UserStarIcon from '@lucide/svelte/icons/user-star'
     import { onMount } from 'svelte'
 
     import { goto } from '$app/navigation'
@@ -30,6 +30,14 @@
             goto(`/app/${session.data.userRoles[0]}/dashboard`)
         }
     })
+
+    //////////////////
+    // 09. Handlers //
+    //////////////////
+
+    function handleProceedToDashboard() {
+        goto(`/app/${selectedRole}/dashboard`)
+    }
 </script>
 
 {#if render}
@@ -51,7 +59,7 @@
             <Card.Root class="w-full max-w-sm">
                 <Card.Header class="m-auto w-full">
                     <div class="flex items-center justify-center">
-                        <UserStar size={56} />
+                        <UserStarIcon size={56} />
                     </div>
                     <Card.Title class="text-center text-xl"
                         >Role Selection</Card.Title
@@ -91,7 +99,7 @@
                     <Button
                         class="w-full"
                         disabled={selectedRole === ''}
-                        onclick={() => goto(`/app/${selectedRole}/dashboard`)}
+                        onclick={handleProceedToDashboard}
                         type="submit">Proceed to Dashboard</Button
                     >
                 </Card.Footer>
