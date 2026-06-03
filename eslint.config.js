@@ -6,6 +6,7 @@
 
 import { includeIgnoreFile } from '@eslint/compat'
 import js from '@eslint/js'
+import betterTailwindcss from 'eslint-plugin-better-tailwindcss'
 import prettier from 'eslint-config-prettier'
 import svelte from 'eslint-plugin-svelte'
 import { defineConfig } from 'eslint/config'
@@ -53,6 +54,36 @@ export default defineConfig(
             'no-var': ['error'],
             'prefer-template': ['error'],
             'svelte/no-navigation-without-resolve': 'off',
+        },
+    },
+    {
+        files: ['apps/web-backoffice/**/*.{js,ts,svelte}'],
+        plugins: {
+            'better-tailwindcss': betterTailwindcss,
+        },
+        rules: {
+            'better-tailwindcss/enforce-canonical-classes': 'warn',
+        },
+        settings: {
+            'better-tailwindcss': {
+                cwd: './apps/web-backoffice',
+                entryPoint: './src/app.css',
+            },
+        },
+    },
+    {
+        files: ['apps/web-public/**/*.{js,ts,svelte}'],
+        plugins: {
+            'better-tailwindcss': betterTailwindcss,
+        },
+        rules: {
+            'better-tailwindcss/enforce-canonical-classes': 'warn',
+        },
+        settings: {
+            'better-tailwindcss': {
+                cwd: './apps/web-public',
+                entryPoint: './src/app.css',
+            },
         },
     },
     {

@@ -51,7 +51,7 @@
 
 <ModeWatcher defaultMode="dark" />
 
-<div class="h-full w-full bg-muted">
+<div class="size-full bg-muted">
     {#if heartbeatQuery.isFetching}
         <LoadingScreen />
     {:else if heartbeatQuery.isSuccess}

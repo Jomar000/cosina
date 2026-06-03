@@ -170,11 +170,11 @@
                     onclick={clearFiles}
                     variant="outline"
                 >
-                    <Trash2Icon class="mr-2 h-4 w-4" />
+                    <Trash2Icon class="mr-2 size-4 " />
                     Clear All</Button
                 >
                 <Button onclick={handleOpenFileInput}>
-                    <CloudUploadIcon class="mr-2 h-4 w-4" />
+                    <CloudUploadIcon class="mr-2 size-4 " />
                     Upload
                 </Button>
             </div>
@@ -194,7 +194,7 @@
                     {#each fileList as p, i (p.hashSha256)}
                         <Table.Row>
                             <Table.Cell>
-                                <Avatar.Root class="h-10 w-10 rounded-md">
+                                <Avatar.Root class="size-10  rounded-md">
                                     {#if p.previewUrl}
                                         <Avatar.Image
                                             src={p.previewUrl}
@@ -206,7 +206,7 @@
                                         class="rounded-md bg-muted"
                                     >
                                         <FileIcon
-                                            class="h-5 w-5 text-muted-foreground"
+                                            class="size-5  text-muted-foreground"
                                         />
                                     </Avatar.Fallback>
                                 </Avatar.Root>
@@ -224,15 +224,13 @@
                                         class="bg-green-500 hover:bg-green-600"
                                     >
                                         <CircleCheckIcon
-                                            class="mr-1.5 h-3.5 w-3.5"
+                                            class="mr-1.5 size-3.5 "
                                         />
                                         UPLOADED
                                     </Badge>
                                 {:else if p.status === 'FAILED'}
                                     <Badge variant="destructive">
-                                        <CircleXIcon
-                                            class="mr-1.5 h-3.5 w-3.5"
-                                        />
+                                        <CircleXIcon class="mr-1.5 size-3.5 " />
                                         FAILED
                                     </Badge>
                                 {:else}
@@ -247,7 +245,7 @@
                                             size="icon"
                                         >
                                             <EllipsisVerticalIcon
-                                                class="h-4 w-4"
+                                                class="size-4 "
                                             />
                                         </Button>
                                     </DropdownMenu.Trigger>
@@ -258,7 +256,7 @@
                                                 onclick={handleFileRetrySelect}
                                             >
                                                 <RefreshCwIcon
-                                                    class="mr-2 h-4 w-4"
+                                                    class="mr-2 size-4 "
                                                 />
                                                 Retry
                                             </DropdownMenu.Item>
@@ -267,7 +265,7 @@
                                             data-hash={p.hashSha256}
                                             onclick={handleRemoveFileSelect}
                                         >
-                                            <Trash2Icon class="mr-2 h-4 w-4" />
+                                            <Trash2Icon class="mr-2 size-4 " />
                                             Delete
                                         </DropdownMenu.Item>
                                     </DropdownMenu.Content>
