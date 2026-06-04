@@ -44,14 +44,72 @@ const createWsChannel = (
     })
 }
 
-export const wsRoute = new Hono<THonoInstance>().route(
-    '/general',
-    createWsChannel(
-        'general',
-        isAuthorized({
-            ws: ['listen'],
-        }),
-    ),
+/**
+ * Public listen-only WebSocket channel for product broadcasts.
+ * No auth required — customers connect here to receive real-time product updates.
+ * canBroadcast is always false so public clients cannot send messages.
+ */
+const publicProductsChannel = new Hono<THonoInstance>().get(
+    '/',
+    async (ctx) => {
+        const upgradeHeader = ctx.req.header('Upgrade')
+
+        if (!upgradeHeader || upgradeHeader !== 'websocket') {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'WEBSOCKET_UPGRADE_REQUIRED',
+                message: 'Expected Upgrade: websocket',
+                status: 426,
+            })
+        }
+
+        const headers = new Headers(ctx.req.raw.headers)
+        headers.set('X-WS-Can-Broadcast', 'false')
+
+        const id = ctx.get('doWssClient').idFromName('products')
+        const stub = ctx.get('doWssClient').get(id)
+
+        return stub.fetch(new Request(ctx.req.raw, { headers }))
+    },
 )
+
+/**
+ * Public listen-only WebSocket channel for order status broadcasts.
+ * No auth required — customers connect here to receive real-time order
+ * status updates. Shares the same Durable Object instance as the admin
+ * orders channel so admin status changes are immediately visible.
+ * canBroadcast is always false so public clients cannot send messages.
+ */
+const publicOrdersChannel = new Hono<THonoInstance>().get('/', async (ctx) => {
+    const upgradeHeader = ctx.req.header('Upgrade')
+
+    if (!upgradeHeader || upgradeHeader !== 'websocket') {
+        return apiResponseErrorWrapper(ctx, {
+            code: 'WEBSOCKET_UPGRADE_REQUIRED',
+            message: 'Expected Upgrade: websocket',
+            status: 426,
+        })
+    }
+
+    const headers = new Headers(ctx.req.raw.headers)
+    headers.set('X-WS-Can-Broadcast', 'false')
+
+    const id = ctx.get('doWssClient').idFromName('orders')
+    const stub = ctx.get('doWssClient').get(id)
+
+    return stub.fetch(new Request(ctx.req.raw, { headers }))
+})
+
+export const wsRoute = new Hono<THonoInstance>()
+    .route(
+        '/general',
+        createWsChannel(
+            'general',
+            isAuthorized({
+                ws: ['listen'],
+            }),
+        ),
+    )
+    .route('/orders', publicOrdersChannel)
+    .route('/products', publicProductsChannel)
 
 export default wsRoute

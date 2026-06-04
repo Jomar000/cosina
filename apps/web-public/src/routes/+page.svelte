@@ -1,5 +1,5 @@
 <script lang="ts">
-    location.replace('/sign-in')
+    import LandingPage from '$lib/modules/order/components/LandingPage.svelte'
 </script>
 
-<!-- README: Add a landing page here or leave it as it is to redirect to the sign-in page -->
+<LandingPage />

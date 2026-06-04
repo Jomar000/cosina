@@ -42,6 +42,7 @@ port = 8081
 [vars]
 ENVIRONMENT = "development"
 STATUS = "up"
+DEFAULT_ORGANIZATION_ID = "cosina-org-001" # TODO: replace with your actual org id from the organization table
 CF_R2_BUCKET_PRIVATE = "hyperion-development-prv"
 CF_R2_BUCKET_PUBLIC = "hyperion-development-pub"
 CF_R2_BUCKET_PUBLIC_URL = "https://hyperion-development-r2.4thdevision.tech"
@@ -69,7 +70,7 @@ id = "00000000000000000000000000000000"
 [[hyperdrive]]
 binding = "HYPERIONPUB_HD"
 id = "00000000000000000000000000000000"
-localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion"
+localConnectionString = "postgres://postgres:password123@localhost:5432/hyperion"
 
 [[durable_objects.bindings]]
 name = "HYPERIONPUB_DO_WSS"
@@ -87,6 +88,7 @@ route = { custom_domain = true, pattern = "" }
 [env.test.vars]
 ENVIRONMENT = "test"
 STATUS = "up"
+DEFAULT_ORGANIZATION_ID = ""
 CF_R2_BUCKET_PRIVATE = "hyperion-test-prv"
 CF_R2_BUCKET_PUBLIC = "hyperion-test-pub"
 CF_R2_BUCKET_PUBLIC_URL = "https://hyperion-development-r2.4thdevision.tech"
@@ -114,7 +116,7 @@ id = "00000000000000000000000000000001"
 [[env.test.hyperdrive]]
 binding = "HYPERIONPUB_HD"
 id = "00000000000000000000000000000001"
-localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion_test"
+localConnectionString = "postgres://postgres:password123@localhost:5432/hyperion_test"
 
 [[env.test.durable_objects.bindings]]
 name = "HYPERIONPUB_DO_WSS"
@@ -132,6 +134,7 @@ route = { custom_domain = true, pattern = "" }
 [env.staging.vars]
 ENVIRONMENT = "staging"
 STATUS = "up"
+DEFAULT_ORGANIZATION_ID = ""
 CF_R2_BUCKET_PRIVATE = "hyperion-staging-prv"
 CF_R2_BUCKET_PUBLIC = "hyperion-staging-pub"
 CF_R2_BUCKET_PUBLIC_URL = ""
@@ -176,6 +179,7 @@ route = { custom_domain = true, pattern = "" }
 [env.production.vars]
 ENVIRONMENT = "production"
 STATUS = "up"
+DEFAULT_ORGANIZATION_ID = ""
 CF_R2_BUCKET_PRIVATE = "hyperion-production-prv"
 CF_R2_BUCKET_PUBLIC = "hyperion-production-pub"
 CF_R2_BUCKET_PUBLIC_URL = ""

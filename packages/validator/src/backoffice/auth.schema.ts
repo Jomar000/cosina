@@ -5,9 +5,6 @@ import * as field from '../shared/field.js'
 import * as refinement from '../shared/refinement.js'
 
 export const signInInputSchema = z.object({
-    organizationId: field.vText({
-        fieldName: 'Organization ID',
-    }),
     accountId: field.vText({
         fieldName: 'Account ID',
     }),

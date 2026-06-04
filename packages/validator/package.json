@@ -29,6 +29,14 @@
             "types": "./dist/backoffice/auth.schema.d.ts",
             "default": "./dist/backoffice/auth.schema.js"
         },
+        "./backoffice/admin/order": {
+            "types": "./dist/backoffice/admin/order/index.d.ts",
+            "default": "./dist/backoffice/admin/order/index.js"
+        },
+        "./backoffice/admin/product": {
+            "types": "./dist/backoffice/admin/product/index.d.ts",
+            "default": "./dist/backoffice/admin/product/index.js"
+        },
         "./backoffice/admin/user": {
             "types": "./dist/backoffice/admin/user/index.d.ts",
             "default": "./dist/backoffice/admin/user/index.js"
@@ -48,6 +56,14 @@
         "./public/auth": {
             "types": "./dist/public/auth.schema.d.ts",
             "default": "./dist/public/auth.schema.js"
+        },
+        "./public/order": {
+            "types": "./dist/public/order/index.d.ts",
+            "default": "./dist/public/order/index.js"
+        },
+        "./public/product": {
+            "types": "./dist/public/product/index.d.ts",
+            "default": "./dist/public/product/index.js"
         },
         "./public/admin/user": {
             "types": "./dist/public/admin/user/index.d.ts",

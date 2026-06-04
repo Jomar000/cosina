@@ -4,11 +4,8 @@
     import * as Sidebar from '@hyperion/ui/components/sidebar'
     import { useSidebar } from '@hyperion/ui/components/sidebar'
     import BadgeCheckIcon from '@lucide/svelte/icons/badge-check'
-    import BellIcon from '@lucide/svelte/icons/bell'
     import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down'
-    import CreditCardIcon from '@lucide/svelte/icons/credit-card'
     import LogOutIcon from '@lucide/svelte/icons/log-out'
-    import SparklesIcon from '@lucide/svelte/icons/sparkles'
     import { getContext } from 'svelte'
 
     ////////////////////
@@ -80,29 +77,14 @@
                 <DropdownMenu.Separator />
                 <DropdownMenu.Group>
                     <DropdownMenu.Item>
-                        <SparklesIcon />
-                        Upgrade to Pro
-                    </DropdownMenu.Item>
-                </DropdownMenu.Group>
-                <DropdownMenu.Separator />
-                <DropdownMenu.Group>
-                    <DropdownMenu.Item>
                         <BadgeCheckIcon />
                         Account
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item>
-                        <CreditCardIcon />
-                        Billing
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item>
-                        <BellIcon />
-                        Notifications
                     </DropdownMenu.Item>
                 </DropdownMenu.Group>
                 <DropdownMenu.Separator />
                 <DropdownMenu.Item onclick={signOut}>
                     <LogOutIcon />
-                    Sign-out
+                    Sign out
                 </DropdownMenu.Item>
             </DropdownMenu.Content>
         </DropdownMenu.Root>

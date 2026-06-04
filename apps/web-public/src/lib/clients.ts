@@ -1,6 +1,8 @@
 import type { AdminRouteType } from '@hyperion/api-public/api/admin'
 import type { AuthRouteType } from '@hyperion/api-public/api/auth'
 import type { ObjectStorageRouteType } from '@hyperion/api-public/api/objectStorage'
+import type { OrderRouteType } from '@hyperion/api-public/api/order'
+import type { ProductRouteType } from '@hyperion/api-public/api/product'
 import type { UserRouteType } from '@hyperion/api-public/api/user'
 import type { HeartbeatRouteType } from '@hyperion/api-public/root/heartbeat'
 import { hc } from 'hono/client'
@@ -80,6 +82,24 @@ export const objectStorageClient = hc<ObjectStorageRouteType>(
         init: { credentials: 'include' },
         fetch: kyClient,
     },
+)
+
+/**
+ * @description
+ * Order RPC Client
+ */
+export const orderClient = hc<OrderRouteType>(`${PUBLIC_API_URL}/api/order`, {
+    init: { credentials: 'include' },
+    fetch: kyClient,
+})
+
+/**
+ * @description
+ * Product RPC Client
+ */
+export const productClient = hc<ProductRouteType>(
+    `${PUBLIC_API_URL}/api/product`,
+    { fetch: kyClient },
 )
 
 /**

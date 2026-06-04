@@ -9,7 +9,7 @@ import {
     username,
 } from 'better-auth/plugins'
 import { createAccessControl } from 'better-auth/plugins/access'
-import { eq, or } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { Resend } from 'resend'
 
@@ -28,8 +28,6 @@ export const auth = async (opts: {
     acl: Awaited<ReturnType<typeof aclBuilder>>
 }) => {
     const { db, dbSchema, kv, env, acl } = opts
-
-    const { organization: organizationTable } = dbSchema
 
     const cookieAttrs = {
         domain: env.COOKIE_DOMAIN,
@@ -102,32 +100,25 @@ export const auth = async (opts: {
         databaseHooks: {
             session: {
                 create: {
-                    before: async (session, ctx) => {
-                        const organizationId = ctx?.query?.organizationId
+                    before: async (session) => {
+                        const { member: memberTable } = dbSchema
 
-                        let activeOrganizationId = ''
-
-                        // Check if the provided organizationId is valid.
-                        // If yes, set it as the activeOrganizationId for this session.
-                        if (organizationId)
-                            activeOrganizationId =
-                                (
-                                    await db
-                                        .select({ id: organizationTable.id })
-                                        .from(organizationTable)
-                                        .where(
-                                            or(
-                                                eq(
-                                                    organizationTable.id,
-                                                    organizationId,
-                                                ),
-                                                eq(
-                                                    organizationTable.slug,
-                                                    organizationId,
-                                                ),
-                                            ),
-                                        )
-                                )[0]?.id ?? ''
+                        // Set activeOrganizationId from the user's membership so
+                        // that readMany can filter orders by org without relying on
+                        // ctx.query, which is not reliably populated by Better Auth.
+                        const activeOrganizationId =
+                            (
+                                await db
+                                    .select({
+                                        organizationId:
+                                            memberTable.organizationId,
+                                    })
+                                    .from(memberTable)
+                                    .where(
+                                        eq(memberTable.userId, session.userId),
+                                    )
+                                    .limit(1)
+                            )[0]?.organizationId ?? null
 
                         return {
                             data: {

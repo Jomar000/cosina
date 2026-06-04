@@ -1,0 +1,802 @@
+import { order } from '@hyperion/validator/backoffice/admin/order'
+import { asc, count as countFn, desc, eq, inArray, sql } from 'drizzle-orm'
+import { type Context, Hono } from 'hono'
+
+import { AppError } from '../../../../../errors.js'
+import type { THonoInstance } from '../../../../../types.js'
+import {
+    apiResponseErrorWrapper,
+    apiResponseOkWrapper,
+    auditTrailLogger,
+    nanoidCustom,
+    nanoidOrderCode,
+} from '../../../../../utilities/helpers.js'
+import { validateRequest } from '../../../../middleware/validateRequest.js'
+
+async function broadcastOrderEvent(
+    ctx: Context<THonoInstance>,
+    event: string,
+    data: unknown,
+) {
+    try {
+        // Broadcast on the PUBLIC API's DO so that the admin orders WS channel
+        // (which routes through HYPERIONPUB_DO_WSS) receives all order events.
+        const id = ctx.env.HYPERIONPUB_DO_WSS.idFromName('orders')
+        const stub = ctx.env.HYPERIONPUB_DO_WSS.get(id)
+        await stub.sendMessage(JSON.stringify({ event, data }))
+    } catch {
+        // Non-fatal: WS broadcast failure should not abort the HTTP response
+    }
+}
+
+function proofUrl(ctx: Context<THonoInstance>, objectStorageId: string | null) {
+    if (!objectStorageId) return null
+    return `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${objectStorageId}`
+}
+
+export const orderRoute = new Hono<THonoInstance>()
+    .get(
+        '/read',
+        validateRequest('query', order.readInputSchema),
+        async (ctx) => {
+            const { orderId } = ctx.req.valid('query')
+
+            const { order: orderTable, orderItem: orderItemTable } =
+                ctx.get('dbSchema')
+
+            try {
+                const [row] = await ctx
+                    .get('dbClient')
+                    .select({
+                        id: orderTable.id,
+                        publicId: orderTable.publicId,
+                        trackingCode: orderTable.trackingCode,
+                        customerName: orderTable.customerName,
+                        contactNumber: orderTable.contactNumber,
+                        contactNumber2: orderTable.contactNumber2,
+                        deliveryType: orderTable.deliveryType,
+                        deliveryAt: orderTable.deliveryAt,
+                        downpayment: orderTable.downpayment,
+                        amountToPay: orderTable.amountToPay,
+                        proofOfPaymentObjectStorageId:
+                            orderTable.proofOfPaymentObjectStorageId,
+                        status: orderTable.status,
+                        notes: orderTable.notes,
+                        createdAt: orderTable.createdAt,
+                    })
+                    .from(orderTable)
+                    .where(eq(orderTable.id, orderId))
+
+                if (!row) {
+                    return apiResponseErrorWrapper(ctx, {
+                        code: 'NOT_FOUND',
+                        message: 'Order not found.',
+                        status: 404,
+                    })
+                }
+
+                const items = await ctx
+                    .get('dbClient')
+                    .select({
+                        id: orderItemTable.id,
+                        productId: orderItemTable.productId,
+                        name: orderItemTable.name,
+                        sizeName: orderItemTable.sizeName,
+                        quantity: orderItemTable.quantity,
+                        price: orderItemTable.price,
+                    })
+                    .from(orderItemTable)
+                    .where(eq(orderItemTable.orderId, orderId))
+                    .orderBy(asc(orderItemTable.id))
+
+                return apiResponseOkWrapper(ctx, {
+                    data: {
+                        ...row,
+                        proofOfPaymentUrl: proofUrl(
+                            ctx,
+                            row.proofOfPaymentObjectStorageId,
+                        ),
+                        items,
+                    },
+                })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'ORDER_READ_FAILED',
+                        message: 'Order retrieval failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
+    .get(
+        '/readMany',
+        validateRequest('query', order.readManyInputSchema),
+        async (ctx) => {
+            const { limit, offset, sortOrder, status } = ctx.req.valid('query')
+
+            const { order: orderTable, orderItem: orderItemTable } =
+                ctx.get('dbSchema')
+
+            try {
+                const whereClause = status
+                    ? eq(orderTable.status, status)
+                    : undefined
+
+                const count = (
+                    await ctx
+                        .get('dbClient')
+                        .select({ count: countFn(orderTable.id) })
+                        .from(orderTable)
+                        .where(whereClause)
+                )[0].count
+
+                // Sort by soonest delivery date first (nulls last), then newest
+                // created orders as the tiebreaker.
+                const orderByClause =
+                    sortOrder === 'asc'
+                        ? [
+                              sql`${orderTable.deliveryAt} ASC NULLS LAST`,
+                              desc(orderTable.createdAt),
+                          ]
+                        : [
+                              sql`${orderTable.deliveryAt} DESC NULLS LAST`,
+                              desc(orderTable.createdAt),
+                          ]
+
+                const subquery = ctx
+                    .get('dbClient')
+                    .select({ id: orderTable.id })
+                    .from(orderTable)
+                    .where(whereClause)
+                    .limit(limit)
+                    .offset(offset)
+                    .orderBy(...orderByClause)
+                    .as('subquery')
+
+                const rows = await ctx
+                    .get('dbClient')
+                    .select({
+                        id: orderTable.id,
+                        publicId: orderTable.publicId,
+                        trackingCode: orderTable.trackingCode,
+                        customerName: orderTable.customerName,
+                        contactNumber: orderTable.contactNumber,
+                        contactNumber2: orderTable.contactNumber2,
+                        deliveryType: orderTable.deliveryType,
+                        deliveryAt: orderTable.deliveryAt,
+                        downpayment: orderTable.downpayment,
+                        amountToPay: orderTable.amountToPay,
+                        proofOfPaymentObjectStorageId:
+                            orderTable.proofOfPaymentObjectStorageId,
+                        status: orderTable.status,
+                        notes: orderTable.notes,
+                        createdAt: orderTable.createdAt,
+                    })
+                    .from(orderTable)
+                    .innerJoin(subquery, eq(subquery.id, orderTable.id))
+                    .orderBy(...orderByClause)
+
+                const orderIds = rows.map((r) => r.id)
+
+                const allItems =
+                    orderIds.length > 0
+                        ? await ctx
+                              .get('dbClient')
+                              .select({
+                                  id: orderItemTable.id,
+                                  orderId: orderItemTable.orderId,
+                                  productId: orderItemTable.productId,
+                                  name: orderItemTable.name,
+                                  sizeName: orderItemTable.sizeName,
+                                  quantity: orderItemTable.quantity,
+                                  price: orderItemTable.price,
+                              })
+                              .from(orderItemTable)
+                              .where(inArray(orderItemTable.orderId, orderIds))
+                              .orderBy(asc(orderItemTable.id))
+                        : []
+
+                const data = rows.map((row) => ({
+                    ...row,
+                    proofOfPaymentUrl: proofUrl(
+                        ctx,
+                        row.proofOfPaymentObjectStorageId,
+                    ),
+                    items: allItems.filter((item) => item.orderId === row.id),
+                }))
+
+                return apiResponseOkWrapper(ctx, { data, count, limit, offset })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'ORDER_LIST_FAILED',
+                        message: 'Order list retrieval failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
+    .post(
+        '/create',
+        validateRequest('json', order.createInputSchema),
+        async (ctx) => {
+            const {
+                customerName,
+                contactNumber,
+                contactNumber2,
+                deliveryType,
+                deliveryAt,
+                downpayment,
+                amountToPay,
+                proofOfPaymentObjectStorageId,
+                notes,
+                items,
+            } = ctx.req.valid('json')
+
+            const {
+                member: memberTable,
+                order: orderTable,
+                orderItem: orderItemTable,
+            } = ctx.get('dbSchema')
+
+            // Derive org from session; fall back to member table lookup.
+            let organizationId =
+                ctx.get('session')?.activeOrganizationId ?? null
+
+            if (!organizationId) {
+                const userId = ctx.get('user')!.id
+                organizationId =
+                    (
+                        await ctx
+                            .get('dbClient')
+                            .select({
+                                organizationId: memberTable.organizationId,
+                            })
+                            .from(memberTable)
+                            .where(eq(memberTable.userId, userId))
+                            .limit(1)
+                    )[0]?.organizationId ?? null
+            }
+
+            if (!organizationId) {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'NO_ACTIVE_ORGANIZATION',
+                    message: 'No active organization found.',
+                    status: 400,
+                })
+            }
+
+            try {
+                const data = await ctx
+                    .get('dbClient')
+                    .transaction(async (tx) => {
+                        const [created] = await tx
+                            .insert(orderTable)
+                            .values({
+                                trackingCode: nanoidOrderCode(),
+                                organizationId,
+                                customerName,
+                                contactNumber,
+                                contactNumber2: contactNumber2 ?? null,
+                                deliveryType,
+                                deliveryAt: deliveryAt
+                                    ? new Date(deliveryAt)
+                                    : null,
+                                downpayment: downpayment ?? null,
+                                amountToPay,
+                                proofOfPaymentObjectStorageId:
+                                    proofOfPaymentObjectStorageId ?? null,
+                                notes: notes ?? null,
+                            })
+                            .returning({
+                                id: orderTable.id,
+                                publicId: orderTable.publicId,
+                                trackingCode: orderTable.trackingCode,
+                                customerName: orderTable.customerName,
+                                contactNumber: orderTable.contactNumber,
+                                contactNumber2: orderTable.contactNumber2,
+                                deliveryType: orderTable.deliveryType,
+                                deliveryAt: orderTable.deliveryAt,
+                                amountToPay: orderTable.amountToPay,
+                                proofOfPaymentObjectStorageId:
+                                    orderTable.proofOfPaymentObjectStorageId,
+                                status: orderTable.status,
+                                notes: orderTable.notes,
+                                createdAt: orderTable.createdAt,
+                            })
+
+                        const insertedItems =
+                            items && items.length > 0
+                                ? await tx
+                                      .insert(orderItemTable)
+                                      .values(
+                                          items.map((item) => ({
+                                              orderId: created.id,
+                                              productId: item.productId ?? null,
+                                              name: item.name,
+                                              sizeName: item.sizeName ?? null,
+                                              quantity: item.quantity,
+                                              price: item.price,
+                                          })),
+                                      )
+                                      .returning({
+                                          id: orderItemTable.id,
+                                          productId: orderItemTable.productId,
+                                          name: orderItemTable.name,
+                                          sizeName: orderItemTable.sizeName,
+                                          quantity: orderItemTable.quantity,
+                                          price: orderItemTable.price,
+                                      })
+                                : []
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'admin.order',
+                                action: 'create',
+                                description: 'Admin created an order',
+                                records: {
+                                    table: 'order',
+                                    id: String(created.id),
+                                },
+                            },
+                            tx,
+                        )
+
+                        return {
+                            ...created,
+                            proofOfPaymentUrl: proofUrl(
+                                ctx,
+                                created.proofOfPaymentObjectStorageId,
+                            ),
+                            items: insertedItems,
+                        }
+                    })
+
+                await broadcastOrderEvent(ctx, 'order.create', data)
+
+                return apiResponseOkWrapper(ctx, { data })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'ORDER_CREATE_FAILED',
+                        message: 'Order creation failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
+    .post(
+        '/update',
+        validateRequest('json', order.updateInputSchema),
+        async (ctx) => {
+            const {
+                orderId,
+                customerName,
+                contactNumber,
+                contactNumber2,
+                deliveryType,
+                deliveryAt,
+                downpayment,
+                amountToPay,
+                proofOfPaymentObjectStorageId,
+                notes,
+            } = ctx.req.valid('json')
+
+            const { order: orderTable } = ctx.get('dbSchema')
+
+            const existing = (
+                await ctx
+                    .get('dbClient')
+                    .select({ count: countFn(orderTable.id) })
+                    .from(orderTable)
+                    .where(eq(orderTable.id, orderId))
+            )[0].count
+
+            if (existing === 0) {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
+                    message: 'Order not found, nothing to update.',
+                    status: 404,
+                })
+            }
+
+            try {
+                const data = await ctx
+                    .get('dbClient')
+                    .transaction(async (tx) => {
+                        const [oldData] = await tx
+                            .select({
+                                customerName: orderTable.customerName,
+                                contactNumber: orderTable.contactNumber,
+                                contactNumber2: orderTable.contactNumber2,
+                                deliveryType: orderTable.deliveryType,
+                                amountToPay: orderTable.amountToPay,
+                                status: orderTable.status,
+                            })
+                            .from(orderTable)
+                            .where(eq(orderTable.id, orderId))
+
+                        const [updated] = await tx
+                            .update(orderTable)
+                            .set({
+                                ...(customerName !== undefined && {
+                                    customerName,
+                                }),
+                                ...(contactNumber !== undefined && {
+                                    contactNumber,
+                                }),
+                                ...(contactNumber2 !== undefined && {
+                                    contactNumber2: contactNumber2 ?? null,
+                                }),
+                                ...(deliveryType !== undefined && {
+                                    deliveryType,
+                                }),
+                                ...(deliveryAt !== undefined && {
+                                    deliveryAt: deliveryAt
+                                        ? new Date(deliveryAt)
+                                        : null,
+                                }),
+                                ...(downpayment !== undefined && {
+                                    downpayment: downpayment ?? null,
+                                }),
+                                ...(amountToPay !== undefined && {
+                                    amountToPay,
+                                }),
+                                ...(proofOfPaymentObjectStorageId !==
+                                    undefined && {
+                                    proofOfPaymentObjectStorageId:
+                                        proofOfPaymentObjectStorageId ?? null,
+                                }),
+                                ...(notes !== undefined && {
+                                    notes: notes ?? null,
+                                }),
+                            })
+                            .where(eq(orderTable.id, orderId))
+                            .returning({
+                                id: orderTable.id,
+                                publicId: orderTable.publicId,
+                                trackingCode: orderTable.trackingCode,
+                                customerName: orderTable.customerName,
+                                contactNumber: orderTable.contactNumber,
+                                contactNumber2: orderTable.contactNumber2,
+                                deliveryType: orderTable.deliveryType,
+                                deliveryAt: orderTable.deliveryAt,
+                                amountToPay: orderTable.amountToPay,
+                                proofOfPaymentObjectStorageId:
+                                    orderTable.proofOfPaymentObjectStorageId,
+                                status: orderTable.status,
+                                notes: orderTable.notes,
+                                createdAt: orderTable.createdAt,
+                            })
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'admin.order',
+                                action: 'update',
+                                description: 'Admin updated an order',
+                                records: {
+                                    table: 'order',
+                                    id: String(orderId),
+                                    oldData,
+                                },
+                            },
+                            tx,
+                        )
+
+                        return {
+                            ...updated,
+                            proofOfPaymentUrl: proofUrl(
+                                ctx,
+                                updated.proofOfPaymentObjectStorageId,
+                            ),
+                        }
+                    })
+
+                await broadcastOrderEvent(ctx, 'order.update', data)
+
+                return apiResponseOkWrapper(ctx, { data })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'ORDER_UPDATE_FAILED',
+                        message: 'Order update failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
+    .post(
+        '/updateStatus',
+        validateRequest('json', order.updateStatusInputSchema),
+        async (ctx) => {
+            const { orderId, status } = ctx.req.valid('json')
+
+            const { order: orderTable } = ctx.get('dbSchema')
+
+            const existing = (
+                await ctx
+                    .get('dbClient')
+                    .select({ count: countFn(orderTable.id) })
+                    .from(orderTable)
+                    .where(eq(orderTable.id, orderId))
+            )[0].count
+
+            if (existing === 0) {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
+                    message: 'Order not found, nothing to update.',
+                    status: 404,
+                })
+            }
+
+            try {
+                const data = await ctx
+                    .get('dbClient')
+                    .transaction(async (tx) => {
+                        const [oldData] = await tx
+                            .select({ status: orderTable.status })
+                            .from(orderTable)
+                            .where(eq(orderTable.id, orderId))
+
+                        const [updated] = await tx
+                            .update(orderTable)
+                            .set({ status })
+                            .where(eq(orderTable.id, orderId))
+                            .returning({
+                                id: orderTable.id,
+                                status: orderTable.status,
+                            })
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'admin.order',
+                                action: 'updateStatus',
+                                description: 'Admin updated order status',
+                                records: {
+                                    table: 'order',
+                                    id: String(orderId),
+                                    oldData,
+                                },
+                            },
+                            tx,
+                        )
+
+                        return updated
+                    })
+
+                await broadcastOrderEvent(ctx, 'order.statusUpdate', data)
+
+                return apiResponseOkWrapper(ctx, { data })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'ORDER_STATUS_UPDATE_FAILED',
+                        message: 'Order status update failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
+    .post(
+        '/delete',
+        validateRequest('json', order.deleteInputSchema),
+        async (ctx) => {
+            const { orderId } = ctx.req.valid('json')
+
+            const { order: orderTable } = ctx.get('dbSchema')
+
+            const existing = (
+                await ctx
+                    .get('dbClient')
+                    .select({ count: countFn(orderTable.id) })
+                    .from(orderTable)
+                    .where(eq(orderTable.id, orderId))
+            )[0].count
+
+            if (existing === 0) {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
+                    message: 'Order not found, nothing to delete.',
+                    status: 404,
+                })
+            }
+
+            try {
+                const [deleted] = await ctx
+                    .get('dbClient')
+                    .delete(orderTable)
+                    .where(eq(orderTable.id, orderId))
+                    .returning({ id: orderTable.id })
+
+                await auditTrailLogger(ctx, {
+                    component: 'admin.order',
+                    action: 'delete',
+                    description: 'Admin deleted an order',
+                    records: {
+                        table: 'order',
+                        id: String(deleted.id),
+                    },
+                })
+
+                await broadcastOrderEvent(ctx, 'order.delete', {
+                    id: deleted.id,
+                })
+
+                return apiResponseOkWrapper(ctx, { data: deleted })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'ORDER_DELETE_FAILED',
+                        message: 'Order deletion failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
+    .post('/proof/upload', async (ctx) => {
+        const body = await ctx.req.parseBody()
+        const file = body['file']
+
+        if (!(file instanceof File)) {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'INVALID_FILE',
+                message: 'A valid image file is required.',
+                status: 400,
+            })
+        }
+
+        const mimeType = file.type || 'application/octet-stream'
+        const fileSize = file.size
+
+        if (fileSize > 10 * 1024 * 1024) {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'FILE_TOO_LARGE',
+                message: 'Image must be 10 MB or less.',
+                status: 400,
+            })
+        }
+
+        if (!mimeType.startsWith('image/')) {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'INVALID_MIME_TYPE',
+                message: 'Only image files are supported.',
+                status: 400,
+            })
+        }
+
+        const buffer = await file.arrayBuffer()
+
+        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
+        const hashHex = Array.from(new Uint8Array(hashBuffer))
+            .map((b) => b.toString(16).padStart(2, '0'))
+            .join('')
+        let base64Str = ''
+        for (const byte of new Uint8Array(hashBuffer)) {
+            base64Str += String.fromCharCode(byte)
+        }
+        const hashBase64 = btoa(base64Str)
+
+        const { objectStorage: objectStorageTable } = ctx.get('dbSchema')
+
+        const [existing] = await ctx
+            .get('dbClient')
+            .select({
+                id: objectStorageTable.id,
+                isUploaded: objectStorageTable.isUploaded,
+            })
+            .from(objectStorageTable)
+            .where(eq(objectStorageTable.hashSha256, hashHex))
+            .limit(1)
+
+        let objectId: string
+
+        if (existing?.isUploaded) {
+            objectId = existing.id
+        } else {
+            try {
+                if (existing) {
+                    objectId = existing.id
+                } else {
+                    objectId = nanoidCustom(32)
+
+                    await ctx
+                        .get('dbClient')
+                        .insert(objectStorageTable)
+                        .values({
+                            id: objectId,
+                            size: fileSize,
+                            mimeType,
+                            hashSha256: hashHex,
+                            isPublic: true,
+                            isUploaded: false,
+                        })
+                }
+
+                const uploadUrl = `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET_PUBLIC}/${objectId}`
+
+                const signedReq = await ctx
+                    .get('aws4FetchClient')
+                    .sign(uploadUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': mimeType,
+                            'x-amz-checksum-sha256': hashBase64,
+                        },
+                        body: buffer,
+                        aws: { service: 's3' },
+                    })
+
+                const r2Response = await fetch(signedReq)
+
+                if (!r2Response.ok) {
+                    const r2ErrorBody = await r2Response.text().catch(() => '')
+                    throw new AppError({
+                        status: 500,
+                        code: 'R2_UPLOAD_FAILED',
+                        message: `R2 upload failed: ${r2Response.status} ${r2Response.statusText}${r2ErrorBody ? ` — ${r2ErrorBody}` : ''}`,
+                    })
+                }
+
+                await ctx
+                    .get('dbClient')
+                    .update(objectStorageTable)
+                    .set({ isUploaded: true })
+                    .where(eq(objectStorageTable.id, objectId))
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'PROOF_UPLOAD_FAILED',
+                        message: 'Proof of payment upload failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        }
+
+        await auditTrailLogger(ctx, {
+            component: 'admin.order',
+            action: 'proof.upload',
+            description: 'Admin uploaded order proof of payment',
+            records: { table: 'object_storage', id: objectId },
+        })
+
+        return apiResponseOkWrapper(ctx, {
+            data: {
+                objectStorageId: objectId,
+                proofOfPaymentUrl: `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${objectId}`,
+            },
+        })
+    })
+
+export default orderRoute

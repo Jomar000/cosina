@@ -39,6 +39,8 @@ export const initContext = () => {
                 new AwsClient({
                     accessKeyId: ctx.env.CF_R2_ACCESS_KEY_ID,
                     secretAccessKey: ctx.env.CF_R2_SECRET_ACCESS_KEY,
+                    service: 's3',
+                    region: 'auto',
                 }),
             )
             ctx.set(

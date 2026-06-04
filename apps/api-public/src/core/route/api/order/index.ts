@@ -1,0 +1,373 @@
+import { order } from '@hyperion/validator/public/order'
+import { asc, eq } from 'drizzle-orm'
+import { type Context, Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
+
+import { AppError } from '../../../../errors.js'
+import type { TGlobalApiResponses, THonoInstance } from '../../../../types.js'
+import {
+    apiResponseErrorWrapper,
+    apiResponseOkWrapper,
+    auditTrailLogger,
+    nanoidCustom,
+    nanoidOrderCode,
+} from '../../../../utilities/helpers.js'
+import { validateRequest } from '../../../middleware/validateRequest.js'
+
+async function broadcastOrderEvent(
+    ctx: Context<THonoInstance>,
+    event: string,
+    data: unknown,
+) {
+    try {
+        const id = ctx.get('doWssClient').idFromName('orders')
+        const stub = ctx.get('doWssClient').get(id)
+        await stub.sendMessage(JSON.stringify({ event, data }))
+    } catch {
+        // Non-fatal: WS broadcast failure should not abort the HTTP response
+    }
+}
+
+export const orderRoute = new Hono<THonoInstance>()
+    .post(
+        '/create',
+        validateRequest('json', order.createInputSchema),
+        async (ctx) => {
+            const {
+                customerName,
+                contactNumber,
+                contactNumber2,
+                deliveryType,
+                deliveryAt,
+                downpayment,
+                proofOfPaymentObjectStorageId,
+                notes,
+                items,
+            } = ctx.req.valid('json')
+
+            const organizationId = ctx.env.DEFAULT_ORGANIZATION_ID
+
+            if (!organizationId) {
+                throw new AppError({
+                    status: 503,
+                    code: 'SERVICE_UNAVAILABLE',
+                    message: 'Ordering is currently unavailable.',
+                })
+            }
+
+            const amountToPay = items
+                .reduce(
+                    (sum, item) => sum + parseFloat(item.price) * item.quantity,
+                    0,
+                )
+                .toFixed(2)
+
+            const { order: orderTable, orderItem } = ctx.get('dbSchema')
+
+            try {
+                const data = await ctx
+                    .get('dbClient')
+                    .transaction(async (tx) => {
+                        const [created] = await tx
+                            .insert(orderTable)
+                            .values({
+                                trackingCode: nanoidOrderCode(),
+                                organizationId,
+                                customerName,
+                                contactNumber,
+                                contactNumber2: contactNumber2 ?? null,
+                                deliveryType,
+                                deliveryAt: deliveryAt
+                                    ? new Date(deliveryAt)
+                                    : null,
+                                downpayment: downpayment ?? null,
+                                amountToPay,
+                                proofOfPaymentObjectStorageId:
+                                    proofOfPaymentObjectStorageId ?? null,
+                                notes: notes ?? null,
+                            })
+                            .returning({
+                                id: orderTable.id,
+                                publicId: orderTable.publicId,
+                                trackingCode: orderTable.trackingCode,
+                                customerName: orderTable.customerName,
+                                contactNumber: orderTable.contactNumber,
+                                contactNumber2: orderTable.contactNumber2,
+                                deliveryType: orderTable.deliveryType,
+                                deliveryAt: orderTable.deliveryAt,
+                                downpayment: orderTable.downpayment,
+                                amountToPay: orderTable.amountToPay,
+                                proofOfPaymentObjectStorageId:
+                                    orderTable.proofOfPaymentObjectStorageId,
+                                status: orderTable.status,
+                                notes: orderTable.notes,
+                                createdAt: orderTable.createdAt,
+                            })
+
+                        const insertedItems = await tx
+                            .insert(orderItem)
+                            .values(
+                                items.map((item) => ({
+                                    orderId: created.id,
+                                    productId: item.productId ?? null,
+                                    name: item.name,
+                                    sizeName: item.sizeName ?? null,
+                                    quantity: item.quantity,
+                                    price: item.price,
+                                })),
+                            )
+                            .returning({
+                                id: orderItem.id,
+                                productId: orderItem.productId,
+                                name: orderItem.name,
+                                sizeName: orderItem.sizeName,
+                                quantity: orderItem.quantity,
+                                price: orderItem.price,
+                            })
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'order',
+                                action: 'create',
+                                description: `Customer ${customerName} placed an order`,
+                                records: {
+                                    table: 'order',
+                                    id: String(created.id),
+                                },
+                            },
+                            tx,
+                        )
+
+                        return {
+                            ...created,
+                            proofOfPaymentUrl:
+                                created.proofOfPaymentObjectStorageId
+                                    ? `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${created.proofOfPaymentObjectStorageId}`
+                                    : null,
+                            items: insertedItems,
+                        }
+                    })
+
+                console.log(
+                    JSON.stringify({
+                        type: 'ORDER_CREATED',
+                        requestId: ctx.get('requestId'),
+                        orderId: data.id,
+                        customerName,
+                        deliveryType,
+                        amountToPay,
+                    }),
+                )
+
+                await broadcastOrderEvent(ctx, 'order.create', data)
+
+                return apiResponseOkWrapper(ctx, { data })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'ORDER_CREATE_FAILED',
+                        message: 'Order placement failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
+    .post('/proof/upload', async (ctx) => {
+        const body = await ctx.req.parseBody()
+        const file = body['file']
+
+        if (!(file instanceof File)) {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'INVALID_FILE',
+                message: 'A valid image file is required.',
+                status: 400,
+            })
+        }
+
+        const mimeType = file.type || 'application/octet-stream'
+        const fileSize = file.size
+
+        if (fileSize > 10 * 1024 * 1024) {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'FILE_TOO_LARGE',
+                message: 'Image must be 10 MB or less.',
+                status: 400,
+            })
+        }
+
+        if (!mimeType.startsWith('image/')) {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'INVALID_MIME_TYPE',
+                message: 'Only image files are supported.',
+                status: 400,
+            })
+        }
+
+        const buffer = await file.arrayBuffer()
+
+        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
+        const hashHex = Array.from(new Uint8Array(hashBuffer))
+            .map((b) => b.toString(16).padStart(2, '0'))
+            .join('')
+        let base64Str = ''
+        for (const byte of new Uint8Array(hashBuffer)) {
+            base64Str += String.fromCharCode(byte)
+        }
+        const hashBase64 = btoa(base64Str)
+
+        const { objectStorage: objectStorageTable } = ctx.get('dbSchema')
+
+        const [existing] = await ctx
+            .get('dbClient')
+            .select({
+                id: objectStorageTable.id,
+                isUploaded: objectStorageTable.isUploaded,
+            })
+            .from(objectStorageTable)
+            .where(eq(objectStorageTable.hashSha256, hashHex))
+            .limit(1)
+
+        let objectId: string
+
+        if (existing?.isUploaded) {
+            objectId = existing.id
+        } else {
+            try {
+                if (existing) {
+                    objectId = existing.id
+                } else {
+                    objectId = nanoidCustom(32)
+
+                    await ctx
+                        .get('dbClient')
+                        .insert(objectStorageTable)
+                        .values({
+                            id: objectId,
+                            size: fileSize,
+                            mimeType,
+                            hashSha256: hashHex,
+                            isPublic: true,
+                            isUploaded: false,
+                        })
+                }
+
+                const uploadUrl = `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET_PUBLIC}/${objectId}`
+
+                const signedReq = await ctx
+                    .get('aws4FetchClient')
+                    .sign(uploadUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': mimeType,
+                            'x-amz-checksum-sha256': hashBase64,
+                        },
+                        body: buffer,
+                        aws: { service: 's3' },
+                    })
+
+                const r2Response = await fetch(signedReq)
+
+                if (!r2Response.ok) {
+                    const r2ErrorBody = await r2Response.text().catch(() => '')
+                    throw new AppError({
+                        status: 500,
+                        code: 'R2_UPLOAD_FAILED',
+                        message: `R2 upload failed: ${r2Response.status} ${r2Response.statusText}${r2ErrorBody ? ` — ${r2ErrorBody}` : ''}`,
+                    })
+                }
+
+                await ctx
+                    .get('dbClient')
+                    .update(objectStorageTable)
+                    .set({ isUploaded: true })
+                    .where(eq(objectStorageTable.id, objectId))
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'PROOF_UPLOAD_FAILED',
+                        message: 'Proof of payment upload failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        }
+
+        await auditTrailLogger(ctx, {
+            component: 'order',
+            action: 'proof.upload',
+            description: 'Customer uploaded proof of payment',
+            records: { table: 'object_storage', id: objectId },
+        })
+
+        return apiResponseOkWrapper(ctx, {
+            data: {
+                objectStorageId: objectId,
+                proofOfPaymentUrl: `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${objectId}`,
+            },
+        })
+    })
+
+export const trackOrderRoute = orderRoute.get(
+    '/track',
+    validateRequest('query', order.trackInputSchema),
+    async (ctx) => {
+        const { trackingCode } = ctx.req.valid('query')
+        const { order: orderTable, orderItem: orderItemTable } =
+            ctx.get('dbSchema')
+
+        const [row] = await ctx
+            .get('dbClient')
+            .select({
+                id: orderTable.id,
+                trackingCode: orderTable.trackingCode,
+                customerName: orderTable.customerName,
+                deliveryType: orderTable.deliveryType,
+                deliveryAt: orderTable.deliveryAt,
+                downpayment: orderTable.downpayment,
+                amountToPay: orderTable.amountToPay,
+                status: orderTable.status,
+                notes: orderTable.notes,
+                createdAt: orderTable.createdAt,
+            })
+            .from(orderTable)
+            .where(eq(orderTable.trackingCode, trackingCode))
+            .limit(1)
+
+        if (!row) {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'NOT_FOUND',
+                message: 'Order not found. Please check your Tracking Code.',
+                status: 404,
+            })
+        }
+
+        const items = await ctx
+            .get('dbClient')
+            .select({
+                id: orderItemTable.id,
+                name: orderItemTable.name,
+                sizeName: orderItemTable.sizeName,
+                quantity: orderItemTable.quantity,
+                price: orderItemTable.price,
+            })
+            .from(orderItemTable)
+            .where(eq(orderItemTable.orderId, row.id))
+            .orderBy(asc(orderItemTable.id))
+
+        return apiResponseOkWrapper(ctx, { data: { ...row, items } })
+    },
+)
+
+export default trackOrderRoute
+export type OrderRouteType = ApplyGlobalResponse<
+    typeof trackOrderRoute,
+    TGlobalApiResponses
+>

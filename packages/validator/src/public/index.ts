@@ -1,4 +1,6 @@
 export * as admin from './admin/index.js'
 export * as auth from './auth.schema.js'
 export * as objectStorage from './objectStorage.schema.js'
+export * from './order/index.js'
+export * from './product/index.js'
 export * as user from './user/index.js'

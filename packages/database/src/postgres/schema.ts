@@ -34,6 +34,28 @@ export const genderEnum = pgEnum('gender', [
     'FEMALE',
 ])
 
+export const productCategoryEnum = pgEnum('product_category', [
+    'bilao_package',
+    'bundle_package',
+    'single_order',
+])
+
+export const orderStatusEnum = pgEnum('order_status', [
+    'pending',
+    'cooking',
+    'looking_for_rider',
+    'ready_to_pick_up',
+    'rider_is_on_the_way',
+    'completed',
+    'cancelled',
+])
+
+export const deliveryTypeEnum = pgEnum('delivery_type', [
+    'self_pickup',
+    'lalamove',
+    'other_courier',
+])
+
 ///////////////////
 // Tables - Core //
 ///////////////////
@@ -379,6 +401,197 @@ export const userRelationship = pgTable(
             foreignColumns: [address.id],
         })
             .onDelete('no action')
+            .onUpdate('no action'),
+    ],
+)
+
+/////////////////////
+// Tables - Domain //
+/////////////////////
+
+export const product = pgTable(
+    'product',
+    {
+        id: bigint('id', { mode: 'number' })
+            .generatedByDefaultAsIdentity()
+            .primaryKey(),
+        publicId: uuid('public_id')
+            .unique()
+            .notNull()
+            .default(sql`gen_random_uuid()`)
+            .$defaultFn(() => uuidv7()),
+        organizationId: text('organization_id').notNull(),
+        name: text('name').notNull(),
+        ingredients: text('ingredients'),
+        category: productCategoryEnum('category')
+            .notNull()
+            .default('single_order'),
+        price: numeric('price').notNull(),
+        imageObjectStorageId: text('image_object_storage_id'),
+        isAvailable: boolean('is_available').notNull().default(true),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        index().on(t.organizationId),
+        foreignKey({
+            columns: [t.organizationId],
+            foreignColumns: [organization.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+        foreignKey({
+            columns: [t.imageObjectStorageId],
+            foreignColumns: [objectStorage.id],
+        })
+            .onDelete('set null')
+            .onUpdate('no action'),
+    ],
+)
+
+export const productSize = pgTable(
+    'product_size',
+    {
+        id: bigint('id', { mode: 'number' })
+            .generatedByDefaultAsIdentity()
+            .primaryKey(),
+        productId: bigint('product_id', { mode: 'number' }).notNull(),
+        name: text('name').notNull(),
+        price: numeric('price').notNull(),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        index().on(t.productId),
+        foreignKey({
+            columns: [t.productId],
+            foreignColumns: [product.id],
+        })
+            .onDelete('cascade')
+            .onUpdate('no action'),
+    ],
+)
+
+export const order = pgTable(
+    'order',
+    {
+        id: bigint('id', { mode: 'number' })
+            .generatedByDefaultAsIdentity()
+            .primaryKey(),
+        publicId: uuid('public_id')
+            .unique()
+            .notNull()
+            .default(sql`gen_random_uuid()`)
+            .$defaultFn(() => uuidv7()),
+        trackingCode: text('tracking_code').notNull().unique(),
+        organizationId: text('organization_id').notNull(),
+        customerName: text('customer_name').notNull(),
+        contactNumber: text('contact_number').notNull(),
+        contactNumber2: text('contact_number_2'),
+        deliveryType: deliveryTypeEnum('delivery_type').notNull(),
+        downpayment: numeric('downpayment'),
+        amountToPay: numeric('amount_to_pay').notNull(),
+        proofOfPaymentObjectStorageId: text(
+            'proof_of_payment_object_storage_id',
+        ),
+        status: orderStatusEnum('status').notNull().default('pending'),
+        notes: text('notes'),
+        deliveryAt: timestamp('delivery_at', {
+            withTimezone: true,
+            mode: 'date',
+        }),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        index().on(t.organizationId),
+        foreignKey({
+            columns: [t.organizationId],
+            foreignColumns: [organization.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+        index().on(t.status),
+        index().on(t.deliveryAt),
+        index().on(t.createdAt),
+        foreignKey({
+            columns: [t.proofOfPaymentObjectStorageId],
+            foreignColumns: [objectStorage.id],
+        })
+            .onDelete('set null')
+            .onUpdate('no action'),
+    ],
+)
+
+export const orderItem = pgTable(
+    'order_item',
+    {
+        id: bigint('id', { mode: 'number' })
+            .generatedByDefaultAsIdentity()
+            .primaryKey(),
+        orderId: bigint('order_id', { mode: 'number' }).notNull(),
+        productId: bigint('product_id', { mode: 'number' }),
+        name: text('name').notNull(),
+        sizeName: text('size_name'),
+        quantity: integer('quantity').notNull().default(1),
+        price: numeric('price').notNull(),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        index().on(t.orderId),
+        foreignKey({
+            columns: [t.orderId],
+            foreignColumns: [order.id],
+        })
+            .onDelete('cascade')
+            .onUpdate('no action'),
+        index().on(t.productId),
+        foreignKey({
+            columns: [t.productId],
+            foreignColumns: [product.id],
+        })
+            .onDelete('set null')
             .onUpdate('no action'),
     ],
 )

@@ -12,6 +12,7 @@
     },
     "scripts": {
         "build": "wrangler deploy --outdir=./dist/$worker --dry-run --env=",
+        "prepare": "tsc --build ./tsconfig.build.json",
         "deploy:prod": "wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
         "deploy:staging": "wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
         "dev": "wrangler dev",
@@ -65,6 +66,14 @@
         "./api/objectStorage": {
             "types": "./dist/core/route/api/objectStorage/index.d.ts",
             "default": "./dist/core/route/api/objectStorage/index.js"
+        },
+        "./api/order": {
+            "types": "./dist/core/route/api/order/index.d.ts",
+            "default": "./dist/core/route/api/order/index.js"
+        },
+        "./api/product": {
+            "types": "./dist/core/route/api/product/index.d.ts",
+            "default": "./dist/core/route/api/product/index.js"
         },
         "./api/user": {
             "types": "./dist/core/route/api/user/index.d.ts",

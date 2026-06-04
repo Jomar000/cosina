@@ -25,6 +25,12 @@ export const nanoidCustom = customAlphabet(
     12,
 )
 
+// Uppercase + digits only so tracking codes are case-insensitive to type.
+export const nanoidOrderCode = customAlphabet(
+    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    10,
+)
+
 /**
  * Audit Trail Logger
  *

@@ -7,6 +7,8 @@ import { initContext } from '../../middleware/initContext.js'
 import { adminRoute } from './admin/index.js'
 import { authRoute } from './auth.js'
 import { objectStorageRoute } from './objectStorage/index.js'
+import { orderRoute } from './order/index.js'
+import { productRoute } from './product/index.js'
 import { userRoute } from './user/index.js'
 import { wsRoute } from './ws.js'
 
@@ -25,6 +27,8 @@ export const apiRoute = new Hono<THonoInstance>()
     .route('/admin', adminRoute)
     .route('/auth', authRoute)
     .route('/objectStorage', objectStorageRoute)
+    .route('/order', orderRoute)
+    .route('/product', productRoute)
     .route('/user', userRoute)
     .route('/ws', wsRoute)
 

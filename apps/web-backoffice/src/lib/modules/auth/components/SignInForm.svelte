@@ -91,7 +91,6 @@
                 const response = await endpoint.$post(
                     {
                         json: {
-                            organizationId: payload.organizationId,
                             accountId: payload.accountId,
                             password: payload.password,
                         },
@@ -169,7 +168,6 @@
             },
         },
         defaultValues: {
-            organizationId: '',
             accountId: '',
             password: '',
         },
@@ -195,52 +193,6 @@
             >
                 <FieldGroup>
                     <AuthSignInFormField
-                        name="organizationId"
-                        validators={{
-                            onBlur: ({ value }) => {
-                                const { error } =
-                                    authValidator.signInInputSchema.shape.organizationId.safeParse(
-                                        value,
-                                    )
-                                return error
-                                    ? error.issues[0].message
-                                    : undefined
-                            },
-                        }}
-                    >
-                        {#snippet children(field)}
-                            {@const { isValid, errors } = field.state.meta}
-                            <Field data-invalid={!isValid}>
-                                <FieldLabel for="organizationId"
-                                    >Organization ID</FieldLabel
-                                >
-                                <Input
-                                    aria-invalid={!isValid}
-                                    autocomplete="organization"
-                                    autofocus
-                                    id="organizationId"
-                                    name={field.name}
-                                    onblur={field.handleBlur}
-                                    oninput={(
-                                        e: Event & {
-                                            currentTarget: HTMLInputElement
-                                        },
-                                    ) =>
-                                        field.handleChange(
-                                            e.currentTarget.value,
-                                        )}
-                                    placeholder="acme-inc"
-                                    required
-                                    type="text"
-                                    value={field.state.value}
-                                />
-                                {#if !isValid}
-                                    <FieldError>{errors.join('\n')}</FieldError>
-                                {/if}
-                            </Field>
-                        {/snippet}
-                    </AuthSignInFormField>
-                    <AuthSignInFormField
                         name="accountId"
                         validators={{
                             onBlur: ({ value }) => {
@@ -263,6 +215,7 @@
                                 <Input
                                     aria-invalid={!isValid}
                                     autocomplete="username"
+                                    autofocus
                                     id="accountId"
                                     name={field.name}
                                     onblur={field.handleBlur}

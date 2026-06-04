@@ -1,7 +1,8 @@
 <script lang="ts">
     import * as Sidebar from '@hyperion/ui/components/sidebar'
-    import ListIcon from '@lucide/svelte/icons/list'
-    import UsersIcon from '@lucide/svelte/icons/users'
+    import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
+    import PackageIcon from '@lucide/svelte/icons/package'
+    import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart'
     import { onMount } from 'svelte'
 
     import { goto } from '$app/navigation'
@@ -21,28 +22,19 @@
 
     const navItems = [
         {
-            title: 'Transactions',
-            url: '#',
-            icon: ListIcon,
-            isActive: true,
-            items: [
-                {
-                    title: 'History',
-                    url: '#',
-                },
-            ],
+            title: 'Dashboard',
+            url: '/app/admin/dashboard',
+            icon: LayoutDashboardIcon,
         },
         {
-            title: 'Visitors',
-            url: '#',
-            icon: UsersIcon,
-            isActive: true,
-            items: [
-                {
-                    title: 'History',
-                    url: '#',
-                },
-            ],
+            title: 'Product',
+            url: '/app/admin/product',
+            icon: PackageIcon,
+        },
+        {
+            title: 'Orders',
+            url: '/app/admin/orders',
+            icon: ShoppingCartIcon,
         },
     ]
 
