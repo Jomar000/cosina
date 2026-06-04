@@ -46,7 +46,7 @@
     "devDependencies": {
         "@internationalized/date": "catalog:",
         "@lucide/svelte": "catalog:",
-        "@sveltejs/package": "^2.5.7",
+        "@sveltejs/package": "^2.5.8",
         "@sveltejs/vite-plugin-svelte": "catalog:",
         "@tanstack/table-core": "catalog:",
         "bits-ui": "catalog:",
