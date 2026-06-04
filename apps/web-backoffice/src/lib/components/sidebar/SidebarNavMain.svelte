@@ -15,6 +15,7 @@
             title: string
             url: string
             icon: Component
+            exact?: boolean
         }[]
     } = $props()
 
@@ -28,7 +29,9 @@
 <Sidebar.Group>
     <Sidebar.Menu class="gap-1">
         {#each items as item (item.title)}
-            {@const isItemActive = activeUrl.startsWith(item.url)}
+            {@const isItemActive = item.exact
+                ? activeUrl === item.url
+                : activeUrl.startsWith(item.url)}
             <Sidebar.MenuItem>
                 <Sidebar.MenuButton tooltipContent={item.title}>
                     {#snippet child({ props })}

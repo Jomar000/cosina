@@ -1,64 +1,154 @@
-<div class="flex h-screen w-full items-center justify-center">
-    <div class="loader">
-        <div class="circle circle-1"></div>
-        <div class="circle circle-2"></div>
-        <div class="circle circle-3"></div>
-        <div class="circle circle-4"></div>
+<script lang="ts">
+    import logoImg from '$lib/assets/image/logo.jpg'
+</script>
+
+<div class="flex h-screen w-full flex-col items-center justify-center gap-8">
+    <div class="loader-wrap">
+        <div class="halo"></div>
+        <div class="ring ring-outer"></div>
+        <div class="ring ring-inner"></div>
+        <img
+            src={logoImg}
+            alt="Cosina ni Cacai"
+            class="logo-img"
+        />
     </div>
+
+    <p class="loading-label">
+        Loading<span
+            class="dot"
+            style="--i:0">.</span
+        ><span
+            class="dot"
+            style="--i:1">.</span
+        ><span
+            class="dot"
+            style="--i:2">.</span
+        >
+    </p>
 </div>
 
 <style>
-    .loader {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
-
-    .circle {
+    .loader-wrap {
         position: relative;
-        width: 15px;
-        height: 15px;
+        width: 160px;
+        height: 160px;
+    }
+
+    /* ambient glow behind the entire ring set */
+    .halo {
+        position: absolute;
+        inset: -20px;
         border-radius: 50%;
-        margin: 10px;
-        box-shadow: inset 0 0 0 2px #fff;
-        transform-origin: center;
-        animation: fill 1.5s ease-in-out infinite;
+        background: radial-gradient(
+            circle,
+            rgba(99, 102, 241, 0.2) 0%,
+            transparent 70%
+        );
+        animation: halo-pulse 2.4s ease-in-out infinite;
     }
 
-    .circle-1 {
-        animation-delay: 0s;
+    .ring {
+        position: absolute;
+        border-radius: 50%;
+        border-style: solid;
+        border-color: transparent;
     }
 
-    .circle-2 {
-        animation-delay: -0.4s;
+    /* outer ring — slow, counter-clockwise, subtle */
+    .ring-outer {
+        inset: -12px;
+        border-width: 2px;
+        border-top-color: rgba(99, 102, 241, 0.35);
+        border-right-color: rgba(59, 130, 246, 0.2);
+        animation: spin-ccw 2.4s linear infinite;
     }
 
-    .circle-3 {
-        animation-delay: -0.8s;
+    /* inner ring — faster, clockwise, vivid gradient arc */
+    .ring-inner {
+        inset: 0;
+        border-width: 3px;
+        border-top-color: #6366f1;
+        border-right-color: #3b82f6;
+        border-bottom-color: rgba(99, 102, 241, 0.1);
+        animation: spin-cw 1s linear infinite;
     }
 
-    .circle-4 {
-        animation-delay: -1.2s;
+    /* Logo: explicit size + transform centering = pixel-perfect alignment */
+    .logo-img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 124px;
+        height: 124px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow:
+            0 0 0 2px rgba(99, 102, 241, 0.3),
+            0 0 24px rgba(99, 102, 241, 0.45),
+            0 4px 20px rgba(0, 0, 0, 0.5);
+        animation: logo-pulse 2.4s ease-in-out infinite;
     }
 
-    @keyframes fill {
-        0% {
-            transform: scale(1);
+    .loading-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(147, 197, 253, 0.6);
+    }
+
+    .dot {
+        display: inline-block;
+        animation: dot-fade 1.4s ease-in-out infinite;
+        animation-delay: calc(var(--i) * 0.2s);
+    }
+
+    @keyframes spin-cw {
+        to {
+            transform: rotate(360deg);
         }
+    }
 
-        50% {
-            box-shadow:
-                inset 0 0 0 2px #fff,
-                inset 0 0 0 6px #1c1c1e;
-            transform: scale(1.5);
+    @keyframes spin-ccw {
+        to {
+            transform: rotate(-360deg);
         }
+    }
 
+    @keyframes logo-pulse {
+        0%,
         100% {
-            box-shadow:
-                inset 0 0 0 2px #fff,
-                inset 0 0 0 6px #fff;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+            opacity: 0.88;
+            transform: translate(-50%, -50%) scale(0.965);
+        }
+    }
+
+    @keyframes halo-pulse {
+        0%,
+        100% {
+            opacity: 0.6;
             transform: scale(1);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    }
+
+    @keyframes dot-fade {
+        0%,
+        60%,
+        100% {
+            opacity: 0.2;
+        }
+        30% {
+            opacity: 1;
         }
     }
 </style>

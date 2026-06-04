@@ -3,8 +3,10 @@ import type { ApplyGlobalResponse } from 'hono/client'
 
 import type { TGlobalApiResponses, THonoInstance } from '../../../../types.js'
 import { isAuthorized } from '../../../middleware/isAuthorized.js'
+import dashboardRoute from './dashboard/index.js'
 import orderRoute from './order/index.js'
 import { productRoute } from './product/index.js'
+import settingsRoute from './settings/index.js'
 import { userRoute } from './user/index.js'
 
 export const adminRoute = new Hono<THonoInstance>()
@@ -13,6 +15,12 @@ export const adminRoute = new Hono<THonoInstance>()
      * Middleware
      */
     .use(
+        '/dashboard/*',
+        isAuthorized({
+            SYSADMIN: ['ANY'],
+        }),
+    )
+    .use(
         '/order/*',
         isAuthorized({
             SYSADMIN: ['ANY'],
@@ -20,6 +28,12 @@ export const adminRoute = new Hono<THonoInstance>()
     )
     .use(
         '/product/*',
+        isAuthorized({
+            SYSADMIN: ['ANY'],
+        }),
+    )
+    .use(
+        '/settings/*',
         isAuthorized({
             SYSADMIN: ['ANY'],
         }),
@@ -34,8 +48,10 @@ export const adminRoute = new Hono<THonoInstance>()
      * @description
      * Routes
      */
+    .route('/dashboard', dashboardRoute)
     .route('/order', orderRoute)
     .route('/product', productRoute)
+    .route('/settings', settingsRoute)
     .route('/user', userRoute)
 
 export default adminRoute

@@ -86,6 +86,44 @@ const adminOrdersChannel = new Hono<THonoInstance>().get(
     },
 )
 
+/**
+ * Settings channel routes through the PUBLIC API's Durable Object so that
+ * admin setting changes are immediately broadcast to all public clients
+ * listening on the same DO instance.
+ */
+const adminSettingsChannel = new Hono<THonoInstance>().get(
+    '/',
+    isAuthorized({ ws: ['listen'] }),
+    async (ctx) => {
+        const upgradeHeader = ctx.req.header('Upgrade')
+
+        if (!upgradeHeader || upgradeHeader !== 'websocket') {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'WEBSOCKET_UPGRADE_REQUIRED',
+                message: 'Expected Upgrade: websocket',
+                status: 426,
+            })
+        }
+
+        const authHeaders = ctx.req.raw.headers
+
+        const { success: canBroadcast } = await ctx
+            .get('auth')
+            .api.hasPermission({
+                headers: authHeaders,
+                body: { permissions: { ws: ['broadcast'] } },
+            })
+
+        const headers = new Headers(authHeaders)
+        headers.set('X-WS-Can-Broadcast', canBroadcast ? 'true' : 'false')
+
+        const id = ctx.env.HYPERIONPUB_DO_WSS.idFromName('settings')
+        const stub = ctx.env.HYPERIONPUB_DO_WSS.get(id)
+
+        return stub.fetch(new Request(ctx.req.raw, { headers }))
+    },
+)
+
 export const wsRoute = new Hono<THonoInstance>()
     .route(
         '/general',
@@ -106,5 +144,6 @@ export const wsRoute = new Hono<THonoInstance>()
         ),
     )
     .route('/orders', adminOrdersChannel)
+    .route('/settings', adminSettingsChannel)
 
 export default wsRoute

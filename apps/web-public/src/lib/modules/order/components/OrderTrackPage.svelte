@@ -123,6 +123,8 @@
     let inputValue = $state(page.url.searchParams.get('code') ?? '')
     let searchedCode = $state(page.url.searchParams.get('code') ?? null)
     let wsConnected = $state(false)
+    let isSearching = $state(!!page.url.searchParams.get('code'))
+    let searchStartTime = $state(0)
 
     /////////////////
     // 05. Queries //
@@ -157,6 +159,16 @@
     /////////////////
     // 08. Effects //
     /////////////////
+
+    $effect(() => {
+        if (trackQuery.isFetching) return
+        if (!isSearching) return
+
+        const elapsed = Date.now() - searchStartTime
+        const remaining = Math.max(0, 2000 - elapsed)
+        const timer = setTimeout(() => (isSearching = false), remaining)
+        return () => clearTimeout(timer)
+    })
 
     // WebSocket: connect to the public orders channel and listen for
     // order.statusUpdate events that match the currently tracked order.
@@ -225,6 +237,8 @@
         e.preventDefault()
         const code = inputValue.trim().toUpperCase()
         if (!code) return
+        isSearching = true
+        searchStartTime = Date.now()
         searchedCode = code
     }
 
@@ -333,17 +347,40 @@
         </form>
 
         <div class="mt-8">
-            <!-- Loading skeleton -->
-            {#if trackQuery.isFetching}
+            <!-- Finding Order loader -->
+            {#if isSearching}
                 <div
-                    class="animate-pulse space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-6"
+                    class="flex flex-col items-center gap-5 rounded-2xl border border-zinc-800 bg-zinc-900 px-6 py-14 text-center"
                 >
-                    <div class="h-5 w-1/3 rounded-full bg-zinc-800"></div>
-                    <div class="h-8 w-1/2 rounded-full bg-zinc-800"></div>
-                    <div class="h-px bg-zinc-800"></div>
-                    <div class="h-4 w-full rounded-full bg-zinc-800"></div>
-                    <div class="h-4 w-4/5 rounded-full bg-zinc-800"></div>
-                    <div class="h-4 w-2/3 rounded-full bg-zinc-800"></div>
+                    <!-- Animated radar rings around search icon -->
+                    <div
+                        class="relative flex size-20 items-center justify-center"
+                    >
+                        <div class="radar-ring"></div>
+                        <div
+                            class="radar-ring"
+                            style="animation-delay: 0.53s"
+                        ></div>
+                        <div
+                            class="radar-ring"
+                            style="animation-delay: 1.07s"
+                        ></div>
+                        <SearchIcon
+                            class="relative z-10 size-8 text-blue-400"
+                        />
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <p class="text-base font-semibold text-zinc-100">
+                            Finding Order<span class="finding-dots"></span>
+                        </p>
+                        <p class="text-sm text-zinc-500">
+                            Looking up tracking code
+                            <span class="font-mono font-semibold text-zinc-400"
+                                >{searchedCode}</span
+                            >
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Error / not found -->
@@ -755,6 +792,29 @@
 </div>
 
 <style>
+    /* finding order — animated ellipsis */
+    .finding-dots::after {
+        content: '';
+        animation: finding-dots 1.5s steps(4, end) infinite;
+    }
+    @keyframes finding-dots {
+        0% {
+            content: '';
+        }
+        25% {
+            content: '.';
+        }
+        50% {
+            content: '..';
+        }
+        75% {
+            content: '...';
+        }
+        100% {
+            content: '';
+        }
+    }
+
     /* pending — clock spin */
     @keyframes spin-slow {
         to {

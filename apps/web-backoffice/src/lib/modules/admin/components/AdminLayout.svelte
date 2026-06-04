@@ -1,5 +1,6 @@
 <script lang="ts">
     import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import HistoryIcon from '@lucide/svelte/icons/history'
     import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
     import PackageIcon from '@lucide/svelte/icons/package'
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart'
@@ -35,6 +36,12 @@
             title: 'Orders',
             url: '/app/admin/orders',
             icon: ShoppingCartIcon,
+            exact: true,
+        },
+        {
+            title: 'Order History',
+            url: '/app/admin/orders/history',
+            icon: HistoryIcon,
         },
     ]
 

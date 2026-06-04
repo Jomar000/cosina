@@ -40,6 +40,7 @@
         "@vitest/browser": "catalog:",
         "@vitest/browser-playwright": "catalog:",
         "dayjs": "catalog:",
+        "apexcharts": "^4.7.0",
         "file-type": "catalog:",
         "hono": "catalog:",
         "ky": "catalog:",

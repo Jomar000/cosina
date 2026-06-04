@@ -1,64 +1,55 @@
+<script lang="ts">
+    import logoImg from '$lib/assets/image/logo.jpg'
+</script>
+
 <div class="flex h-screen w-full items-center justify-center">
-    <div class="loader">
-        <div class="circle circle-1"></div>
-        <div class="circle circle-2"></div>
-        <div class="circle circle-3"></div>
-        <div class="circle circle-4"></div>
+    <div class="logo-loader">
+        <div class="spin-ring"></div>
+        <img
+            src={logoImg}
+            alt="Cosina ni Cacai"
+            class="logo-img"
+        />
     </div>
 </div>
 
 <style>
-    .loader {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
-
-    .circle {
+    .logo-loader {
         position: relative;
-        width: 15px;
-        height: 15px;
+        width: 96px;
+        height: 96px;
+    }
+
+    .logo-img {
+        position: absolute;
+        inset: 12px;
         border-radius: 50%;
-        margin: 10px;
-        box-shadow: inset 0 0 0 2px #fff;
-        transform-origin: center;
-        animation: fill 1.5s ease-in-out infinite;
+        object-fit: cover;
+        animation: pulse 2s ease-in-out infinite;
     }
 
-    .circle-1 {
-        animation-delay: 0s;
+    .spin-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 3px solid oklch(1 0 0 / 10%);
+        border-top-color: var(--sidebar-primary);
+        animation: spin 1s linear infinite;
     }
 
-    .circle-2 {
-        animation-delay: -0.4s;
-    }
-
-    .circle-3 {
-        animation-delay: -0.8s;
-    }
-
-    .circle-4 {
-        animation-delay: -1.2s;
-    }
-
-    @keyframes fill {
-        0% {
-            transform: scale(1);
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
         }
+    }
 
-        50% {
-            box-shadow:
-                inset 0 0 0 2px #fff,
-                inset 0 0 0 6px #1c1c1e;
-            transform: scale(1.5);
-        }
-
+    @keyframes pulse {
+        0%,
         100% {
-            box-shadow:
-                inset 0 0 0 2px #fff,
-                inset 0 0 0 6px #fff;
-            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
         }
     }
 </style>

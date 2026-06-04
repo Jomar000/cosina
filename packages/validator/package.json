@@ -29,9 +29,17 @@
             "types": "./dist/backoffice/auth.schema.d.ts",
             "default": "./dist/backoffice/auth.schema.js"
         },
+        "./backoffice/admin/dashboard": {
+            "types": "./dist/backoffice/admin/dashboard/index.d.ts",
+            "default": "./dist/backoffice/admin/dashboard/index.js"
+        },
         "./backoffice/admin/order": {
             "types": "./dist/backoffice/admin/order/index.d.ts",
             "default": "./dist/backoffice/admin/order/index.js"
+        },
+        "./backoffice/admin/settings": {
+            "types": "./dist/backoffice/admin/settings/index.d.ts",
+            "default": "./dist/backoffice/admin/settings/index.js"
         },
         "./backoffice/admin/product": {
             "types": "./dist/backoffice/admin/product/index.d.ts",

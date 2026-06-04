@@ -5,7 +5,6 @@
     import * as Card from '@hyperion/ui/components/card'
     import {
         Field,
-        FieldDescription,
         FieldError,
         FieldGroup,
         FieldLabel,
@@ -15,6 +14,8 @@
     import { auth as authValidator } from '@hyperion/validator/backoffice'
     import Eye from '@lucide/svelte/icons/eye'
     import EyeOff from '@lucide/svelte/icons/eye-off'
+    import Lock from '@lucide/svelte/icons/lock'
+    import User from '@lucide/svelte/icons/user'
     import { createForm } from '@tanstack/svelte-form'
     import { createMutation } from '@tanstack/svelte-query'
     import { tick } from 'svelte'
@@ -35,10 +36,12 @@
         class: className,
         session,
         showCaptchaModal = $bindable(false), // eslint-disable-line no-useless-assignment
+        showLoader = $bindable(false), // eslint-disable-line no-useless-assignment
         ...restProps
     }: HTMLAttributes<HTMLDivElement> & {
         session: SessionState
         showCaptchaModal: boolean
+        showLoader: boolean
     } = $props()
 
     ///////////////
@@ -155,6 +158,8 @@
             toast.dismiss()
             const redirect = await authSignInMutation.mutateAsync(value)
             if (redirect) {
+                showLoader = true
+                await new Promise<void>((resolve) => setTimeout(resolve, 2500))
                 goto(redirect)
             }
         },
@@ -175,15 +180,22 @@
 </script>
 
 <div
-    class={cn('flex flex-col gap-6', className)}
+    class={cn('flex flex-col gap-5', className)}
     {...restProps}
 >
-    <Card.Root>
-        <Card.Header class="text-center">
-            <Card.Title class="text-xl">Welcome back</Card.Title>
-            <Card.Description>Sign-in with your credentials</Card.Description>
+    <Card.Root
+        class="border border-white/10 bg-white/5 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+    >
+        <Card.Header class="pb-2 text-center">
+            <Card.Title class="text-2xl font-bold text-white">
+                Welcome back
+            </Card.Title>
+            <Card.Description class="text-blue-200/60">
+                Sign in to your account to continue
+            </Card.Description>
         </Card.Header>
-        <Card.Content>
+
+        <Card.Content class="pt-2">
             <form
                 onsubmit={(e: SubmitEvent) => {
                     e.preventDefault()
@@ -192,6 +204,7 @@
                 }}
             >
                 <FieldGroup>
+                    <!-- Account ID -->
                     <AuthSignInFormField
                         name="accountId"
                         validators={{
@@ -212,32 +225,40 @@
                                 <FieldLabel for="accountId"
                                     >Account ID</FieldLabel
                                 >
-                                <Input
-                                    aria-invalid={!isValid}
-                                    autocomplete="username"
-                                    autofocus
-                                    id="accountId"
-                                    name={field.name}
-                                    onblur={field.handleBlur}
-                                    oninput={(
-                                        e: Event & {
-                                            currentTarget: HTMLInputElement
-                                        },
-                                    ) =>
-                                        field.handleChange(
-                                            e.currentTarget.value,
-                                        )}
-                                    placeholder="john.doe@acme.inc"
-                                    required
-                                    type="text"
-                                    value={field.state.value}
-                                />
+                                <div class="relative">
+                                    <User
+                                        class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-blue-300/50"
+                                    />
+                                    <Input
+                                        aria-invalid={!isValid}
+                                        autocomplete="username"
+                                        autofocus
+                                        class="pl-10"
+                                        id="accountId"
+                                        name={field.name}
+                                        onblur={field.handleBlur}
+                                        oninput={(
+                                            e: Event & {
+                                                currentTarget: HTMLInputElement
+                                            },
+                                        ) =>
+                                            field.handleChange(
+                                                e.currentTarget.value,
+                                            )}
+                                        placeholder="email or username"
+                                        required
+                                        type="text"
+                                        value={field.state.value}
+                                    />
+                                </div>
                                 {#if !isValid}
                                     <FieldError>{errors.join('\n')}</FieldError>
                                 {/if}
                             </Field>
                         {/snippet}
                     </AuthSignInFormField>
+
+                    <!-- Password -->
                     <AuthSignInFormField
                         name="password"
                         validators={{
@@ -261,17 +282,20 @@
                                     >
                                     <a
                                         href="##"
-                                        class="ml-auto text-sm underline-offset-4 hover:underline"
+                                        class="ml-auto text-xs font-medium text-indigo-400/80 underline-offset-4 hover:text-indigo-300 hover:underline"
                                         tabindex={-1}
                                     >
-                                        Forgot your password?
+                                        Forgot password?
                                     </a>
                                 </div>
                                 <div class="relative">
+                                    <Lock
+                                        class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-blue-300/50"
+                                    />
                                     <Input
                                         aria-invalid={!isValid}
                                         autocomplete="current-password"
-                                        class="pr-10"
+                                        class="px-10"
                                         id="password"
                                         name={field.name}
                                         onblur={field.handleBlur}
@@ -283,7 +307,7 @@
                                             field.handleChange(
                                                 e.currentTarget.value,
                                             )}
-                                        placeholder="⊛⊛⊛⊛⊛⊛⊛⊛"
+                                        placeholder="••••••••"
                                         required
                                         type={showPassword
                                             ? 'text'
@@ -298,13 +322,9 @@
                                         tabindex={-1}
                                     >
                                         {#if showPassword}
-                                            <Eye
-                                                class="font-extrabold text-black"
-                                            />
+                                            <Eye class="text-foreground" />
                                         {:else}
-                                            <EyeOff
-                                                class="font-extrabold text-black"
-                                            />
+                                            <EyeOff class="text-foreground" />
                                         {/if}
                                     </Button>
                                 </div>
@@ -314,6 +334,8 @@
                             </Field>
                         {/snippet}
                     </AuthSignInFormField>
+
+                    <!-- Submit -->
                     <AuthSignInFormSubscribe>
                         <!--
                             README: canSubmit is always true on first form render
@@ -327,24 +349,21 @@
                                 !form.canSubmit ||
                                 form.isPristine ||
                                 form.isSubmitting}
-                            <Field>
+                            <Field class="gap-3">
                                 <Button
-                                    class={isDisabled
-                                        ? 'cursor-not-allowed opacity-50'
-                                        : ''}
+                                    class={cn(
+                                        'bg-linear-to-r from-indigo-600 to-blue-600 font-semibold text-white shadow-[0_4px_16px_rgba(99,102,241,0.35)] hover:from-indigo-500 hover:to-blue-500',
+                                        isDisabled &&
+                                            'cursor-not-allowed opacity-50',
+                                    )}
                                     disabled={isDisabled}
                                     id="signIn"
                                     type="submit"
-                                    >{form.isSubmitting
-                                        ? 'Signing-in...'
-                                        : 'Sign-in'}</Button
                                 >
-                                <FieldDescription class="text-center">
-                                    Don't have an account? <a
-                                        href="##"
-                                        tabindex={-1}>Sign-up</a
-                                    >
-                                </FieldDescription>
+                                    {form.isSubmitting
+                                        ? 'Signing in…'
+                                        : 'Sign in'}
+                                </Button>
                             </Field>
                         {/snippet}
                     </AuthSignInFormSubscribe>
@@ -352,15 +371,4 @@
             </form>
         </Card.Content>
     </Card.Root>
-    <FieldDescription class="px-6 text-center">
-        By clicking continue, you agree to our <a
-            href="##"
-            tabindex={-1}>Terms of Service</a
-        >
-        and
-        <a
-            href="##"
-            tabindex={-1}>Privacy Policy</a
-        >.
-    </FieldDescription>
 </div>

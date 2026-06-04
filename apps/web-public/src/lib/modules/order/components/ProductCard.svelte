@@ -30,9 +30,11 @@
 
     let {
         product,
+        cartQuantity = 0,
         onAddToCart,
     }: {
         product: TProduct
+        cartQuantity?: number
         onAddToCart: (item: TCartItem) => void
     } = $props()
 
@@ -95,7 +97,7 @@
 </script>
 
 <div
-    class="group flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 transition-all duration-300 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-500/5"
+    class="group flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 transition-all duration-300 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-500/5"
 >
     <!-- Product Image -->
     <div class="relative aspect-4/3 overflow-hidden bg-zinc-800">
@@ -127,26 +129,39 @@
             </div>
         {/if}
         <!-- Category Badge -->
-        <div class="absolute top-3 left-3">
+        <div class="absolute top-2 left-2">
             <span
                 class={cn(
-                    'rounded-full border px-2.5 py-1 text-xs font-medium',
+                    'rounded-full border px-2 py-0.5 text-[10px] font-medium',
                     CATEGORY_COLORS[product.category],
                 )}
             >
                 {CATEGORY_LABELS[product.category]}
             </span>
         </div>
+
+        <!-- Cart quantity indicator -->
+        {#if cartQuantity > 0}
+            <div class="absolute right-2 top-2 z-10">
+                <span
+                    class="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[9px] font-bold text-white shadow ring-2 ring-zinc-900"
+                >
+                    {cartQuantity > 99 ? '99+' : cartQuantity}
+                </span>
+            </div>
+        {/if}
     </div>
 
     <!-- Card Body -->
-    <div class="flex flex-1 flex-col gap-3 p-4">
+    <div class="flex flex-1 flex-col gap-2 p-3">
         <div class="flex-1">
-            <h3 class="text-base font-semibold text-zinc-100 leading-tight">
+            <h3 class="text-sm font-semibold leading-tight text-zinc-100">
                 {product.name}
             </h3>
             {#if product.ingredients}
-                <p class="mt-1 line-clamp-2 text-xs text-zinc-500">
+                <p
+                    class="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-zinc-500"
+                >
                     {product.ingredients}
                 </p>
             {/if}
@@ -154,12 +169,12 @@
 
         <!-- Size Selector -->
         {#if product.sizes.length > 0}
-            <div class="flex flex-wrap gap-1.5">
+            <div class="flex flex-wrap gap-1">
                 {#each product.sizes as size (size.id)}
                     <button
                         type="button"
                         class={cn(
-                            'rounded-lg border px-2.5 py-1 text-xs font-medium transition-all',
+                            'rounded border px-2 py-0.5 text-[10px] font-medium transition-all',
                             selectedSizeId === size.id
                                 ? 'border-blue-500 bg-blue-500/15 text-blue-400'
                                 : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600',
@@ -174,21 +189,19 @@
 
         <!-- Price + Add to Cart -->
         <div class="flex items-center justify-between gap-2">
-            <div>
-                <span class="text-xl font-bold text-blue-400">
-                    ₱{Number(displayPrice).toLocaleString('en-PH', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                    })}
-                </span>
-            </div>
+            <span class="text-base font-bold tabular-nums text-blue-400">
+                ₱{Number(displayPrice).toLocaleString('en-PH', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                })}
+            </span>
             <Button
                 size="sm"
                 onclick={handleAddToCart}
-                class="flex items-center gap-1.5 bg-blue-600 text-white hover:bg-blue-500 active:bg-blue-700"
+                class="h-7 gap-1 bg-blue-600 px-2.5 text-white hover:bg-blue-500 active:bg-blue-700"
             >
-                <ShoppingCartIcon class="h-3.5 w-3.5" />
-                <span class="text-xs font-semibold">Add</span>
+                <ShoppingCartIcon class="h-3 w-3" />
+                <span class="text-[11px] font-semibold">Add</span>
             </Button>
         </div>
     </div>

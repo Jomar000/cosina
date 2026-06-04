@@ -99,6 +99,34 @@ const publicOrdersChannel = new Hono<THonoInstance>().get('/', async (ctx) => {
     return stub.fetch(new Request(ctx.req.raw, { headers }))
 })
 
+/**
+ * Public listen-only WebSocket channel for settings broadcasts.
+ * No auth required — clients connect here to receive real-time advance
+ * order days changes pushed by the admin backoffice.
+ */
+const publicSettingsChannel = new Hono<THonoInstance>().get(
+    '/',
+    async (ctx) => {
+        const upgradeHeader = ctx.req.header('Upgrade')
+
+        if (!upgradeHeader || upgradeHeader !== 'websocket') {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'WEBSOCKET_UPGRADE_REQUIRED',
+                message: 'Expected Upgrade: websocket',
+                status: 426,
+            })
+        }
+
+        const headers = new Headers(ctx.req.raw.headers)
+        headers.set('X-WS-Can-Broadcast', 'false')
+
+        const id = ctx.get('doWssClient').idFromName('settings')
+        const stub = ctx.get('doWssClient').get(id)
+
+        return stub.fetch(new Request(ctx.req.raw, { headers }))
+    },
+)
+
 export const wsRoute = new Hono<THonoInstance>()
     .route(
         '/general',
@@ -111,5 +139,6 @@ export const wsRoute = new Hono<THonoInstance>()
     )
     .route('/orders', publicOrdersChannel)
     .route('/products', publicProductsChannel)
+    .route('/settings', publicSettingsChannel)
 
 export default wsRoute

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { navigating } from '$app/state'
     import { Toaster as Sonner } from '@hyperion/ui/components/sonner'
     import {
         createQuery,
@@ -30,6 +31,14 @@
         },
     })
 
+    ///////////////
+    // 03. State //
+    ///////////////
+
+    let showNavLoader = $state(false)
+    let navStartTime = 0
+    let navTimer: ReturnType<typeof setTimeout> | null = null
+
     /////////////////
     // 05. Queries //
     /////////////////
@@ -47,6 +56,28 @@
         }),
         () => queryClient,
     )
+
+    /////////////////
+    // 08. Effects //
+    /////////////////
+
+    $effect(() => {
+        if (navigating.to) {
+            showNavLoader = true
+            navStartTime = Date.now()
+            if (navTimer) clearTimeout(navTimer)
+            navTimer = null
+        } else if (showNavLoader) {
+            const remaining = Math.max(0, 2000 - (Date.now() - navStartTime))
+            navTimer = setTimeout(() => {
+                showNavLoader = false
+            }, remaining)
+        }
+
+        return () => {
+            if (navTimer) clearTimeout(navTimer)
+        }
+    })
 </script>
 
 <ModeWatcher defaultMode="dark" />
@@ -62,7 +93,11 @@
                     duration={30000}
                     position="top-center"
                 />
-                {@render children()}
+                {#if showNavLoader}
+                    <LoadingScreen />
+                {:else}
+                    {@render children()}
+                {/if}
             </SessionProvider>
         </QueryClientProvider>
     {:else}

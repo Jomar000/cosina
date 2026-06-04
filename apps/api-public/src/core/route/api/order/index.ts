@@ -315,56 +315,84 @@ export const orderRoute = new Hono<THonoInstance>()
         })
     })
 
-export const trackOrderRoute = orderRoute.get(
-    '/track',
-    validateRequest('query', order.trackInputSchema),
-    async (ctx) => {
-        const { trackingCode } = ctx.req.valid('query')
-        const { order: orderTable, orderItem: orderItemTable } =
-            ctx.get('dbSchema')
+const ADVANCE_DAYS_KEY = 'order:settings:advanceDays'
+const DEFAULT_ADVANCE_DAYS = 3
 
-        const [row] = await ctx
-            .get('dbClient')
-            .select({
-                id: orderTable.id,
-                trackingCode: orderTable.trackingCode,
-                customerName: orderTable.customerName,
-                deliveryType: orderTable.deliveryType,
-                deliveryAt: orderTable.deliveryAt,
-                downpayment: orderTable.downpayment,
-                amountToPay: orderTable.amountToPay,
-                status: orderTable.status,
-                notes: orderTable.notes,
-                createdAt: orderTable.createdAt,
-            })
-            .from(orderTable)
-            .where(eq(orderTable.trackingCode, trackingCode))
-            .limit(1)
+export const trackOrderRoute = orderRoute
+    .get('/settings', async (ctx) => {
+        const { keyValue } = ctx.get('dbSchema')
 
-        if (!row) {
-            return apiResponseErrorWrapper(ctx, {
-                code: 'NOT_FOUND',
-                message: 'Order not found. Please check your Tracking Code.',
-                status: 404,
+        try {
+            const [row] = await ctx
+                .get('dbClient')
+                .select({ value: keyValue.value })
+                .from(keyValue)
+                .where(eq(keyValue.key, ADVANCE_DAYS_KEY))
+                .limit(1)
+
+            const advanceDays = row?.value
+                ? parseInt(row.value, 10)
+                : DEFAULT_ADVANCE_DAYS
+
+            return ctx.json({ success: true, data: { advanceDays } })
+        } catch {
+            return ctx.json({
+                success: true,
+                data: { advanceDays: DEFAULT_ADVANCE_DAYS },
             })
         }
+    })
+    .get(
+        '/track',
+        validateRequest('query', order.trackInputSchema),
+        async (ctx) => {
+            const { trackingCode } = ctx.req.valid('query')
+            const { order: orderTable, orderItem: orderItemTable } =
+                ctx.get('dbSchema')
 
-        const items = await ctx
-            .get('dbClient')
-            .select({
-                id: orderItemTable.id,
-                name: orderItemTable.name,
-                sizeName: orderItemTable.sizeName,
-                quantity: orderItemTable.quantity,
-                price: orderItemTable.price,
-            })
-            .from(orderItemTable)
-            .where(eq(orderItemTable.orderId, row.id))
-            .orderBy(asc(orderItemTable.id))
+            const [row] = await ctx
+                .get('dbClient')
+                .select({
+                    id: orderTable.id,
+                    trackingCode: orderTable.trackingCode,
+                    customerName: orderTable.customerName,
+                    deliveryType: orderTable.deliveryType,
+                    deliveryAt: orderTable.deliveryAt,
+                    downpayment: orderTable.downpayment,
+                    amountToPay: orderTable.amountToPay,
+                    status: orderTable.status,
+                    notes: orderTable.notes,
+                    createdAt: orderTable.createdAt,
+                })
+                .from(orderTable)
+                .where(eq(orderTable.trackingCode, trackingCode))
+                .limit(1)
 
-        return apiResponseOkWrapper(ctx, { data: { ...row, items } })
-    },
-)
+            if (!row) {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
+                    message:
+                        'Order not found. Please check your Tracking Code.',
+                    status: 404,
+                })
+            }
+
+            const items = await ctx
+                .get('dbClient')
+                .select({
+                    id: orderItemTable.id,
+                    name: orderItemTable.name,
+                    sizeName: orderItemTable.sizeName,
+                    quantity: orderItemTable.quantity,
+                    price: orderItemTable.price,
+                })
+                .from(orderItemTable)
+                .where(eq(orderItemTable.orderId, row.id))
+                .orderBy(asc(orderItemTable.id))
+
+            return apiResponseOkWrapper(ctx, { data: { ...row, items } })
+        },
+    )
 
 export default trackOrderRoute
 export type OrderRouteType = ApplyGlobalResponse<
