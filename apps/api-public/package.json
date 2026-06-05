@@ -71,9 +71,9 @@
             "types": "./dist/core/route/api/user/index.d.ts",
             "default": "./dist/core/route/api/user/index.js"
         },
-        "./root/heartbeat": {
-            "types": "./dist/core/route/root/heartbeat.d.ts",
-            "default": "./dist/core/route/root/heartbeat.js"
+        "./api/heartbeat": {
+            "types": "./dist/core/route/api/heartbeat.d.ts",
+            "default": "./dist/core/route/api/heartbeat.js"
         }
     }
 }

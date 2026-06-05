@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 
-import type { THonoInstance } from '../../../types.js'
-import { corsHandler } from '../../middleware/corsHandler.js'
-import { initRequestContext } from '../../middleware/initContext.js'
+import type { THonoInstance } from '../../../../types.js'
+import { corsHandler } from '../../../middleware/corsHandler.js'
+import { initRequestContext } from '../../../middleware/initContext.js'
 
 export const v1Route = new Hono<THonoInstance>()
     /**

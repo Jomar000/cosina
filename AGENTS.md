@@ -15,7 +15,7 @@
 ## 2. Tech Stack & Standards
 
 - **Frontend:** Svelte (SvelteKit), SPA mode (`adapter-static`). CSP via `kit.csp` in `svelte.config.js` (hash mode, build-time).
-- **Backend:** Hono. BFF pattern -- separate instances for `public` (client-facing) and `admin` (dashboard) APIs. Use Hono RPC or shared Zod validators for contract safety.
+- **Backend:** Hono BFFs for public and backoffice clients. Mount all HTTP endpoints below `/api`, including heartbeat and v1. Use Hono RPC or shared Zod validators for contract safety.
 - **Database:** Drizzle ORM. Schema in `packages/database/src/postgres/schema.ts`. Direct DB calls only in backend apps.
 - **Language:** TypeScript (Strict mode).
 - **Types (`packages/types`):**
@@ -27,6 +27,7 @@
 
 - **Directories:**
     - `src/routes`: SvelteKit routes.
+    - `apps/api-*/src/core/route/api/`: Hono route modules mounted below `/api`.
     - `packages/ui/src/components/`: shadcn-svelte UI primitives (managed by the `shadcn-svelte` CLI).
     - `apps/*/src/lib/components/`: Custom/project-specific reusable components.
 - **Styling:** Tailwind CSS v4 with `@tailwindcss/vite` and `tw-animate-css`.
@@ -45,7 +46,7 @@
     pnpm --filter=@PROJECT_NAME/database migrate:dev  # Run DB migrations (dev)
     ```
 - **Environment Variables:**
-    - `apps/api-{public,backoffice}/wrangler.toml` -- non-secret `[vars]` (CORS, cookie, URLs, R2 bucket names/public URL/presign expiry, etc.) and CF bindings (`PROJECT_NAME{PUB|BOFC}_KV`, `PROJECT_NAME{PUB|BOFC}_HD`, `PROJECT_NAME{PUB|BOFC}_DO_WSS`). Object storage uses S3-compatible R2 requests signed with `aws4fetch`; do not add direct R2 bucket bindings.
+    - `apps/api-{public,backoffice}/wrangler.toml` -- non-secret vars and Cloudflare bindings. BFF deployments default to `zone_name` subdirectory routes; commented `custom_domain` routes are the alternative. Object storage uses `aws4fetch`-signed S3-compatible R2 requests, not direct R2 bindings.
     - `apps/api-public/.dev.vars` -- secrets (not committed). Copy from `.dev.vars.example` which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
     - `packages/database/.env` / `.env.test` -- Postgres connection strings for local dev and test migrations.
 
@@ -66,7 +67,7 @@ Project skills live in `.agents/skills/`. Load the relevant skill before startin
 
 To ensure project safety, strictly adhere to the following file access and command execution boundaries (mirrored from `.claude/settings.json`):
 
-- **Allowed Scope:** Focus your file reads and edits within `apps/` and `packages/`, as well as root configuration files (`*.json`, `*.yaml`, `*.toml`, `*.js`, `*.ts`, `*.md`).
+- **Allowed Scope:** `apps/`, `packages/`, both skill directories, and root configuration files (`*.json`, `*.yaml`, `*.toml`, `*.js`, `*.ts`, `*.md`).
 - **Forbidden Files:** NEVER edit or write to ANY files inside the `.git/` directory.
 - **Allowed Commands:** You may safely execute generic package manager commands (`pnpm *`) and read-only Git commands (`git status`, `git log`, `git diff`, `git branch`, `git show`, `git stash list`).
 - **Forbidden Commands:** NEVER auto-run or propose the following destructive commands:

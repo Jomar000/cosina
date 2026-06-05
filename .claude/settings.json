@@ -3,8 +3,12 @@
         "allow": [
             "Edit(apps/**)",
             "Edit(packages/**)",
+            "Edit(.agents/skills/**)",
+            "Edit(.claude/skills/**)",
             "Read(apps/**)",
             "Read(packages/**)",
+            "Read(.agents/skills/**)",
+            "Read(.claude/skills/**)",
             "Read(*.json)",
             "Read(*.yaml)",
             "Read(*.toml)",

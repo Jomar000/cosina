@@ -41,8 +41,9 @@
                 'heartbeat',
             ],
             queryFn: async () => {
-                await heartbeatClient.index.$get()
-                return null
+                const response = await heartbeatClient.index.$get()
+                if (!response.ok) throw new Error('API unavailable.')
+                return response
             },
         }),
         () => queryClient,

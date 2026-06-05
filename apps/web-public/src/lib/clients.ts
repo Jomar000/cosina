@@ -1,8 +1,8 @@
 import type { AdminRouteType } from '@hyperion/api-public/api/admin'
 import type { AuthRouteType } from '@hyperion/api-public/api/auth'
+import type { HeartbeatRouteType } from '@hyperion/api-public/api/heartbeat'
 import type { ObjectStorageRouteType } from '@hyperion/api-public/api/objectStorage'
 import type { UserRouteType } from '@hyperion/api-public/api/user'
-import type { HeartbeatRouteType } from '@hyperion/api-public/root/heartbeat'
 import { hc } from 'hono/client'
 import ky from 'ky'
 
@@ -63,7 +63,7 @@ export const authClient = hc<AuthRouteType>(`${PUBLIC_API_URL}/api/auth`, {
  * Heartbeat RPC Client
  */
 export const heartbeatClient = hc<HeartbeatRouteType>(
-    `${PUBLIC_API_URL}/heartbeat`,
+    `${PUBLIC_API_URL}/api/heartbeat`,
     {
         init: { credentials: 'include' },
         fetch: kyClient,

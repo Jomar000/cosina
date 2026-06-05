@@ -9,8 +9,6 @@ import { apiResponseErrorWrapper } from '../utilities/helpers.js'
 import { WebSocketServer } from './durableObject/webSocketServer.js'
 import { requestTimer } from './middleware/requestTimer.js'
 import { apiRoute } from './route/api/index.js'
-import { rootRoute } from './route/root/index.js'
-import { v1Route } from './route/v1/index.js'
 
 export const app = new Hono<THonoInstance>()
     /**
@@ -70,9 +68,7 @@ export const app = new Hono<THonoInstance>()
      * @description
      * Routes
      */
-    .route('/', rootRoute)
     .route('/api', apiRoute)
-    .route('/v1', v1Route)
 
 export default app
 export { WebSocketServer }

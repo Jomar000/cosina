@@ -82,7 +82,8 @@ class_name = "WebSocketServer"
 [env.test]
 workers_dev = false
 preview_urls = false
-route = { custom_domain = true, pattern = "" }
+route = { zone_name = "", pattern = "" }
+#route = { custom_domain = true, pattern = "" }
 
 [env.test.vars]
 ENVIRONMENT = "test"
@@ -127,7 +128,8 @@ class_name = "WebSocketServer"
 [env.staging]
 workers_dev = false
 preview_urls = false
-route = { custom_domain = true, pattern = "" }
+route = { zone_name = "", pattern = "" }
+#route = { custom_domain = true, pattern = "" }
 
 [env.staging.vars]
 ENVIRONMENT = "staging"
@@ -171,7 +173,8 @@ class_name = "WebSocketServer"
 [env.production]
 workers_dev = false
 preview_urls = false
-route = { custom_domain = true, pattern = "" }
+route = { zone_name = "", pattern = "" }
+#route = { custom_domain = true, pattern = "" }
 
 [env.production.vars]
 ENVIRONMENT = "production"
