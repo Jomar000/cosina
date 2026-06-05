@@ -40,10 +40,15 @@ export class SessionState {
     }
 
     isValid = (): this is { data: TSessionData } => {
-        return (
+        const isValid =
             this.#session.expiresAt >
             Math.floor(new SvelteDate().getTime() / 1000)
-        )
+
+        if (!isValid) {
+            this.clear()
+        }
+
+        return isValid
     }
 
     loadFromLocalStorage = () => {
@@ -51,6 +56,7 @@ export class SessionState {
             this.#session = this.#parseData(
                 JSON.parse(localStorage.getItem('session_data')!),
             )
+            this.isValid()
         } catch {
             /* EMPTY */
         }
