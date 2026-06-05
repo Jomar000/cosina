@@ -11,6 +11,7 @@ let privilegedCookie: string // eslint-disable-line @typescript-eslint/no-unused
 let standardCookie: string
 
 type TSignInResponseData = {
+    roles: Record<string, Record<string, string[]>>
     userRoles: string[]
 }
 
@@ -99,11 +100,17 @@ describe('Auth Endpoint', () => {
                     )
 
                     const responseData =
-                        await response.json<TApiResponseOk<unknown>>()
+                        await response.json<
+                            TApiResponseOk<TSignInResponseData>
+                        >()
 
                     expect(response.status).toBe(200)
                     expect(response.headers.get('set-cookie')).toBeTruthy()
                     expect(responseData).toHaveProperty('data')
+                    expect(responseData.data.userRoles).toEqual(['owner'])
+                    expect(Object.keys(responseData.data.roles)).toEqual([
+                        'owner',
+                    ])
                 })
 
                 it('Sign-in with missing Organization ID should fail.', async () => {
@@ -292,6 +299,11 @@ describe('Auth Endpoint', () => {
 
                     expect(response.status).toBe(200)
                     expect(responseData.data.userRoles).toEqual([
+                        'owner',
+                        'admin',
+                        'member',
+                    ])
+                    expect(Object.keys(responseData.data.roles)).toEqual([
                         'owner',
                         'admin',
                         'member',

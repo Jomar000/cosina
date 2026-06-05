@@ -110,6 +110,19 @@ const signInHandler = async (
     }
 
     const { permissions, roles } = ctx.get('acl')
+    const userRoles = parseAuthRoles(orgMemberData.member.role)
+    const userRoleDefinitions = Object.fromEntries(
+        userRoles.flatMap((role) =>
+            roles[role]
+                ? [
+                      [
+                          role,
+                          roles[role],
+                      ] as const,
+                  ]
+                : [],
+        ),
+    )
 
     /**
      * @description
@@ -131,8 +144,8 @@ const signInHandler = async (
             email: orgMemberData.user.email,
             avatar: orgMemberData.user.image ?? '',
             permissions,
-            roles,
-            userRoles: parseAuthRoles(orgMemberData.member.role),
+            roles: userRoleDefinitions,
+            userRoles,
             expiresAt:
                 Math.floor(new Date().getTime() / 1000) +
                 Number(ctx.env.SESSION_EXPIRATION),
