@@ -147,6 +147,39 @@ const updateResourceMutation = createMutation(() => ({
 }))
 ```
 
+### Debounced Search Inputs
+
+- For debounced server-backed search, never bind the input directly to state that appears in a `queryKey` or `queryFn`; each keystroke will change the query key and bypass the debounce.
+- Use separate draft and applied state: initialize both from a plain `initialSearchFilter`, bind the input to `inputSearchFilter`, and keep `searchFilter` as the applied query/URL state.
+- Avoid `$state(searchFilter)` for the draft state because it captures another rune's initial value and triggers Svelte warnings.
+- When syncing from URL params, update both `searchFilter` and `inputSearchFilter`. When applying user input, let the debounced handler copy `inputSearchFilter` into the applied state/URL.
+- Lookup/autocomplete searches may use a shorter debounce or a separate `debouncedSearchTerm`, but query keys must use the debounced/applied value, not the live input value.
+
+```svelte
+<script lang="ts">
+    const initialSearchFilter = page.url.searchParams.get('searchFilter') || ''
+
+    let searchFilter = $state(initialSearchFilter)
+    let inputSearchFilter = $state(initialSearchFilter)
+
+    const listQuery = createQuery(() => ({
+        queryKey: ['items', searchFilter],
+        queryFn: () => client.items.$get({ query: { searchFilter } }),
+    }))
+
+    const handleSearchInput = debounce(() => {
+        applySearch(inputSearchFilter)
+    })
+
+    function syncFromUrl(url: URL) {
+        searchFilter = url.searchParams.get('searchFilter') || ''
+        inputSearchFilter = searchFilter
+    }
+</script>
+
+<input bind:value={inputSearchFilter} oninput={handleSearchInput} />
+```
+
 ## Submission Guards
 
 - For non-idempotent create/update/remove flows, add an explicit component-local lock such as `isSubmitting`, `isSaving`, or `isConfirming`, even when TanStack mutation pending state exists.
