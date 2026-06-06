@@ -12,18 +12,21 @@ export const corsHandler = (mode: 'default' | 'reflect' = 'default') => {
             return
         }
 
-        let allowedOrigins: string[] = [ctx.env.URL_FRONTEND]
-
-        if (mode === 'reflect') {
-            allowedOrigins = ctx.req.header('origin')
-                ? [ctx.req.header('origin')!]
-                : []
-        }
+        const allowedOrigins =
+            mode === 'reflect'
+                ? ctx.req.header('origin')
+                    ? [ctx.req.header('origin')!]
+                    : []
+                : [ctx.env.URL_FRONTEND]
 
         // Credentials must never be allowed in reflect mode — doing so would
         // permit any origin to make credentialed requests, bypassing CORS entirely.
+        // In default mode, only emit credential support for the configured
+        // frontend origin.
         const allowCredentials =
-            mode !== 'reflect' && !!ctx.env.CORS_ALLOW_CREDENTIALS
+            mode !== 'reflect' &&
+            !!ctx.env.CORS_ALLOW_CREDENTIALS &&
+            allowedOrigins.includes(ctx.req.header('origin') ?? '')
 
         const corsMiddlewareHandler = cors({
             origin: allowedOrigins,
