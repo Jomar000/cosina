@@ -27,16 +27,14 @@ export const csrfHandler = () => {
         ]
 
         if (safeMethods.includes(ctx.req.method)) {
-            if (ctx.req.header('origin') === ctx.env.URL_FRONTEND) {
-                setCookie(ctx, 'csrf_token', nanoid(32), {
-                    domain: ctx.env.COOKIE_DOMAIN,
-                    httpOnly: false,
-                    partitioned: true,
-                    path: '/',
-                    sameSite: 'strict' as const,
-                    secure: true,
-                })
-            }
+            setCookie(ctx, 'csrf_token', nanoid(32), {
+                domain: ctx.env.COOKIE_DOMAIN,
+                httpOnly: false,
+                partitioned: true,
+                path: '/',
+                sameSite: 'strict' as const,
+                secure: true,
+            })
         } else {
             if (!ctx.req.header('origin')) {
                 return apiResponseErrorWrapper(ctx, {
