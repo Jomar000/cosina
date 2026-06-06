@@ -4,8 +4,12 @@ import type { THonoInstance } from '../../types.js'
 import { assertUserUnlocked } from '../../utilities/assertUserUnlocked.js'
 import {
     apiResponseErrorWrapper,
+    canLoginAuthRole,
     hasPrivilegedAuthRole,
 } from '../../utilities/helpers.js'
+
+// Roles allowed to authenticate on this API surface.
+const loginAuthRoles = [] as const
 
 export const isAuthenticated = () => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
@@ -18,6 +22,18 @@ export const isAuthenticated = () => {
                 code: 'UNAUTHORIZED',
                 message: 'You are not allowed to access this resource.',
                 status: 401,
+            })
+        }
+
+        const { role } = await ctx.get('auth').api.getActiveMemberRole({
+            headers: ctx.req.raw.headers,
+        })
+
+        if (!canLoginAuthRole(role, loginAuthRoles)) {
+            return apiResponseErrorWrapper(ctx, {
+                code: 'FORBIDDEN',
+                message: 'You are not allowed to access this resource.',
+                status: 403,
             })
         }
 
@@ -41,10 +57,6 @@ export const isAuthenticated = () => {
 
             throw err
         }
-
-        const { role } = await ctx.get('auth').api.getActiveMemberRole({
-            headers: ctx.req.raw.headers,
-        })
 
         ctx.set('isPrivilegedRole', hasPrivilegedAuthRole(role))
         ctx.set('role', role)

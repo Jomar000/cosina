@@ -16,11 +16,15 @@ import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     auditTrailLogger,
+    canLoginAuthRole,
     parseAuthRoles,
 } from '../../../utilities/helpers.js'
 import { captchaHandler } from '../../middleware/captchaHandler.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 import { validateRequest } from '../../middleware/validateRequest.js'
+
+// Roles allowed to authenticate on this API surface.
+const loginAuthRoles = [] as const
 
 const signInHandler = async (
     ctx: Context<THonoInstance>,
@@ -65,6 +69,14 @@ const signInHandler = async (
             code: 'UNPROCESSABLE_CONTENT',
             message: 'Invalid credentials provided.',
             status: 422,
+        })
+    }
+
+    if (!canLoginAuthRole(orgMemberData.member.role, loginAuthRoles)) {
+        return apiResponseErrorWrapper(ctx, {
+            code: 'FORBIDDEN',
+            message: 'You are not allowed to access this resource.',
+            status: 403,
         })
     }
 

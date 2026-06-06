@@ -180,6 +180,16 @@ export const parseAuthRoles = (role: string) =>
         .filter((value) => value.length > 0)
 
 /**
+ * Checks whether any parsed Better Auth organization role can login.
+ */
+export const canLoginAuthRole = (
+    role: string,
+    allowedRoles: readonly string[] = [],
+) =>
+    allowedRoles.length === 0 ||
+    parseAuthRoles(role).some((value) => allowedRoles.includes(value))
+
+/**
  * Checks whether any parsed Better Auth organization role is privileged.
  */
 export const hasPrivilegedAuthRole = (role: string) =>
