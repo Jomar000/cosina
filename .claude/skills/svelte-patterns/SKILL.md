@@ -193,6 +193,13 @@ const updateResourceMutation = createMutation(() => ({
 - For components with several create/update/remove actions behind one modal, use a shared local action lock so overlapping confirm actions cannot interleave.
 - Include the shared action lock in every modal action's disabled state.
 
+### Idempotent Create Attempts
+
+- For create endpoints that require `idempotencyKey`, generate a UUID v7 once per create attempt and include it in the payload.
+- Preserve the same key across failed retries, including network failures where persistence may have succeeded.
+- Rotate to a fresh key only after confirmed persistence and local cleanup.
+- Preserve attempt-coupled local snapshots, such as receipt or print data, across retries until the create is confirmed.
+
 ## Fonts
 
 - Load web fonts from each SvelteKit app's `static/fonts/` directory and reference them with root-relative URLs such as `/fonts/inter-variable.woff2`.

@@ -4,6 +4,7 @@ import type { z } from 'zod'
 
 import { authClient } from '$lib/clients'
 import type { SessionState } from '$lib/states/session'
+import { requestCaptchaToken } from '$lib/utilities/helpers'
 
 export type SignInPayload = z.input<typeof authValidator.signInInputSchema>
 
@@ -72,28 +73,6 @@ export async function signInWithCaptcha({
 
 function getSignInAction(accountId: string) {
     return accountId.includes('@') ? 'sign-in-email' : 'sign-in-username'
-}
-
-async function requestCaptchaToken({
-    action,
-    onCaptchaResolved,
-    siteKey,
-}: {
-    action: string
-    onCaptchaResolved: () => void
-    siteKey: string
-}) {
-    return new Promise<string>((resolve) => {
-        turnstile.execute('#captchaRenderArea', {
-            sitekey: siteKey,
-            action,
-            callback: (token: string) => {
-                onCaptchaResolved()
-                turnstile.remove('#captchaRenderArea')
-                resolve(token)
-            },
-        })
-    })
 }
 
 function showSignInErrorToast({

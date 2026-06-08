@@ -24,6 +24,8 @@ description: Rules for Drizzle ORM schema changes and queries, and for adding or
     - Do not add duplicate single-column indexes when a primary key, unique constraint, or existing index already covers the access pattern.
     - Before adding an index, check whether an existing composite index or unique constraint already provides left-prefix coverage, such as `(organization_id, user_id)` covering filters by `organization_id`.
 
+4.  **Idempotency for Creates:** When a create endpoint needs retry safety, add a nullable unique `idempotency_key uuid` column on the primary created table in `packages/database/src/postgres/schema.ts`. Keep the database column nullable so legacy/manual rows remain compatible, but require API callers to provide the key through validation. Do not add idempotency columns to guarded status-transition endpoints that are better protected by atomic update conditions.
+
 # Validators (`packages/validator`)
 
 - **Depends on:** `@PROJECT_NAME/types` (tsconfig project reference + workspace dependency).
