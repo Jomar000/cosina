@@ -39,4 +39,12 @@ export const updateInputSchema = z.object({
         .uppercase(),
 })
 
+export const readOutputSchema = base.outputSchema(base.objectOutputDataSchema)
+
+export const updateOutputSchema = base.outputSchema(base.objectOutputDataSchema)
+
 export const updateAddressInputSchema = base.addressInputSchema
+
+export const updateAddressOutputSchema = base.outputSchema(
+    base.objectOutputDataSchema,
+)

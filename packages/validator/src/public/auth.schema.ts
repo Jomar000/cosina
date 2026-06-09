@@ -49,11 +49,15 @@ export const passwordChangeInputSchema = z.object({
         .check(refinement.password()),
 })
 
+export const passwordChangeOutputSchema = base.outputSchema(z.null())
+
 export const passwordResetRequestInputSchema = z.object({
     email: z
         .email({ error: 'Please provide a valid e-mail address.' })
         .toLowerCase(),
 })
+
+export const passwordResetRequestOutputSchema = base.outputSchema(z.null())
 
 export const passwordResetInputSchema = z.object({
     token: field.vText({ fieldName: 'Token', max: 512 }),
@@ -65,6 +69,8 @@ export const passwordResetInputSchema = z.object({
         })
         .check(refinement.password()),
 })
+
+export const passwordResetOutputSchema = base.outputSchema(z.null())
 
 export const signUpInputSchema = z.object({
     email: z
@@ -91,3 +97,7 @@ export const signUpInputSchema = z.object({
         fieldName: 'Name',
     }),
 })
+
+export const signUpOutputSchema = base.outputSchema(base.objectOutputDataSchema)
+
+export const signOutOutputSchema = base.outputSchema(z.null())

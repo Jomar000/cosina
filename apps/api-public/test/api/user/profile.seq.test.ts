@@ -20,7 +20,6 @@ let originalMemberAddress:
       }
     | undefined
 let originalMemberAddressId: number | null = null
-let createdMemberProfile = false
 const touchedAddressIds = new Set<number>()
 
 const getDb = () =>
@@ -60,24 +59,12 @@ beforeAll(async () => {
     const { address, userProfile } = dbSchema
 
     try {
-        let [profile] = await db
+        const [profile] = await db
             .select({ addressId: userProfile.addressId })
             .from(userProfile)
             .where(eq(userProfile.userId, 'USER_003'))
 
-        if (!profile) {
-            ;[profile] = await db
-                .insert(userProfile)
-                .values({
-                    userId: 'USER_003',
-                    firstName: 'MEMBER',
-                    lastName: 'MEMBER',
-                    gender: 'MALE',
-                    backupPhoneNumber: '09170000000',
-                })
-                .returning({ addressId: userProfile.addressId })
-            createdMemberProfile = true
-        }
+        if (!profile) throw new Error('Seeded USER_003 profile was not found.')
 
         originalMemberAddressId = profile.addressId
 
@@ -104,16 +91,10 @@ afterAll(async () => {
     const { address, userProfile } = dbSchema
 
     try {
-        if (createdMemberProfile) {
-            await db
-                .delete(userProfile)
-                .where(eq(userProfile.userId, 'USER_003'))
-        } else {
-            await db
-                .update(userProfile)
-                .set({ addressId: originalMemberAddressId })
-                .where(eq(userProfile.userId, 'USER_003'))
-        }
+        await db
+            .update(userProfile)
+            .set({ addressId: originalMemberAddressId })
+            .where(eq(userProfile.userId, 'USER_003'))
 
         if (originalMemberAddressId && originalMemberAddress) {
             await db
@@ -136,8 +117,8 @@ afterAll(async () => {
     }
 })
 
-describe('User Profile Endpoint', () => {
-    describe('Sequential Tests', () => {
+describe.sequential('User Profile Endpoint', () => {
+    describe.sequential('Sequential Tests', () => {
         it('User address update should write previous address ID in audit trail oldData.', async () => {
             await updateUserAddress(firstAddressPayload)
             const previousAddressId = await getMemberAddressId()

@@ -22,7 +22,7 @@ describe.concurrent('WebSocket Endpoint', () => {
      *
      * isAuthorized() middleware wraps isAuthenticated() and runs before all route logic.
      */
-    describe('Authentication Guard', () => {
+    describe.concurrent('Authentication Guard', () => {
         it('Unauthenticated request should return 401.', async () => {
             const response = await app.request(
                 '/api/ws/general',
@@ -51,7 +51,7 @@ describe.concurrent('WebSocket Endpoint', () => {
      * Channels are statically registered via createWsChannel factory.
      * Requests to unregistered channels should return 404.
      */
-    describe('Unregistered Channel', () => {
+    describe.concurrent('Unregistered Channel', () => {
         it('Request to an unregistered channel should return 404.', async () => {
             const response = await app.request(
                 '/api/ws/nonexistent-channel',
@@ -76,7 +76,7 @@ describe.concurrent('WebSocket Endpoint', () => {
      *
      * Request must include a valid `Upgrade: websocket` header.
      */
-    describe('WebSocket Upgrade Guard', () => {
+    describe.concurrent('WebSocket Upgrade Guard', () => {
         it('Request without Upgrade header should return 426.', async () => {
             const response = await app.request(
                 '/api/ws/general',
@@ -131,7 +131,7 @@ describe.concurrent('WebSocket Endpoint', () => {
      *
      * WebSocket upgrade requests must come from the configured frontend origin.
      */
-    describe('WebSocket Origin Guard', () => {
+    describe.concurrent('WebSocket Origin Guard', () => {
         it('Request without Origin header should return 400.', async () => {
             const response = await app.request(
                 '/api/ws/general',
@@ -186,7 +186,7 @@ describe.concurrent('WebSocket Endpoint', () => {
      * - Members receive ws.listen only.
      * - All roles with ws.listen should successfully upgrade to WebSocket (101).
      */
-    describe('Permission Guard', () => {
+    describe.concurrent('Permission Guard', () => {
         it('Owner (ws.broadcast + ws.listen) connecting should return 101.', async () => {
             const response = await app.request(
                 '/api/ws/general',

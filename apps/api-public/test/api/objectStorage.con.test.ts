@@ -103,13 +103,13 @@ const commitUpload = async (uploadId: string) =>
         env,
     )
 
-describe('Object Storage Endpoint', () => {
+describe.concurrent('Object Storage Endpoint', () => {
     describe.concurrent('Concurrent Tests', () => {
         /**
          * @description
          * Authentication Guard
          */
-        describe('Authentication Guard', () => {
+        describe.concurrent('Authentication Guard', () => {
             it('Unauthenticated request to /upload/create should return 401.', async () => {
                 const response = await app.request(
                     '/api/objectStorage/upload/create',
@@ -252,7 +252,7 @@ describe('Object Storage Endpoint', () => {
          * @description
          * Basic Validation (Independent)
          */
-        describe('Basic Validation', () => {
+        describe.concurrent('Basic Validation', () => {
             it('Should reject attachment with invalid upload ID.', async () => {
                 const response = await app.request(
                     '/api/objectStorage/upload/attachment/create',
@@ -364,13 +364,13 @@ describe('Object Storage Endpoint', () => {
         })
     })
 
-    describe('Sequential Tests', () => {
+    describe.sequential('Sequential Tests', () => {
         /**
          * @description
          * Upload Flow
          */
-        describe('Upload Flow', () => {
-            describe('Create Upload', () => {
+        describe.sequential('Upload Flow', () => {
+            describe.sequential('Create Upload', () => {
                 it('Privileged user should be able to create an upload.', async () => {
                     const response = await app.request(
                         '/api/objectStorage/upload/create',
@@ -420,7 +420,7 @@ describe('Object Storage Endpoint', () => {
                 })
             })
 
-            describe('Create Upload Attachment', () => {
+            describe.sequential('Create Upload Attachment', () => {
                 it('Should create attachment with valid input and return signed URLs.', async () => {
                     // Step 1: Create an upload
                     const uploadResponse = await app.request(
@@ -836,7 +836,7 @@ describe('Object Storage Endpoint', () => {
                 })
             })
 
-            describe('Retry Upload Attachment', () => {
+            describe.sequential('Retry Upload Attachment', () => {
                 it('Should regenerate signed URLs for non-uploaded attachments.', async () => {
                     // Create upload and attachment
                     const uploadResponse = await app.request(
@@ -1104,7 +1104,7 @@ describe('Object Storage Endpoint', () => {
                 })
             })
 
-            describe('Commit Upload Attachment', () => {
+            describe.sequential('Commit Upload Attachment', () => {
                 it('Should mark attachments as uploaded.', async () => {
                     const uploadResponse = await app.request(
                         '/api/objectStorage/upload/create',
@@ -1232,7 +1232,7 @@ describe('Object Storage Endpoint', () => {
                 })
             })
 
-            describe('Commit Upload', () => {
+            describe.sequential('Commit Upload', () => {
                 it('Should commit an upload with attachments.', async () => {
                     // Full flow: create → attach → attachment commit → upload commit
                     const uploadResponse = await app.request(
@@ -1561,8 +1561,8 @@ describe('Object Storage Endpoint', () => {
          * @description
          * Download Flow
          */
-        describe('Download Flow', () => {
-            describe('Create Download Link', () => {
+        describe.sequential('Download Flow', () => {
+            describe.sequential('Create Download Link', () => {
                 it('Should create download links for own upload.', async () => {
                     // Full upload flow first
                     const uploadResponse = await app.request(

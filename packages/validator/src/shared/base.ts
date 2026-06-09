@@ -38,6 +38,10 @@ export const outputSchema = <Data extends z.ZodType = z.ZodType>(data: Data) =>
         }),
     ])
 
+export const objectOutputDataSchema = z.looseObject({})
+
+export const objectArrayOutputDataSchema = z.array(objectOutputDataSchema)
+
 export const readManyInputSchema = z.object({
     limit: z.coerce
         .number({

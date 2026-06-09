@@ -16,8 +16,9 @@ description: Checklist and rules for debugging or writing vitest tests targeting
 - **Concurrency & Execution Order:** The Vitest config splits tests by filename:
     - `*.con.test.ts` runs under the `concurrent-test-files` project.
     - `*.seq.test.ts` runs under the `sequential-test-files` project with `fileParallelism: false`.
-    - Within a file, keep using `describe.concurrent('Concurrent Tests', ...)` for read-only validation/guard tests and `describe('Sequential Tests', ...)` for stateful flows that depend on prior steps.
-- **Idempotent Create Coverage:** For create endpoints protected by UUID v7 `idempotencyKey`, cover missing key validation, invalid UUID validation, same-key replay returning the original ID/response, replay not duplicating primary rows, secondary rows, counters, audit logs, WebSocket-triggered state, or external-call records where observable, concurrent same-key requests creating only one resource and returning the same ID, and different payload replay returning the first created resource when that is the endpoint policy.
+    - Every suite, including nested suites, must explicitly use either `describe.concurrent(...)` or `describe.sequential(...)`; do not use plain `describe(...)`.
+    - Use `describe.concurrent('Concurrent Tests', ...)` for independent validation, guard, and read-only tests. Use `describe.sequential('Sequential Tests', ...)` for stateful flows that depend on prior steps.
+- **Request Origin:** Use `env.URL_FRONTEND` for the `Origin` request header in Worker API tests. This matches the configured frontend origin and keeps WebSocket origin-guard coverage representative of production requests.
 - **Test Data Hardening:** Tests must be resilient to changes in seed data (e.g., `99999999999999_test_data`). Follow these rules:
     1. **Never hardcode numeric DB IDs** (`warehouseId: 1`, `itemId: 1`, etc.) in tests that reach the database. Resolve all reference IDs via API calls in `beforeAll()` using discovery helpers from `apps/api-backoffice/test/utilities.ts`.
     2. **Exception — validation-only tests:** Auth guard tests (401/403) and schema validation tests (400) that fail *before* DB access may use placeholder IDs (any positive integer), since the request is rejected at the middleware or validator layer.

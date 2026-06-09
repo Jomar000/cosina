@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import * as base from '../shared/base.js'
 import * as field from '../shared/field.js'
 import * as refinement from '../shared/refinement.js'
 
@@ -10,6 +11,10 @@ export const downloadLinkCreateInputSchema = z.object({
             error: 'Upload ID must be alphanumeric characters only.',
         }),
 })
+
+export const downloadLinkCreateOutputSchema = base.outputSchema(
+    base.objectOutputDataSchema,
+)
 
 export const uploadAttachmentCreateInputSchema = z.object({
     uploadId: field
@@ -59,6 +64,10 @@ export const uploadAttachmentCreateInputSchema = z.object({
         }),
 })
 
+export const uploadAttachmentCreateOutputSchema = base.outputSchema(
+    base.objectOutputDataSchema,
+)
+
 export const uploadAttachmentCommitInputSchema = z.object({
     uploadId: field
         .vText({ fieldName: 'Upload ID', min: 16 })
@@ -77,8 +86,16 @@ export const uploadAttachmentCommitInputSchema = z.object({
         .max(25, { error: 'A maximum of 25 attachments can be provided.' }),
 })
 
+export const uploadAttachmentCommitOutputSchema = base.outputSchema(
+    base.objectOutputDataSchema,
+)
+
 export const uploadAttachmentRetryInputSchema =
     uploadAttachmentCommitInputSchema
+
+export const uploadAttachmentRetryOutputSchema = base.outputSchema(
+    base.objectOutputDataSchema,
+)
 
 export const uploadCommitInputSchema = z.object({
     uploadId: field
@@ -98,3 +115,7 @@ export const uploadCommitInputSchema = z.object({
         .optional()
         .default([]),
 })
+
+export const uploadCommitOutputSchema = base.outputSchema(
+    base.objectOutputDataSchema,
+)
