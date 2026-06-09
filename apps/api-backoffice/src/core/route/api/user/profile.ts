@@ -31,7 +31,7 @@ export const profileRoute = new Hono<THonoInstance>()
             const { createdAt, updatedAt, ...selectedColumns } =
                 getColumns(userProfile)
 
-            const data = await ctx
+            const [data] = await ctx
                 .get('dbClient')
                 .select(selectedColumns)
                 .from(userProfile)
@@ -65,7 +65,7 @@ export const profileRoute = new Hono<THonoInstance>()
                 backupPhoneNumber,
             } = ctx.req.valid('json')
 
-            const { member, userProfile } = ctx.get('dbSchema')
+            const { userProfile } = ctx.get('dbSchema')
 
             try {
                 const data = await ctx
@@ -94,7 +94,6 @@ export const profileRoute = new Hono<THonoInstance>()
                                 gender,
                                 backupPhoneNumber,
                             })
-                            .from(member)
                             .where(eq(userProfile.userId, ctx.get('user')!.id))
                             .returning({
                                 firstName: userProfile.firstName,
@@ -122,7 +121,7 @@ export const profileRoute = new Hono<THonoInstance>()
                             tx,
                         )
 
-                        return updated
+                        return updated[0]
                     })
 
                 return apiResponseOkWrapper(ctx, { data })

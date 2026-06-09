@@ -12,6 +12,7 @@
     import FileIcon from '@lucide/svelte/icons/file'
     import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw'
     import Trash2Icon from '@lucide/svelte/icons/trash-2'
+    import { createMutation } from '@tanstack/svelte-query'
     import { onDestroy, onMount } from 'svelte'
 
     import { formatBytes } from '$lib/utilities/helpers'
@@ -67,6 +68,40 @@
 
     let fileList: UploadMetadata[] = $state([])
     let addedToList: UploadMetadata[] = $state([])
+    let isActionLocked = $state(false)
+
+    ///////////////////
+    // 06. Mutations //
+    ///////////////////
+
+    const createUploadMutation = createMutation(() => ({
+        mutationKey: [
+            'objectStorage',
+            'upload',
+            'create',
+        ],
+        mutationFn: createUploadId,
+    }))
+
+    const uploadQueuedFilesMutation = createMutation(() => ({
+        mutationKey: [
+            'objectStorage',
+            'upload',
+            'attachment',
+            'create',
+        ],
+        mutationFn: uploadQueuedFiles,
+    }))
+
+    const retryUploadFileMutation = createMutation(() => ({
+        mutationKey: [
+            'objectStorage',
+            'upload',
+            'attachment',
+            'retry',
+        ],
+        mutationFn: retryUploadFile,
+    }))
 
     /////////////////
     // 08. Effects //
@@ -74,7 +109,12 @@
 
     onMount(async () => {
         if (opMode === 'NEW') {
-            uploadId = await createUploadId()
+            isActionLocked = true
+            try {
+                uploadId = await createUploadMutation.mutateAsync()
+            } finally {
+                isActionLocked = false
+            }
         } else {
             // TODO: Populate fileList with existing data
         }
@@ -87,54 +127,73 @@
     //////////////////
 
     async function handleFileInputChange(event: Event) {
-        const selectedFiles = (event.target as HTMLInputElement)?.files
-        addedToList = []
+        if (isActionLocked) return
 
+        const input = event.target as HTMLInputElement
+        const selectedFiles = input.files
         if (!selectedFiles) return
 
-        const result = await prepareUploadFiles({
-            allowedMimeTypes,
-            existingFiles: fileList,
-            maxItems,
-            selectedFiles,
-        })
+        isActionLocked = true
+        try {
+            addedToList = []
 
-        if (result.maxItemsReached) {
-            // TODO: Add alert banner or modal here.
-            alert(`Maximum of ${maxItems} files only.`)
+            const result = await prepareUploadFiles({
+                allowedMimeTypes,
+                existingFiles: fileList,
+                maxItems,
+                selectedFiles,
+            })
+
+            if (result.maxItemsReached) {
+                // TODO: Add alert banner or modal here.
+                alert(`Maximum of ${maxItems} files only.`)
+            }
+
+            addedToList = result.queuedFiles
+            if (addedToList.length === 0) return
+
+            fileList = [
+                ...fileList,
+                ...addedToList,
+            ]
+
+            await uploadQueuedFilesMutation.mutateAsync({
+                queuedFiles: addedToList,
+                uploadId,
+            })
+        } finally {
+            input.value = ''
+            isActionLocked = false
         }
-
-        addedToList = result.queuedFiles
-        if (addedToList.length === 0) return
-
-        fileList = [
-            ...fileList,
-            ...addedToList,
-        ]
-
-        await uploadQueuedFiles({
-            queuedFiles: addedToList,
-            uploadId,
-        })
     }
 
     async function handleFileRetry(index: number) {
-        await retryUploadFile({
-            file: fileList[index],
-            uploadId,
-        })
+        if (isActionLocked) return
+
+        isActionLocked = true
+        try {
+            await retryUploadFileMutation.mutateAsync({
+                file: fileList[index],
+                uploadId,
+            })
+        } finally {
+            isActionLocked = false
+        }
     }
 
     function handleOpenFileInput() {
+        if (isActionLocked) return
         document.getElementById('fileInput')?.click()
     }
 
-    function handleFileRetrySelect(event: Event) {
+    async function handleFileRetrySelect(event: Event) {
         const index = Number((event.currentTarget as HTMLElement).dataset.index)
-        void handleFileRetry(index)
+        await handleFileRetry(index)
     }
 
     function handleRemoveFileSelect(event: Event) {
+        if (isActionLocked) return
+
         const hashSha256 = (event.currentTarget as HTMLElement).dataset.hash
         if (hashSha256) {
             removeFile(hashSha256)
@@ -146,11 +205,14 @@
     /////////////////
 
     function clearFiles() {
+        if (isActionLocked) return
+
         revokePreviewUrls(fileList)
         fileList = []
     }
 
     function removeFile(hashSha256: string) {
+        if (isActionLocked) return
         fileList = removeUploadFile(fileList, hashSha256)
     }
 </script>
@@ -166,14 +228,17 @@
             </div>
             <div class="flex items-center gap-x-4">
                 <Button
-                    disabled={fileList.length === 0}
+                    disabled={isActionLocked || fileList.length === 0}
                     onclick={clearFiles}
                     variant="outline"
                 >
                     <Trash2Icon class="mr-2 size-4 " />
                     Clear All</Button
                 >
-                <Button onclick={handleOpenFileInput}>
+                <Button
+                    disabled={isActionLocked || uploadId === ''}
+                    onclick={handleOpenFileInput}
+                >
                     <CloudUploadIcon class="mr-2 size-4 " />
                     Upload
                 </Button>
@@ -241,8 +306,9 @@
                                 <DropdownMenu.Root>
                                     <DropdownMenu.Trigger>
                                         <Button
-                                            variant="ghost"
+                                            disabled={isActionLocked}
                                             size="icon"
+                                            variant="ghost"
                                         >
                                             <EllipsisVerticalIcon
                                                 class="size-4 "
@@ -253,6 +319,7 @@
                                         {#if p.status === 'FAILED'}
                                             <DropdownMenu.Item
                                                 data-index={i}
+                                                disabled={isActionLocked}
                                                 onclick={handleFileRetrySelect}
                                             >
                                                 <RefreshCwIcon
@@ -263,6 +330,7 @@
                                         {/if}
                                         <DropdownMenu.Item
                                             data-hash={p.hashSha256}
+                                            disabled={isActionLocked}
                                             onclick={handleRemoveFileSelect}
                                         >
                                             <Trash2Icon class="mr-2 size-4 " />
@@ -277,6 +345,7 @@
             </Table.Root>
             <input
                 class="hidden"
+                disabled={isActionLocked}
                 id="fileInput"
                 multiple
                 onchange={handleFileInputChange}

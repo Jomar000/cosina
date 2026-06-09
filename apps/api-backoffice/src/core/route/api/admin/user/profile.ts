@@ -38,7 +38,7 @@ export const profileRoute = new Hono<THonoInstance>()
                 const { createdAt, updatedAt, ...selectedColumns } =
                     getColumns(userProfile)
 
-                const data = await ctx
+                const [data] = await ctx
                     .get('dbClient')
                     .select(selectedColumns)
                     .from(userProfile)
@@ -206,7 +206,6 @@ export const profileRoute = new Hono<THonoInstance>()
                                 gender,
                                 backupPhoneNumber,
                             })
-                            .from(member)
                             .where(eq(userProfile.userId, userId))
                             .returning({
                                 firstName: userProfile.firstName,

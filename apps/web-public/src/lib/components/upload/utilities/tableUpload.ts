@@ -27,9 +27,11 @@ export function getUploadMode(uploadId: string): UploadMode {
 
 export async function createUploadId() {
     const response = await objectStorageClient.upload.create.$post()
-    const { data, error, success } = await response.json()
-    if (!success) throw new Error(error.message)
-    return data.uploadId
+    const responseJson = await response.json()
+    if (!responseJson.success) {
+        throw new Error(responseJson.error.message)
+    }
+    return responseJson.data.uploadId
 }
 
 export async function prepareUploadFiles({
@@ -115,12 +117,14 @@ export async function uploadQueuedFiles({
             },
         })
 
-    const { data, error, success } = await signingResponse.json()
-    if (!success) throw new Error(error.message)
+    const responseJson = await signingResponse.json()
+    if (!responseJson.success) {
+        throw new Error(responseJson.error.message)
+    }
 
     const uploadQueue = new PQueue({ concurrency: 3 })
 
-    for (const signedUpload of data.signedUrls) {
+    for (const signedUpload of responseJson.data.signedUrls) {
         uploadQueue
             .add(() => uploadSignedFile(signedUpload, queuedFiles, uploadId))
             .catch(() => {})
@@ -144,10 +148,12 @@ export async function retryUploadFile({
             },
         })
 
-    const { data, error, success } = await retryResponse.json()
-    if (!success) throw new Error(error.message)
+    const responseJson = await retryResponse.json()
+    if (!responseJson.success) {
+        throw new Error(responseJson.error.message)
+    }
 
-    for (const signedUpload of data.signedUrls) {
+    for (const signedUpload of responseJson.data.signedUrls) {
         if (signedUpload.status === 409) {
             file.status = 'UPLOADED'
         } else if (signedUpload.status === 200) {
@@ -247,8 +253,10 @@ async function commitUploadedFile(uploadId: string, objectId: string) {
         },
     })
 
-    const { error, success } = await response.json()
-    if (!success) throw new Error(error.message)
+    const responseJson = await response.json()
+    if (!responseJson.success) {
+        throw new Error(responseJson.error.message)
+    }
 }
 
 async function hashFileBuffer(fileBuffer: ArrayBuffer) {

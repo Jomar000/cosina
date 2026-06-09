@@ -1,5 +1,8 @@
 import { dbClient, dbSchema } from '@hyperion/database/postgres'
-import type { TApiResponseOk } from '@hyperion/types/shared'
+import type {
+    TApiResponseOk,
+    TApiResponsePaginatedOk,
+} from '@hyperion/types/shared'
 import { env } from 'cloudflare:workers'
 import { and, desc, eq, inArray } from 'drizzle-orm'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -20,7 +23,24 @@ let originalMemberAddress:
       }
     | undefined
 let originalMemberAddressId: number | null = null
+let originalMemberProfile: TProfileData | undefined
 const touchedAddressIds = new Set<number>()
+
+type TProfileData = {
+    backupPhoneNumber: string | null
+    firstName: string
+    gender: 'MALE' | 'FEMALE'
+    lastName: string
+    middleName: string | null
+    nameExtension: string | null
+}
+
+const profileUpdatePayload = {
+    backupPhoneNumber: '09171234567',
+    firstName: 'TEST',
+    gender: 'MALE' as const,
+    lastName: 'PROFILE',
+}
 
 const getDb = () =>
     dbClient({
@@ -60,15 +80,25 @@ beforeAll(async () => {
 
     try {
         const [profile] = await db
-            .select({ addressId: userProfile.addressId })
+            .select({
+                addressId: userProfile.addressId,
+                backupPhoneNumber: userProfile.backupPhoneNumber,
+                firstName: userProfile.firstName,
+                gender: userProfile.gender,
+                lastName: userProfile.lastName,
+                middleName: userProfile.middleName,
+                nameExtension: userProfile.nameExtension,
+            })
             .from(userProfile)
             .where(eq(userProfile.userId, 'USER_003'))
 
         if (!profile) throw new Error('Seeded USER_003 profile was not found.')
 
-        originalMemberAddressId = profile.addressId
+        const { addressId, ...profileData } = profile
+        originalMemberAddressId = addressId
+        originalMemberProfile = profileData
 
-        if (profile.addressId) {
+        if (addressId) {
             ;[originalMemberAddress] = await db
                 .select({
                     cityMunicipality: address.cityMunicipality,
@@ -79,7 +109,7 @@ beforeAll(async () => {
                     provinceStateRegion: address.provinceStateRegion,
                 })
                 .from(address)
-                .where(eq(address.id, profile.addressId))
+                .where(eq(address.id, addressId))
         }
     } finally {
         await db.$client.end()
@@ -93,7 +123,10 @@ afterAll(async () => {
     try {
         await db
             .update(userProfile)
-            .set({ addressId: originalMemberAddressId })
+            .set({
+                ...originalMemberProfile,
+                addressId: originalMemberAddressId,
+            })
             .where(eq(userProfile.userId, 'USER_003'))
 
         if (originalMemberAddressId && originalMemberAddress) {
@@ -119,6 +152,107 @@ afterAll(async () => {
 
 describe('User Profile Endpoint', () => {
     describe('Sequential Tests', () => {
+        it('Admin profile list should return paginated metadata.', async () => {
+            const response = await app.request(
+                '/api/admin/user/profile/readMany?limit=2&offset=0&sortOrder=asc',
+                {
+                    method: 'GET',
+                    headers: {
+                        origin: env.URL_FRONTEND,
+                        cookie: privilegedCookie,
+                    },
+                },
+                env,
+            )
+            const responseJson =
+                await response.json<TApiResponsePaginatedOk<TProfileData[]>>()
+
+            expect(response.status).toBe(200)
+            expect(Array.isArray(responseJson.data)).toBe(true)
+            expect(responseJson.count).toBeGreaterThanOrEqual(
+                responseJson.data.length,
+            )
+            expect(responseJson.limit).toBe(2)
+            expect(responseJson.offset).toBe(0)
+        })
+
+        it('Profile reads and updates should return object data.', async () => {
+            const userReadResponse = await app.request(
+                '/api/user/profile/read',
+                {
+                    method: 'GET',
+                    headers: {
+                        origin: env.URL_FRONTEND,
+                        cookie: standardCookie,
+                    },
+                },
+                env,
+            )
+            const userReadJson =
+                await userReadResponse.json<TApiResponseOk<TProfileData>>()
+
+            expect(userReadResponse.status).toBe(200)
+            expect(Array.isArray(userReadJson.data)).toBe(false)
+
+            const userUpdateResponse = await app.request(
+                '/api/user/profile/update',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: env.URL_FRONTEND,
+                        'content-type': 'application/json',
+                        cookie: standardCookie,
+                    },
+                    body: JSON.stringify(profileUpdatePayload),
+                },
+                env,
+            )
+            const userUpdateJson =
+                await userUpdateResponse.json<TApiResponseOk<TProfileData>>()
+
+            expect(userUpdateResponse.status).toBe(200)
+            expect(Array.isArray(userUpdateJson.data)).toBe(false)
+
+            const adminReadResponse = await app.request(
+                '/api/admin/user/profile/read?userId=USER_003',
+                {
+                    method: 'GET',
+                    headers: {
+                        origin: env.URL_FRONTEND,
+                        cookie: privilegedCookie,
+                    },
+                },
+                env,
+            )
+            const adminReadJson =
+                await adminReadResponse.json<TApiResponseOk<TProfileData>>()
+
+            expect(adminReadResponse.status).toBe(200)
+            expect(Array.isArray(adminReadJson.data)).toBe(false)
+
+            const adminUpdateResponse = await app.request(
+                '/api/admin/user/profile/update',
+                {
+                    method: 'POST',
+                    headers: {
+                        origin: env.URL_FRONTEND,
+                        'content-type': 'application/json',
+                        cookie: privilegedCookie,
+                    },
+                    body: JSON.stringify({
+                        userId: 'USER_003',
+                        ...profileUpdatePayload,
+                    }),
+                },
+                env,
+            )
+            const adminUpdateJson =
+                await adminUpdateResponse.json<TApiResponseOk<TProfileData>>()
+
+            expect(adminUpdateResponse.status).toBe(200)
+            expect(Array.isArray(adminUpdateJson.data)).toBe(false)
+        })
+
         it('User address update should write previous address ID in audit trail oldData.', async () => {
             await updateUserAddress(firstAddressPayload)
             const previousAddressId = await getMemberAddressId()

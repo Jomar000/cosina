@@ -51,10 +51,12 @@ export async function signInWithCaptcha({
             },
         )
 
-        const { data, error, success } = await response.json()
-        if (!success) throw new Error(error.message)
+        const responseJson = await response.json()
+        if (!responseJson.success) {
+            throw new Error(responseJson.error.message)
+        }
 
-        session.set(data)
+        session.set(responseJson.data)
         if (!session.isValid()) {
             throw new Error('Invalid session data.')
         }
