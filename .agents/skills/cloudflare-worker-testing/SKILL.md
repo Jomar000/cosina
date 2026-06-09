@@ -16,8 +16,9 @@ description: Checklist and rules for debugging or writing vitest tests targeting
 - **Concurrency & Execution Order:** The Vitest config splits tests by filename:
     - `*.con.test.ts` runs under the `concurrent-test-files` project.
     - `*.seq.test.ts` runs under the `sequential-test-files` project with `fileParallelism: false`.
-    - Every suite, including nested suites, must explicitly use either `describe.concurrent(...)` or `describe.sequential(...)`; do not use plain `describe(...)`.
-    - Use `describe.concurrent('Concurrent Tests', ...)` for independent validation, guard, and read-only tests. Use `describe.sequential('Sequential Tests', ...)` for stateful flows that depend on prior steps.
+    - Use `describe.concurrent(...)` for suites whose tests can run concurrently. Use plain `describe(...)` for sequential suites because sequential execution is Vitest's default.
+    - In mixed files, keep the outer grouping suite plain and explicitly mark only concurrent child suites. If a sequential suite must remain nested under a concurrent suite, override inheritance with `describe(name, { concurrent: false }, callback)`.
+    - Do not use the deprecated `describe.sequential(...)` modifier.
 - **Request Origin:** Use `env.URL_FRONTEND` for the `Origin` request header in Worker API tests. This matches the configured frontend origin and keeps WebSocket origin-guard coverage representative of production requests.
 - **Test Data Hardening:** Tests must be resilient to changes in seed data (e.g., `99999999999999_test_data`). Follow these rules:
     1. **Never hardcode numeric DB IDs** (`warehouseId: 1`, `itemId: 1`, etc.) in tests that reach the database. Resolve all reference IDs via API calls in `beforeAll()` using discovery helpers from `apps/api-backoffice/test/utilities.ts`.

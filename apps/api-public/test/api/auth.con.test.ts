@@ -26,7 +26,7 @@ beforeAll(async () => {
  * Handled by the event listeners defined on vitest.setup.ts
  */
 
-describe.concurrent('Auth Endpoint', () => {
+describe('Auth Endpoint', () => {
     describe.concurrent('Concurrent Tests', () => {
         describe.concurrent('Sign-in', () => {
             describe.concurrent('Username', () => {
@@ -450,7 +450,7 @@ describe.concurrent('Auth Endpoint', () => {
             })
         })
 
-        describe.sequential('Sign-out', () => {
+        describe('Sign-out', { concurrent: false }, () => {
             it('Sign-out with valid session should pass.', async () => {
                 // Sign in first to get a session cookie
                 const signInResponse = await app.request(

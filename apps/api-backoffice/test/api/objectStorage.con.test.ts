@@ -103,7 +103,7 @@ const commitUpload = async (uploadId: string) =>
         env,
     )
 
-describe.concurrent('Object Storage Endpoint', () => {
+describe('Object Storage Endpoint', () => {
     describe.concurrent('Concurrent Tests', () => {
         /**
          * @description
@@ -364,13 +364,13 @@ describe.concurrent('Object Storage Endpoint', () => {
         })
     })
 
-    describe.sequential('Sequential Tests', () => {
+    describe('Sequential Tests', () => {
         /**
          * @description
          * Upload Flow
          */
-        describe.sequential('Upload Flow', () => {
-            describe.sequential('Create Upload', () => {
+        describe('Upload Flow', () => {
+            describe('Create Upload', () => {
                 it('Privileged user should be able to create an upload.', async () => {
                     const response = await app.request(
                         '/api/objectStorage/upload/create',
@@ -420,7 +420,7 @@ describe.concurrent('Object Storage Endpoint', () => {
                 })
             })
 
-            describe.sequential('Create Upload Attachment', () => {
+            describe('Create Upload Attachment', () => {
                 it('Should create attachment with valid input and return signed URLs.', async () => {
                     // Step 1: Create an upload
                     const uploadResponse = await app.request(
@@ -836,7 +836,7 @@ describe.concurrent('Object Storage Endpoint', () => {
                 })
             })
 
-            describe.sequential('Retry Upload Attachment', () => {
+            describe('Retry Upload Attachment', () => {
                 it('Should regenerate signed URLs for non-uploaded attachments.', async () => {
                     // Create upload and attachment
                     const uploadResponse = await app.request(
@@ -1104,7 +1104,7 @@ describe.concurrent('Object Storage Endpoint', () => {
                 })
             })
 
-            describe.sequential('Commit Upload Attachment', () => {
+            describe('Commit Upload Attachment', () => {
                 it('Should mark attachments as uploaded.', async () => {
                     const uploadResponse = await app.request(
                         '/api/objectStorage/upload/create',
@@ -1232,7 +1232,7 @@ describe.concurrent('Object Storage Endpoint', () => {
                 })
             })
 
-            describe.sequential('Commit Upload', () => {
+            describe('Commit Upload', () => {
                 it('Should commit an upload with attachments.', async () => {
                     // Full flow: create → attach → attachment commit → upload commit
                     const uploadResponse = await app.request(
@@ -1561,8 +1561,8 @@ describe.concurrent('Object Storage Endpoint', () => {
          * @description
          * Download Flow
          */
-        describe.sequential('Download Flow', () => {
-            describe.sequential('Create Download Link', () => {
+        describe('Download Flow', () => {
+            describe('Create Download Link', () => {
                 it('Should create download links for own upload.', async () => {
                     // Full upload flow first
                     const uploadResponse = await app.request(

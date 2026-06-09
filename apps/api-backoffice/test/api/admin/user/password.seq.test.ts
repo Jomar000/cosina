@@ -38,13 +38,13 @@ beforeAll(async () => {
  * - USER_999 (locked, member)
  */
 
-describe.sequential('Admin User Password Endpoint', () => {
-    describe.sequential('Sequential Tests', () => {
+describe('Admin User Password Endpoint', () => {
+    describe('Sequential Tests', () => {
         /**
          * @description
          * Reset Request (Email OTP Flow)
          */
-        describe.sequential('Reset Request Flow', () => {
+        describe('Reset Request Flow', () => {
             it('Reset request for a valid organization member should pass.', async () => {
                 const response = await app.request(
                     '/api/admin/user/password/reset-request',
@@ -74,7 +74,7 @@ describe.sequential('Admin User Password Endpoint', () => {
          * @description
          * Direct Reset (Admin sets password directly)
          */
-        describe.sequential('Direct Reset Flow', () => {
+        describe('Direct Reset Flow', () => {
             it('Direct password reset for a valid organization member should pass.', async () => {
                 const response = await app.request(
                     '/api/admin/user/password/reset',
@@ -246,150 +246,143 @@ describe.sequential('Admin User Password Endpoint', () => {
             })
         })
 
-        describe.sequential(
-            'Full Password Reset Flow (OTP Interception)',
-            () => {
-                let interceptedToken: string
+        describe('Full Password Reset Flow (OTP Interception)', () => {
+            let interceptedToken: string
 
-                beforeAll(async () => {
-                    const response = await app.request(
-                        '/api/admin/user/password/reset-request',
-                        {
-                            method: 'POST',
-                            headers: {
-                                origin: env.URL_FRONTEND,
-                                'content-type': 'application/json',
-                                cookie: privilegedCookie,
-                            },
-                            body: JSON.stringify({
-                                userId: 'USER_PASSWORD_MUTABLE',
-                            }),
+            beforeAll(async () => {
+                const response = await app.request(
+                    '/api/admin/user/password/reset-request',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: env.URL_FRONTEND,
+                            'content-type': 'application/json',
+                            cookie: privilegedCookie,
                         },
-                        env,
-                    )
+                        body: JSON.stringify({
+                            userId: 'USER_PASSWORD_MUTABLE',
+                        }),
+                    },
+                    env,
+                )
 
-                    const responseData =
-                        await response.json<TApiResponseOk<null>>()
+                const responseData = await response.json<TApiResponseOk<null>>()
 
-                    expect(response.status).toBe(200)
-                    expect(responseData.success).toBe(true)
-                    expect(responseData.data).toBeNull()
+                expect(response.status).toBe(200)
+                expect(responseData.success).toBe(true)
+                expect(responseData.data).toBeNull()
 
-                    interceptedToken = await interceptPasswordResetToken(
-                        'USER_PASSWORD_MUTABLE',
-                    )
-                    expect(interceptedToken).toBeTruthy()
-                })
+                interceptedToken = await interceptPasswordResetToken(
+                    'USER_PASSWORD_MUTABLE',
+                )
+                expect(interceptedToken).toBeTruthy()
+            })
 
-                it('Step 1: Complete password reset using the intercepted token.', async () => {
-                    const response = await app.request(
-                        '/api/auth/password/reset',
-                        {
-                            method: 'POST',
-                            headers: {
-                                origin: env.URL_FRONTEND,
-                                'content-type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                token: interceptedToken,
-                                newPassword: 'R3set@P@ssw0rd5678',
-                            }),
+            it('Step 1: Complete password reset using the intercepted token.', async () => {
+                const response = await app.request(
+                    '/api/auth/password/reset',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: env.URL_FRONTEND,
+                            'content-type': 'application/json',
                         },
-                        env,
-                    )
+                        body: JSON.stringify({
+                            token: interceptedToken,
+                            newPassword: 'R3set@P@ssw0rd5678',
+                        }),
+                    },
+                    env,
+                )
 
-                    const responseData =
-                        await response.json<TApiResponseOk<null>>()
+                const responseData = await response.json<TApiResponseOk<null>>()
 
-                    expect(response.status).toBe(200)
-                    expect(responseData.success).toBe(true)
-                    expect(responseData.data).toBeNull()
-                })
+                expect(response.status).toBe(200)
+                expect(responseData.success).toBe(true)
+                expect(responseData.data).toBeNull()
+            })
 
-                it('Step 2: Sign-in with the new password should pass.', async () => {
-                    const response = await app.request(
-                        '/api/auth/sign-in/username',
-                        {
-                            method: 'POST',
-                            headers: {
-                                origin: env.URL_FRONTEND,
-                                'content-type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                organizationId: 'superorganization',
-                                accountId: 'password_mutable',
-                                password: 'R3set@P@ssw0rd5678',
-                            }),
+            it('Step 2: Sign-in with the new password should pass.', async () => {
+                const response = await app.request(
+                    '/api/auth/sign-in/username',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: env.URL_FRONTEND,
+                            'content-type': 'application/json',
                         },
-                        env,
-                    )
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'password_mutable',
+                            password: 'R3set@P@ssw0rd5678',
+                        }),
+                    },
+                    env,
+                )
 
-                    const responseData =
-                        await response.json<TApiResponseOk<unknown>>()
+                const responseData =
+                    await response.json<TApiResponseOk<unknown>>()
 
-                    expect(response.status).toBe(200)
-                    expect(response.headers.get('set-cookie')).toBeTruthy()
-                    expect(responseData).toHaveProperty('data')
-                })
+                expect(response.status).toBe(200)
+                expect(response.headers.get('set-cookie')).toBeTruthy()
+                expect(responseData).toHaveProperty('data')
+            })
 
-                it('Step 3: Sign-in with the old password should fail.', async () => {
-                    const response = await app.request(
-                        '/api/auth/sign-in/username',
-                        {
-                            method: 'POST',
-                            headers: {
-                                origin: env.URL_FRONTEND,
-                                'content-type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                organizationId: 'superorganization',
-                                accountId: 'password_mutable',
-                                password: 'P@ssw0rd1234',
-                            }),
+            it('Step 3: Sign-in with the old password should fail.', async () => {
+                const response = await app.request(
+                    '/api/auth/sign-in/username',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: env.URL_FRONTEND,
+                            'content-type': 'application/json',
                         },
-                        env,
-                    )
+                        body: JSON.stringify({
+                            organizationId: 'superorganization',
+                            accountId: 'password_mutable',
+                            password: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
 
-                    const responseData =
-                        await response.json<TApiResponseError>()
+                const responseData = await response.json<TApiResponseError>()
 
-                    expect(response.status).toBe(422)
-                    expect(responseData).toHaveProperty('error')
-                    expect(responseData.error.message).toBe(
-                        'Invalid credentials provided.',
-                    )
-                })
+                expect(response.status).toBe(422)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.message).toBe(
+                    'Invalid credentials provided.',
+                )
+            })
 
-                it('Step 4: Restore original password.', async () => {
-                    /**
-                     * @description
-                     * Use admin direct reset to restore the original password
-                     * so other tests are not affected.
-                     */
-                    const response = await app.request(
-                        '/api/admin/user/password/reset',
-                        {
-                            method: 'POST',
-                            headers: {
-                                origin: env.URL_FRONTEND,
-                                'content-type': 'application/json',
-                                cookie: privilegedCookie,
-                            },
-                            body: JSON.stringify({
-                                userId: 'USER_PASSWORD_MUTABLE',
-                                newPassword: 'P@ssw0rd1234',
-                            }),
+            it('Step 4: Restore original password.', async () => {
+                /**
+                 * @description
+                 * Use admin direct reset to restore the original password
+                 * so other tests are not affected.
+                 */
+                const response = await app.request(
+                    '/api/admin/user/password/reset',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: env.URL_FRONTEND,
+                            'content-type': 'application/json',
+                            cookie: privilegedCookie,
                         },
-                        env,
-                    )
+                        body: JSON.stringify({
+                            userId: 'USER_PASSWORD_MUTABLE',
+                            newPassword: 'P@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
 
-                    const responseData =
-                        await response.json<TApiResponseOk<null>>()
+                const responseData = await response.json<TApiResponseOk<null>>()
 
-                    expect(response.status).toBe(200)
-                    expect(responseData.success).toBe(true)
-                })
-            },
-        )
+                expect(response.status).toBe(200)
+                expect(responseData.success).toBe(true)
+            })
+        })
     })
 })

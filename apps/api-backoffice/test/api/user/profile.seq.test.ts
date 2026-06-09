@@ -117,8 +117,8 @@ afterAll(async () => {
     }
 })
 
-describe.sequential('User Profile Endpoint', () => {
-    describe.sequential('Sequential Tests', () => {
+describe('User Profile Endpoint', () => {
+    describe('Sequential Tests', () => {
         it('User address update should write previous address ID in audit trail oldData.', async () => {
             await updateUserAddress(firstAddressPayload)
             const previousAddressId = await getMemberAddressId()
