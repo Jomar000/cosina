@@ -17,7 +17,7 @@ export const passwordRoute = new Hono<THonoInstance>()
      * Routes
      */
     .post(
-        '/reset-request',
+        '/resetRequest',
         validateRequest('json', password.resetRequestInputSchema),
         async (ctx) => {
             const { userId } = ctx.req.valid('json')

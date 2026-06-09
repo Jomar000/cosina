@@ -230,7 +230,7 @@ describe.concurrent('WebSocket Endpoint', () => {
 
             it('Admin (ws.broadcast + ws.listen) connecting should return 101.', async () => {
                 const signInResponse = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {

@@ -35,9 +35,9 @@ describe.concurrent('Admin User Password Endpoint', () => {
          * Authentication & Authorization Guard
          */
         describe.concurrent('Authentication & Authorization Guard', () => {
-            it('Unauthenticated request to /reset-request should return 401.', async () => {
+            it('Unauthenticated request to /resetRequest should return 401.', async () => {
                 const response = await app.request(
-                    '/api/admin/user/password/reset-request',
+                    '/api/admin/user/password/resetRequest',
                     {
                         method: 'POST',
                         headers: {
@@ -82,9 +82,9 @@ describe.concurrent('Admin User Password Endpoint', () => {
                 expect(responseData.error.code).toBe('UNAUTHORIZED')
             })
 
-            it('Non-admin request to /reset-request should return 403.', async () => {
+            it('Non-admin request to /resetRequest should return 403.', async () => {
                 const response = await app.request(
-                    '/api/admin/user/password/reset-request',
+                    '/api/admin/user/password/resetRequest',
                     {
                         method: 'POST',
                         headers: {
@@ -139,7 +139,7 @@ describe.concurrent('Admin User Password Endpoint', () => {
         describe.concurrent('Validation', () => {
             it('Reset request with missing userId should return 400.', async () => {
                 const response = await app.request(
-                    '/api/admin/user/password/reset-request',
+                    '/api/admin/user/password/resetRequest',
                     {
                         method: 'POST',
                         headers: {
@@ -236,7 +236,7 @@ describe.concurrent('Admin User Password Endpoint', () => {
         describe.concurrent('Reset Request Validations', () => {
             it('Reset request for a non-existent user should return 404.', async () => {
                 const response = await app.request(
-                    '/api/admin/user/password/reset-request',
+                    '/api/admin/user/password/resetRequest',
                     {
                         method: 'POST',
                         headers: {

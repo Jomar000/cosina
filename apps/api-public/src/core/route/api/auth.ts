@@ -207,7 +207,7 @@ export const authRoute = new Hono<THonoInstance>()
         },
     )
     .post(
-        '/password/reset-request',
+        '/password/resetRequest',
         validateRequest('json', passwordResetRequestInputSchema),
         async (ctx) => {
             const { email } = ctx.req.valid('json')
@@ -265,18 +265,18 @@ export const authRoute = new Hono<THonoInstance>()
         },
     )
     .post(
-        '/sign-in/email',
+        '/signIn/email',
         captchaHandler('sign-in-email'),
         validateRequest('json', signInInputSchema),
         async (ctx) => signInHandler(ctx, ctx.req.valid('json'), 'email'),
     )
     .post(
-        '/sign-in/username',
+        '/signIn/username',
         captchaHandler('sign-in-username'),
         validateRequest('json', signInInputSchema),
         async (ctx) => signInHandler(ctx, ctx.req.valid('json'), 'username'),
     )
-    .post('/sign-out', async (ctx) => {
+    .post('/signOut', async (ctx) => {
         const auth = ctx.get('auth')
 
         const betterAuthResponse = await auth.api.signOut({

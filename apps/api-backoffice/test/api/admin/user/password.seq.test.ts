@@ -47,7 +47,7 @@ describe('Admin User Password Endpoint', () => {
         describe('Reset Request Flow', () => {
             it('Reset request for a valid organization member should pass.', async () => {
                 const response = await app.request(
-                    '/api/admin/user/password/reset-request',
+                    '/api/admin/user/password/resetRequest',
                     {
                         method: 'POST',
                         headers: {
@@ -144,7 +144,7 @@ describe('Admin User Password Endpoint', () => {
 
             it('Sign-in with the new password after direct reset should pass.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
@@ -170,7 +170,7 @@ describe('Admin User Password Endpoint', () => {
 
             it('Sign-in with the old password after direct reset should fail.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
@@ -251,7 +251,7 @@ describe('Admin User Password Endpoint', () => {
 
             beforeAll(async () => {
                 const response = await app.request(
-                    '/api/admin/user/password/reset-request',
+                    '/api/admin/user/password/resetRequest',
                     {
                         method: 'POST',
                         headers: {
@@ -304,7 +304,7 @@ describe('Admin User Password Endpoint', () => {
 
             it('Step 2: Sign-in with the new password should pass.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
@@ -330,7 +330,7 @@ describe('Admin User Password Endpoint', () => {
 
             it('Step 3: Sign-in with the old password should fail.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {

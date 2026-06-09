@@ -35,7 +35,7 @@ const restoreMutableAuthAttribute = async () => {
 
 const signInMutableAuthUser = async () => {
     const response = await app.request(
-        '/api/auth/sign-in/username',
+        '/api/auth/signIn/username',
         {
             method: 'POST',
             headers: {
@@ -67,7 +67,7 @@ describe('Auth Endpoint', () => {
         describe('User Attribute Lock Enforcement', () => {
             it('Sign-in by username with missing user attribute should fail closed.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
@@ -94,7 +94,7 @@ describe('Auth Endpoint', () => {
 
             it('Sign-in by email with missing user attribute should fail closed.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/email',
+                    '/api/auth/signIn/email',
                     {
                         method: 'POST',
                         headers: {
@@ -280,7 +280,7 @@ describe('Auth Endpoint', () => {
 
             it('Sign-in with the new password should pass.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
@@ -306,7 +306,7 @@ describe('Auth Endpoint', () => {
 
             it('Sign-in with the old password should fail.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
@@ -338,7 +338,7 @@ describe('Auth Endpoint', () => {
                  * then change back to original.
                  */
                 const signInResponse = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
@@ -401,7 +401,7 @@ describe('Auth Endpoint', () => {
 
             beforeAll(async () => {
                 const response = await app.request(
-                    '/api/auth/password/reset-request',
+                    '/api/auth/password/resetRequest',
                     {
                         method: 'POST',
                         headers: {
@@ -452,7 +452,7 @@ describe('Auth Endpoint', () => {
 
             it('Step 2: Sign-in with the new password should pass.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
@@ -478,7 +478,7 @@ describe('Auth Endpoint', () => {
 
             it('Step 3: Sign-in with the old password should fail.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
@@ -510,7 +510,7 @@ describe('Auth Endpoint', () => {
                  * then use password change to restore original.
                  */
                 const signInResponse = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
