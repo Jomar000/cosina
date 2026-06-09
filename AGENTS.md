@@ -19,7 +19,7 @@
 - **Database:** Drizzle ORM. Schema in `packages/database/src/postgres/schema.ts`. Direct DB calls only in backend apps.
 - **Language:** TypeScript (Strict mode).
 - **Types (`packages/types`):**
-    - `@PROJECT_NAME/types/shared` -- shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError`).
+    - `@PROJECT_NAME/types/shared` -- shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponsePaginated<T>`, `TApiResponsePaginatedOk<T>`, `TApiResponseError`).
     - `@PROJECT_NAME/types/public` -- public-app specific types.
     - Type definitions only -- no runtime code beyond type references.
 

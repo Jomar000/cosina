@@ -118,33 +118,101 @@ description: Coding rules for Svelte/SvelteKit frontend and the shared UI compon
 ## TanStack Query
 
 - Use `createQuery(() => ({ queryKey, queryFn }))` and `createMutation(() => ({ mutationKey, mutationFn }))` with typed Hono clients from `src/lib/clients.ts`.
-- Do not typecast `await response.json()` results from Hono typed clients. Destructure `{ data, error, success }`, throw `new Error(error.message)` when `success` is false, then return `data`.
+- Do not typecast `await response.json()` results from Hono typed clients.
+- Preserve the complete response as `responseJson` until checking its `success` discriminant. By default, throw on `!responseJson.success`, then access `responseJson.data` or destructure success-only fields after the guard.
+- Prefer the early failure guard because it keeps the success path unindented and lets TypeScript narrow the complete response union. Use `if (responseJson.success) ... else ...` only when both branches require meaningful, non-terminal handling.
 - For no-body liveness endpoints, return the typed response directly but throw unless `response.ok`; shared `ky` does not throw on HTTP errors, while network/DNS failures reject naturally. Do not add a `TApiResponse` envelope.
-- `TApiResponse` branches intentionally expose the inactive side as `null` (`error?: null` on success, `data?: null` on error) to support this destructuring pattern.
 - Keep query and mutation keys stable arrays. Add dynamic values to mutation keys as needed, such as record IDs or action variants.
+
+Use the following examples as the response-handling guide.
+
+Default query when only `data` is needed:
 
 ```typescript
 const resourceQuery = createQuery(() => ({
     queryKey: ['resource'],
     queryFn: async () => {
         const response = await honoClient.resource.read.$get()
-        const { data, error, success } = await response.json()
-        if (!success) throw new Error(error.message)
-        return data
+        const responseJson = await response.json()
+
+        if (!responseJson.success) {
+            throw new Error(responseJson.error.message)
+        }
+
+        return responseJson.data
     },
 }))
+```
 
+Paginated query with success-only metadata:
+
+```typescript
+const response = await honoClient.resource.list.$get()
+const responseJson = await response.json()
+
+if (!responseJson.success) {
+    throw new Error(responseJson.error.message)
+}
+
+const { data, count, limit, offset } = responseJson
+return { data, count, limit, offset }
+```
+
+Mutation returning data:
+
+```typescript
 const updateResourceMutation = createMutation(() => ({
     mutationKey: ['resource', 'update', resourceId],
     mutationFn: async (payload) => {
         const response = await honoClient.resource.update.$post({
             json: payload,
         })
-        const { data, error, success } = await response.json()
-        if (!success) throw new Error(error.message)
-        return data
+        const responseJson = await response.json()
+
+        if (!responseJson.success) {
+            throw new Error(responseJson.error.message)
+        }
+
+        return responseJson.data
     },
 }))
+```
+
+Mutation with no useful response data:
+
+```typescript
+const response = await honoClient.resource.remove.$delete()
+const responseJson = await response.json()
+
+if (!responseJson.success) {
+    throw new Error(responseJson.error.message)
+}
+```
+
+Failure handling that needs structured error metadata:
+
+```typescript
+const responseJson = await response.json()
+
+if (!responseJson.success) {
+    const { code, message, requestId } = responseJson.error
+    logApiError({ code, requestId })
+    throw new Error(message)
+}
+
+return responseJson.data
+```
+
+Meaningful handling in both branches:
+
+```typescript
+const responseJson = await response.json()
+
+if (responseJson.success) {
+    handleSuccess(responseJson.data)
+} else {
+    handleFailure(responseJson.error)
+}
 ```
 
 ### Debounced Search Inputs

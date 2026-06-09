@@ -12,7 +12,7 @@ export const readOutputSchema = base.outputSchema(base.objectOutputDataSchema)
 
 export const readManyInputSchema = base.readManyInputSchema
 
-export const readManyOutputSchema = base.outputSchema(
+export const readManyOutputSchema = base.paginatedOutputSchema(
     base.objectArrayOutputDataSchema,
 )
 

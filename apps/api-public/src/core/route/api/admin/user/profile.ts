@@ -8,6 +8,7 @@ import type { THonoInstance } from '../../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    apiResponsePaginatedOkWrapper,
     auditTrailLogger,
 } from '../../../../../utilities/helpers.js'
 import { validateRequest } from '../../../../middleware/validateRequest.js'
@@ -117,7 +118,12 @@ export const profileRoute = new Hono<THonoInstance>()
                             : desc(userProfile.userId),
                     )
 
-                return apiResponseOkWrapper(ctx, { data, count, limit, offset })
+                return apiResponsePaginatedOkWrapper(ctx, {
+                    data,
+                    count,
+                    limit,
+                    offset,
+                })
             } catch (err) {
                 if (err instanceof AppError) throw err
 

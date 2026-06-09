@@ -32,7 +32,7 @@ description: Rules for Drizzle ORM schema changes and queries, and for adding or
 
 1.  **Shared Validators (`@PROJECT_NAME/validator/shared`):**
     - `field.ts` — Low-level Zod field builders (`vBoolean`, `vInt`, `vNumeric`, `vText`) accepting `{ fieldName, message, min, max }`.
-    - `base.ts` — Composed schemas: `addressInputSchema`, `readManyInputSchema` (limit/offset/sort), `outputSchema<Data>`.
+    - `base.ts` — Composed schemas: `addressInputSchema`, `readManyInputSchema` (limit/offset/sort), `outputSchema<Data>`, and `paginatedOutputSchema<Data>` with required `count`, `limit`, and `offset`.
     - `refinement.ts` — Custom `.check()` callbacks: `dateString()`, `password()` (uppercase + lowercase + numeric + symbol), `updatedFields()`.
 2.  **App Validators:** Domain-specific schemas are mirrored by app surface:
     - `@PROJECT_NAME/validator/public/*` from `packages/validator/src/public`.

@@ -3,6 +3,17 @@ import { z } from 'zod'
 
 import { vText } from './field.js'
 
+const outputErrorSchema = z.object({
+    success: z.literal(false),
+    data: z.null().optional(),
+    error: z.object({
+        requestId: z.string(),
+        code: z.string(),
+        message: z.string(),
+        validatorIssues: z.array(z.custom<TValidatorIssue>()).optional(),
+    }),
+})
+
 export const addressInputSchema = z.object({
     line1: vText({ fieldName: 'Address Line 1' }).uppercase(),
     line2: vText({ fieldName: 'Address Line 2' }).uppercase().optional(),
@@ -20,22 +31,23 @@ export const outputSchema = <Data extends z.ZodType = z.ZodType>(data: Data) =>
             success: z.literal(true),
             data,
             error: z.null().optional(),
-            count: z.number().optional(),
-            limit: z.number().optional(),
-            offset: z.number().optional(),
         }),
+        outputErrorSchema,
+    ])
+
+export const paginatedOutputSchema = <Data extends z.ZodType = z.ZodType>(
+    data: Data,
+) =>
+    z.union([
         z.object({
-            success: z.literal(false),
-            data: z.null().optional(),
-            error: z.object({
-                requestId: z.string(),
-                code: z.string(),
-                message: z.string(),
-                validatorIssues: z
-                    .array(z.custom<TValidatorIssue>())
-                    .optional(),
-            }),
+            success: z.literal(true),
+            data,
+            error: z.null().optional(),
+            count: z.number(),
+            limit: z.number(),
+            offset: z.number(),
         }),
+        outputErrorSchema,
     ])
 
 export const objectOutputDataSchema = z.looseObject({})

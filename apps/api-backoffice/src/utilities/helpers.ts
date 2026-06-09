@@ -2,6 +2,7 @@ import { dbSchema } from '@hyperion/database/postgres'
 import type {
     TApiResponseError,
     TApiResponseOk,
+    TApiResponsePaginatedOk,
     TValidatorIssue,
 } from '@hyperion/types/shared'
 import { sql } from 'drizzle-orm'
@@ -142,19 +143,44 @@ export const apiResponseOkWrapper = <T = unknown>(
     ctx: Context<THonoInstance>,
     {
         data,
+        status = 200,
+    }: {
+        data: T
+        status?: ContentfulStatusCode
+    },
+) => {
+    return ctx.json<TApiResponseOk<T>>(
+        {
+            success: true,
+            data,
+        },
+        status,
+    )
+}
+
+/**
+ * API Paginated Response Success Wrapper
+ *
+ * @description
+ * Wrapper for successful paginated API responses.
+ */
+export const apiResponsePaginatedOkWrapper = <T = unknown>(
+    ctx: Context<THonoInstance>,
+    {
+        data,
         count,
         limit,
         offset,
         status = 200,
     }: {
         data: T
-        count?: number
-        limit?: number
-        offset?: number
+        count: number
+        limit: number
+        offset: number
         status?: ContentfulStatusCode
     },
 ) => {
-    return ctx.json<TApiResponseOk<T>>(
+    return ctx.json<TApiResponsePaginatedOk<T>>(
         {
             success: true,
             data,
