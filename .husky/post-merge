@@ -6,54 +6,25 @@ echo = BEGIN: git post-merge hook =
 echo ==============================
 echo
 
-# Check if certain files were modified by the merge process
-contractsChanged=$(git diff --name-only 'HEAD@{1}' HEAD | (grep 'packages/contracts/src/' || true))
-databaseChanged=$(git diff --name-only 'HEAD@{1}' HEAD | (grep 'packages/database/src/' || true))
-apiPublicChanged=$(git diff --name-only 'HEAD@{1}' HEAD | (grep 'apps/api-public/src/' || true))
-apiBackOfficeChanged=$(git diff --name-only 'HEAD@{1}' HEAD | (grep 'apps/api-backoffice/src/' || true))
+# Check if dependency files were modified
+depsChanged=$(git diff --name-only ORIG_HEAD HEAD | (grep -E 'package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml' || true))
 
-# Re-install dependencies
-echo Installing project dependencies...
-pnpm -r i
-echo
-
-# Build contracts package
-if [[ $contractsChanged != '' ]]; then
-    echo Building contracts package...
-    pnpm --filter="@hyperion/contracts" exec rm -rf dist
-    pnpm --filter="@hyperion/contracts" exec rm -rf *.tsbuildinfo
-    pnpm --filter="@hyperion/contracts" build
+if [[ $depsChanged != '' ]]; then
+    echo "Installing project dependencies..."
+    pnpm -r i
     echo
 fi
 
-# Build database package
-if [[ $databaseChanged != '' ]]; then
-    echo Building database package...
-    pnpm --filter="@hyperion/database" exec rm -rf dist
-    pnpm --filter="@hyperion/database" exec rm -rf *.tsbuildinfo
-    pnpm --filter="@hyperion/database" build
+# Check if any relevant source or config files were modified
+tsFilesChanged=$(git diff --name-only ORIG_HEAD HEAD | (grep -E 'packages/(types|validator|database)/src/|apps/(api-public|api-backoffice)/src/|tsconfig' || true))
+
+if [[ $tsFilesChanged != '' ]]; then
+    echo "Rebuilding TypeScript project graph..."
+    pnpm exec tsc --build ./tsconfig.json --clean
+    pnpm exec tsc --build ./tsconfig.json
     echo
 fi
 
-# Build api-public package
-if [[ $apiPublicChanged != '' ]]; then
-    echo Building api-public package...
-    pnpm --filter="@hyperion/api-public" exec rm -rf dist
-    pnpm --filter="@hyperion/api-public" exec rm -rf *.tsbuildinfo
-    pnpm --filter="@hyperion/api-public" build
-    echo
-fi
-
-# Build api-backoffice package
-if [[ $apiBackOfficeChanged != '' ]]; then
-    echo Building api-backoffice package...
-    pnpm --filter="@hyperion/api-backoffice" exec rm -rf dist
-    pnpm --filter="@hyperion/api-backoffice" exec rm -rf *.tsbuildinfo
-    pnpm --filter="@hyperion/api-backoffice" build
-    echo
-fi
-
-echo
 echo ============================
 echo = END: git post-merge hook =
 echo ============================

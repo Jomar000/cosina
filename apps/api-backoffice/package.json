@@ -12,9 +12,10 @@
     },
     "scripts": {
         "build": "wrangler deploy --outdir=./dist/$worker --dry-run --env=",
+        "build:force": "tsc --build ./tsconfig.build.json --clean && pnpm run build",
         "check": "tsc --noEmit",
-        "deploy:prod": "wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
-        "deploy:staging": "wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
+        "deploy:prod": "tsc --build ./tsconfig.build.json --clean && wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
+        "deploy:staging": "tsc --build ./tsconfig.build.json --clean && wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
         "dev": "wrangler dev",
         "format": "prettier --write .",
         "lint": "prettier --check . && eslint .",

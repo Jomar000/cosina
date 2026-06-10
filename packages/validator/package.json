@@ -12,6 +12,7 @@
     },
     "scripts": {
         "build": "tsc --build ./tsconfig.json",
+        "build:force": "tsc --build ./tsconfig.json --clean && pnpm run build",
         "format": "prettier --write .",
         "lint": "prettier --check . && eslint .",
         "prepare": "pnpm build"
