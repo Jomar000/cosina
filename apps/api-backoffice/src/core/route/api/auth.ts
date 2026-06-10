@@ -3,6 +3,7 @@ import {
     passwordResetInputSchema,
     passwordResetRequestInputSchema,
     signInInputSchema,
+    //verifyEmailInputSchema,
 } from '@hyperion/validator/backoffice/auth'
 import { and, eq } from 'drizzle-orm'
 import type { Context } from 'hono'
@@ -296,6 +297,37 @@ export const authRoute = new Hono<THonoInstance>()
 
         return apiResponseOkWrapper(ctx, { data: null })
     })
+/*
+    .get(
+        '/verifyEmail',
+        validateRequest('query', verifyEmailInputSchema),
+        async (ctx) => {
+            const { token } = ctx.req.valid('query')
+            const auth = ctx.get('auth')
+
+            try {
+                // Since onAPIError.throw is true, this will throw on failure
+                await auth.api.verifyEmail({
+                    query: { token },
+                })
+            } catch {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'UNPROCESSABLE_CONTENT',
+                    message: 'Email verification failed. The token may be invalid or expired.',
+                    status: 422,
+                })
+            }
+
+            await auditTrailLogger(ctx, {
+                component: 'auth',
+                action: 'verifyEmail',
+                description: 'User verified their email address',
+            })
+
+            return apiResponseOkWrapper(ctx, { data: null })
+        },
+    )
+*/
 
 export default authRoute
 export type AuthRouteType = ApplyGlobalResponse<

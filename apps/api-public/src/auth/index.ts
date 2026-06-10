@@ -139,6 +139,17 @@ export const auth = async (opts: {
                 },
             },
         },
+        emailVerification: {
+            sendOnSignUp: false,
+            sendVerificationEmail: async ({ user, token }) => {
+                await resend.emails.send({
+                    from: env.MAILER_ACCOUNT,
+                    to: user.email,
+                    subject: 'E-mail Verification',
+                    text: `${env.URL_BACKEND}/api/auth/verifyEmail?token=${token}`,
+                })
+            },
+        },
         emailAndPassword: {
             enabled: true,
             autoSignIn: false,
@@ -172,7 +183,8 @@ export const auth = async (opts: {
         },
         plugins: [
             emailOTP({
-                overrideDefaultEmailVerification: true,
+                generateOTP: () => nanoid(8).toUpperCase(),
+                overrideDefaultEmailVerification: false,
                 sendVerificationOTP: async ({ email, otp, type }) => {
                     if (env.ENVIRONMENT === 'test') {
                         return

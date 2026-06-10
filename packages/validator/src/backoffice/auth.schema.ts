@@ -100,4 +100,10 @@ export const signUpInputSchema = z.object({
 
 export const signUpOutputSchema = base.outputSchema(base.objectOutputDataSchema)
 
+export const verifyEmailInputSchema = z.object({
+    token: field.vText({ fieldName: 'Token', max: 512 }),
+})
+
+export const verifyEmailOutputSchema = base.outputSchema(z.null())
+
 export const signOutOutputSchema = base.outputSchema(z.null())
