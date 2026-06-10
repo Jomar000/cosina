@@ -4,12 +4,6 @@ import * as base from '../../../shared/base.js'
 import * as field from '../../../shared/field.js'
 import * as refinement from '../../../shared/refinement.js'
 
-export const resetRequestInputSchema = z.object({
-    userId: field.vText({ fieldName: 'User ID' }),
-})
-
-export const resetRequestOutputSchema = base.outputSchema(z.null())
-
 export const resetInputSchema = z.object({
     userId: field.vText({ fieldName: 'User ID' }),
     newPassword: field
@@ -22,3 +16,9 @@ export const resetInputSchema = z.object({
 })
 
 export const resetOutputSchema = base.outputSchema(z.null())
+
+export const resetRequestInputSchema = z.object({
+    userId: field.vText({ fieldName: 'User ID' }),
+})
+
+export const resetRequestOutputSchema = base.outputSchema(z.null())

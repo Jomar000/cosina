@@ -16,6 +16,28 @@ export const downloadLinkCreateOutputSchema = base.outputSchema(
     base.objectOutputDataSchema,
 )
 
+export const uploadAttachmentCommitInputSchema = z.object({
+    uploadId: field
+        .vText({ fieldName: 'Upload ID', min: 16 })
+        .regex(/^[a-zA-Z0-9]+$/, {
+            error: 'Upload ID must be alphanumeric characters only.',
+        }),
+    attachments: z
+        .array(
+            field
+                .vText({ fieldName: 'Attachment ID', min: 32 })
+                .regex(/^[a-zA-Z0-9]+$/, {
+                    error: 'Attachment ID must be alphanumeric characters only.',
+                }),
+        )
+        .min(1, { error: 'At least one attachment must be provided.' })
+        .max(25, { error: 'A maximum of 25 attachments can be provided.' }),
+})
+
+export const uploadAttachmentCommitOutputSchema = base.outputSchema(
+    base.objectOutputDataSchema,
+)
+
 export const uploadAttachmentCreateInputSchema = z.object({
     uploadId: field
         .vText({ fieldName: 'Upload ID', min: 16 })
@@ -65,28 +87,6 @@ export const uploadAttachmentCreateInputSchema = z.object({
 })
 
 export const uploadAttachmentCreateOutputSchema = base.outputSchema(
-    base.objectOutputDataSchema,
-)
-
-export const uploadAttachmentCommitInputSchema = z.object({
-    uploadId: field
-        .vText({ fieldName: 'Upload ID', min: 16 })
-        .regex(/^[a-zA-Z0-9]+$/, {
-            error: 'Upload ID must be alphanumeric characters only.',
-        }),
-    attachments: z
-        .array(
-            field
-                .vText({ fieldName: 'Attachment ID', min: 32 })
-                .regex(/^[a-zA-Z0-9]+$/, {
-                    error: 'Attachment ID must be alphanumeric characters only.',
-                }),
-        )
-        .min(1, { error: 'At least one attachment must be provided.' })
-        .max(25, { error: 'A maximum of 25 attachments can be provided.' }),
-})
-
-export const uploadAttachmentCommitOutputSchema = base.outputSchema(
     base.objectOutputDataSchema,
 )
 

@@ -63,6 +63,7 @@ To add a validator:
 
 1. Create `*.schema.ts` in the appropriate public or backoffice directory.
 2. Compose shared field builders, base schemas, and refinements where they fit; use raw `z.*` only for unsupported behavior.
-3. Re-export it from the nearest `index.ts`.
-4. Add its named export to the `packages/validator/package.json` exports map.
-5. Run `pnpm --filter=@PROJECT_NAME/validator build`.
+3. Alphabetize all named schema exports within your `.schema.ts` files.
+4. Re-export it from the nearest `index.ts`, keeping the re-exports alphabetized as well.
+5. Add its named export to the `packages/validator/package.json` exports map.
+6. Run `pnpm --filter=@PROJECT_NAME/validator build`.

@@ -25,6 +25,10 @@ export const addressInputSchema = z.object({
     countryCode: vText({ fieldName: 'Country Code' }).uppercase(),
 })
 
+export const objectOutputDataSchema = z.looseObject({})
+
+export const objectArrayOutputDataSchema = z.array(objectOutputDataSchema)
+
 export const outputSchema = <Data extends z.ZodType = z.ZodType>(data: Data) =>
     z.union([
         z.object({
@@ -49,10 +53,6 @@ export const paginatedOutputSchema = <Data extends z.ZodType = z.ZodType>(
         }),
         outputErrorSchema,
     ])
-
-export const objectOutputDataSchema = z.looseObject({})
-
-export const objectArrayOutputDataSchema = z.array(objectOutputDataSchema)
 
 export const readManyInputSchema = z.object({
     limit: z.coerce

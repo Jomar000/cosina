@@ -3,6 +3,14 @@ import { z } from 'zod'
 import * as base from '../../shared/base.js'
 import * as field from '../../shared/field.js'
 
+export const readOutputSchema = base.outputSchema(base.objectOutputDataSchema)
+
+export const updateAddressInputSchema = base.addressInputSchema
+
+export const updateAddressOutputSchema = base.outputSchema(
+    base.objectOutputDataSchema,
+)
+
 export const updateInputSchema = z.object({
     firstName: field.vText({ fieldName: 'First Name' }).uppercase(),
     middleName: field
@@ -39,12 +47,4 @@ export const updateInputSchema = z.object({
         .uppercase(),
 })
 
-export const readOutputSchema = base.outputSchema(base.objectOutputDataSchema)
-
 export const updateOutputSchema = base.outputSchema(base.objectOutputDataSchema)
-
-export const updateAddressInputSchema = base.addressInputSchema
-
-export const updateAddressOutputSchema = base.outputSchema(
-    base.objectOutputDataSchema,
-)
