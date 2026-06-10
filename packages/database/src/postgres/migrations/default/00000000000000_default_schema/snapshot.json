@@ -1,7 +1,7 @@
 {
     "version": "8",
     "dialect": "postgres",
-    "id": "f24774ef-1503-47b7-b98f-c95078c8da5f",
+    "id": "04813fb0-8781-4a2b-a6a4-f9e006460939",
     "prevIds": [
         "00000000-0000-0000-0000-000000000000"
     ],
@@ -1741,6 +1741,32 @@
             "default": null,
             "generated": null,
             "identity": null,
+            "name": "phone_number",
+            "entityType": "columns",
+            "schema": "public",
+            "table": "user"
+        },
+        {
+            "type": "boolean",
+            "typeSchema": null,
+            "notNull": false,
+            "dimensions": 0,
+            "default": "false",
+            "generated": null,
+            "identity": null,
+            "name": "phone_number_verified",
+            "entityType": "columns",
+            "schema": "public",
+            "table": "user"
+        },
+        {
+            "type": "text",
+            "typeSchema": null,
+            "notNull": false,
+            "dimensions": 0,
+            "default": null,
+            "generated": null,
+            "identity": null,
             "name": "image",
             "entityType": "columns",
             "schema": "public",
@@ -3262,6 +3288,17 @@
             ],
             "nullsNotDistinct": false,
             "name": "user_email_key",
+            "schema": "public",
+            "table": "user",
+            "entityType": "uniques"
+        },
+        {
+            "nameExplicit": false,
+            "columns": [
+                "phone_number"
+            ],
+            "nullsNotDistinct": false,
+            "name": "user_phone_number_key",
             "schema": "public",
             "table": "user",
             "entityType": "uniques"

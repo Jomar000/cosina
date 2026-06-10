@@ -175,6 +175,8 @@ CREATE TABLE "user" (
 	"name" text NOT NULL,
 	"email" text NOT NULL UNIQUE,
 	"email_verified" boolean DEFAULT false NOT NULL,
+	"phone_number" text UNIQUE,
+	"phone_number_verified" boolean DEFAULT false,
 	"image" text,
 	"username" text NOT NULL UNIQUE,
 	"display_username" text,

@@ -681,6 +681,8 @@ export const user = pgTable(
         name: text('name').notNull(),
         email: text('email').unique().notNull(),
         emailVerified: boolean('email_verified').notNull().default(false),
+        phoneNumber: text('phone_number').unique(),
+        phoneNumberVerified: boolean('phone_number_verified').default(false),
         image: text('image'),
         username: text('username').unique().notNull(),
         displayUsername: text('display_username'),
