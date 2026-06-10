@@ -1,32 +1,50 @@
 ---
 name: cloudflare-worker-testing
-description: Checklist and rules for debugging or writing vitest tests targeting Cloudflare Workers.
+description: Project rules for writing and debugging Vitest tests that run against Cloudflare Workers, including storage isolation, concurrency, authentication fixtures, and resilient test data.
 ---
 
-# Testing: Cloudflare Workers (vitest-pool-workers)
+# Cloudflare Worker Testing
 
-- **Storage Isolation:** `@cloudflare/vitest-pool-workers` is managed through the root `pnpm-workspace.yaml` catalog (currently `^0.16.5`) and isolates Cloudflare-bound local storage **per test file** (not per `it()` block). All writes to KV, Durable Objects, Caches, and any local worker storage persist across `it()` blocks within the same file and are reset between files. Object storage is accessed through `aws4fetch`-signed S3-compatible R2 HTTP requests, not a direct R2 binding, so it is not covered by local pool storage isolation unless a test explicitly stubs or intercepts it.
-    - Data seeded in `beforeAll()` persists across all `it()` blocks within the file.
-    - Data written inside an `it()` block **is visible** in subsequent `it()` blocks within the same file.
-    - Database writes (Postgres via Hyperdrive) are **never** covered by storage isolation — they persist globally.
-- **Debugging Checklist:** When tests fail due to missing or unexpected data:
-    1. Check if the data comes from a different test file — storage is isolated per file.
-    2. Move shared setup (e.g., token generation, data seeding) into `beforeAll()`.
-    3. Verify whether the storage backend changed (e.g., better-auth moving from DB to KV when `secondaryStorage` is configured) — the data may exist but in a different location than expected.
-- **Concurrency & Execution Order:** The Vitest config splits tests by filename:
-    - `*.con.test.ts` runs under the `concurrent-test-files` project.
-    - `*.seq.test.ts` runs under the `sequential-test-files` project with `fileParallelism: false`.
-    - Use `describe.concurrent(...)` for suites whose tests can run concurrently. Use plain `describe(...)` for sequential suites because sequential execution is Vitest's default.
-    - In mixed files, keep the outer grouping suite plain and explicitly mark only concurrent child suites. If a sequential suite must remain nested under a concurrent suite, override inheritance with `describe(name, { concurrent: false }, callback)`.
-    - Do not use the deprecated `describe.sequential(...)` modifier.
-- **Request Origin:** Use `env.URL_FRONTEND` for the `Origin` request header in Worker API tests. This matches the configured frontend origin and keeps WebSocket origin-guard coverage representative of production requests.
-- **Test Data Hardening:** Tests must be resilient to changes in seed data (e.g., `99999999999999_test_data`). Follow these rules:
-    1. **Never hardcode numeric DB IDs** (`warehouseId: 1`, `itemId: 1`, etc.) in tests that reach the database. Resolve all reference IDs via API calls in `beforeAll()` using discovery helpers from `apps/api-backoffice/test/utilities.ts`.
-    2. **Exception — validation-only tests:** Auth guard tests (401/403) and schema validation tests (400) that fail *before* DB access may use placeholder IDs (any positive integer), since the request is rejected at the middleware or validator layer.
-    3. **Sequential dependency:** When a sequential test creates an entity, subsequent sequential tests that need a related ID should reuse that test's captured ID (e.g., use `createdTableId` as `floorPlanId`) rather than a hardcoded seed ID.
-    4. **Unique names:** All `name`, `sku`, `slug`, `code` fields must use a unique suffix. Use `generateUniqueName(prefix)` from `utilities.ts` (e.g., `generateUniqueName('__vitest__item')`).
-    5. **Resilient count assertions:** Avoid `expect(data).toHaveLength(n)` on endpoints whose tables contain seed data. Use `toBeGreaterThanOrEqual(1)` or filter strictly by test-created records.
-    - **Current helpers** (in each app's `test/utilities.ts`):
-        - `generateUniqueName(prefix)` → `${prefix}_${Date.now()}_${random}`
-        - `setTestingCookies()` → returns privileged and standard session cookies.
-        - `interceptPasswordResetToken(userId)` → reads reset tokens from KV first, then falls back to the Postgres verification table.
+## Storage
+
+- `@cloudflare/vitest-pool-workers` is managed in the root `pnpm-workspace.yaml` catalog (currently `^0.16.5`).
+- Cloudflare-bound local storage is isolated per test file, not per `it()` block. KV, Durable Object, Cache, and other local Worker writes persist between tests in one file and reset between files.
+- Setup in `beforeAll()` remains available to every test in that file. Writes from one test are visible to later tests in the same file.
+- Postgres writes through Hyperdrive are never isolated and persist globally.
+- R2 uses `aws4fetch`-signed S3-compatible HTTP requests, not a direct binding; local pool isolation does not cover it unless the test stubs or intercepts the request.
+
+When data is missing or unexpected:
+
+1. Check whether it was created in another test file.
+2. Move file-shared setup, such as token generation or seeding, to `beforeAll()`.
+3. Check whether the storage backend changed, such as better-auth moving data from Postgres to KV through `secondaryStorage`.
+
+## Execution
+
+- Name independent files `*.con.test.ts`; they run in the `concurrent-test-files` project.
+- Name ordered or stateful files `*.seq.test.ts`; they run in `sequential-test-files` with `fileParallelism: false`.
+- Use `describe.concurrent(...)` only for suites whose tests may overlap. Use plain `describe(...)` for sequential suites.
+- In mixed files, keep the outer grouping suite plain and mark only concurrent child suites. Override inherited concurrency with `describe(name, { concurrent: false }, callback)` when a sequential suite must sit under a concurrent suite.
+- Never use deprecated `describe.sequential(...)`.
+
+## Requests and Authentication
+
+- Set the `Origin` header from `env.URL_FRONTEND`, including WebSocket origin-guard tests.
+- Use shared `setTestingCookies()` fixtures instead of repeating seeded sign-in requests. Destructure only the roles the file needs.
+- Choose actors by domain relationship as well as permission. For example, use the seeded operator assigned to the location or tenant resource resolved by the production workflow.
+- To share another seeded role, add its cookie to the helper, append it to the returned tuple to preserve existing destructuring, and document the role and tuple order.
+- Leave seeded sign-in success assertions to authentication endpoint tests; unrelated endpoint setup should not assert them.
+
+## Resilient Data
+
+1. Never hardcode numeric database IDs in tests that reach Postgres. Resolve reference IDs through API discovery helpers in `apps/api-backoffice/test/utilities.ts` during `beforeAll()`.
+2. Auth guard (`401`/`403`) and schema validation (`400`) tests may use positive placeholder IDs only when rejection occurs before database access.
+3. In sequential flows, capture and reuse IDs created by earlier tests instead of relying on seed IDs.
+4. Generate unique `name`, `sku`, `slug`, and `code` values with `generateUniqueName(prefix)`.
+5. Do not assert exact collection lengths when seed rows may exist. Filter to test-created records or use a lower-bound assertion.
+
+Current helpers in each app's `test/utilities.ts`:
+
+- `generateUniqueName(prefix)` returns `${prefix}_${Date.now()}_${random}`.
+- `setTestingCookies()` returns shared seeded-role cookies in its documented tuple order.
+- `interceptPasswordResetToken(userId)` reads KV first, then the Postgres verification table.

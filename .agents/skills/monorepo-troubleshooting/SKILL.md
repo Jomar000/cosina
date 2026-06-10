@@ -1,34 +1,27 @@
 ---
 name: monorepo-troubleshooting
-description: Details about the pnpm workspace dependency graph, package boundaries, and local environment setup. Use this when fixing build errors or setting up new packages.
+description: Project rules for pnpm workspace dependencies, package boundaries, build order, and local setup. Use when diagnosing build or dependency errors, adding packages, or changing the workspace graph.
 ---
 
-# Monorepo Build Details
+# Monorepo Troubleshooting
 
-## Build Order / Dependency Graph
+## Dependency Graph
 
-```
-Level 0 (parallel, no inter-dependencies):
-  @PROJECT_NAME/types       (no workspace deps)
-  @PROJECT_NAME/database    (no workspace deps)
-  @PROJECT_NAME/ui          (no workspace deps)
+Build order is:
 
-Level 1 (depends on Level 0):
-  @PROJECT_NAME/validator   (depends on types)
+1. `@PROJECT_NAME/types`, `@PROJECT_NAME/database`, and `@PROJECT_NAME/ui` in parallel.
+2. `@PROJECT_NAME/validator`, which depends on `types`.
+3. `@PROJECT_NAME/api-public` and `@PROJECT_NAME/api-backoffice`, which depend on `types`, `validator`, and `database`.
+4. `@PROJECT_NAME/web-public` and `@PROJECT_NAME/web-backoffice`, which depend on their matching API plus `types`, `validator`, and `ui`.
 
-Level 2 (depends on Level 0 + 1):
-  @PROJECT_NAME/api-public      (depends on types + validator + database)
-  @PROJECT_NAME/api-backoffice  (depends on types + validator + database)
+Let pnpm derive this order from `workspace:*`; do not add Turborepo or Nx.
 
-Level 3 (depends on Level 0–2):
-  @PROJECT_NAME/web-public      (depends on api-public + types + validator + ui)
-  @PROJECT_NAME/web-backoffice  (depends on api-backoffice + types + validator + ui)
-```
+Shared packages (`types`, `database`, `ui`, and `validator`) auto-build on install through `"prepare": "pnpm build"`. The root `prepare` runs Husky, and web app `prepare` scripts run `svelte-kit sync`; do not assume every workspace `prepare` builds a package.
 
-pnpm resolves this order automatically from `workspace:*` declarations. Shared packages (`@PROJECT_NAME/types`, `@PROJECT_NAME/database`, `@PROJECT_NAME/ui`, `@PROJECT_NAME/validator`) auto-build on install via `"prepare": "pnpm build"`. The root `prepare` script runs Husky, and web app `prepare` scripts run `svelte-kit sync`; do not treat every workspace `prepare` as a package build. No Turborepo/Nx pipeline needed.
+## Dependency Rules
 
-Workspace dependency versions are centralized through the root `pnpm-workspace.yaml` catalog, with `engineStrict: true` enforcing the root `package.json` Node and pnpm engine ranges. Prefer `catalog:` for shared third-party dependencies and `workspace:*` for internal packages.
-
-## Dependency Strategy for `api-public` / `api-backoffice`
-
-These are private packages bundled by wrangler — the `dependencies` vs `devDependencies` split has no effect on their own builds. `dependencies` lists only what consumers (e.g., `web-public`) need for type resolution of the exported Hono routes. Server-only packages live in `devDependencies` to avoid leaking them transitively into frontend apps. See the `README` key in each app's `package.json`.
+- Centralize shared third-party versions in the root `pnpm-workspace.yaml` catalog and reference them with `catalog:`.
+- Reference internal packages with `workspace:*`.
+- Keep `engineStrict: true`; root `package.json` defines supported Node and pnpm versions.
+- API apps are private Wrangler bundles, so their own builds ignore the `dependencies`/`devDependencies` distinction. Put only dependencies needed by web consumers to resolve exported Hono route types in `dependencies`.
+- Put server-only API packages in `devDependencies` so they do not leak transitively into frontend apps. See each API app's `package.json` `README` key.
