@@ -43,6 +43,14 @@ When data is missing or unexpected:
 4. Generate unique `name`, `sku`, `slug`, and `code` values with `generateUniqueName(prefix)`.
 5. Do not assert exact collection lengths when seed rows may exist. Filter to test-created records or use a lower-bound assertion.
 
+Fixture ownership:
+
+- Put reusable, generic reference rows in the test migration. This includes shared identities, memberships, organizations, uploads, and other records used across multiple suites.
+- Create scenario-specific or mutable lifecycle state in the owning file's `beforeAll()`. This includes balances, approval flags, pending transactions, open deals, and records that the suite consumes or transitions.
+- Make `beforeAll()` setup idempotent and restore the suite's expected clean slate when rerun without rebuilding the database.
+- Clean up in foreign-key dependency order and target only records owned by that scenario.
+- Never rely on test-file execution order or another suite's Postgres mutations.
+
 Current helpers in each app's `test/utilities.ts`:
 
 - `generateUniqueName(prefix)` returns `${prefix}_${Date.now()}_${random}`.
