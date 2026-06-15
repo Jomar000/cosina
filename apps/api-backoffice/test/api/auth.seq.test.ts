@@ -1,8 +1,9 @@
 import { dbClient, dbSchema } from '@hyperion/database/postgres'
 import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
+import { createEmailVerificationToken } from 'better-auth/api'
 import { env } from 'cloudflare:workers'
 import { eq } from 'drizzle-orm'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../src/core/index.js'
 import { interceptPasswordResetToken } from '../utilities.js'
@@ -56,6 +57,13 @@ const signInMutableAuthUser = async () => {
     return response.headers.getSetCookie().join('; ')
 }
 
+const verificationUser = {
+    id: 'USER_EMAIL_VERIFICATION_BACKOFFICE',
+    name: 'EMAIL VERIFICATION BACKOFFICE',
+    email: 'email.verification.backoffice@hyperion.app',
+    username: 'email_verification_backoffice',
+}
+
 /**
  * @description
  * Some marked tests trigger a false-positive unhandled rejection error.
@@ -64,6 +72,87 @@ const signInMutableAuthUser = async () => {
 
 describe('Auth Endpoint', () => {
     describe('Sequential Tests', () => {
+        describe('Email Verification Flow', () => {
+            let verificationToken = ''
+
+            beforeAll(async () => {
+                const db = getDb()
+                const { user } = dbSchema
+
+                try {
+                    await db
+                        .delete(user)
+                        .where(eq(user.id, verificationUser.id))
+                    await db.insert(user).values(verificationUser)
+                    verificationToken = await createEmailVerificationToken(
+                        env.BETTER_AUTH_SECRET,
+                        verificationUser.email,
+                    )
+                } finally {
+                    await db.$client.end()
+                }
+            })
+
+            afterAll(async () => {
+                const db = getDb()
+                const { user } = dbSchema
+
+                try {
+                    await db
+                        .delete(user)
+                        .where(eq(user.id, verificationUser.id))
+                } finally {
+                    await db.$client.end()
+                }
+            })
+
+            it('Valid token should verify the user.', async () => {
+                const response = await app.request(
+                    `/api/auth/verifyEmail?token=${encodeURIComponent(verificationToken)}`,
+                    {
+                        method: 'GET',
+                        headers: { origin: env.URL_FRONTEND },
+                    },
+                    env,
+                )
+                const responseData = await response.json<TApiResponseOk<null>>()
+
+                expect(response.status).toBe(200)
+                expect(responseData.success).toBe(true)
+                expect(responseData.data).toBeNull()
+
+                const db = getDb()
+                const { user } = dbSchema
+
+                try {
+                    const [verifiedUser] = await db
+                        .select({ emailVerified: user.emailVerified })
+                        .from(user)
+                        .where(eq(user.id, verificationUser.id))
+
+                    expect(verifiedUser.emailVerified).toBe(true)
+                } finally {
+                    await db.$client.end()
+                }
+            })
+
+            it('Reusing a valid token should remain successful.', async () => {
+                const response = await app.request(
+                    `/api/auth/verifyEmail?token=${encodeURIComponent(verificationToken)}`,
+                    {
+                        method: 'GET',
+                        headers: { origin: env.URL_FRONTEND },
+                    },
+                    env,
+                )
+                const responseData = await response.json<TApiResponseOk<null>>()
+
+                expect(response.status).toBe(200)
+                expect(responseData.success).toBe(true)
+                expect(responseData.data).toBeNull()
+            })
+        })
+
         describe('User Attribute Lock Enforcement', () => {
             it('Sign-in by username with missing user attribute should fail closed.', async () => {
                 const response = await app.request(

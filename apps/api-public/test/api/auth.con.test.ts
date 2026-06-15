@@ -1,4 +1,5 @@
 import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
+import { createEmailVerificationToken } from 'better-auth/api'
 import { env } from 'cloudflare:workers'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -493,6 +494,68 @@ describe('Auth Endpoint', () => {
                 expect(responseData.success).toBe(true)
                 expect(responseData.data).toBeNull()
             }, 20_000)
+        })
+
+        describe.concurrent('Email Verification Validation', () => {
+            it('Missing token should return 400.', async () => {
+                const response = await app.request(
+                    '/api/auth/verifyEmail',
+                    {
+                        method: 'GET',
+                        headers: { origin: env.URL_FRONTEND },
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(400)
+                expect(responseData.error.code).toBe('DATA_VALIDATION')
+            })
+
+            it('Invalid token should return 422.', async () => {
+                const response = await app.request(
+                    '/api/auth/verifyEmail?token=invalid-token',
+                    {
+                        method: 'GET',
+                        headers: { origin: env.URL_FRONTEND },
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(422)
+                expect(responseData.error.code).toBe('UNPROCESSABLE_CONTENT')
+                expect(responseData.error.message).toBe(
+                    'Email verification failed. The token may be invalid or expired.',
+                )
+            })
+
+            it('Expired token should return 422.', async () => {
+                const token = await createEmailVerificationToken(
+                    env.BETTER_AUTH_SECRET,
+                    'expired.email.verification.public@hyperion.app',
+                    undefined,
+                    -1,
+                )
+                const response = await app.request(
+                    `/api/auth/verifyEmail?token=${encodeURIComponent(token)}`,
+                    {
+                        method: 'GET',
+                        headers: { origin: env.URL_FRONTEND },
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(422)
+                expect(responseData.error.code).toBe('UNPROCESSABLE_CONTENT')
+                expect(responseData.error.message).toBe(
+                    'Email verification failed. The token may be invalid or expired.',
+                )
+            })
         })
 
         describe.concurrent('Password Change Validation', () => {

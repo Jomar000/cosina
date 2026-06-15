@@ -142,11 +142,17 @@ export const auth = async (opts: {
         emailVerification: {
             sendOnSignUp: false,
             sendVerificationEmail: async ({ user, token }) => {
+                const verificationUrl = new URL(
+                    '/verify-email',
+                    env.URL_FRONTEND,
+                )
+                verificationUrl.searchParams.set('token', token)
+
                 await resend.emails.send({
                     from: env.MAILER_ACCOUNT,
                     to: user.email,
                     subject: 'E-mail Verification',
-                    text: `${env.URL_BACKEND}/api/auth/verifyEmail?token=${token}`,
+                    text: verificationUrl.toString(),
                 })
             },
         },
