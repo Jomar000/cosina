@@ -7,7 +7,7 @@ description: Project rules for writing and debugging Vitest tests that run again
 
 ## Storage
 
-- `@cloudflare/vitest-pool-workers` is managed in the root `pnpm-workspace.yaml` catalog (currently `^0.16.5`).
+- `@cloudflare/vitest-pool-workers` is managed in the root `pnpm-workspace.yaml` catalog (currently `^0.16.15`).
 - Cloudflare-bound local storage is isolated per test file, not per `it()` block. KV, Durable Object, Cache, and other local Worker writes persist between tests in one file and reset between files.
 - Setup in `beforeAll()` remains available to every test in that file. Writes from one test are visible to later tests in the same file.
 - Postgres writes through Hyperdrive are never isolated and persist globally.

@@ -13,8 +13,8 @@
     "scripts": {
         "build": "svelte-package",
         "check": "svelte-check --tsconfig ./tsconfig.json",
-        "format": "prettier --write .",
-        "lint": "prettier --check . && eslint .",
+        "format": "prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+        "lint": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore && eslint .",
         "prepare": "pnpm build"
     },
     "exports": {

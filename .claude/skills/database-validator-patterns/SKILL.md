@@ -8,6 +8,7 @@ description: Project rules for Drizzle schemas and queries, PostgreSQL constrain
 ## Drizzle
 
 - Change database structure only in `packages/database/src/postgres/schema.ts`.
+- After changing the schema, generate the matching Drizzle migration and snapshot artifacts and commit them with the schema change. Do not hand-edit an existing applied migration.
 - In Hono handlers, use the initialized request context: `ctx.get('dbClient')` for typed `select`, `insert`, `update`, `delete`, and transactions; `ctx.get('dbSchema')` for table references.
 - Use `db.query.*` only where already configured and materially clearer.
 - Avoid raw `sql` except for schema defaults/checks, atomic expressions, or queries the typed builder cannot express cleanly.
@@ -45,13 +46,15 @@ When a create endpoint needs retry safety:
 
 ## Zod Validators
 
+`PROJECT_NAME` is the reusable template token for the repository package scope; it resolves to `hyperion` in this repository.
+
 `@PROJECT_NAME/validator` depends on `@PROJECT_NAME/types` through a workspace dependency and TypeScript project reference.
 
 Shared exports under `@PROJECT_NAME/validator/shared`:
 
-- `field.ts`: `vBoolean`, `vInt`, `vNumeric`, and `vText`, accepting `{ fieldName, message, min, max }`.
-- `base.ts`: `addressInputSchema`, `readManyInputSchema` (`limit`, `offset`, and `sort`), `outputSchema<Data>`, and `paginatedOutputSchema<Data>` with required `count`, `limit`, and `offset`.
-- `refinement.ts`: `.check()` callbacks `dateString()`, `password()` (uppercase, lowercase, numeric, and symbol), and `updatedFields()`.
+- `field.ts`: `vBoolean(fieldName)` accepts a field-name string; `vInt`, `vNumeric`, and `vText` accept `{ fieldName, message, min, max }` option objects.
+- `base.ts`: `addressInputSchema`, `readManyInputSchema` (`limit`, `offset`, and `sortOrder`), `outputSchema<Data>`, and `paginatedOutputSchema<Data>` with required `count`, `limit`, and `offset`.
+- `refinement.ts`: `.check()` callbacks `dateString()`, `password()` (uppercase, lowercase, numeric, and symbol), `uniqueArrayValues()`, and `updatedFields()`.
 
 Domain schemas mirror app surfaces:
 
@@ -65,5 +68,5 @@ To add a validator:
 2. Compose shared field builders, base schemas, and refinements where they fit; use raw `z.*` only for unsupported behavior.
 3. Alphabetize all named schema exports within your `.schema.ts` files.
 4. Re-export it from the nearest `index.ts`, keeping the re-exports alphabetized as well.
-5. Add its named export to the `packages/validator/package.json` exports map.
+5. Add a `packages/validator/package.json` export only when introducing a new public package subpath; named schemas within an existing subpath do not need separate export-map entries.
 6. Run `pnpm --filter=@PROJECT_NAME/validator build`.

@@ -13,8 +13,8 @@
     "scripts": {
         "build": "tsc --build ./tsconfig.build.json",
         "build:force": "tsc --build ./tsconfig.build.json --clean && pnpm run build",
-        "format": "prettier --write .",
-        "lint": "prettier --check . && eslint .",
+        "format": "prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+        "lint": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore && eslint .",
         "migrate:dev": "tsx --env-file=.env ./src/postgres/bootstrap.ts",
         "migrate:prod": "drizzle-kit migrate --config=drizzle-production.config.ts",
         "migrate:staging": "drizzle-kit migrate --config=drizzle-staging.config.ts",

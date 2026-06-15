@@ -9,8 +9,14 @@
     - `packages/`: Shared libraries (`types`, `validator`, `database`, `ui`).
 - **Runtime Environment:**
     - **Production:** Cloudflare Workers (Edge).
-    - **Development/Scripting:** Node.js (>=24.15.0).
-    - **Constraint:** All shared code must be runtime-agnostic (no Node-specific APIs like `fs` inside Cloudflare-targeted packages).
+    - **Development/Scripting:** Node.js (>=24.16.0).
+    - **Constraint:** Code imported into Cloudflare Worker bundles must be runtime-agnostic and must not use Node-specific APIs such as `fs` or `process.env`. Node-only development and migration entrypoints, such as the database bootstrap script, may use Node APIs when they are not exported into Worker runtime code.
+
+### Template Tokens
+
+- Agent guidance and skills remain reusable by downstream template forks.
+- `PROJECT_NAME` is a documentation token for the package scope and uppercase binding prefix. In this repository, package examples resolve to `@hyperion/*`, while app-specific bindings include `HYPERIONPUB_KV` and `HYPERIONBOFC_KV`.
+- Commands copied into a concrete repository must replace `@PROJECT_NAME` with that repository's actual package scope.
 
 ## 2. Tech Stack & Standards
 
@@ -21,6 +27,7 @@
 - **Types (`packages/types`):**
     - `@PROJECT_NAME/types/shared` -- shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponsePaginated<T>`, `TApiResponsePaginatedOk<T>`, `TApiResponseError`).
     - `@PROJECT_NAME/types/public` -- public-app specific types.
+    - `@PROJECT_NAME/types/backoffice` -- backoffice-app specific types.
     - Type definitions only -- no runtime code beyond type references.
 
 ## 3. File Structure & Naming
@@ -37,7 +44,7 @@
 
 ## 4. Development Workflow
 
-- **Package Management:** pnpm (>=11.1.2) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
+- **Package Management:** pnpm (>=11.6.0) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
 - **Template Merges:** When merging this global template into downstream forks, follow `MERGING.md` before applying domain-specific skills.
 - **Running Apps:** Use `pnpm --filter=<package-name>` to target individual workspaces:
     ```bash
@@ -47,10 +54,18 @@
     ```
 - **Environment Variables:**
     - `apps/api-{public,backoffice}/wrangler.toml` -- non-secret vars and Cloudflare bindings. BFF deployments default to `zone_name` subdirectory routes; commented `custom_domain` routes are the alternative. Object storage uses `aws4fetch`-signed S3-compatible R2 requests, not direct R2 bindings.
-    - `apps/api-public/.dev.vars` -- secrets (not committed). Copy from `.dev.vars.example` which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
+    - `apps/api-{public,backoffice}/.dev.vars` -- secrets (not committed). Copy the matching `.dev.vars.example`, which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
     - `packages/database/.env` / `.env.test` -- Postgres connection strings for local dev and test migrations.
 
-## 5. Project Skills
+## 5. Deployment & CI/CD
+
+- App scripts provide `deploy:staging` and `deploy:prod` using `wrangler-staging.toml` and `wrangler-production.toml`.
+- API scripts provide `secret:staging` and `secret:prod` for `wrangler secret bulk`.
+- Database scripts provide `migrate:staging` and `migrate:prod`.
+- Deployment, secret-management, and staging/production migration commands require explicit human approval and must never be auto-run.
+- No repository-wide CI pipeline convention is established yet. Preserve existing `.github/` or `.gitlab-ci.yaml` behavior when one is introduced or modified.
+
+## 6. Project Skills
 
 Project skills live in `.agents/skills/`. Load the relevant skill before starting any task in these areas:
 
@@ -61,7 +76,7 @@ Project skills live in `.agents/skills/`. Load the relevant skill before startin
 - `cloudflare-worker-testing` -- Debugging or writing vitest tests targeting Cloudflare Workers
 - `monorepo-troubleshooting` -- Fixing build errors, setting up new packages, or understanding the build graph
 
-## 6. Permissions & Command Boundaries
+## 7. Permissions & Command Boundaries
 
 > **Note for agents and developers:** For Claude Code, these rules are **hard-enforced** by `.claude/settings.json` at the tool level -- this section is a human-readable mirror of those settings. For Codex and Gemini, this section is the **project-level guidance** for safe operation. If you tighten or change `.claude/settings.json`, update this section in all root agent docs to match.
 
@@ -69,19 +84,10 @@ To ensure project safety, strictly adhere to the following file access and comma
 
 - **Allowed Scope:** `apps/`, `packages/`, both skill directories, and root configuration files (`*.json`, `*.yaml`, `*.toml`, `*.js`, `*.ts`, `*.md`).
 - **Forbidden Files:** NEVER edit or write to ANY files inside the `.git/` directory.
-- **Allowed Commands:** You may safely execute generic package manager commands (`pnpm *`) and read-only Git commands (`git status`, `git log`, `git diff`, `git branch`, `git show`, `git stash list`).
+- **Allowed Commands:** You may execute pnpm install, build, check, lint, test, format, and dev workflows, plus development/test database migrations. Read-only Git access is limited to `git status`, `git log`, `git diff`, `git show`, `git stash list`, `git branch --show-current`, and `git branch --list`.
+- **Approval-Required Commands:** Mutating Git commands, deployments, secret changes, and staging/production migrations require explicit human approval. Do not infer approval from a general implementation request.
 - **Forbidden Commands:** NEVER auto-run or propose the following destructive commands:
     - `git reset --hard *`
     - `git push --force` or `git push -f`
     - `git clean *`
     - `rm -rf *` or `rimraf *`
-
----
-
-> **TODO -- Future Iterations:** Add a **Deployment & CI/CD** section covering:
->
-> - `wrangler deploy` workflows for staging/production (scripts already exist per app).
-> - Environment-specific wrangler configs (`wrangler-staging.toml`, `wrangler-production.toml`).
-> - Secret management (`wrangler secret bulk .dev.vars.<env>`).
-> - Database migration promotion (`migrate:staging`, `migrate:prod`).
-> - CI/CD pipeline conventions (`.gitlab-ci.yaml`, `.github/` workflows).
