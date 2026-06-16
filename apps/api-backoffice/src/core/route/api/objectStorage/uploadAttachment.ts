@@ -4,7 +4,7 @@ import {
     uploadAttachmentRetryInputSchema,
 } from '@hyperion/validator/backoffice/objectStorage'
 import { hexToBytes } from '@noble/hashes/utils.js'
-import { and, eq, inArray } from 'drizzle-orm'
+import { and, eq, inArray, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { encodeBase64 } from 'hono/utils/encode'
 
@@ -36,21 +36,6 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                 uploadAttachment,
             } = ctx.get('dbSchema')
 
-            const objectStorageData: Pick<
-                typeof objectStorage.$inferInsert,
-                'id' | 'size' | 'mimeType' | 'hashSha256' | 'isPublic'
-            >[] = []
-
-            const objectStorageAclData: Pick<
-                typeof objectStorageAcl.$inferInsert,
-                'userId' | 'objectStorageId'
-            >[] = []
-
-            const uploadAttachmentData: Pick<
-                typeof uploadAttachment.$inferInsert,
-                'uploadId' | 'objectStorageId'
-            >[] = []
-
             const uploadData = await ctx
                 .get('dbClient')
                 .select({ id: upload.id })
@@ -73,145 +58,204 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                 })
             }
 
-            const signedUrls: {
-                id: string
-                hashSha256: string
-                encodedHash: string | null
-                signedUrl: string | null
-                status: 201 | 409
-            }[] = []
-
             const hashesToCheck = attachments.map(
                 ({ hashSha256 }) => hashSha256,
             )
 
-            const [
-                uploadedObjects,
-                nonUploadedObjects,
-            ] = await Promise.all([
-                ctx
+            try {
+                const preparedSignedUrls = await ctx
                     .get('dbClient')
-                    .select({
-                        id: objectStorage.id,
-                        hashSha256: objectStorage.hashSha256,
+                    .transaction(async (tx) => {
+                        const [activeUpload] = await tx
+                            .update(upload)
+                            .set({ isCommitted: false })
+                            .where(
+                                and(
+                                    eq(upload.id, uploadId),
+                                    eq(upload.isCommitted, false),
+                                    ctx.get('isPrivilegedRole')
+                                        ? undefined
+                                        : eq(
+                                              upload.userId,
+                                              ctx.get('user')!.id,
+                                          ),
+                                ),
+                            )
+                            .returning({ id: upload.id })
+
+                        if (!activeUpload) {
+                            throw new AppError({
+                                status: 409,
+                                code: 'UPLOAD_ALREADY_COMMITTED',
+                                message: 'Upload is already committed.',
+                            })
+                        }
+
+                        for (const hashSha256 of [
+                            ...hashesToCheck,
+                        ].sort()) {
+                            await tx.execute(
+                                sql`SELECT pg_advisory_xact_lock(hashtextextended(${hashSha256}, 0))`,
+                            )
+                        }
+
+                        const existingObjects = await tx
+                            .select({
+                                id: objectStorage.id,
+                                hashSha256: objectStorage.hashSha256,
+                                isPublic: objectStorage.isPublic,
+                                isUploaded: objectStorage.isUploaded,
+                            })
+                            .from(objectStorage)
+                            .where(
+                                inArray(
+                                    objectStorage.hashSha256,
+                                    hashesToCheck,
+                                ),
+                            )
+
+                        const existingObjectsByHash = new Map(
+                            existingObjects.map((os) => [
+                                os.hashSha256,
+                                os,
+                            ]),
+                        )
+
+                        const objectStorageData: Pick<
+                            typeof objectStorage.$inferInsert,
+                            | 'id'
+                            | 'size'
+                            | 'mimeType'
+                            | 'hashSha256'
+                            | 'isPublic'
+                        >[] = []
+
+                        const objectStorageAclData: Pick<
+                            typeof objectStorageAcl.$inferInsert,
+                            'userId' | 'objectStorageId'
+                        >[] = []
+
+                        const uploadAttachmentData: Pick<
+                            typeof uploadAttachment.$inferInsert,
+                            'uploadId' | 'objectStorageId'
+                        >[] = []
+
+                        const prepared: {
+                            id: string
+                            hashSha256: string
+                            encodedHash: string | null
+                            isPublic: boolean
+                            status: 201 | 409
+                        }[] = []
+
+                        for (const attachment of attachments) {
+                            const existingObject = existingObjectsByHash.get(
+                                attachment.hashSha256,
+                            )
+
+                            const objectStorageId =
+                                existingObject?.id ?? nanoidCustom(32)
+                            const isPublic =
+                                existingObject?.isPublic ?? attachment.isPublic
+
+                            if (!existingObject) {
+                                objectStorageData.push({
+                                    id: objectStorageId,
+                                    ...attachment,
+                                    isPublic,
+                                    size: Number(attachment.size),
+                                })
+                            }
+
+                            uploadAttachmentData.push({
+                                uploadId,
+                                objectStorageId,
+                            })
+
+                            objectStorageAclData.push({
+                                userId: ctx.get('user')!.id,
+                                objectStorageId,
+                            })
+
+                            if (existingObject?.isUploaded) {
+                                prepared.push({
+                                    id: objectStorageId,
+                                    hashSha256: attachment.hashSha256,
+                                    encodedHash: null,
+                                    isPublic,
+                                    status: 409,
+                                })
+                                continue
+                            }
+
+                            prepared.push({
+                                id: objectStorageId,
+                                hashSha256: attachment.hashSha256,
+                                encodedHash: encodeBase64(
+                                    hexToBytes(attachment.hashSha256).buffer,
+                                ),
+                                isPublic,
+                                status: 201,
+                            })
+                        }
+
+                        if (objectStorageData.length > 0) {
+                            await tx
+                                .insert(objectStorage)
+                                .values(objectStorageData)
+                        }
+
+                        await tx
+                            .insert(objectStorageAcl)
+                            .values(objectStorageAclData)
+                            .onConflictDoNothing()
+
+                        await tx
+                            .insert(uploadAttachment)
+                            .values(uploadAttachmentData)
+                            .onConflictDoNothing()
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'objectStorage.uploadAttachment',
+                                action: 'create',
+                                description:
+                                    'Attachments added to upload session',
+                                records: { table: 'upload', id: uploadId },
+                            },
+                            tx,
+                        )
+
+                        return prepared
                     })
-                    .from(objectStorage)
-                    .where(
-                        and(
-                            eq(objectStorage.isUploaded, true),
-                            inArray(objectStorage.hashSha256, hashesToCheck),
-                        ),
-                    ),
-                ctx
-                    .get('dbClient')
-                    .select({
-                        id: objectStorage.id,
-                        hashSha256: objectStorage.hashSha256,
-                    })
-                    .from(objectStorage)
-                    .where(
-                        and(
-                            eq(objectStorage.isUploaded, false),
-                            inArray(objectStorage.hashSha256, hashesToCheck),
-                        ),
-                    ),
-            ])
 
-            const uploadedObjectsHash = uploadedObjects.map(
-                ({ hashSha256 }) => hashSha256,
-            )
+                const signedUrls = await Promise.all(
+                    preparedSignedUrls.map(async (prepared) => {
+                        if (prepared.status === 409) {
+                            return {
+                                id: prepared.id,
+                                hashSha256: prepared.hashSha256,
+                                encodedHash: null,
+                                signedUrl: null,
+                                status: prepared.status,
+                            }
+                        }
 
-            const nonUploadedObjectsHash = nonUploadedObjects.map(
-                ({ hashSha256 }) => hashSha256,
-            )
+                        const uploadBucket = prepared.isPublic
+                            ? ctx.env.CF_R2_BUCKET_PUBLIC
+                            : ctx.env.CF_R2_BUCKET_PRIVATE
 
-            // Prepare data and generate pre-signed upload URLs
-            const signingPromises: Promise<void>[] = []
-
-            for (const attachment of attachments) {
-                if (uploadedObjectsHash.includes(attachment.hashSha256)) {
-                    const objectStorageId = uploadedObjects.filter(
-                        ({ hashSha256 }) =>
-                            hashSha256 === attachment.hashSha256,
-                    )[0].id
-
-                    uploadAttachmentData.push({
-                        uploadId,
-                        objectStorageId,
-                    })
-
-                    objectStorageAclData.push({
-                        userId: ctx.get('user')!.id,
-                        objectStorageId,
-                    })
-
-                    signedUrls.push({
-                        id: objectStorageId,
-                        hashSha256: attachment.hashSha256,
-                        encodedHash: null,
-                        signedUrl: null,
-                        status: 409,
-                    })
-                } else {
-                    let objectStorageId = nanoidCustom(32)
-
-                    // Object is already present but not yet marked uploaded. Reuse existing object.
-                    if (
-                        nonUploadedObjectsHash.includes(attachment.hashSha256)
-                    ) {
-                        objectStorageId = nonUploadedObjects.filter(
-                            ({ hashSha256 }) =>
-                                hashSha256 === attachment.hashSha256,
-                        )[0].id
-                    } else {
-                        objectStorageData.push({
-                            id: objectStorageId,
-                            ...attachment,
-                            isPublic: attachment.isPublic,
-                            size: Number(attachment.size),
-                        })
-                    }
-
-                    uploadAttachmentData.push({
-                        uploadId,
-                        objectStorageId,
-                    })
-
-                    objectStorageAclData.push({
-                        userId: ctx.get('user')!.id,
-                        objectStorageId,
-                    })
-
-                    // Encode SHA-256 hash to Base64
-                    const hashBase64 = encodeBase64(
-                        hexToBytes(attachment.hashSha256).buffer,
-                    )
-
-                    const uploadBucket = attachment.isPublic
-                        ? ctx.env.CF_R2_BUCKET_PUBLIC
-                        : ctx.env.CF_R2_BUCKET_PRIVATE
-
-                    // Get the index so that the signed URL can be matched to the object later
-                    const index = signedUrls.length
-
-                    signedUrls.push({
-                        id: objectStorageId,
-                        hashSha256: attachment.hashSha256,
-                        encodedHash: hashBase64,
-                        signedUrl: null,
-                        status: 201,
-                    })
-
-                    signingPromises.push(
-                        ctx
+                        const signed = await ctx
                             .get('aws4FetchClient')
                             .sign(
-                                `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${uploadBucket}/${objectStorageId}?X-Amz-Expires=${ctx.env.CF_R2_PRESIGN_EXPIRY}`,
+                                `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${uploadBucket}/${prepared.id}?X-Amz-Expires=${ctx.env.CF_R2_PRESIGN_EXPIRY}`,
                                 {
                                     method: 'PUT',
                                     headers: {
                                         // https://developers.cloudflare.com/r2/api/s3/api/#checksum-types
-                                        'x-amz-checksum-sha256': hashBase64,
+                                        'x-amz-checksum-sha256':
+                                            prepared.encodedHash!,
                                     },
                                     aws: {
                                         service: 's3',
@@ -219,64 +263,16 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                                     },
                                 },
                             )
-                            .then((signed) => {
-                                signedUrls[index].signedUrl = signed.url
-                            }),
-                    )
-                }
-            }
 
-            await Promise.all(signingPromises)
-
-            try {
-                await ctx.get('dbClient').transaction(async (tx) => {
-                    const [activeUpload] = await tx
-                        .update(upload)
-                        .set({ isCommitted: false })
-                        .where(
-                            and(
-                                eq(upload.id, uploadId),
-                                eq(upload.isCommitted, false),
-                                ctx.get('isPrivilegedRole')
-                                    ? undefined
-                                    : eq(upload.userId, ctx.get('user')!.id),
-                            ),
-                        )
-                        .returning({ id: upload.id })
-
-                    if (!activeUpload) {
-                        throw new AppError({
-                            status: 409,
-                            code: 'UPLOAD_ALREADY_COMMITTED',
-                            message: 'Upload is already committed.',
-                        })
-                    }
-
-                    if (objectStorageData.length > 0) {
-                        await tx.insert(objectStorage).values(objectStorageData)
-                    }
-
-                    await tx
-                        .insert(objectStorageAcl)
-                        .values(objectStorageAclData)
-                        .onConflictDoNothing()
-
-                    await tx
-                        .insert(uploadAttachment)
-                        .values(uploadAttachmentData)
-                        .onConflictDoNothing()
-
-                    await auditTrailLogger(
-                        ctx,
-                        {
-                            component: 'objectStorage.uploadAttachment',
-                            action: 'create',
-                            description: 'Attachments added to upload session',
-                            records: { table: 'upload', id: uploadId },
-                        },
-                        tx,
-                    )
-                })
+                        return {
+                            id: prepared.id,
+                            hashSha256: prepared.hashSha256,
+                            encodedHash: prepared.encodedHash,
+                            signedUrl: signed.url,
+                            status: prepared.status,
+                        }
+                    }),
+                )
 
                 return apiResponseOkWrapper(ctx, {
                     data: { uploadId, signedUrls },
@@ -493,30 +489,54 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                             })
                         }
 
-                        const attachmentsToCommit = (
-                            await tx
-                                .select({ id: objectStorage.id })
-                                .from(uploadAttachment)
-                                .innerJoin(
-                                    objectStorage,
-                                    eq(
-                                        objectStorage.id,
-                                        uploadAttachment.objectStorageId,
-                                    ),
-                                )
-                                .where(
-                                    and(
-                                        eq(uploadAttachment.uploadId, uploadId),
-                                        inArray(objectStorage.id, attachments),
-                                    ),
-                                )
-                        ).map(({ id }) => id)
+                        const requestedAttachmentIds = [
+                            ...new Set(attachments),
+                        ]
 
-                        if (attachmentsToCommit.length === 0) {
+                        const attachmentsToCommit = await tx
+                            .select({
+                                id: objectStorage.id,
+                                isUploaded: objectStorage.isUploaded,
+                            })
+                            .from(uploadAttachment)
+                            .innerJoin(
+                                objectStorage,
+                                eq(
+                                    objectStorage.id,
+                                    uploadAttachment.objectStorageId,
+                                ),
+                            )
+                            .where(
+                                and(
+                                    eq(uploadAttachment.uploadId, uploadId),
+                                    inArray(
+                                        objectStorage.id,
+                                        requestedAttachmentIds,
+                                    ),
+                                ),
+                            )
+
+                        if (
+                            attachmentsToCommit.length !==
+                            requestedAttachmentIds.length
+                        ) {
                             throw new AppError({
                                 status: 404,
                                 code: 'UPLOAD_ATTACHMENTS_NOT_FOUND',
                                 message: 'Upload attachments not found.',
+                            })
+                        }
+
+                        if (
+                            attachmentsToCommit.some(
+                                ({ isUploaded }) => isUploaded,
+                            )
+                        ) {
+                            throw new AppError({
+                                status: 409,
+                                code: 'UPLOAD_ATTACHMENTS_ALREADY_COMMITTED',
+                                message:
+                                    'Upload attachments are already committed.',
                             })
                         }
 
@@ -528,7 +548,7 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                                     eq(objectStorage.isUploaded, false),
                                     inArray(
                                         objectStorage.id,
-                                        attachmentsToCommit,
+                                        attachmentsToCommit.map(({ id }) => id),
                                     ),
                                 ),
                             )

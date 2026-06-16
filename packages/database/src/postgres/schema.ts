@@ -222,6 +222,7 @@ export const upload = pgTable(
     {
         id: text('id').primaryKey(),
         userId: text('user_id').notNull(),
+        idempotencyKey: uuid('idempotency_key').unique(),
         isCommitted: boolean('is_committed').notNull().default(false),
         createdAt: timestamp('created_at', {
             withTimezone: true,

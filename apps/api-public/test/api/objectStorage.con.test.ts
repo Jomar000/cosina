@@ -1,5 +1,6 @@
 import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
 import { env } from 'cloudflare:workers'
+import { v7 as uuidv7 } from 'uuid'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../src/core/index.js'
@@ -15,15 +16,21 @@ beforeAll(async () => {
     ] = await setTestingCookies()
 })
 
-const createUpload = async () => {
+const createHashSha256 = () => crypto.randomUUID().replaceAll('-', '').repeat(2)
+
+const createUpload = async (cookie = privilegedCookie) => {
     const response = await app.request(
         '/api/objectStorage/upload/create',
         {
             method: 'POST',
             headers: {
                 origin: env.URL_FRONTEND,
-                cookie: privilegedCookie,
+                'content-type': 'application/json',
+                cookie,
             },
+            body: JSON.stringify({
+                idempotencyKey: uuidv7(),
+            }),
         },
         env,
     )
@@ -34,7 +41,11 @@ const createUpload = async () => {
     return responseData.data.uploadId
 }
 
-const createUploadAttachment = async (uploadId: string) => {
+const createUploadAttachment = async (
+    uploadId: string,
+    cookie = privilegedCookie,
+    isPublic = false,
+) => {
     const response = await app.request(
         '/api/objectStorage/upload/attachment/create',
         {
@@ -42,18 +53,15 @@ const createUploadAttachment = async (uploadId: string) => {
             headers: {
                 origin: env.URL_FRONTEND,
                 'content-type': 'application/json',
-                cookie: privilegedCookie,
+                cookie,
             },
             body: JSON.stringify({
                 uploadId,
                 attachments: [
                     {
                         size: 1024,
-                        hashSha256: crypto
-                            .randomUUID()
-                            .replaceAll('-', '')
-                            .repeat(2),
-                        isPublic: false,
+                        hashSha256: createHashSha256(),
+                        isPublic,
                     },
                 ],
             }),
@@ -88,7 +96,7 @@ const commitUploadAttachment = async (uploadId: string, attachmentId: string) =>
         env,
     )
 
-const commitUpload = async (uploadId: string) =>
+const commitUpload = async (uploadId: string, attachments?: string[]) =>
     await app.request(
         '/api/objectStorage/upload/commit',
         {
@@ -98,7 +106,14 @@ const commitUpload = async (uploadId: string) =>
                 'content-type': 'application/json',
                 cookie: privilegedCookie,
             },
-            body: JSON.stringify({ uploadId }),
+            body: JSON.stringify(
+                attachments === undefined
+                    ? { uploadId }
+                    : {
+                          uploadId,
+                          attachments,
+                      },
+            ),
         },
         env,
     )
@@ -117,7 +132,11 @@ describe('Object Storage Endpoint', () => {
                         method: 'POST',
                         headers: {
                             origin: env.URL_FRONTEND,
+                            'content-type': 'application/json',
                         },
+                        body: JSON.stringify({
+                            idempotencyKey: uuidv7(),
+                        }),
                     },
                     env,
                 )
@@ -371,6 +390,52 @@ describe('Object Storage Endpoint', () => {
          */
         describe('Upload Flow', () => {
             describe('Create Upload', () => {
+                it('Should reject upload creation without an idempotency key.', async () => {
+                    const response = await app.request(
+                        '/api/objectStorage/upload/create',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({}),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(400)
+                    expect(responseData.error.code).toBe('DATA_VALIDATION')
+                })
+
+                it('Should reject upload creation with a non-v7 idempotency key.', async () => {
+                    const response = await app.request(
+                        '/api/objectStorage/upload/create',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({
+                                idempotencyKey: crypto.randomUUID(),
+                            }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(400)
+                    expect(responseData.error.code).toBe('DATA_VALIDATION')
+                })
+
                 it('Privileged user should be able to create an upload.', async () => {
                     const response = await app.request(
                         '/api/objectStorage/upload/create',
@@ -378,8 +443,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -402,8 +471,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -418,6 +491,97 @@ describe('Object Storage Endpoint', () => {
                     expect(responseData.data.uploadId).toBeDefined()
                     expect(responseData.data.uploadId).toHaveLength(16)
                 })
+
+                it('Should return the same upload for a repeated idempotency key.', async () => {
+                    const idempotencyKey = uuidv7()
+
+                    const responses = await Promise.all([
+                        app.request(
+                            '/api/objectStorage/upload/create',
+                            {
+                                method: 'POST',
+                                headers: {
+                                    origin: env.URL_FRONTEND,
+                                    'content-type': 'application/json',
+                                    cookie: privilegedCookie,
+                                },
+                                body: JSON.stringify({ idempotencyKey }),
+                            },
+                            env,
+                        ),
+                        app.request(
+                            '/api/objectStorage/upload/create',
+                            {
+                                method: 'POST',
+                                headers: {
+                                    origin: env.URL_FRONTEND,
+                                    'content-type': 'application/json',
+                                    cookie: privilegedCookie,
+                                },
+                                body: JSON.stringify({ idempotencyKey }),
+                            },
+                            env,
+                        ),
+                    ])
+
+                    const responseData = await Promise.all(
+                        responses.map((response) =>
+                            response.json<
+                                TApiResponseOk<{ uploadId: string }>
+                            >(),
+                        ),
+                    )
+
+                    expect(responses.map(({ status }) => status)).toEqual([
+                        200,
+                        200,
+                    ])
+                    expect(responseData[0].data.uploadId).toBe(
+                        responseData[1].data.uploadId,
+                    )
+                })
+
+                it('Should reject idempotency key reuse by another user.', async () => {
+                    const idempotencyKey = uuidv7()
+
+                    const firstResponse = await app.request(
+                        '/api/objectStorage/upload/create',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({ idempotencyKey }),
+                        },
+                        env,
+                    )
+
+                    expect(firstResponse.status).toBe(200)
+
+                    const response = await app.request(
+                        '/api/objectStorage/upload/create',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: standardCookie,
+                            },
+                            body: JSON.stringify({ idempotencyKey }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(409)
+                    expect(responseData.error.code).toBe(
+                        'IDEMPOTENCY_KEY_CONFLICT',
+                    )
+                })
             })
 
             describe('Create Upload Attachment', () => {
@@ -429,8 +593,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -456,7 +624,7 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 1024,
-                                        hashSha256: 'a'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                 ],
@@ -495,6 +663,80 @@ describe('Object Storage Endpoint', () => {
                     ).toBeTruthy()
                 })
 
+                it('Should converge concurrent attachment creates with the same hash.', async () => {
+                    const uploadId = await createUpload()
+                    const hashSha256 = createHashSha256()
+
+                    const attachmentPayload = {
+                        uploadId,
+                        attachments: [
+                            {
+                                size: 1024,
+                                hashSha256,
+                                isPublic: false,
+                            },
+                        ],
+                    }
+
+                    const responses = await Promise.all([
+                        app.request(
+                            '/api/objectStorage/upload/attachment/create',
+                            {
+                                method: 'POST',
+                                headers: {
+                                    origin: env.URL_FRONTEND,
+                                    'content-type': 'application/json',
+                                    cookie: privilegedCookie,
+                                },
+                                body: JSON.stringify(attachmentPayload),
+                            },
+                            env,
+                        ),
+                        app.request(
+                            '/api/objectStorage/upload/attachment/create',
+                            {
+                                method: 'POST',
+                                headers: {
+                                    origin: env.URL_FRONTEND,
+                                    'content-type': 'application/json',
+                                    cookie: privilegedCookie,
+                                },
+                                body: JSON.stringify(attachmentPayload),
+                            },
+                            env,
+                        ),
+                    ])
+
+                    const responseData = await Promise.all(
+                        responses.map((response) =>
+                            response.json<
+                                TApiResponseOk<{
+                                    signedUrls: {
+                                        id: string
+                                        status: number
+                                    }[]
+                                }>
+                            >(),
+                        ),
+                    )
+
+                    expect(responses.map(({ status }) => status)).toEqual([
+                        200,
+                        200,
+                    ])
+                    expect(responseData[0].data.signedUrls[0].id).toBe(
+                        responseData[1].data.signedUrls[0].id,
+                    )
+                    expect(
+                        responseData.map(
+                            ({ data }) => data.signedUrls[0].status,
+                        ),
+                    ).toEqual([
+                        201,
+                        201,
+                    ])
+                })
+
                 it('Should reject attachment with empty attachments array.', async () => {
                     const uploadResponse = await app.request(
                         '/api/objectStorage/upload/create',
@@ -502,8 +744,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -544,8 +790,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -592,8 +842,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -648,8 +902,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -674,7 +932,7 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 1024,
-                                        hashSha256: 'd'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                 ],
@@ -701,8 +959,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -713,7 +975,7 @@ describe('Object Storage Endpoint', () => {
                         >()
                     const uploadId1 = upload1Data.data.uploadId
 
-                    const sharedHash = 'e'.repeat(64)
+                    const sharedHash = createHashSha256()
 
                     const attach1Response = await app.request(
                         '/api/objectStorage/upload/attachment/create',
@@ -780,8 +1042,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -845,8 +1111,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -871,7 +1141,7 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 512,
-                                        hashSha256: 'f'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                 ],
@@ -941,8 +1211,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -999,8 +1273,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -1025,7 +1303,7 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 256,
-                                        hashSha256: '1'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                 ],
@@ -1102,6 +1380,36 @@ describe('Object Storage Endpoint', () => {
                     expect(responseData.data.signedUrls[0].status).toBe(409)
                     expect(responseData.data.signedUrls[0].signedUrl).toBeNull()
                 })
+
+                it('Should reject attachment retry after upload commit.', async () => {
+                    const uploadId = await createUpload()
+                    const attachmentId = await createUploadAttachment(uploadId)
+
+                    expect((await commitUpload(uploadId)).status).toBe(200)
+
+                    const response = await app.request(
+                        '/api/objectStorage/upload/attachment/retry',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({
+                                uploadId,
+                                attachments: [attachmentId],
+                            }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(404)
+                    expect(responseData.error.code).toBe('NOT_FOUND')
+                })
             })
 
             describe('Commit Upload Attachment', () => {
@@ -1112,8 +1420,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -1138,7 +1450,7 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 2048,
-                                        hashSha256: '2'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                 ],
@@ -1230,6 +1542,115 @@ describe('Object Storage Endpoint', () => {
                         409,
                     ])
                 })
+
+                it('Should reject partial attachment commit with unknown IDs.', async () => {
+                    const uploadId = await createUpload()
+                    const attachmentId = await createUploadAttachment(uploadId)
+
+                    const response = await app.request(
+                        '/api/objectStorage/upload/attachment/commit',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({
+                                uploadId,
+                                attachments: [
+                                    attachmentId,
+                                    'a'.repeat(32),
+                                ],
+                            }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(404)
+                    expect(responseData.error.code).toBe(
+                        'UPLOAD_ATTACHMENTS_NOT_FOUND',
+                    )
+                    expect(
+                        (await commitUploadAttachment(uploadId, attachmentId))
+                            .status,
+                    ).toBe(200)
+                })
+
+                it('Should reject partial attachment commit with already committed IDs.', async () => {
+                    const uploadId = await createUpload()
+                    const committedAttachmentId =
+                        await createUploadAttachment(uploadId)
+                    const pendingAttachmentId =
+                        await createUploadAttachment(uploadId)
+
+                    expect(
+                        (
+                            await commitUploadAttachment(
+                                uploadId,
+                                committedAttachmentId,
+                            )
+                        ).status,
+                    ).toBe(200)
+
+                    const response = await app.request(
+                        '/api/objectStorage/upload/attachment/commit',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({
+                                uploadId,
+                                attachments: [
+                                    committedAttachmentId,
+                                    pendingAttachmentId,
+                                ],
+                            }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(409)
+                    expect(responseData.error.code).toBe(
+                        'UPLOAD_ATTACHMENTS_ALREADY_COMMITTED',
+                    )
+                    expect(
+                        (
+                            await commitUploadAttachment(
+                                uploadId,
+                                pendingAttachmentId,
+                            )
+                        ).status,
+                    ).toBe(200)
+                })
+
+                it('Should reject attachment commit after upload commit.', async () => {
+                    const uploadId = await createUpload()
+                    const attachmentId = await createUploadAttachment(uploadId)
+
+                    expect((await commitUpload(uploadId)).status).toBe(200)
+
+                    const response = await commitUploadAttachment(
+                        uploadId,
+                        attachmentId,
+                    )
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(409)
+                    expect(responseData.error.code).toBe(
+                        'UPLOAD_ALREADY_COMMITTED',
+                    )
+                })
             })
 
             describe('Commit Upload', () => {
@@ -1241,8 +1662,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -1267,7 +1692,7 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 4096,
-                                        hashSha256: '3'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                 ],
@@ -1340,6 +1765,94 @@ describe('Object Storage Endpoint', () => {
                     )
                 })
 
+                it('Should allow commit for an empty upload.', async () => {
+                    const uploadId = await createUpload()
+
+                    const response = await app.request(
+                        '/api/objectStorage/upload/commit',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({ uploadId }),
+                        },
+                        env,
+                    )
+
+                    const responseData = await response.json<
+                        TApiResponseOk<{
+                            uploadId: string
+                            attachments: string[]
+                        }>
+                    >()
+
+                    expect(response.status).toBe(200)
+                    expect(responseData.data.uploadId).toBe(uploadId)
+                    expect(responseData.data.attachments).toEqual([])
+                })
+
+                it('Should reject upload commit with pending selected attachments.', async () => {
+                    const uploadId = await createUpload()
+                    const attachmentId = await createUploadAttachment(uploadId)
+
+                    const response = await app.request(
+                        '/api/objectStorage/upload/commit',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({
+                                uploadId,
+                                attachments: [attachmentId],
+                            }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(409)
+                    expect(responseData.error.code).toBe(
+                        'UPLOAD_ATTACHMENTS_NOT_COMMITTED',
+                    )
+                })
+
+                it('Should reject upload commit with unknown selected attachments.', async () => {
+                    const uploadId = await createUpload()
+
+                    const response = await app.request(
+                        '/api/objectStorage/upload/commit',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({
+                                uploadId,
+                                attachments: ['a'.repeat(32)],
+                            }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(404)
+                    expect(responseData.error.code).toBe(
+                        'UPLOAD_ATTACHMENTS_NOT_FOUND',
+                    )
+                })
+
                 it('Should reject commit for already committed upload.', async () => {
                     // Create and commit an upload first
                     const uploadResponse = await app.request(
@@ -1348,8 +1861,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -1423,8 +1940,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -1450,12 +1971,12 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 1024,
-                                        hashSha256: '4'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                     {
                                         size: 2048,
-                                        hashSha256: '5'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                 ],
@@ -1476,6 +1997,23 @@ describe('Object Storage Endpoint', () => {
                         'Expected signedUrls to be present in the response',
                     ).toBeDefined()
                     const keepAttachmentId = attachData.data.signedUrls[0].id
+
+                    await app.request(
+                        '/api/objectStorage/upload/attachment/commit',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({
+                                uploadId,
+                                attachments: [keepAttachmentId],
+                            }),
+                        },
+                        env,
+                    )
 
                     // Commit with only the first attachment (purge the second)
                     const response = await app.request(
@@ -1517,8 +2055,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -1563,6 +2105,80 @@ describe('Object Storage Endpoint', () => {
          */
         describe('Download Flow', () => {
             describe('Create Download Link', () => {
+                it('Should reject download links before upload commit.', async () => {
+                    const uploadId = await createUpload(standardCookie)
+                    const attachmentId = await createUploadAttachment(
+                        uploadId,
+                        standardCookie,
+                    )
+
+                    await app.request(
+                        '/api/objectStorage/upload/attachment/commit',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: standardCookie,
+                            },
+                            body: JSON.stringify({
+                                uploadId,
+                                attachments: [attachmentId],
+                            }),
+                        },
+                        env,
+                    )
+
+                    const response = await app.request(
+                        '/api/objectStorage/download/link/create',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: standardCookie,
+                            },
+                            body: JSON.stringify({ uploadId }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(404)
+                    expect(responseData.error.message).toBe(
+                        'Upload ID not found.',
+                    )
+                })
+
+                it('Should reject download links for pending attachments.', async () => {
+                    const uploadId = await createUpload(standardCookie)
+                    await createUploadAttachment(uploadId, standardCookie)
+
+                    const response = await app.request(
+                        '/api/objectStorage/download/link/create',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: standardCookie,
+                            },
+                            body: JSON.stringify({ uploadId }),
+                        },
+                        env,
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(404)
+                    expect(responseData.error.message).toBe(
+                        'Upload ID not found.',
+                    )
+                })
+
                 it('Should create download links for own upload.', async () => {
                     // Full upload flow first
                     const uploadResponse = await app.request(
@@ -1571,8 +2187,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -1597,7 +2217,7 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 1024,
-                                        hashSha256: '6'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                 ],
@@ -1695,8 +2315,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: privilegedCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -1721,7 +2345,7 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 1024,
-                                        hashSha256: '7'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                 ],
@@ -1810,8 +2434,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -1836,7 +2464,7 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 1024,
-                                        hashSha256: '8'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: false,
                                     },
                                 ],
@@ -1932,8 +2560,12 @@ describe('Object Storage Endpoint', () => {
                             method: 'POST',
                             headers: {
                                 origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
                                 cookie: standardCookie,
                             },
+                            body: JSON.stringify({
+                                idempotencyKey: uuidv7(),
+                            }),
                         },
                         env,
                     )
@@ -1958,7 +2590,7 @@ describe('Object Storage Endpoint', () => {
                                 attachments: [
                                     {
                                         size: 1024,
-                                        hashSha256: '9'.repeat(64),
+                                        hashSha256: createHashSha256(),
                                         isPublic: true,
                                     },
                                 ],
@@ -2048,6 +2680,48 @@ describe('Object Storage Endpoint', () => {
                     expect(
                         responseData.data.downloadUrls[0].downloadUrl,
                     ).not.toContain('X-Amz')
+                })
+
+                it('Should reject public object downloads when public URL config is blank.', async () => {
+                    const uploadId = await createUpload()
+                    const attachmentId = await createUploadAttachment(
+                        uploadId,
+                        privilegedCookie,
+                        true,
+                    )
+
+                    expect(
+                        (await commitUploadAttachment(uploadId, attachmentId))
+                            .status,
+                    ).toBe(200)
+                    expect(
+                        (await commitUpload(uploadId, [attachmentId])).status,
+                    ).toBe(200)
+
+                    const response = await app.request(
+                        '/api/objectStorage/download/link/create',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({ uploadId }),
+                        },
+                        {
+                            ...env,
+                            CF_R2_BUCKET_PUBLIC_URL: '',
+                        },
+                    )
+
+                    const responseData =
+                        await response.json<TApiResponseError>()
+
+                    expect(response.status).toBe(500)
+                    expect(responseData.error.code).toBe(
+                        'PUBLIC_R2_URL_NOT_CONFIGURED',
+                    )
                 })
             })
         })

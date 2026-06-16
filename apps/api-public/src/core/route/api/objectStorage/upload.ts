@@ -1,5 +1,8 @@
-import { uploadCommitInputSchema } from '@hyperion/validator/public/objectStorage'
-import { and, eq, inArray, notInArray } from 'drizzle-orm'
+import {
+    uploadCommitInputSchema,
+    uploadCreateInputSchema,
+} from '@hyperion/validator/public/objectStorage'
+import { and, eq, inArray, notInArray, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 
 import { AppError } from '../../../../errors.js'
@@ -17,43 +20,81 @@ export const uploadRoute = new Hono<THonoInstance>()
      * @description
      * Routes
      */
-    .post('/create', async (ctx) => {
-        const { upload } = ctx.get('dbSchema')
+    .post(
+        '/create',
+        validateRequest('json', uploadCreateInputSchema),
+        async (ctx) => {
+            const { idempotencyKey } = ctx.req.valid('json')
+            const { upload } = ctx.get('dbSchema')
 
-        try {
-            const uploadId = nanoidCustom(16)
+            try {
+                const uploadId = await ctx
+                    .get('dbClient')
+                    .transaction(async (tx) => {
+                        await tx.execute(
+                            sql`SELECT pg_advisory_xact_lock(hashtextextended(${idempotencyKey}, 0))`,
+                        )
 
-            await ctx
-                .get('dbClient')
-                .insert(upload)
-                .values({
-                    id: uploadId,
-                    userId: ctx.get('user')!.id,
+                        const [existingUpload] = await tx
+                            .select({
+                                id: upload.id,
+                                userId: upload.userId,
+                            })
+                            .from(upload)
+                            .where(eq(upload.idempotencyKey, idempotencyKey))
+
+                        if (existingUpload) {
+                            if (existingUpload.userId !== ctx.get('user')!.id) {
+                                throw new AppError({
+                                    status: 409,
+                                    code: 'IDEMPOTENCY_KEY_CONFLICT',
+                                    message:
+                                        'Idempotency Key was already used by another user.',
+                                })
+                            }
+
+                            return existingUpload.id
+                        }
+
+                        const newUploadId = nanoidCustom(16)
+
+                        await tx.insert(upload).values({
+                            id: newUploadId,
+                            userId: ctx.get('user')!.id,
+                            idempotencyKey,
+                        })
+
+                        await auditTrailLogger(
+                            ctx,
+                            {
+                                component: 'objectStorage.upload',
+                                action: 'create',
+                                description: 'Upload session created',
+                                records: { table: 'upload', id: newUploadId },
+                            },
+                            tx,
+                        )
+
+                        return newUploadId
+                    })
+
+                return apiResponseOkWrapper(ctx, {
+                    data: { uploadId },
                 })
+            } catch (err) {
+                if (err instanceof AppError) throw err
 
-            await auditTrailLogger(ctx, {
-                component: 'objectStorage.upload',
-                action: 'create',
-                description: 'Upload session created',
-                records: { table: 'upload', id: uploadId },
-            })
-
-            return apiResponseOkWrapper(ctx, {
-                data: { uploadId },
-            })
-        } catch (err) {
-            if (err instanceof AppError) throw err
-
-            throw new AppError(
-                {
-                    status: 500,
-                    code: 'UPLOAD_ID_CREATION_FAILED',
-                    message: 'Upload ID creation failed.',
-                },
-                err instanceof Error ? err : undefined,
-            )
-        }
-    })
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'UPLOAD_ID_CREATION_FAILED',
+                        message: 'Upload ID creation failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
     .post(
         '/commit',
         validateRequest('json', uploadCommitInputSchema),
@@ -113,6 +154,59 @@ export const uploadRoute = new Hono<THonoInstance>()
                             })
                         }
 
+                        const requestedAttachmentIds = [
+                            ...new Set(attachments),
+                        ]
+
+                        if (requestedAttachmentIds.length > 0) {
+                            const selectedAttachments = await tx
+                                .select({
+                                    id: objectStorage.id,
+                                    isUploaded: objectStorage.isUploaded,
+                                })
+                                .from(uploadAttachment)
+                                .innerJoin(
+                                    objectStorage,
+                                    eq(
+                                        objectStorage.id,
+                                        uploadAttachment.objectStorageId,
+                                    ),
+                                )
+                                .where(
+                                    and(
+                                        eq(uploadAttachment.uploadId, uploadId),
+                                        inArray(
+                                            objectStorage.id,
+                                            requestedAttachmentIds,
+                                        ),
+                                    ),
+                                )
+
+                            if (
+                                selectedAttachments.length !==
+                                requestedAttachmentIds.length
+                            ) {
+                                throw new AppError({
+                                    status: 404,
+                                    code: 'UPLOAD_ATTACHMENTS_NOT_FOUND',
+                                    message: 'Upload attachments not found.',
+                                })
+                            }
+
+                            if (
+                                selectedAttachments.some(
+                                    ({ isUploaded }) => !isUploaded,
+                                )
+                            ) {
+                                throw new AppError({
+                                    status: 409,
+                                    code: 'UPLOAD_ATTACHMENTS_NOT_COMMITTED',
+                                    message:
+                                        'Upload attachments are not committed.',
+                                })
+                            }
+                        }
+
                         const attachmentsToPurge = (
                             await tx
                                 .select({ id: objectStorage.id })
@@ -131,10 +225,10 @@ export const uploadRoute = new Hono<THonoInstance>()
                                 .where(
                                     and(
                                         eq(upload.id, uploadId),
-                                        attachments.length > 0
+                                        requestedAttachmentIds.length > 0
                                             ? notInArray(
                                                   objectStorage.id,
-                                                  attachments,
+                                                  requestedAttachmentIds,
                                               )
                                             : undefined,
                                     ),

@@ -2,6 +2,7 @@ import { downloadLinkCreateInputSchema } from '@hyperion/validator/public/object
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 
+import { AppError } from '../../../../errors.js'
 import type { THonoInstance } from '../../../../types.js'
 import {
     apiResponseErrorWrapper,
@@ -51,6 +52,8 @@ export const downloadRoute = new Hono<THonoInstance>()
                 .where(
                     and(
                         eq(upload.id, uploadId),
+                        eq(upload.isCommitted, true),
+                        eq(objectStorage.isUploaded, true),
                         ctx.get('isPrivilegedRole')
                             ? undefined
                             : eq(upload.userId, ctx.get('user')!.id),
@@ -80,6 +83,17 @@ export const downloadRoute = new Hono<THonoInstance>()
                             isPublicObject ||
                             hasObjectPermission
                         ) {
+                            if (
+                                isPublicObject &&
+                                !ctx.env.CF_R2_BUCKET_PUBLIC_URL
+                            ) {
+                                throw new AppError({
+                                    status: 500,
+                                    code: 'PUBLIC_R2_URL_NOT_CONFIGURED',
+                                    message: 'Public R2 URL is not configured.',
+                                })
+                            }
+
                             const downloadUrl = isPublicObject
                                 ? `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${os.id}`
                                 : (

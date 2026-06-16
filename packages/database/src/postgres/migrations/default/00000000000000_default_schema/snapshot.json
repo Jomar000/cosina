@@ -1,7 +1,7 @@
 {
     "version": "8",
     "dialect": "postgres",
-    "id": "04813fb0-8781-4a2b-a6a4-f9e006460939",
+    "id": "93e928f4-46d1-4263-a55a-76c3fd1afd85",
     "prevIds": [
         "00000000-0000-0000-0000-000000000000"
     ],
@@ -1612,6 +1612,19 @@
             "generated": null,
             "identity": null,
             "name": "user_id",
+            "entityType": "columns",
+            "schema": "public",
+            "table": "upload"
+        },
+        {
+            "type": "uuid",
+            "typeSchema": null,
+            "notNull": false,
+            "dimensions": 0,
+            "default": null,
+            "generated": null,
+            "identity": null,
+            "name": "idempotency_key",
             "entityType": "columns",
             "schema": "public",
             "table": "upload"
@@ -3279,6 +3292,17 @@
             "name": "session_token_key",
             "schema": "public",
             "table": "session",
+            "entityType": "uniques"
+        },
+        {
+            "nameExplicit": false,
+            "columns": [
+                "idempotency_key"
+            ],
+            "nullsNotDistinct": false,
+            "name": "upload_idempotency_key_key",
+            "schema": "public",
+            "table": "upload",
             "entityType": "uniques"
         },
         {

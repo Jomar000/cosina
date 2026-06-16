@@ -1617,6 +1617,19 @@
             "table": "upload"
         },
         {
+            "type": "uuid",
+            "typeSchema": null,
+            "notNull": false,
+            "dimensions": 0,
+            "default": null,
+            "generated": null,
+            "identity": null,
+            "name": "idempotency_key",
+            "entityType": "columns",
+            "schema": "public",
+            "table": "upload"
+        },
+        {
             "type": "boolean",
             "typeSchema": null,
             "notNull": true,
@@ -3279,6 +3292,17 @@
             "name": "session_token_key",
             "schema": "public",
             "table": "session",
+            "entityType": "uniques"
+        },
+        {
+            "nameExplicit": false,
+            "columns": [
+                "idempotency_key"
+            ],
+            "nullsNotDistinct": false,
+            "name": "upload_idempotency_key_key",
+            "schema": "public",
+            "table": "upload",
             "entityType": "uniques"
         },
         {

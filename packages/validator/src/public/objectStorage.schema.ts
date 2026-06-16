@@ -119,3 +119,14 @@ export const uploadCommitInputSchema = z.object({
 export const uploadCommitOutputSchema = base.outputSchema(
     base.objectOutputDataSchema,
 )
+
+export const uploadCreateInputSchema = z.object({
+    idempotencyKey: field
+        .vText({ fieldName: 'Idempotency Key', min: 36, max: 36 })
+        .toLowerCase()
+        .pipe(z.uuidv7({ error: 'Idempotency Key must be a UUID v7.' })),
+})
+
+export const uploadCreateOutputSchema = base.outputSchema(
+    base.objectOutputDataSchema,
+)
