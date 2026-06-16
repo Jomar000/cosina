@@ -1,6 +1,7 @@
 import { fileTypeFromBuffer } from 'file-type'
 import ky from 'ky'
 import PQueue from 'p-queue'
+import { v7 as uuidv7 } from 'uuid'
 
 import { objectStorageClient } from '$lib/clients'
 
@@ -11,7 +12,7 @@ export type UploadMetadata = {
     mimeType: string
     previewUrl: string | null
     hashSha256: string
-    status: 'QUEUED' | 'UPLOADED' | 'FAILED'
+    status: 'QUEUED' | 'UPLOADING' | 'UPLOADED' | 'FAILED'
 }
 
 export type UploadMode = 'NEW' | 'UPDATE'
@@ -21,27 +22,57 @@ export type PrepareUploadFilesResult = {
     queuedFiles: UploadMetadata[]
 }
 
+export type UploadFileChangeHandler = (file: UploadMetadata) => void
+
 export function getUploadMode(uploadId: string): UploadMode {
     return uploadId === '' ? 'NEW' : 'UPDATE'
 }
 
-export async function createUploadId() {
-    const response = await objectStorageClient.upload.create.$post()
+export async function createUploadId(idempotencyKey = uuidv7()) {
+    const response = await objectStorageClient.upload.create.$post({
+        json: { idempotencyKey },
+    })
+
     const responseJson = await response.json()
     if (!responseJson.success) {
         throw new Error(responseJson.error.message)
     }
+
     return responseJson.data.uploadId
+}
+
+export async function commitUploadSession({
+    objectIds,
+    uploadId,
+}: {
+    objectIds: string[]
+    uploadId: string
+}) {
+    const response = await objectStorageClient.upload.commit.$post({
+        json: {
+            uploadId,
+            attachments: objectIds,
+        },
+    })
+
+    const responseJson = await response.json()
+    if (!responseJson.success) {
+        throw new Error(responseJson.error.message)
+    }
+
+    return responseJson.data
 }
 
 export async function prepareUploadFiles({
     allowedMimeTypes,
     existingFiles,
+    isPublic,
     maxItems,
     selectedFiles,
 }: {
     allowedMimeTypes: string[]
     existingFiles: UploadMetadata[]
+    isPublic: boolean
     maxItems: number
     selectedFiles: FileList
 }): Promise<PrepareUploadFilesResult> {
@@ -80,7 +111,7 @@ export async function prepareUploadFiles({
             file,
             objectId: '',
             hashSha256,
-            isPublic: false,
+            isPublic,
             mimeType,
             previewUrl: mimeType.startsWith('image/')
                 ? URL.createObjectURL(file)
@@ -96,9 +127,11 @@ export async function prepareUploadFiles({
 }
 
 export async function uploadQueuedFiles({
+    onFileChange,
     queuedFiles,
     uploadId,
 }: {
+    onFileChange?: UploadFileChangeHandler
     queuedFiles: UploadMetadata[]
     uploadId: string
 }) {
@@ -125,9 +158,9 @@ export async function uploadQueuedFiles({
     const uploadQueue = new PQueue({ concurrency: 3 })
 
     for (const signedUpload of responseJson.data.signedUrls) {
-        uploadQueue
-            .add(() => uploadSignedFile(signedUpload, queuedFiles, uploadId))
-            .catch(() => {})
+        uploadQueue.add(() =>
+            uploadSignedFile(signedUpload, queuedFiles, uploadId, onFileChange),
+        )
     }
 
     await uploadQueue.onIdle()
@@ -135,9 +168,11 @@ export async function uploadQueuedFiles({
 
 export async function retryUploadFile({
     file,
+    onFileChange,
     uploadId,
 }: {
     file: UploadMetadata
+    onFileChange?: UploadFileChangeHandler
     uploadId: string
 }) {
     const retryResponse =
@@ -155,11 +190,16 @@ export async function retryUploadFile({
 
     for (const signedUpload of responseJson.data.signedUrls) {
         if (signedUpload.status === 409) {
-            file.status = 'UPLOADED'
+            updateFile(file, { status: 'UPLOADED' }, onFileChange)
         } else if (signedUpload.status === 200) {
-            await uploadRetrySignedFile(signedUpload, file, uploadId)
+            await uploadRetrySignedFile(
+                signedUpload,
+                file,
+                uploadId,
+                onFileChange,
+            )
         } else {
-            file.status = 'FAILED'
+            updateFile(file, { status: 'FAILED' }, onFileChange)
         }
     }
 }
@@ -188,6 +228,7 @@ async function uploadSignedFile(
     },
     queuedFiles: UploadMetadata[],
     uploadId: string,
+    onFileChange?: UploadFileChangeHandler,
 ) {
     const file = queuedFiles.find(
         (queuedFile) => queuedFile.hashSha256 === signedUpload.hashSha256,
@@ -195,19 +236,20 @@ async function uploadSignedFile(
 
     if (!file) return
 
-    file.objectId = signedUpload.id
+    updateFile(file, { objectId: signedUpload.id }, onFileChange)
 
     if (signedUpload.status === 409) {
-        file.status = 'UPLOADED'
+        updateFile(file, { status: 'UPLOADED' }, onFileChange)
         return
     }
 
     try {
+        updateFile(file, { status: 'UPLOADING' }, onFileChange)
         await putSignedFile(signedUpload, file.file)
         await commitUploadedFile(uploadId, signedUpload.id)
-        file.status = 'UPLOADED'
+        updateFile(file, { status: 'UPLOADED' }, onFileChange)
     } catch {
-        file.status = 'FAILED'
+        updateFile(file, { status: 'FAILED' }, onFileChange)
     }
 }
 
@@ -219,14 +261,25 @@ async function uploadRetrySignedFile(
     },
     file: UploadMetadata,
     uploadId: string,
+    onFileChange?: UploadFileChangeHandler,
 ) {
     try {
+        updateFile(file, { status: 'UPLOADING' }, onFileChange)
         await putSignedFile(signedUpload, file.file)
         await commitUploadedFile(uploadId, file.objectId)
-        file.status = 'UPLOADED'
+        updateFile(file, { status: 'UPLOADED' }, onFileChange)
     } catch {
-        file.status = 'FAILED'
+        updateFile(file, { status: 'FAILED' }, onFileChange)
     }
+}
+
+function updateFile(
+    file: UploadMetadata,
+    values: Partial<Pick<UploadMetadata, 'objectId' | 'status'>>,
+    onFileChange?: UploadFileChangeHandler,
+) {
+    Object.assign(file, values)
+    onFileChange?.(file)
 }
 
 async function putSignedFile(

@@ -1,5 +1,8 @@
-import { downloadLinkCreateInputSchema } from '@hyperion/validator/public/objectStorage'
-import { and, eq } from 'drizzle-orm'
+import {
+    downloadLinkCreateInputSchema,
+    downloadReadManyInputSchema,
+} from '@hyperion/validator/public/objectStorage'
+import { and, asc, count as countFn, desc, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 
 import { AppError } from '../../../../errors.js'
@@ -7,6 +10,7 @@ import type { THonoInstance } from '../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    apiResponsePaginatedOkWrapper,
 } from '../../../../utilities/helpers.js'
 import { validateRequest } from '../../../middleware/validateRequest.js'
 
@@ -130,6 +134,92 @@ export const downloadRoute = new Hono<THonoInstance>()
             return apiResponseOkWrapper(ctx, {
                 data: { downloadUrls },
             })
+        },
+    )
+    .get(
+        '/readMany',
+        validateRequest('query', downloadReadManyInputSchema),
+        async (ctx) => {
+            const { limit, offset, sortOrder } = ctx.req.valid('query')
+
+            const { objectStorage, upload, uploadAttachment } =
+                ctx.get('dbSchema')
+
+            try {
+                const searchCondition = and(
+                    eq(upload.isCommitted, true),
+                    eq(objectStorage.isUploaded, true),
+                    ctx.get('isPrivilegedRole')
+                        ? undefined
+                        : eq(upload.userId, ctx.get('user')!.id),
+                )
+
+                const count = (
+                    await ctx
+                        .get('dbClient')
+                        .select({
+                            count: countFn(uploadAttachment.objectStorageId),
+                        })
+                        .from(uploadAttachment)
+                        .innerJoin(
+                            objectStorage,
+                            eq(
+                                objectStorage.id,
+                                uploadAttachment.objectStorageId,
+                            ),
+                        )
+                        .innerJoin(
+                            upload,
+                            eq(upload.id, uploadAttachment.uploadId),
+                        )
+                        .where(searchCondition)
+                )[0].count
+
+                const data = await ctx
+                    .get('dbClient')
+                    .select({
+                        uploadId: upload.id,
+                        objectStorageId: objectStorage.id,
+                        size: objectStorage.size,
+                        mimeType: objectStorage.mimeType,
+                        hashSha256: objectStorage.hashSha256,
+                        isPublic: objectStorage.isPublic,
+                        objectCreatedAt: objectStorage.createdAt,
+                        uploadCreatedAt: upload.createdAt,
+                    })
+                    .from(uploadAttachment)
+                    .innerJoin(
+                        objectStorage,
+                        eq(objectStorage.id, uploadAttachment.objectStorageId),
+                    )
+                    .innerJoin(upload, eq(upload.id, uploadAttachment.uploadId))
+                    .where(searchCondition)
+                    .limit(limit)
+                    .offset(offset)
+                    .orderBy(
+                        sortOrder === 'asc'
+                            ? asc(upload.createdAt)
+                            : desc(upload.createdAt),
+                    )
+
+                return apiResponsePaginatedOkWrapper(ctx, {
+                    data,
+                    count,
+                    limit,
+                    offset,
+                })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'DOWNLOAD_LIST_RETRIEVAL_FAILED',
+                        message: 'Download list retrieval failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
         },
     )
 

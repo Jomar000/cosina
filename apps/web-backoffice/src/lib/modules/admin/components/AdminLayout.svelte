@@ -1,5 +1,6 @@
 <script lang="ts">
     import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import CloudUploadIcon from '@lucide/svelte/icons/cloud-upload'
     import ListIcon from '@lucide/svelte/icons/list'
     import UsersIcon from '@lucide/svelte/icons/users'
     import { onMount } from 'svelte'
@@ -41,6 +42,22 @@
                 {
                     title: 'History',
                     url: '#',
+                },
+            ],
+        },
+        {
+            title: 'Object Storage',
+            url: '#',
+            icon: CloudUploadIcon,
+            isActive: true,
+            items: [
+                {
+                    title: 'Download',
+                    url: '/app/admin/object-storage/download',
+                },
+                {
+                    title: 'Upload',
+                    url: '/app/admin/object-storage/upload',
                 },
             ],
         },

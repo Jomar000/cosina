@@ -91,11 +91,12 @@ CREATE TABLE "object_storage" (
 	"id" text PRIMARY KEY,
 	"size" bigint NOT NULL,
 	"mime_type" text,
-	"hash_sha256" text NOT NULL UNIQUE,
+	"hash_sha256" text NOT NULL,
 	"is_public" boolean DEFAULT false NOT NULL,
 	"is_uploaded" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "object_storage_hash_sha256_is_public_unique" UNIQUE("hash_sha256","is_public")
 );
 --> statement-breakpoint
 CREATE TABLE "object_storage_acl" (

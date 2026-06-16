@@ -16,6 +16,12 @@ export const downloadLinkCreateOutputSchema = base.outputSchema(
     base.objectOutputDataSchema,
 )
 
+export const downloadReadManyInputSchema = base.readManyInputSchema
+
+export const downloadReadManyOutputSchema = base.paginatedOutputSchema(
+    base.objectArrayOutputDataSchema,
+)
+
 export const uploadAttachmentCommitInputSchema = z.object({
     uploadId: field
         .vText({ fieldName: 'Upload ID', min: 16 })

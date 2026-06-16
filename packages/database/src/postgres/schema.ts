@@ -167,26 +167,32 @@ export const keyValue = pgTable('key_value', {
         .defaultNow(),
 })
 
-export const objectStorage = pgTable('object_storage', {
-    id: text('id').primaryKey(),
-    size: bigint('size', { mode: 'number' }).notNull(),
-    mimeType: text('mime_type'),
-    hashSha256: text('hash_sha256').unique().notNull(),
-    isPublic: boolean('is_public').notNull().default(false),
-    isUploaded: boolean('is_uploaded').notNull().default(false),
-    createdAt: timestamp('created_at', {
-        withTimezone: true,
-        mode: 'date',
-    })
-        .notNull()
-        .defaultNow(),
-    updatedAt: timestamp('updated_at', {
-        withTimezone: true,
-        mode: 'date',
-    })
-        .notNull()
-        .defaultNow(),
-})
+export const objectStorage = pgTable(
+    'object_storage',
+    {
+        id: text('id').primaryKey(),
+        size: bigint('size', { mode: 'number' }).notNull(),
+        mimeType: text('mime_type'),
+        hashSha256: text('hash_sha256').notNull(),
+        isPublic: boolean('is_public').notNull().default(false),
+        isUploaded: boolean('is_uploaded').notNull().default(false),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        unique().on(t.hashSha256, t.isPublic),
+    ],
+)
 
 export const objectStorageAcl = pgTable(
     'object_storage_acl',

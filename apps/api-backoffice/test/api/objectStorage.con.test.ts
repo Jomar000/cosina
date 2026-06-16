@@ -1,4 +1,8 @@
-import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
+import type {
+    TApiResponseError,
+    TApiResponseOk,
+    TApiResponsePaginatedOk,
+} from '@hyperion/types/shared'
 import { env } from 'cloudflare:workers'
 import { v7 as uuidv7 } from 'uuid'
 import { beforeAll, describe, expect, it } from 'vitest'
@@ -160,6 +164,25 @@ describe('Object Storage Endpoint', () => {
                         body: JSON.stringify({
                             uploadId: 'a1b2c3d4e5f6g7h8',
                         }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(401)
+                expect(responseData).toHaveProperty('error')
+                expect(responseData.error.code).toBe('UNAUTHORIZED')
+            })
+
+            it('Unauthenticated request to /download/readMany should return 401.', async () => {
+                const response = await app.request(
+                    '/api/objectStorage/download/readMany',
+                    {
+                        method: 'GET',
+                        headers: {
+                            origin: env.URL_FRONTEND,
+                        },
                     },
                     env,
                 )
@@ -1099,6 +1122,95 @@ describe('Object Storage Endpoint', () => {
                     ).toBeDefined()
                     expect(responseData.data.signedUrls[0].status).toBe(409)
                     expect(responseData.data.signedUrls[0].signedUrl).toBeNull()
+                })
+
+                it('Should create a public object for the same hash as an existing private object.', async () => {
+                    const sharedHash = createHashSha256()
+                    const privateUploadId = await createUpload()
+
+                    const privateAttachResponse = await app.request(
+                        '/api/objectStorage/upload/attachment/create',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({
+                                uploadId: privateUploadId,
+                                attachments: [
+                                    {
+                                        size: 1024,
+                                        hashSha256: sharedHash,
+                                        isPublic: false,
+                                    },
+                                ],
+                            }),
+                        },
+                        env,
+                    )
+
+                    const privateAttachData = await privateAttachResponse.json<
+                        TApiResponseOk<{
+                            signedUrls: { id: string; status: number }[]
+                        }>
+                    >()
+                    const privateObjectId =
+                        privateAttachData.data.signedUrls[0].id
+
+                    expect(privateAttachResponse.status).toBe(200)
+                    expect(
+                        (
+                            await commitUploadAttachment(
+                                privateUploadId,
+                                privateObjectId,
+                            )
+                        ).status,
+                    ).toBe(200)
+
+                    const publicUploadId = await createUpload()
+                    const publicAttachResponse = await app.request(
+                        '/api/objectStorage/upload/attachment/create',
+                        {
+                            method: 'POST',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                'content-type': 'application/json',
+                                cookie: privilegedCookie,
+                            },
+                            body: JSON.stringify({
+                                uploadId: publicUploadId,
+                                attachments: [
+                                    {
+                                        size: 1024,
+                                        hashSha256: sharedHash,
+                                        isPublic: true,
+                                    },
+                                ],
+                            }),
+                        },
+                        env,
+                    )
+
+                    const publicAttachData = await publicAttachResponse.json<
+                        TApiResponseOk<{
+                            signedUrls: {
+                                id: string
+                                signedUrl: string | null
+                                status: number
+                            }[]
+                        }>
+                    >()
+
+                    expect(publicAttachResponse.status).toBe(200)
+                    expect(publicAttachData.data.signedUrls[0].status).toBe(201)
+                    expect(publicAttachData.data.signedUrls[0].id).not.toBe(
+                        privateObjectId,
+                    )
+                    expect(
+                        publicAttachData.data.signedUrls[0].signedUrl,
+                    ).toContain(`/${env.CF_R2_BUCKET_PUBLIC}/`)
                 })
             })
 
@@ -2104,6 +2216,76 @@ describe('Object Storage Endpoint', () => {
          * Download Flow
          */
         describe('Download Flow', () => {
+            describe('Read Download List', () => {
+                it('Should list committed uploaded objects and skip pending objects.', async () => {
+                    const committedUploadId = await createUpload(standardCookie)
+                    const committedAttachmentId = await createUploadAttachment(
+                        committedUploadId,
+                        standardCookie,
+                    )
+
+                    expect(
+                        (
+                            await commitUploadAttachment(
+                                committedUploadId,
+                                committedAttachmentId,
+                            )
+                        ).status,
+                    ).toBe(200)
+                    expect(
+                        (
+                            await commitUpload(committedUploadId, [
+                                committedAttachmentId,
+                            ])
+                        ).status,
+                    ).toBe(200)
+
+                    const pendingUploadId = await createUpload(standardCookie)
+                    const pendingAttachmentId = await createUploadAttachment(
+                        pendingUploadId,
+                        standardCookie,
+                    )
+
+                    const response = await app.request(
+                        '/api/objectStorage/download/readMany?limit=100&offset=0&sortOrder=desc',
+                        {
+                            method: 'GET',
+                            headers: {
+                                origin: env.URL_FRONTEND,
+                                cookie: standardCookie,
+                            },
+                        },
+                        env,
+                    )
+
+                    const responseData = await response.json<
+                        TApiResponsePaginatedOk<
+                            {
+                                uploadId: string
+                                objectStorageId: string
+                            }[]
+                        >
+                    >()
+
+                    expect(response.status).toBe(200)
+                    expect(responseData.success).toBe(true)
+                    expect(
+                        responseData.data.some(
+                            ({ objectStorageId, uploadId }) =>
+                                uploadId === committedUploadId &&
+                                objectStorageId === committedAttachmentId,
+                        ),
+                    ).toBe(true)
+                    expect(
+                        responseData.data.some(
+                            ({ objectStorageId, uploadId }) =>
+                                uploadId === pendingUploadId &&
+                                objectStorageId === pendingAttachmentId,
+                        ),
+                    ).toBe(false)
+                })
+            })
+
             describe('Create Download Link', () => {
                 it('Should reject download links before upload commit.', async () => {
                     const uploadId = await createUpload(standardCookie)

@@ -52,6 +52,7 @@
         "svelte-check": "catalog:",
         "svelte-sonner": "catalog:",
         "tailwindcss": "catalog:",
+        "uuid": "catalog:",
         "vite": "catalog:",
         "vite-imagetools": "catalog:",
         "vitest": "catalog:",

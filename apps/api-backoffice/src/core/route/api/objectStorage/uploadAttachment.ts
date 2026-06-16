@@ -114,9 +114,9 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                                 ),
                             )
 
-                        const existingObjectsByHash = new Map(
+                        const existingObjectsByHashAndBucket = new Map(
                             existingObjects.map((os) => [
-                                os.hashSha256,
+                                `${os.hashSha256}:${String(os.isPublic)}`,
                                 os,
                             ]),
                         )
@@ -149,9 +149,12 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
                         }[] = []
 
                         for (const attachment of attachments) {
-                            const existingObject = existingObjectsByHash.get(
-                                attachment.hashSha256,
-                            )
+                            const existingObject =
+                                existingObjectsByHashAndBucket.get(
+                                    `${attachment.hashSha256}:${String(
+                                        attachment.isPublic,
+                                    )}`,
+                                )
 
                             const objectStorageId =
                                 existingObject?.id ?? nanoidCustom(32)

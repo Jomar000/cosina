@@ -3150,6 +3150,18 @@
         {
             "nameExplicit": false,
             "columns": [
+                "hash_sha256",
+                "is_public"
+            ],
+            "nullsNotDistinct": false,
+            "name": "object_storage_hash_sha256_is_public_unique",
+            "entityType": "uniques",
+            "schema": "public",
+            "table": "object_storage"
+        },
+        {
+            "nameExplicit": false,
+            "columns": [
                 "object_storage_id",
                 "user_id"
             ],
@@ -3248,17 +3260,6 @@
             "name": "key_value_key_key",
             "schema": "public",
             "table": "key_value",
-            "entityType": "uniques"
-        },
-        {
-            "nameExplicit": false,
-            "columns": [
-                "hash_sha256"
-            ],
-            "nullsNotDistinct": false,
-            "name": "object_storage_hash_sha256_key",
-            "schema": "public",
-            "table": "object_storage",
             "entityType": "uniques"
         },
         {
