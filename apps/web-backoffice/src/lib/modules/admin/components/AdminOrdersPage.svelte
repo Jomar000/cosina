@@ -4,6 +4,7 @@
     import * as DropdownMenu from '@hyperion/ui/components/dropdown-menu'
     import { Input } from '@hyperion/ui/components/input'
     import { Label } from '@hyperion/ui/components/label'
+    import { Textarea } from '@hyperion/ui/components/textarea'
     import { Separator } from '@hyperion/ui/components/separator'
     import { Skeleton } from '@hyperion/ui/components/skeleton'
     import CalendarClockIcon from '@lucide/svelte/icons/calendar-clock'
@@ -29,7 +30,10 @@
     import { adminClient } from '$lib/clients'
     import { wsClientManager } from '$lib/utilities/wsClientManager'
 
-    type TSettingsData = { advanceDays: number }
+    type TSettingsData = {
+        advanceDays: number
+        restaurantAddress: string | null
+    }
 
     ///////////////////
     // 02. Constants //
@@ -158,6 +162,7 @@
     let filterStatus = $state<TOrderStatus | 'all'>('all')
 
     let advanceDaysInput = $state(3)
+    let restaurantAddressInput = $state('')
 
     const ordersQuery = createQuery(() => ({
         queryKey: [
@@ -265,7 +270,10 @@
             'settings',
             'update',
         ],
-        mutationFn: async (payload: { advanceDays: number }) => {
+        mutationFn: async (payload: {
+            advanceDays: number
+            restaurantAddress?: string
+        }) => {
             const response = await adminClient.settings.update.$post({
                 json: payload,
             })
@@ -293,9 +301,10 @@
     /////////////////
 
     $effect(() => {
-        const fetched = settingsQuery.data?.advanceDays
+        const fetched = settingsQuery.data
         if (fetched !== undefined) {
-            advanceDaysInput = fetched
+            advanceDaysInput = fetched.advanceDays
+            restaurantAddressInput = fetched.restaurantAddress ?? ''
         }
     })
 
@@ -368,14 +377,20 @@
     }
 
     function openSettings() {
-        advanceDaysInput = settingsQuery.data?.advanceDays ?? advanceDaysInput
+        const data = settingsQuery.data
+        advanceDaysInput = data?.advanceDays ?? advanceDaysInput
+        restaurantAddressInput =
+            data?.restaurantAddress ?? restaurantAddressInput
         settingsOpen = true
     }
 
     function saveSettings() {
         const clamped = Math.max(1, Math.min(30, advanceDaysInput))
         advanceDaysInput = clamped
-        updateSettingsMutation.mutate({ advanceDays: clamped })
+        updateSettingsMutation.mutate({
+            advanceDays: clamped,
+            restaurantAddress: restaurantAddressInput.trim() || undefined,
+        })
     }
 
     /////////////////
@@ -1157,6 +1172,30 @@
                         customer devices in real time via WebSocket.
                     </p>
                 </div>
+            </div>
+
+            <!-- Restaurant address -->
+            <div class="flex flex-col gap-3">
+                <div class="flex flex-col gap-1">
+                    <Label
+                        for="restaurantAddress"
+                        class="text-sm font-medium"
+                    >
+                        Restaurant / Pickup Address
+                    </Label>
+                    <p class="text-muted-foreground text-xs">
+                        Shown to customers who select Self Pickup as their
+                        delivery option.
+                    </p>
+                </div>
+
+                <Textarea
+                    id="restaurantAddress"
+                    placeholder="e.g. 123 Main St, Barangay Sample, Makati City, Metro Manila"
+                    bind:value={restaurantAddressInput}
+                    rows={3}
+                    class="resize-none text-sm"
+                />
             </div>
         </div>
 

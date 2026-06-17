@@ -1,8 +1,9 @@
 import { downloadLinkCreateInputSchema } from '@hyperion/validator/public/objectStorage'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
 
-import type { THonoInstance } from '../../../../types.js'
+import type { TGlobalApiResponses, THonoInstance } from '../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
@@ -118,5 +119,10 @@ export const downloadRoute = new Hono<THonoInstance>()
             })
         },
     )
+
+export type DownloadRouteType = ApplyGlobalResponse<
+    typeof downloadRoute,
+    TGlobalApiResponses
+>
 
 export default downloadRoute

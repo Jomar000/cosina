@@ -6,10 +6,11 @@ import {
 import { hexToBytes } from '@noble/hashes/utils.js'
 import { and, eq, inArray } from 'drizzle-orm'
 import { Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
 import { encodeBase64 } from 'hono/utils/encode'
 
 import { AppError } from '../../../../errors.js'
-import type { THonoInstance } from '../../../../types.js'
+import type { TGlobalApiResponses, THonoInstance } from '../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
@@ -581,5 +582,10 @@ export const uploadAttachmentRoute = new Hono<THonoInstance>()
             }
         },
     )
+
+export type UploadAttachmentRouteType = ApplyGlobalResponse<
+    typeof uploadAttachmentRoute,
+    TGlobalApiResponses
+>
 
 export default uploadAttachmentRoute

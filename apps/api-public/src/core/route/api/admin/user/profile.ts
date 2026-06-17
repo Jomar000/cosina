@@ -2,9 +2,13 @@ import { profile } from '@hyperion/validator/public/admin/user'
 import { and, asc, count as countFn, desc, eq } from 'drizzle-orm'
 import { getColumns } from 'drizzle-orm/utils'
 import { Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
 
 import { AppError } from '../../../../../errors.js'
-import type { THonoInstance } from '../../../../../types.js'
+import type {
+    TGlobalApiResponses,
+    THonoInstance,
+} from '../../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
@@ -402,5 +406,10 @@ export const profileRoute = new Hono<THonoInstance>()
             }
         },
     )
+
+export type AdminUserProfileRouteType = ApplyGlobalResponse<
+    typeof profileRoute,
+    TGlobalApiResponses
+>
 
 export default profileRoute

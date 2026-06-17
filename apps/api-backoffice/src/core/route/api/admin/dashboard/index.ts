@@ -1,9 +1,13 @@
 import { dashboard } from '@hyperion/validator/backoffice/admin/dashboard'
 import { and, count as countFn, eq, gte, inArray, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
 
 import { AppError } from '../../../../../errors.js'
-import type { THonoInstance } from '../../../../../types.js'
+import type {
+    TGlobalApiResponses,
+    THonoInstance,
+} from '../../../../../types.js'
 import { apiResponseOkWrapper } from '../../../../../utilities/helpers.js'
 import { validateRequest } from '../../../../middleware/validateRequest.js'
 
@@ -106,5 +110,10 @@ export const dashboardRoute = new Hono<THonoInstance>().get(
         }
     },
 )
+
+export type DashboardRouteType = ApplyGlobalResponse<
+    typeof dashboardRoute,
+    TGlobalApiResponses
+>
 
 export default dashboardRoute

@@ -41,6 +41,7 @@ export const createInputSchema = z.object({
         .optional(),
     proofOfPaymentObjectStorageId: z.string().trim().min(1).max(64).optional(),
     notes: z.string().trim().max(512).optional(),
+    deliveryAddress: z.string().trim().max(512).optional(),
     items: z
         .array(orderItemInputSchema)
         .min(1, { error: 'Order must have at least one item.' }),

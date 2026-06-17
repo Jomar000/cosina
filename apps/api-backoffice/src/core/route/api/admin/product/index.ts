@@ -1,9 +1,13 @@
 import { product } from '@hyperion/validator/backoffice/admin/product'
 import { asc, count as countFn, desc, eq, inArray } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
 
 import { AppError } from '../../../../../errors.js'
-import type { THonoInstance } from '../../../../../types.js'
+import type {
+    TGlobalApiResponses,
+    THonoInstance,
+} from '../../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
@@ -704,5 +708,10 @@ export const productRoute = new Hono<THonoInstance>()
             },
         })
     })
+
+export type AdminProductRouteType = ApplyGlobalResponse<
+    typeof productRoute,
+    TGlobalApiResponses
+>
 
 export default productRoute

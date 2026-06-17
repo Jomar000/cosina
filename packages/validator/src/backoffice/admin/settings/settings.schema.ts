@@ -8,4 +8,5 @@ export const updateSettingsInputSchema = z.object({
         min: 1,
         max: 30,
     }),
+    restaurantAddress: z.string().trim().max(512).optional(),
 })

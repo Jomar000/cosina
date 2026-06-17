@@ -1,9 +1,13 @@
 import { settings } from '@hyperion/validator/backoffice/admin/settings'
-import { eq, sql } from 'drizzle-orm'
+import { eq, inArray, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
 
 import { AppError } from '../../../../../errors.js'
-import type { THonoInstance } from '../../../../../types.js'
+import type {
+    TGlobalApiResponses,
+    THonoInstance,
+} from '../../../../../types.js'
 import {
     apiResponseOkWrapper,
     auditTrailLogger,
@@ -12,6 +16,7 @@ import { validateRequest } from '../../../../middleware/validateRequest.js'
 
 const ADVANCE_DAYS_KEY = 'order:settings:advanceDays'
 const DEFAULT_ADVANCE_DAYS = 3
+const RESTAURANT_ADDRESS_KEY = 'order:settings:restaurantAddress'
 
 async function broadcastSettingsEvent(
     env: THonoInstance['Bindings'],
@@ -33,18 +38,33 @@ export const settingsRoute = new Hono<THonoInstance>()
         const { keyValue } = ctx.get('dbSchema')
 
         try {
-            const [row] = await ctx
+            const rows = await ctx
                 .get('dbClient')
-                .select({ value: keyValue.value })
+                .select({ key: keyValue.key, value: keyValue.value })
                 .from(keyValue)
-                .where(eq(keyValue.key, ADVANCE_DAYS_KEY))
-                .limit(1)
+                .where(
+                    inArray(keyValue.key, [
+                        ADVANCE_DAYS_KEY,
+                        RESTAURANT_ADDRESS_KEY,
+                    ]),
+                )
 
-            const advanceDays = row?.value
-                ? parseInt(row.value, 10)
+            const byKey = Object.fromEntries(
+                rows.map((r) => [
+                    r.key,
+                    r.value,
+                ]),
+            )
+
+            const advanceDays = byKey[ADVANCE_DAYS_KEY]
+                ? parseInt(byKey[ADVANCE_DAYS_KEY]!, 10)
                 : DEFAULT_ADVANCE_DAYS
 
-            return apiResponseOkWrapper(ctx, { data: { advanceDays } })
+            const restaurantAddress = byKey[RESTAURANT_ADDRESS_KEY] ?? null
+
+            return apiResponseOkWrapper(ctx, {
+                data: { advanceDays, restaurantAddress },
+            })
         } catch (err) {
             if (err instanceof AppError) throw err
 
@@ -62,7 +82,7 @@ export const settingsRoute = new Hono<THonoInstance>()
         '/update',
         validateRequest('json', settings.updateSettingsInputSchema),
         async (ctx) => {
-            const { advanceDays } = ctx.req.valid('json')
+            const { advanceDays, restaurantAddress } = ctx.req.valid('json')
 
             const { keyValue } = ctx.get('dbSchema')
 
@@ -82,19 +102,55 @@ export const settingsRoute = new Hono<THonoInstance>()
                         },
                     })
 
+                if (restaurantAddress !== undefined) {
+                    await ctx
+                        .get('dbClient')
+                        .insert(keyValue)
+                        .values({
+                            key: RESTAURANT_ADDRESS_KEY,
+                            value: restaurantAddress,
+                        })
+                        .onConflictDoUpdate({
+                            target: keyValue.key,
+                            set: {
+                                value: restaurantAddress,
+                                updatedAt: sql`now()`,
+                            },
+                        })
+                }
+
                 await auditTrailLogger(ctx, {
                     component: 'admin.settings',
                     action: 'update',
-                    description: `Admin updated advance order days to ${advanceDays}`,
+                    description: `Admin updated order settings`,
                     records: {
                         table: 'key_value',
                         id: ADVANCE_DAYS_KEY,
                     },
                 })
 
-                await broadcastSettingsEvent(ctx.env, { advanceDays })
+                const resolvedAddress =
+                    restaurantAddress !== undefined
+                        ? restaurantAddress
+                        : ((
+                              await ctx
+                                  .get('dbClient')
+                                  .select({ value: keyValue.value })
+                                  .from(keyValue)
+                                  .where(
+                                      eq(keyValue.key, RESTAURANT_ADDRESS_KEY),
+                                  )
+                                  .limit(1)
+                          )[0]?.value ?? null)
 
-                return apiResponseOkWrapper(ctx, { data: { advanceDays } })
+                await broadcastSettingsEvent(ctx.env, {
+                    advanceDays,
+                    restaurantAddress: resolvedAddress,
+                })
+
+                return apiResponseOkWrapper(ctx, {
+                    data: { advanceDays, restaurantAddress: resolvedAddress },
+                })
             } catch (err) {
                 if (err instanceof AppError) throw err
 
@@ -109,5 +165,10 @@ export const settingsRoute = new Hono<THonoInstance>()
             }
         },
     )
+
+export type SettingsRouteType = ApplyGlobalResponse<
+    typeof settingsRoute,
+    TGlobalApiResponses
+>
 
 export default settingsRoute

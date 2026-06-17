@@ -2,6 +2,7 @@
     import { Button } from '@hyperion/ui/components/button'
     import { cn } from '@hyperion/ui/utils'
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart'
+    import UtensilsIcon from '@lucide/svelte/icons/utensils'
 
     ////////////////////
     // 01. Properties //
@@ -110,22 +111,10 @@
             />
         {:else}
             <div
-                class="flex h-full w-full items-center justify-center text-zinc-600"
+                class="flex h-full w-full flex-col items-center justify-center gap-1.5 text-zinc-700"
             >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-12 w-12 opacity-40"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M9 13h6M9 17h3m-3-8h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"
-                    />
-                </svg>
+                <UtensilsIcon class="h-10 w-10 opacity-30" />
+                <span class="text-[10px] font-medium opacity-40">No photo</span>
             </div>
         {/if}
         <!-- Category Badge -->
@@ -169,19 +158,27 @@
 
         <!-- Size Selector -->
         {#if product.sizes.length > 0}
-            <div class="flex flex-wrap gap-1">
+            <div class="flex flex-wrap gap-1.5">
                 {#each product.sizes as size (size.id)}
                     <button
                         type="button"
                         class={cn(
-                            'rounded border px-2 py-0.5 text-[10px] font-medium transition-all',
+                            'flex min-h-11 flex-col items-center justify-center rounded border px-3 py-1 transition-all sm:min-h-0 sm:py-0.5',
                             selectedSizeId === size.id
                                 ? 'border-blue-500 bg-blue-500/15 text-blue-400'
                                 : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600',
                         )}
                         onclick={() => (selectedSizeId = size.id)}
                     >
-                        {size.name}
+                        <span class="text-xs font-medium">{size.name}</span>
+                        <span
+                            class="tabular-nums text-[10px] leading-tight opacity-70"
+                        >
+                            ₱{Number(size.price).toLocaleString('en-PH', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                            })}
+                        </span>
                     </button>
                 {/each}
             </div>
@@ -198,10 +195,10 @@
             <Button
                 size="sm"
                 onclick={handleAddToCart}
-                class="h-7 gap-1 bg-blue-600 px-2.5 text-white hover:bg-blue-500 active:bg-blue-700"
+                class="h-11 gap-1.5 bg-blue-600 px-4 text-white hover:bg-blue-500 active:bg-blue-700 sm:h-8 sm:px-2.5"
             >
-                <ShoppingCartIcon class="h-3 w-3" />
-                <span class="text-[11px] font-semibold">Add</span>
+                <ShoppingCartIcon class="h-4 w-4 sm:h-3 sm:w-3" />
+                <span class="text-sm font-semibold sm:text-[11px]">Add</span>
             </Button>
         </div>
     </div>

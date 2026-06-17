@@ -1,5 +1,5 @@
 import { order } from '@hyperion/validator/public/order'
-import { asc, eq } from 'drizzle-orm'
+import { asc, eq, inArray } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'
 
@@ -42,6 +42,7 @@ export const orderRoute = new Hono<THonoInstance>()
                 downpayment,
                 proofOfPaymentObjectStorageId,
                 notes,
+                deliveryAddress,
                 items,
             } = ctx.req.valid('json')
 
@@ -85,6 +86,7 @@ export const orderRoute = new Hono<THonoInstance>()
                                 proofOfPaymentObjectStorageId:
                                     proofOfPaymentObjectStorageId ?? null,
                                 notes: notes ?? null,
+                                deliveryAddress: deliveryAddress ?? null,
                             })
                             .returning({
                                 id: orderTable.id,
@@ -317,28 +319,46 @@ export const orderRoute = new Hono<THonoInstance>()
 
 const ADVANCE_DAYS_KEY = 'order:settings:advanceDays'
 const DEFAULT_ADVANCE_DAYS = 3
+const RESTAURANT_ADDRESS_KEY = 'order:settings:restaurantAddress'
 
 export const trackOrderRoute = orderRoute
     .get('/settings', async (ctx) => {
         const { keyValue } = ctx.get('dbSchema')
 
         try {
-            const [row] = await ctx
+            const rows = await ctx
                 .get('dbClient')
-                .select({ value: keyValue.value })
+                .select({ key: keyValue.key, value: keyValue.value })
                 .from(keyValue)
-                .where(eq(keyValue.key, ADVANCE_DAYS_KEY))
-                .limit(1)
+                .where(
+                    inArray(keyValue.key, [
+                        ADVANCE_DAYS_KEY,
+                        RESTAURANT_ADDRESS_KEY,
+                    ]),
+                )
 
-            const advanceDays = row?.value
-                ? parseInt(row.value, 10)
+            const byKey = Object.fromEntries(
+                rows.map((r) => [
+                    r.key,
+                    r.value,
+                ]),
+            )
+
+            const advanceDays = byKey[ADVANCE_DAYS_KEY]
+                ? parseInt(byKey[ADVANCE_DAYS_KEY]!, 10)
                 : DEFAULT_ADVANCE_DAYS
 
-            return ctx.json({ success: true, data: { advanceDays } })
+            const restaurantAddress = byKey[RESTAURANT_ADDRESS_KEY] ?? null
+
+            return apiResponseOkWrapper(ctx, {
+                data: { advanceDays, restaurantAddress },
+            })
         } catch {
-            return ctx.json({
-                success: true,
-                data: { advanceDays: DEFAULT_ADVANCE_DAYS },
+            return apiResponseOkWrapper(ctx, {
+                data: {
+                    advanceDays: DEFAULT_ADVANCE_DAYS,
+                    restaurantAddress: null,
+                },
             })
         }
     })

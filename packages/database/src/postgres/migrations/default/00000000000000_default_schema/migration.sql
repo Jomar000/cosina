@@ -464,6 +464,7 @@ CREATE TABLE "order" (
 	"proof_of_payment_object_storage_id" text,
 	"status" "order_status" DEFAULT 'pending' NOT NULL,
 	"notes" text,
+	"delivery_address" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );

@@ -58,5 +58,8 @@
         "vitest": "catalog:",
         "vitest-browser-svelte": "catalog:",
         "zod": "catalog:"
+    },
+    "dependencies": {
+        "motion": "^12.40.0"
     }
 }

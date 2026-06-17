@@ -99,7 +99,7 @@ export const orderClient = hc<OrderRouteType>(`${PUBLIC_API_URL}/api/order`, {
  */
 export const productClient = hc<ProductRouteType>(
     `${PUBLIC_API_URL}/api/product`,
-    { fetch: kyClient },
+    { init: { credentials: 'include' }, fetch: kyClient },
 )
 
 /**

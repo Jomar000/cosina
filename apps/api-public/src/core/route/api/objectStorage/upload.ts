@@ -1,9 +1,10 @@
 import { uploadCommitInputSchema } from '@hyperion/validator/public/objectStorage'
 import { and, eq, inArray, notInArray } from 'drizzle-orm'
 import { Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
 
 import { AppError } from '../../../../errors.js'
-import type { THonoInstance } from '../../../../types.js'
+import type { TGlobalApiResponses, THonoInstance } from '../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
@@ -219,5 +220,10 @@ export const uploadRoute = new Hono<THonoInstance>()
             }
         },
     )
+
+export type UploadRouteType = ApplyGlobalResponse<
+    typeof uploadRoute,
+    TGlobalApiResponses
+>
 
 export default uploadRoute

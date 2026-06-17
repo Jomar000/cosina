@@ -6,7 +6,6 @@
     import { Label } from '@hyperion/ui/components/label'
     import * as Popover from '@hyperion/ui/components/popover'
     import * as Select from '@hyperion/ui/components/select'
-    import { Separator } from '@hyperion/ui/components/separator'
     import { Textarea } from '@hyperion/ui/components/textarea'
     import {
         getLocalTimeZone,
@@ -15,10 +14,13 @@
     } from '@internationalized/date'
     import CalendarIcon from '@lucide/svelte/icons/calendar'
     import CheckIcon from '@lucide/svelte/icons/check'
+    import ChevronLeftIcon from '@lucide/svelte/icons/chevron-left'
+    import ChevronRightIcon from '@lucide/svelte/icons/chevron-right'
     import ClockIcon from '@lucide/svelte/icons/clock'
     import CopyIcon from '@lucide/svelte/icons/copy'
     import ImageIcon from '@lucide/svelte/icons/image'
     import InfoIcon from '@lucide/svelte/icons/info'
+    import MapPinIcon from '@lucide/svelte/icons/map-pin'
     import SmartphoneIcon from '@lucide/svelte/icons/smartphone'
     import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert'
     import UploadIcon from '@lucide/svelte/icons/upload'
@@ -42,12 +44,14 @@
         cart,
         onOrderSuccess,
         advanceDays = 3,
+        restaurantAddress = null,
         settingsLoading = false,
     }: {
         open: boolean
         cart: TCartItem[]
         onOrderSuccess: () => void
         advanceDays?: number
+        restaurantAddress?: string | null
         settingsLoading?: boolean
     } = $props()
 
@@ -70,9 +74,17 @@
     const GCASH_ACCOUNT_NAME = 'Cosina Home Cooking'
     const GCASH_NUMBER = '0917-450-5619'
 
+    const STEPS: { num: number; label: string }[] = [
+        { num: 1, label: 'Contact' },
+        { num: 2, label: 'Delivery' },
+        { num: 3, label: 'Payment' },
+    ]
+
     ///////////////
     // 03. State //
     ///////////////
+
+    let currentStep = $state(1)
 
     let customerName = $state('')
     let contactNumber = $state('')
@@ -81,6 +93,7 @@
     let deliveryDate = $state<DateValue | undefined>(undefined)
     let deliveryTime = $state('12:00')
     let deliveryPickerOpen = $state(false)
+    let deliveryAddress = $state('')
     let downpayment = $state('')
     let notes = $state('')
     let proofOfPayment = $state<File | null>(null)
@@ -115,7 +128,6 @@
             : 'Pick a delivery date',
     )
 
-    // Combine date + time into an ISO string for the API
     const deliveryAt = $derived.by<string | undefined>(() => {
         if (!deliveryDate) return undefined
         const [
@@ -127,11 +139,19 @@
         return d.toISOString()
     })
 
-    const isFormValid = $derived(
-        customerName.trim().length > 0 &&
-            contactNumber.trim().length > 0 &&
-            !!deliveryDate,
+    const isDelivery = $derived(
+        deliveryType === 'lalamove' || deliveryType === 'other_courier',
     )
+
+    const step1Valid = $derived(
+        customerName.trim().length > 0 && contactNumber.trim().length > 0,
+    )
+
+    const step2Valid = $derived(
+        !!deliveryDate && (!isDelivery || deliveryAddress.trim().length > 0),
+    )
+
+    const isFormValid = $derived(step1Valid && step2Valid)
 
     ///////////////////
     // 06. Mutations //
@@ -191,6 +211,7 @@
                     downpayment: downpayment || undefined,
                     proofOfPaymentObjectStorageId,
                     notes: notes.trim() || undefined,
+                    deliveryAddress: deliveryAddress.trim() || undefined,
                     items: cart.map((item) => ({
                         productId: item.productId,
                         name: item.name,
@@ -210,9 +231,7 @@
             resetForm()
         },
         onError: (err: Error) => {
-            toast.error('Failed to place order', {
-                description: err.message,
-            })
+            toast.error('Failed to place order', { description: err.message })
         },
     }))
 
@@ -235,9 +254,15 @@
     // 09. Handlers //
     //////////////////
 
-    function handleSubmit(e: SubmitEvent) {
-        e.preventDefault()
-        e.stopPropagation()
+    function goNext() {
+        if (currentStep < STEPS.length) currentStep++
+    }
+
+    function goBack() {
+        if (currentStep > 1) currentStep--
+    }
+
+    function handleConfirm() {
         if (!isFormValid || cart.length === 0) return
         createOrderMutation.mutate()
     }
@@ -283,11 +308,13 @@
         contactNumber = ''
         contactNumber2 = ''
         deliveryType = 'self_pickup'
+        deliveryAddress = ''
         deliveryDate = undefined
         deliveryTime = '12:00'
         downpayment = ''
         notes = ''
         proofOfPayment = null
+        currentStep = 1
     }
 </script>
 
@@ -300,7 +327,6 @@
             <div
                 class="flex flex-col items-center gap-6 px-6 py-10 text-center"
             >
-                <!-- Checkmark -->
                 <div
                     class="flex size-16 items-center justify-center rounded-full bg-emerald-500/15 ring-4 ring-emerald-500/20"
                 >
@@ -320,7 +346,6 @@
                     </p>
                 </div>
 
-                <!-- Tracking Code box -->
                 <div
                     class="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-6 py-5"
                 >
@@ -356,7 +381,6 @@
                     </button>
                 </div>
 
-                <!-- Track link -->
                 <a
                     href="/track?code={placedOrderCode}"
                     class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
@@ -375,14 +399,63 @@
             </div>
         {:else}
             <!-- ── Order form ── -->
-            <Dialog.Header class="border-b border-zinc-800 px-6 py-5">
+            <Dialog.Header class="border-b border-zinc-800 px-6 py-4">
                 <Dialog.Title class="text-lg font-semibold text-zinc-100">
-                    Complete Your Order
+                    Place Your Order
                 </Dialog.Title>
-                <Dialog.Description class="text-sm text-zinc-500">
-                    Fill in your details to place the order.
+                <Dialog.Description class="sr-only">
+                    Complete your order in {STEPS.length} steps.
                 </Dialog.Description>
             </Dialog.Header>
+
+            <!-- Step indicator -->
+            <div
+                class="flex items-center gap-0 border-b border-zinc-800 px-6 py-3"
+            >
+                {#each STEPS as step, i (step.num)}
+                    {#if i > 0}
+                        <div
+                            class="mx-2 h-px flex-1 transition-colors {currentStep >
+                            i
+                                ? 'bg-blue-500'
+                                : 'bg-zinc-800'}"
+                        ></div>
+                    {/if}
+                    <button
+                        type="button"
+                        class="flex items-center gap-2 disabled:cursor-default"
+                        disabled={step.num > currentStep}
+                        onclick={() => {
+                            if (step.num < currentStep) currentStep = step.num
+                        }}
+                    >
+                        <div
+                            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors
+                                {currentStep > step.num
+                                ? 'bg-blue-500 text-white'
+                                : currentStep === step.num
+                                  ? 'bg-blue-600 text-white ring-2 ring-blue-500/30'
+                                  : 'bg-zinc-800 text-zinc-500'}"
+                        >
+                            {#if currentStep > step.num}
+                                <CheckIcon class="h-3 w-3" />
+                            {:else}
+                                {step.num}
+                            {/if}
+                        </div>
+                        <span
+                            class="text-xs font-medium transition-colors {currentStep ===
+                            step.num
+                                ? 'text-zinc-100'
+                                : currentStep > step.num
+                                  ? 'text-blue-400'
+                                  : 'text-zinc-600'}"
+                        >
+                            {step.label}
+                        </span>
+                    </button>
+                {/each}
+            </div>
 
             {#if createOrderMutation.isPending}
                 <div
@@ -398,17 +471,20 @@
                     </p>
                 </div>
             {:else}
-                <div class="flex-1 overflow-y-auto">
-                    <form
-                        id="order-form"
-                        onsubmit={handleSubmit}
-                        class="flex flex-col gap-5 px-6 py-5"
-                    >
-                        <!-- Customer Details -->
-                        <div class="flex flex-col gap-4">
-                            <h3 class="text-sm font-semibold text-zinc-300">
-                                Contact Details
-                            </h3>
+                <div class="min-h-0 flex-1 overflow-y-auto">
+                    <div class="flex flex-col gap-5 px-6 py-5">
+                        <!-- ── Step 1: Contact ── -->
+                        {#if currentStep === 1}
+                            <div class="flex flex-col gap-1 pb-1">
+                                <h3
+                                    class="text-base font-semibold text-zinc-100"
+                                >
+                                    Contact Details
+                                </h3>
+                                <p class="text-xs text-zinc-500">
+                                    We'll use this to coordinate your order.
+                                </p>
+                            </div>
 
                             <div class="flex flex-col gap-1.5">
                                 <Label
@@ -463,16 +539,20 @@
                                     />
                                 </div>
                             </div>
-                        </div>
+                        {/if}
 
-                        <Separator class="bg-zinc-800" />
-
-                        <!-- Delivery Details -->
-                        <div class="flex flex-col gap-4">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-semibold text-zinc-300">
+                        <!-- ── Step 2: Delivery ── -->
+                        {#if currentStep === 2}
+                            <div class="flex flex-col gap-1 pb-1">
+                                <h3
+                                    class="text-base font-semibold text-zinc-100"
+                                >
                                     Delivery Details
                                 </h3>
+                                <p class="text-xs text-zinc-500">
+                                    Choose how and when you'd like to receive
+                                    your order.
+                                </p>
                             </div>
 
                             <!-- Advance Order Notice -->
@@ -511,21 +591,117 @@
                                         <p
                                             class="text-xs leading-relaxed text-amber-300/80"
                                         >
-                                            Orders must be placed at least <span
+                                            Orders must be placed at least
+                                            <span
                                                 class="font-semibold text-amber-200"
                                                 >{advanceDays}
                                                 {advanceDays === 1
                                                     ? 'day'
                                                     : 'days'} in advance</span
-                                            >. The earliest available delivery
-                                            date is shown in the calendar.
+                                            >. The earliest available date is
+                                            shown in the calendar.
                                         </p>
                                     </div>
                                 </div>
                             {/if}
 
+                            <!-- Delivery Type -->
+                            <div class="flex flex-col gap-1.5">
+                                <Label
+                                    class="text-xs font-medium text-zinc-400"
+                                >
+                                    Delivery Type <span class="text-red-400"
+                                        >*</span
+                                    >
+                                </Label>
+                                <Select.Root
+                                    type="single"
+                                    value={deliveryType}
+                                    onValueChange={(v: string | undefined) =>
+                                        (deliveryType =
+                                            (v as TDeliveryType) ??
+                                            deliveryType)}
+                                >
+                                    <Select.Trigger
+                                        class="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 focus:ring-blue-500/50"
+                                    >
+                                        {DELIVERY_TYPE_LABELS[deliveryType]}
+                                    </Select.Trigger>
+                                    <Select.Content
+                                        class="border-zinc-700 bg-zinc-900"
+                                    >
+                                        {#each DELIVERY_OPTIONS as opt (opt.value)}
+                                            <Select.Item
+                                                value={opt.value}
+                                                class="text-zinc-100 focus:bg-zinc-800 focus:text-zinc-100"
+                                            >
+                                                {opt.label}
+                                            </Select.Item>
+                                        {/each}
+                                    </Select.Content>
+                                </Select.Root>
+                            </div>
+
+                            <!-- Pickup address or Delivery address input -->
+                            {#if deliveryType === 'self_pickup'}
+                                <div
+                                    class="overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-900/60"
+                                >
+                                    <div
+                                        class="flex items-center gap-2.5 border-b border-zinc-700/40 px-4 py-3"
+                                    >
+                                        <div
+                                            class="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-700/60"
+                                        >
+                                            <MapPinIcon
+                                                class="h-4 w-4 text-zinc-300"
+                                            />
+                                        </div>
+                                        <span
+                                            class="text-sm font-semibold text-zinc-200"
+                                        >
+                                            Pickup Address
+                                        </span>
+                                    </div>
+                                    <div class="px-4 py-3">
+                                        {#if restaurantAddress}
+                                            <p
+                                                class="text-sm leading-relaxed text-zinc-300"
+                                            >
+                                                {restaurantAddress}
+                                            </p>
+                                        {:else}
+                                            <p
+                                                class="text-sm italic text-zinc-500"
+                                            >
+                                                Please contact us for the pickup
+                                                address.
+                                            </p>
+                                        {/if}
+                                    </div>
+                                </div>
+                            {:else}
+                                <div class="flex flex-col gap-1.5">
+                                    <Label
+                                        for="deliveryAddress"
+                                        class="text-xs font-medium text-zinc-400"
+                                    >
+                                        Delivery Address <span
+                                            class="text-red-400">*</span
+                                        >
+                                    </Label>
+                                    <Textarea
+                                        id="deliveryAddress"
+                                        placeholder="Enter your complete delivery address"
+                                        bind:value={deliveryAddress}
+                                        rows={3}
+                                        class="resize-none border-zinc-800 bg-zinc-900 text-sm text-zinc-100 placeholder:text-zinc-600 focus:ring-blue-500/50"
+                                    />
+                                </div>
+                            {/if}
+
                             <!-- Delivery Date + Time -->
-                            <div class="flex flex-col gap-3">
+                            <div class="grid grid-cols-2 gap-3">
                                 <div class="flex flex-col gap-1.5">
                                     <Label
                                         class="text-xs font-medium text-zinc-400"
@@ -538,19 +714,25 @@
                                         bind:open={deliveryPickerOpen}
                                     >
                                         <Popover.Trigger>
-                                            {#snippet child({ props })}
+                                            {#snippet child({
+                                                props,
+                                            }: {
+                                                props: Record<string, unknown>
+                                            })}
                                                 <button
                                                     {...props}
                                                     type="button"
-                                                    class="flex h-10 w-full items-center gap-2.5 rounded-md border border-zinc-800 bg-zinc-900 px-3 text-left text-sm transition-colors hover:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50
-                                                {deliveryDate
+                                                    class="flex h-10 w-full items-center gap-2 rounded-md border border-zinc-800 bg-zinc-900 px-3 text-left text-sm transition-colors hover:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                                                        {deliveryDate
                                                         ? 'text-zinc-100'
                                                         : 'text-zinc-500'}"
                                                 >
                                                     <CalendarIcon
                                                         class="h-4 w-4 shrink-0 text-zinc-500"
                                                     />
-                                                    {deliveryDateLabel}
+                                                    <span class="truncate"
+                                                        >{deliveryDateLabel}</span
+                                                    >
                                                 </button>
                                             {/snippet}
                                         </Popover.Trigger>
@@ -592,44 +774,95 @@
                                     </div>
                                 </div>
                             </div>
+                        {/if}
 
-                            <div class="flex flex-col gap-1.5">
-                                <Label
-                                    class="text-xs font-medium text-zinc-400"
+                        <!-- ── Step 3: Payment & Review ── -->
+                        {#if currentStep === 3}
+                            <div class="flex flex-col gap-1 pb-1">
+                                <h3
+                                    class="text-base font-semibold text-zinc-100"
                                 >
-                                    Delivery Type <span class="text-red-400"
-                                        >*</span
-                                    >
-                                </Label>
-                                <Select.Root
-                                    type="single"
-                                    value={deliveryType}
-                                    onValueChange={(v: string | undefined) =>
-                                        (deliveryType =
-                                            (v as TDeliveryType) ??
-                                            deliveryType)}
-                                >
-                                    <Select.Trigger
-                                        class="border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 focus:ring-blue-500/50"
-                                    >
-                                        {DELIVERY_TYPE_LABELS[deliveryType]}
-                                    </Select.Trigger>
-                                    <Select.Content
-                                        class="border-zinc-700 bg-zinc-900"
-                                    >
-                                        {#each DELIVERY_OPTIONS as opt (opt.value)}
-                                            <Select.Item
-                                                value={opt.value}
-                                                class="text-zinc-100 focus:bg-zinc-800 focus:text-zinc-100"
-                                            >
-                                                {opt.label}
-                                            </Select.Item>
-                                        {/each}
-                                    </Select.Content>
-                                </Select.Root>
+                                    Payment & Review
+                                </h3>
+                                <p class="text-xs text-zinc-500">
+                                    Review your order and complete the
+                                    downpayment.
+                                </p>
                             </div>
 
-                            <!-- GCash Payment Details -->
+                            <!-- Order Summary -->
+                            <div
+                                class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/40"
+                            >
+                                <div class="border-b border-zinc-800 px-4 py-3">
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-zinc-400"
+                                    >
+                                        Order Summary
+                                    </p>
+                                </div>
+                                <ul
+                                    class="flex flex-col divide-y divide-zinc-800/60 px-4"
+                                >
+                                    {#each cart as item (item.key)}
+                                        <li
+                                            class="flex items-start justify-between gap-3 py-2.5"
+                                        >
+                                            <div class="min-w-0 flex-1">
+                                                <p
+                                                    class="truncate text-sm text-zinc-300"
+                                                >
+                                                    {item.name}
+                                                    {#if item.sizeName}
+                                                        <span
+                                                            class="text-zinc-500"
+                                                        >
+                                                            ({item.sizeName})
+                                                        </span>
+                                                    {/if}
+                                                </p>
+                                                <p
+                                                    class="text-xs text-zinc-600"
+                                                >
+                                                    {item.quantity} × ₱{Number(
+                                                        item.price,
+                                                    ).toLocaleString('en-PH', {
+                                                        minimumFractionDigits: 2,
+                                                    })}
+                                                </p>
+                                            </div>
+                                            <span
+                                                class="shrink-0 text-sm font-medium text-zinc-200"
+                                            >
+                                                ₱{(
+                                                    parseFloat(item.price) *
+                                                    item.quantity
+                                                ).toLocaleString('en-PH', {
+                                                    minimumFractionDigits: 2,
+                                                })}
+                                            </span>
+                                        </li>
+                                    {/each}
+                                </ul>
+                                <div
+                                    class="flex items-center justify-between border-t border-zinc-800 px-4 py-3"
+                                >
+                                    <span
+                                        class="text-sm font-semibold text-zinc-300"
+                                        >Total</span
+                                    >
+                                    <span
+                                        class="text-lg font-bold text-blue-400"
+                                    >
+                                        ₱{orderTotal.toLocaleString('en-PH', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        })}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- GCash info -->
                             <div
                                 class="overflow-hidden rounded-xl border border-blue-500/30 bg-blue-500/5"
                             >
@@ -727,9 +960,8 @@
                                                 )})
                                             {/if}
                                         </span>
-                                        to proceed with your order. Also No Proof
-                                        Of Payment, Automatic Cancel. Thank you for
-                                        your understanding.
+                                        to proceed. No Proof of Payment = Automatic
+                                        Cancel.
                                     </p>
                                 </div>
                                 <Input
@@ -743,7 +975,7 @@
                                 />
                             </div>
 
-                            <!-- Proof of Payment Upload -->
+                            <!-- Proof of Payment -->
                             <div class="flex flex-col gap-1.5">
                                 <Label
                                     class="text-xs font-medium text-zinc-400"
@@ -757,12 +989,12 @@
                                         <img
                                             src={proofPreviewUrl}
                                             alt="Proof of payment preview"
-                                            class="max-h-48 w-full object-contain bg-zinc-900"
+                                            class="max-h-48 w-full bg-zinc-900 object-contain"
                                         />
                                         <button
                                             type="button"
                                             onclick={clearProofFile}
-                                            class="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/80 text-zinc-300 backdrop-blur-sm transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+                                            class="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/80 text-zinc-300 backdrop-blur-sm transition-colors hover:bg-zinc-800 hover:text-zinc-100"
                                             aria-label="Remove image"
                                         >
                                             <XIcon class="h-4 w-4" />
@@ -815,6 +1047,7 @@
                                 {/if}
                             </div>
 
+                            <!-- Special Instructions -->
                             <div class="flex flex-col gap-1.5">
                                 <Label
                                     for="notes"
@@ -830,98 +1063,68 @@
                                     class="resize-none border-zinc-800 bg-zinc-900 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-blue-500/50"
                                 />
                             </div>
-                        </div>
+                        {/if}
+                    </div>
+                </div>
 
-                        <Separator class="bg-zinc-800" />
-
-                        <!-- Order Summary -->
-                        <div class="flex flex-col gap-3">
-                            <h3 class="text-sm font-semibold text-zinc-300">
-                                Order Summary
-                            </h3>
-                            <ul class="flex flex-col gap-2">
-                                {#each cart as item (item.key)}
-                                    <li
-                                        class="flex items-start justify-between gap-3"
-                                    >
-                                        <div class="flex-1 min-w-0">
-                                            <p
-                                                class="text-sm text-zinc-300 truncate"
-                                            >
-                                                {item.name}
-                                                {#if item.sizeName}
-                                                    <span class="text-zinc-500"
-                                                        >({item.sizeName})</span
-                                                    >
-                                                {/if}
-                                            </p>
-                                            <p class="text-xs text-zinc-600">
-                                                {item.quantity} × ₱{Number(
-                                                    item.price,
-                                                ).toLocaleString('en-PH', {
-                                                    minimumFractionDigits: 2,
-                                                })}
-                                            </p>
-                                        </div>
-                                        <span
-                                            class="shrink-0 text-sm font-medium text-zinc-200"
-                                        >
-                                            ₱{(
-                                                parseFloat(item.price) *
-                                                item.quantity
-                                            ).toLocaleString('en-PH', {
-                                                minimumFractionDigits: 2,
-                                            })}
-                                        </span>
-                                    </li>
-                                {/each}
-                            </ul>
-                            <Separator class="bg-zinc-800" />
-                            <div class="flex items-center justify-between">
-                                <span
-                                    class="text-sm font-semibold text-zinc-300"
-                                    >Total</span
-                                >
-                                <span class="text-lg font-bold text-blue-400">
-                                    ₱{orderTotal.toLocaleString('en-PH', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2,
-                                    })}
-                                </span>
-                            </div>
-                        </div>
-                    </form>
+                <!-- Footer navigation -->
+                <div
+                    class="flex items-center justify-between border-t border-zinc-800 bg-transparent px-6 py-4"
+                >
+                    {#if currentStep === 1}
+                        <Button
+                            variant="ghost"
+                            onclick={() => (open = false)}
+                            class="text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onclick={goNext}
+                            disabled={!step1Valid}
+                            class="gap-1.5 bg-blue-600 text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Next
+                            <ChevronRightIcon class="h-4 w-4" />
+                        </Button>
+                    {:else if currentStep === 2}
+                        <Button
+                            variant="ghost"
+                            onclick={goBack}
+                            class="gap-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+                        >
+                            <ChevronLeftIcon class="h-4 w-4" />
+                            Back
+                        </Button>
+                        <Button
+                            onclick={goNext}
+                            disabled={!step2Valid}
+                            class="gap-1.5 bg-blue-600 text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Next
+                            <ChevronRightIcon class="h-4 w-4" />
+                        </Button>
+                    {:else}
+                        <Button
+                            variant="ghost"
+                            onclick={goBack}
+                            class="gap-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+                        >
+                            <ChevronLeftIcon class="h-4 w-4" />
+                            Back
+                        </Button>
+                        <Button
+                            onclick={handleConfirm}
+                            disabled={!isFormValid ||
+                                cart.length === 0 ||
+                                createOrderMutation.isPending}
+                            class="bg-blue-600 text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Confirm Order
+                        </Button>
+                    {/if}
                 </div>
             {/if}
-
-            <Dialog.Footer
-                class="mx-0 mb-0 rounded-none border-t border-zinc-800 bg-transparent px-6 py-4"
-            >
-                <Button
-                    variant="ghost"
-                    onclick={() => (open = false)}
-                    class="text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
-                    disabled={createOrderMutation.isPending}
-                >
-                    Cancel
-                </Button>
-                <Button
-                    form="order-form"
-                    type="submit"
-                    disabled={!isFormValid ||
-                        cart.length === 0 ||
-                        createOrderMutation.isPending}
-                    class="bg-blue-600 text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                    {#if createOrderMutation.isPending}
-                        {proofOfPayment
-                            ? 'Uploading & Placing Order...'
-                            : 'Placing Order...'}
-                    {:else}
-                        Confirm Order
-                    {/if}
-                </Button>
-            </Dialog.Footer>
         {/if}
     </Dialog.Content>
 </Dialog.Root>

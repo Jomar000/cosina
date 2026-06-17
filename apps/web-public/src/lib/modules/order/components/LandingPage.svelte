@@ -1,492 +1,958 @@
 <script lang="ts">
-    import { Button } from '@hyperion/ui/components/button'
-    import { cn } from '@hyperion/ui/utils'
-    import type { TApiResponse } from '@hyperion/types/shared'
+    import ArrowRightIcon from '@lucide/svelte/icons/arrow-right'
+    import CheckIcon from '@lucide/svelte/icons/check'
+    import FlameIcon from '@lucide/svelte/icons/flame'
+    import HeartIcon from '@lucide/svelte/icons/heart'
+    import MenuIcon from '@lucide/svelte/icons/menu'
+    import PackageIcon from '@lucide/svelte/icons/package'
     import PackageSearchIcon from '@lucide/svelte/icons/package-search'
     import SearchIcon from '@lucide/svelte/icons/search'
+    import ShoppingBagIcon from '@lucide/svelte/icons/shopping-bag'
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart'
+    import StarIcon from '@lucide/svelte/icons/star'
     import UtensilsIcon from '@lucide/svelte/icons/utensils'
     import XIcon from '@lucide/svelte/icons/x'
-    import { createQuery, useQueryClient } from '@tanstack/svelte-query'
-
-    import { orderClient, productClient } from '$lib/clients'
-    import { wsClientManager } from '$lib/utilities/wsClientManager'
-    import type { TCartItem, TProduct } from '../types.js'
-    import CartPanel from './CartPanel.svelte'
-    import OrderForm from './OrderForm.svelte'
-    import ProductCard from './ProductCard.svelte'
-
-    ///////////////////
-    // 02. Constants //
-    ///////////////////
-
-    type TCategory = 'all' | 'bilao_package' | 'bundle_package' | 'single_order'
-
-    const CATEGORIES: { value: TCategory; label: string }[] = [
-        { value: 'all', label: 'All Items' },
-        { value: 'bilao_package', label: 'Bilao Package' },
-        { value: 'bundle_package', label: 'Bundle Package' },
-        { value: 'single_order', label: 'Single Order' },
-    ]
+    import cookingImg from '$lib/assets/image/cooking.png'
+    import heroBgImg from '$lib/assets/image/bgLogin1.png'
+    import logoImg from '$lib/assets/image/logo.jpg'
+    import videoSrc from '$lib/assets/video/cosina1.mp4?url'
+    import { animate, inView, stagger } from 'motion'
+    import { slide } from 'svelte/transition'
 
     ///////////////
     // 03. State //
     ///////////////
 
-    const queryClient = useQueryClient()
-
-    let cart = $state<TCartItem[]>([])
-    let cartOpen = $state(false)
-    let orderFormOpen = $state(false)
-    let searchQuery = $state('')
-    let selectedCategory = $state<TCategory>('all')
-    let nextKey = 0
-
-    /////////////////
-    // 05. Queries //
-    /////////////////
-
-    const settingsQuery = createQuery(() => ({
-        queryKey: [
-            'order',
-            'settings',
-        ],
-        queryFn: async () => {
-            const response = await orderClient.settings.$get()
-            const { data } = (await response.json()) as TApiResponse<{
-                advanceDays: number
-            }>
-            return data!
-        },
-        staleTime: 5 * 60 * 1000,
-    }))
-
-    /////////////////
-    // 04. Derived //
-    /////////////////
-
-    const cartItemCount = $derived(
-        cart.reduce((sum, item) => sum + item.quantity, 0),
-    )
-
-    const advanceDays = $derived(settingsQuery.data?.advanceDays ?? 3)
-
-    const productsQuery = createQuery(() => ({
-        queryKey: ['products'],
-        queryFn: async () => {
-            const response = await productClient.readMany.$get({
-                query: { limit: '100', offset: '0', sortOrder: 'asc' },
-            })
-            const { data, error, success } =
-                (await response.json()) as TApiResponse<TProduct[]>
-            if (!success) throw new Error(error.message)
-            return data
-        },
-    }))
+    let mobileMenuOpen = $state(false)
 
     /////////////////
     // 08. Effects //
     /////////////////
 
     $effect(() => {
-        const ws = wsClientManager.connect('products')
-
-        function handleMessage() {
-            queryClient.invalidateQueries({ queryKey: ['products'] })
-        }
-
-        ws.addEventListener('message', handleMessage)
-
-        return () => {
-            ws.removeEventListener('message', handleMessage)
-            ws.release()
-        }
-    })
-
-    $effect(() => {
-        const ws = wsClientManager.connect('settings')
-
-        function handleMessage(event: MessageEvent) {
-            try {
-                const { event: eventType, data } = JSON.parse(event.data)
-                if (
-                    eventType === 'settings.update' &&
-                    typeof data?.advanceDays === 'number'
-                ) {
-                    queryClient.setQueryData(
-                        [
-                            'order',
-                            'settings',
-                        ],
-                        data,
-                    )
-                }
-            } catch {
-                // ignore malformed messages
-            }
-        }
-
-        ws.addEventListener('message', handleMessage)
-
-        return () => {
-            ws.removeEventListener('message', handleMessage)
-            ws.release()
-        }
-    })
-
-    /////////////////
-    // 10. Helpers //
-    /////////////////
-
-    function filteredProducts(products: TProduct[]): TProduct[] {
-        let result =
-            selectedCategory === 'all'
-                ? products
-                : products.filter((p) => p.category === selectedCategory)
-
-        const query = searchQuery.trim().toLowerCase()
-        if (query) {
-            result = result.filter(
-                (p) =>
-                    p.name.toLowerCase().includes(query) ||
-                    (p.ingredients?.toLowerCase().includes(query) ?? false),
-            )
-        }
-
-        return result
-    }
-
-    function addToCart(item: Omit<TCartItem, 'key'>) {
-        const existingIdx = cart.findIndex(
-            (c) =>
-                c.productId === item.productId && c.sizeName === item.sizeName,
+        // Hero entrance — staggered explicit delays
+        animate(
+            '.hero-badge',
+            {
+                opacity: [
+                    0,
+                    1,
+                ],
+                transform: [
+                    'translateY(-8px)',
+                    'translateY(0px)',
+                ],
+            },
+            { duration: 0.4, delay: 0.15 },
         )
-        if (existingIdx !== -1) {
-            cart = cart.map((c, i) =>
-                i === existingIdx
-                    ? { ...c, quantity: Math.min(c.quantity + 1, 100) }
-                    : c,
-            )
-        } else {
-            cart = [
-                ...cart,
-                { ...item, key: nextKey++ },
-            ]
-        }
-    }
+        animate(
+            '.hero-headline',
+            {
+                opacity: [
+                    0,
+                    1,
+                ],
+                transform: [
+                    'translateY(32px)',
+                    'translateY(0px)',
+                ],
+            },
+            { duration: 0.65, delay: 0.3 },
+        )
+        animate(
+            '.hero-sub',
+            {
+                opacity: [
+                    0,
+                    1,
+                ],
+                transform: [
+                    'translateY(20px)',
+                    'translateY(0px)',
+                ],
+            },
+            { duration: 0.5, delay: 0.5 },
+        )
+        animate(
+            '.hero-ctas',
+            {
+                opacity: [
+                    0,
+                    1,
+                ],
+                transform: [
+                    'translateY(16px)',
+                    'translateY(0px)',
+                ],
+            },
+            { duration: 0.5, delay: 0.65 },
+        )
+        animate(
+            '.hero-image',
+            {
+                opacity: [
+                    0,
+                    1,
+                ],
+                transform: [
+                    'translateX(40px)',
+                    'translateX(0px)',
+                ],
+            },
+            { duration: 0.7, delay: 0.4 },
+        )
+        animate(
+            '.hero-scroll',
+            {
+                opacity: [
+                    0,
+                    1,
+                ],
+            },
+            { duration: 0.5, delay: 1.0 },
+        )
 
-    function handleOrderSuccess() {
-        cart = []
-    }
+        // Scroll-reveal sections
+        const stops: Array<() => void> = []
 
-    function getProductCartQuantity(productId: number): number {
-        return cart
-            .filter((c) => c.productId === productId)
-            .reduce((sum, c) => sum + c.quantity, 0)
+        stops.push(
+            inView(
+                '.cards-grid',
+                (element) => {
+                    animate(
+                        element.querySelectorAll('.reveal-card'),
+                        {
+                            opacity: [
+                                0,
+                                1,
+                            ],
+                            transform: [
+                                'translateY(48px)',
+                                'translateY(0px)',
+                            ],
+                        },
+                        { duration: 0.55, delay: stagger(0.12) },
+                    )
+                },
+                { amount: 0.1 },
+            ),
+        )
+
+        stops.push(
+            inView(
+                '.steps-grid',
+                (element) => {
+                    animate(
+                        element.querySelectorAll('.reveal-step'),
+                        {
+                            opacity: [
+                                0,
+                                1,
+                            ],
+                            transform: [
+                                'translateY(40px)',
+                                'translateY(0px)',
+                            ],
+                        },
+                        { duration: 0.55, delay: stagger(0.15) },
+                    )
+                },
+                { amount: 0.1 },
+            ),
+        )
+
+        stops.push(
+            inView(
+                '.features-grid',
+                (element) => {
+                    animate(
+                        element.querySelectorAll('.reveal-feature'),
+                        {
+                            opacity: [
+                                0,
+                                1,
+                            ],
+                            transform: [
+                                'translateY(30px)',
+                                'translateY(0px)',
+                            ],
+                        },
+                        { duration: 0.5, delay: stagger(0.08) },
+                    )
+                },
+                { amount: 0.15 },
+            ),
+        )
+
+        stops.push(
+            inView(
+                '.story-content',
+                (element) => {
+                    animate(
+                        element.querySelectorAll('.reveal-story'),
+                        {
+                            opacity: [
+                                0,
+                                1,
+                            ],
+                            transform: [
+                                'translateY(32px)',
+                                'translateY(0px)',
+                            ],
+                        },
+                        { duration: 0.55, delay: stagger(0.12) },
+                    )
+                },
+                { amount: 0.1 },
+            ),
+        )
+
+        return () => stops.forEach((fn) => fn())
+    })
+
+    //////////////////
+    // 09. Handlers //
+    //////////////////
+
+    function closeMobileMenu() {
+        mobileMenuOpen = false
     }
 </script>
 
-<div class="min-h-dvh bg-zinc-950 text-zinc-100">
-    <!-- Sticky Navigation -->
-    <header
-        class="sticky top-0 z-40 border-b border-zinc-800/60 bg-zinc-950/90 backdrop-blur-md"
+<!-- ===== NAVBAR ===== -->
+<header
+    class="fixed top-0 z-50 w-full border-b border-white/5 bg-zinc-950/80 backdrop-blur-md"
+>
+    <div
+        class="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 sm:px-6"
     >
-        <div
-            class="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 sm:px-6"
+        <!-- Brand logo -->
+        <a
+            href="/"
+            class="flex items-center gap-2.5"
         >
-            <!-- Logo -->
-            <div class="flex items-center gap-2">
-                <div
-                    class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600"
+            <img
+                src={logoImg}
+                alt="Cosina Ni Cacai logo"
+                class="h-10 w-10 rounded-xl object-cover"
+            />
+            <div>
+                <span class="text-sm font-bold leading-none text-zinc-100"
+                    >Cosina Ni Cacai</span
                 >
-                    <UtensilsIcon class="h-4 w-4 text-white" />
-                </div>
-                <div>
-                    <h1 class="text-sm font-bold leading-none text-zinc-100">
-                        Cosina
-                    </h1>
-                    <p class="mt-0.5 text-[9px] leading-none text-zinc-500">
-                        Home-cooked meals
-                    </p>
-                </div>
+                <p class="mt-0.5 text-[9px] leading-none text-zinc-500">
+                    Home-cooked meals
+                </p>
             </div>
+        </a>
 
-            <!-- Nav actions -->
-            <div class="flex items-center gap-1.5">
+        <!-- Desktop nav -->
+        <nav
+            class="hidden items-center gap-6 md:flex"
+            aria-label="Main navigation"
+        >
+            <a
+                href="/"
+                class="text-sm font-medium text-blue-400">Home</a
+            >
+            <a
+                href="/order"
+                class="text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-100"
+                >Order</a
+            >
+            <a
+                href="/track"
+                class="text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-100"
+                >Track Order</a
+            >
+        </nav>
+
+        <!-- Right actions -->
+        <div class="flex items-center gap-2">
+            <a
+                href="/order"
+                class="hidden rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500 sm:block"
+            >
+                Order Now
+            </a>
+            <button
+                type="button"
+                onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
+                aria-label="Toggle navigation menu"
+                aria-expanded={mobileMenuOpen}
+                class="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 transition-colors hover:border-zinc-700 hover:text-zinc-200 md:hidden"
+            >
+                {#if mobileMenuOpen}
+                    <XIcon class="h-4 w-4" />
+                {:else}
+                    <MenuIcon class="h-4 w-4" />
+                {/if}
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    {#if mobileMenuOpen}
+        <div
+            transition:slide={{ duration: 200 }}
+            class="border-t border-zinc-800 bg-zinc-950 px-4 pb-4 pt-3 md:hidden"
+        >
+            <nav
+                class="flex flex-col gap-3"
+                aria-label="Mobile navigation"
+            >
+                <a
+                    href="/"
+                    onclick={closeMobileMenu}
+                    class="text-sm font-medium text-blue-400">Home</a
+                >
+                <a
+                    href="/order"
+                    onclick={closeMobileMenu}
+                    class="text-sm font-medium text-zinc-300 transition-colors hover:text-zinc-100"
+                    >Order</a
+                >
                 <a
                     href="/track"
-                    class="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-all hover:border-zinc-700 hover:text-zinc-200"
+                    onclick={closeMobileMenu}
+                    class="text-sm font-medium text-zinc-300 transition-colors hover:text-zinc-100"
+                    >Track Order</a
                 >
-                    <PackageSearchIcon class="h-3.5 w-3.5" />
-                    <span class="hidden sm:inline">Track Order</span>
-                </a>
-
-                <!-- Cart Button -->
-                <button
-                    type="button"
-                    onclick={() => (cartOpen = true)}
-                    class="relative flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-all hover:border-blue-500/40 hover:text-zinc-100"
-                >
-                    <ShoppingCartIcon class="h-3.5 w-3.5" />
-                    <span class="hidden sm:inline">Cart</span>
-                    {#if cartItemCount > 0}
-                        <span
-                            class="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white"
-                        >
-                            {cartItemCount > 99 ? '99+' : cartItemCount}
-                        </span>
-                    {/if}
-                </button>
-            </div>
+                <div class="mt-1 border-t border-zinc-800 pt-3">
+                    <a
+                        href="/order"
+                        class="block rounded-lg bg-blue-600 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+                    >
+                        Order Now
+                    </a>
+                </div>
+            </nav>
         </div>
-    </header>
+    {/if}
+</header>
 
-    <main class="mx-auto max-w-6xl px-4 pb-28 sm:pb-16 sm:px-6">
-        <!-- Hero Section -->
-        <section class="py-4 sm:py-6">
-            <div class="text-center">
+<div class="bg-zinc-950 text-zinc-100">
+    <!-- ===== HERO ===== -->
+    <section class="relative min-h-dvh overflow-hidden pb-16 pt-20">
+        <!-- Ambient glow -->
+        <div
+            class="pointer-events-none absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-indigo-600/10 blur-3xl"
+            aria-hidden="true"
+        ></div>
+        <div
+            class="pointer-events-none absolute -right-24 top-1/3 h-72 w-72 rounded-full bg-blue-600/8 blur-3xl"
+            aria-hidden="true"
+        ></div>
+        <div
+            class="pointer-events-none absolute bottom-24 left-1/2 h-48 w-96 -translate-x-1/2 rounded-full bg-purple-600/5 blur-3xl"
+            aria-hidden="true"
+        ></div>
+
+        <div
+            class="relative mx-auto flex max-w-6xl flex-col items-center gap-8 px-4 py-8 sm:px-6 lg:flex-row lg:items-center lg:gap-12 lg:py-20"
+        >
+            <!-- Left: headline + copy + CTAs -->
+            <div class="flex-1 text-center lg:text-left">
+                <!-- Badge -->
                 <div
-                    class="mb-2 inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1"
+                    class="hero-badge mb-5 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 opacity-0"
                 >
-                    <span class="h-1 w-1 rounded-full bg-blue-400"></span>
-                    <span class="text-[11px] font-medium text-blue-400"
-                        >Order Online • Fresh Daily</span
+                    <span
+                        class="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400"
+                    ></span>
+                    <span class="text-xs font-medium text-blue-300"
+                        >✦ Order Online · Fresh Daily</span
                     >
                 </div>
-                <h2
-                    class="text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl"
+
+                <!-- Headline -->
+                <h1
+                    class="hero-headline text-4xl font-extrabold tracking-tight text-zinc-100 opacity-0 sm:text-5xl lg:text-[3.5rem] lg:leading-tight"
                 >
                     Authentic Filipino
                     <span
-                        class="bg-linear-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent"
+                        class="block bg-linear-to-r from-blue-400 via-indigo-300 to-violet-400 bg-clip-text text-transparent"
                     >
                         Home Cooking
                     </span>
-                </h2>
+                </h1>
+
+                <!-- Sub-copy -->
                 <p
-                    class="mx-auto mt-1.5 max-w-md text-xs text-zinc-400 sm:text-sm"
+                    class="hero-sub mx-auto mt-5 max-w-lg text-base leading-relaxed text-zinc-400 opacity-0 lg:mx-0 sm:text-lg"
                 >
-                    Bilao packages, bundle deals, and à la carte — made with
-                    love.
+                    Cosina Ni Cacai brings the warmth of Filipino
+                    <em class="not-italic text-zinc-300">lutong bahay</em>
+                    straight to your table — bilao packages, bundle deals, and fresh
+                    daily picks.
+                </p>
+
+                <!-- CTAs -->
+                <div
+                    class="hero-ctas mt-8 flex flex-col items-center gap-3 opacity-0 sm:flex-row sm:justify-center lg:justify-start"
+                >
+                    <a
+                        href="/order"
+                        class="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-700/30 transition-all hover:bg-blue-500 hover:shadow-blue-600/30 active:scale-[0.98] sm:w-auto"
+                    >
+                        Order Now
+                        <ArrowRightIcon
+                            class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                        />
+                    </a>
+                    <a
+                        href="/track"
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900/80 px-7 py-3.5 text-sm font-semibold text-zinc-300 transition-all hover:border-zinc-600 hover:text-zinc-100 active:scale-[0.98] sm:w-auto"
+                    >
+                        <PackageSearchIcon class="h-4 w-4" />
+                        Track Order
+                    </a>
+                </div>
+
+                <!-- Scroll indicator -->
+                <div
+                    class="hero-scroll mt-10 flex justify-center opacity-0 lg:justify-start"
+                >
+                    <div class="flex flex-col items-center gap-2 text-zinc-600">
+                        <span class="text-xs tracking-wider"
+                            >Scroll to explore</span
+                        >
+                        <div
+                            class="h-7 w-px bg-linear-to-b from-zinc-600 to-transparent"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: cooking hero video -->
+            <div
+                class="hero-image relative flex flex-1 items-center justify-center opacity-0"
+            >
+                <div class="relative w-96">
+                    <!-- Glow halo behind video -->
+                    <div
+                        class="pointer-events-none absolute -inset-3 rounded-3xl bg-indigo-600/15 blur-2xl"
+                        aria-hidden="true"
+                    ></div>
+                    <video
+                        src={videoSrc}
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        class="relative w-full rounded-3xl border border-white/10 object-cover shadow-2xl"
+                    ></video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WHAT WE OFFER ===== -->
+    <section class="py-24">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+            <div class="mb-14 text-center">
+                <p
+                    class="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400"
+                >
+                    What We Offer
+                </p>
+                <h2
+                    class="text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl"
+                >
+                    Our Signature Packages
+                </h2>
+                <p class="mx-auto mt-3 max-w-md text-sm text-zinc-400">
+                    From celebration bilao to everyday meals — the perfect
+                    package for every occasion.
                 </p>
             </div>
-        </section>
 
-        <!-- Search Bar -->
-        <section class="mb-3">
-            <div class="relative">
-                <SearchIcon
-                    class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500"
-                />
-                <input
-                    type="search"
-                    placeholder="Search menu items..."
-                    bind:value={searchQuery}
-                    aria-label="Search menu items"
-                    class="w-full rounded-xl border border-zinc-800 bg-zinc-900 py-2 pl-9 pr-9 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-500 focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/20"
-                />
-                {#if searchQuery}
-                    <button
-                        type="button"
-                        onclick={() => (searchQuery = '')}
-                        aria-label="Clear search"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-colors hover:text-zinc-300"
-                    >
-                        <XIcon class="h-3.5 w-3.5" />
-                    </button>
-                {/if}
-            </div>
-        </section>
-
-        <!-- Category Filter -->
-        <section class="mb-4">
-            <!-- Mobile: 2×2 grid | sm+: horizontal scrollable row -->
-            <div
-                class="grid grid-cols-2 gap-1.5 sm:flex sm:flex-nowrap sm:gap-2 sm:overflow-x-auto sm:pb-1"
-            >
-                {#each CATEGORIES as cat (cat.value)}
-                    <button
-                        type="button"
-                        class={cn(
-                            'rounded-lg border px-3 py-2 text-xs font-medium transition-all sm:shrink-0 sm:rounded-full sm:px-3.5 sm:py-1.5',
-                            selectedCategory === cat.value
-                                ? 'border-blue-500 bg-blue-500/15 text-blue-400'
-                                : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:text-zinc-300',
-                        )}
-                        onclick={() => (selectedCategory = cat.value)}
-                    >
-                        {cat.label}
-                    </button>
-                {/each}
-            </div>
-        </section>
-
-        <!-- Product Grid -->
-        <section>
-            {#if productsQuery.isFetching && !productsQuery.isPending}
-                <div
-                    class="mb-3 flex items-center gap-1.5 text-xs text-zinc-500"
+            <div class="cards-grid grid grid-cols-1 gap-5 sm:grid-cols-3">
+                <!-- Bilao Package -->
+                <article
+                    class="reveal-card group rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 opacity-0 transition-colors hover:border-blue-500/40 hover:bg-zinc-900"
                 >
                     <div
-                        class="h-3 w-3 animate-spin rounded-full border border-zinc-700 border-t-blue-400"
-                    ></div>
-                    Updating menu…
-                </div>
-            {/if}
+                        class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/15 ring-1 ring-blue-500/20 transition-all group-hover:bg-blue-500/25 group-hover:ring-blue-500/40"
+                    >
+                        <UtensilsIcon class="h-5 w-5 text-blue-400" />
+                    </div>
+                    <h3 class="mb-2 text-base font-semibold text-zinc-100">
+                        Bilao Package
+                    </h3>
+                    <p class="mb-5 text-sm leading-relaxed text-zinc-400">
+                        Large-format bilao meals perfect for celebrations,
+                        fiestas, and family gatherings.
+                    </p>
+                    <a
+                        href="/order"
+                        class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 transition-colors hover:text-blue-300"
+                    >
+                        Order now <ArrowRightIcon class="h-3.5 w-3.5" />
+                    </a>
+                </article>
 
-            {#if productsQuery.isPending}
-                <div
-                    class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+                <!-- Bundle Package -->
+                <article
+                    class="reveal-card group rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 opacity-0 transition-colors hover:border-blue-500/40 hover:bg-zinc-900"
                 >
-                    {#each Array.from({ length: 6 }, (_, k) => k) as i (i)}
-                        <div
-                            class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900"
+                    <div
+                        class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/15 ring-1 ring-blue-500/20 transition-all group-hover:bg-blue-500/25 group-hover:ring-blue-500/40"
+                    >
+                        <PackageIcon class="h-5 w-5 text-blue-400" />
+                    </div>
+                    <h3 class="mb-2 text-base font-semibold text-zinc-100">
+                        Bundle Package
+                    </h3>
+                    <p class="mb-5 text-sm leading-relaxed text-zinc-400">
+                        Curated bundles for groups — more variety, better value
+                        with every order.
+                    </p>
+                    <a
+                        href="/order"
+                        class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 transition-colors hover:text-blue-300"
+                    >
+                        Order now <ArrowRightIcon class="h-3.5 w-3.5" />
+                    </a>
+                </article>
+
+                <!-- Single Order -->
+                <article
+                    class="reveal-card group rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 opacity-0 transition-colors hover:border-blue-500/40 hover:bg-zinc-900"
+                >
+                    <div
+                        class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/15 ring-1 ring-blue-500/20 transition-all group-hover:bg-blue-500/25 group-hover:ring-blue-500/40"
+                    >
+                        <ShoppingBagIcon class="h-5 w-5 text-blue-400" />
+                    </div>
+                    <h3 class="mb-2 text-base font-semibold text-zinc-100">
+                        Single Order
+                    </h3>
+                    <p class="mb-5 text-sm leading-relaxed text-zinc-400">
+                        Individual servings made fresh daily —
+                        <em class="not-italic text-zinc-300">lutong bahay</em>
+                        taste just for you.
+                    </p>
+                    <a
+                        href="/order"
+                        class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 transition-colors hover:text-blue-300"
+                    >
+                        Order now <ArrowRightIcon class="h-3.5 w-3.5" />
+                    </a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== OUR STORY ===== -->
+    <section class="py-24">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+            <div
+                class="story-content flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16"
+            >
+                <!-- Left: Cacai cooking illustration -->
+                <div class="reveal-story relative flex-1">
+                    <div
+                        class="pointer-events-none absolute -inset-6 rounded-full bg-blue-600/10 blur-3xl"
+                        aria-hidden="true"
+                    ></div>
+                    <img
+                        src={cookingImg}
+                        alt="Cacai cooking authentic Filipino dishes in her kitchen"
+                        class="relative mx-auto w-full max-w-sm rounded-3xl border border-white/10 shadow-2xl lg:max-w-none"
+                    />
+                </div>
+
+                <!-- Right: story text + stats -->
+                <div class="flex-1">
+                    <div class="reveal-story opacity-0">
+                        <p
+                            class="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400"
                         >
-                            <div
-                                class="aspect-4/3 animate-pulse bg-zinc-800"
-                            ></div>
-                            <div class="flex flex-col gap-2 p-3">
+                            Our Story
+                        </p>
+                        <h2
+                            class="text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl"
+                        >
+                            From Cacai's Kitchen<br />to Your Table
+                        </h2>
+                    </div>
+
+                    <div class="reveal-story mt-5 opacity-0">
+                        <p class="text-sm leading-relaxed text-zinc-400">
+                            What started as a love of sharing home-cooked meals
+                            with family has grown into something truly special.
+                            Cacai's passion for authentic Filipino
+                            <em class="not-italic text-zinc-300"
+                                >lutong bahay</em
+                            >
+                            means every dish is prepared with the same warmth and
+                            care as if you were sitting at her own dining table.
+                        </p>
+                        <p class="mt-3 text-sm leading-relaxed text-zinc-400">
+                            From celebration bilaos to everyday family meals,
+                            each order is made fresh on the day — no shortcuts,
+                            no preservatives. Just real food, cooked with love.
+                        </p>
+                    </div>
+
+                    <!-- Stats row -->
+                    <div
+                        class="reveal-story mt-8 grid grid-cols-3 gap-4 border-t border-zinc-800 pt-8 opacity-0"
+                    >
+                        <div>
+                            <p class="text-2xl font-bold text-zinc-100">5+</p>
+                            <p class="mt-0.5 text-xs text-zinc-500">
+                                Years cooking
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-zinc-100">500+</p>
+                            <p class="mt-0.5 text-xs text-zinc-500">
+                                Happy orders
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-zinc-100">100%</p>
+                            <p class="mt-0.5 text-xs text-zinc-500">Homemade</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="bg-zinc-900/30 py-24">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+            <div
+                class="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16"
+            >
+                <!-- Left: food image -->
+                <div class="relative w-full flex-1">
+                    <div
+                        class="pointer-events-none absolute -inset-4 rounded-3xl bg-blue-600/10 blur-2xl"
+                        aria-hidden="true"
+                    ></div>
+                    <img
+                        src={heroBgImg}
+                        alt="Cosina Ni Cacai food spread with delicious Filipino dishes"
+                        class="relative w-full rounded-3xl border border-white/10 shadow-2xl"
+                    />
+                </div>
+
+                <!-- Right: header + vertical steps -->
+                <div class="flex-1">
+                    <p
+                        class="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400"
+                    >
+                        How to Order
+                    </p>
+                    <h2
+                        class="text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl"
+                    >
+                        Simple as 1-2-3
+                    </h2>
+                    <p class="mt-3 text-sm text-zinc-400">
+                        Order your favourite meal in just a few taps.
+                    </p>
+
+                    <div class="steps-grid mt-10 flex flex-col gap-2">
+                        <!-- Step 1 -->
+                        <div
+                            class="reveal-step flex items-start gap-5 opacity-0"
+                        >
+                            <div class="relative shrink-0">
                                 <div
-                                    class="h-3.5 w-3/4 animate-pulse rounded bg-zinc-800"
-                                ></div>
-                                <div
-                                    class="h-3 w-full animate-pulse rounded bg-zinc-800"
-                                ></div>
-                                <div class="flex justify-between">
-                                    <div
-                                        class="h-5 w-16 animate-pulse rounded bg-zinc-800"
-                                    ></div>
-                                    <div
-                                        class="h-7 w-14 animate-pulse rounded-lg bg-zinc-800"
-                                    ></div>
+                                    class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/15 ring-1 ring-blue-500/30"
+                                >
+                                    <SearchIcon class="h-6 w-6 text-blue-400" />
                                 </div>
+                                <span
+                                    class="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white"
+                                    aria-hidden="true">1</span
+                                >
+                            </div>
+                            <div class="pt-1">
+                                <h3
+                                    class="mb-1.5 text-sm font-semibold text-zinc-100"
+                                >
+                                    Browse the Menu
+                                </h3>
+                                <p
+                                    class="text-xs leading-relaxed text-zinc-400"
+                                >
+                                    Explore our full range of packages and daily
+                                    specials. Filter by category or search for
+                                    your favourite dish.
+                                </p>
                             </div>
                         </div>
-                    {/each}
-                </div>
-            {:else if productsQuery.isError}
-                <div
-                    class="flex flex-col items-center justify-center gap-3 py-20 text-center"
-                >
-                    <p class="text-sm text-zinc-500">
-                        Unable to load the menu. Please try again.
-                    </p>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onclick={() => productsQuery.refetch()}
-                        class="text-blue-400 hover:text-blue-300"
-                    >
-                        Retry
-                    </Button>
-                </div>
-            {:else if productsQuery.data}
-                {@const products = filteredProducts(productsQuery.data)}
-                {#if products.length === 0}
-                    <div
-                        class="flex flex-col items-center justify-center gap-3 py-20 text-center"
-                    >
-                        {#if searchQuery.trim()}
-                            <SearchIcon class="h-12 w-12 text-zinc-700" />
-                            <p class="text-sm text-zinc-500">
-                                No items match "<span class="text-zinc-400"
-                                    >{searchQuery.trim()}</span
-                                >"
-                            </p>
-                            <button
-                                type="button"
-                                onclick={() => (searchQuery = '')}
-                                class="text-xs text-blue-400 transition-colors hover:text-blue-300"
-                            >
-                                Clear search
-                            </button>
-                        {:else}
-                            <UtensilsIcon class="h-12 w-12 text-zinc-700" />
-                            <p class="text-sm text-zinc-500">
-                                No items in this category right now.
-                            </p>
-                        {/if}
+
+                        <div
+                            class="ml-7 h-6 w-px bg-linear-to-b from-blue-500/30 to-transparent"
+                            aria-hidden="true"
+                        ></div>
+
+                        <!-- Step 2 -->
+                        <div
+                            class="reveal-step flex items-start gap-5 opacity-0"
+                        >
+                            <div class="relative shrink-0">
+                                <div
+                                    class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/15 ring-1 ring-blue-500/30"
+                                >
+                                    <ShoppingCartIcon
+                                        class="h-6 w-6 text-blue-400"
+                                    />
+                                </div>
+                                <span
+                                    class="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white"
+                                    aria-hidden="true">2</span
+                                >
+                            </div>
+                            <div class="pt-1">
+                                <h3
+                                    class="mb-1.5 text-sm font-semibold text-zinc-100"
+                                >
+                                    Add to Cart
+                                </h3>
+                                <p
+                                    class="text-xs leading-relaxed text-zinc-400"
+                                >
+                                    Pick your items, choose sizes, and add them
+                                    to your cart. Adjust quantities before
+                                    checkout.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="ml-7 h-6 w-px bg-linear-to-b from-blue-500/30 to-transparent"
+                            aria-hidden="true"
+                        ></div>
+
+                        <!-- Step 3 -->
+                        <div
+                            class="reveal-step flex items-start gap-5 opacity-0"
+                        >
+                            <div class="relative shrink-0">
+                                <div
+                                    class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/15 ring-1 ring-blue-500/30"
+                                >
+                                    <CheckIcon class="h-6 w-6 text-blue-400" />
+                                </div>
+                                <span
+                                    class="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white"
+                                    aria-hidden="true">3</span
+                                >
+                            </div>
+                            <div class="pt-1">
+                                <h3
+                                    class="mb-1.5 text-sm font-semibold text-zinc-100"
+                                >
+                                    Place Your Order
+                                </h3>
+                                <p
+                                    class="text-xs leading-relaxed text-zinc-400"
+                                >
+                                    Fill in your details, upload proof of
+                                    payment, and submit. We'll take it from
+                                    there with love.
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                {:else}
-                    <div
-                        class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
-                    >
-                        {#each products as product (product.id)}
-                            <ProductCard
-                                {product}
-                                cartQuantity={getProductCartQuantity(
-                                    product.id,
-                                )}
-                                onAddToCart={(item) => addToCart(item)}
-                            />
-                        {/each}
-                    </div>
-                {/if}
-            {/if}
-        </section>
-    </main>
-
-    <!-- Floating Cart Button (mobile sticky) -->
-    {#if cartItemCount > 0 && !cartOpen}
-        <div
-            class="fixed bottom-6 left-0 right-0 z-30 flex justify-center px-5 sm:hidden"
-        >
-            <button
-                type="button"
-                onclick={() => (cartOpen = true)}
-                class="flex w-full max-w-sm items-center overflow-hidden rounded-2xl bg-blue-600 shadow-2xl shadow-blue-600/40 transition-transform active:scale-[0.97]"
-            >
-                <!-- Cart icon with item-count badge -->
-                <div
-                    class="relative flex shrink-0 items-center justify-center px-3 py-3"
-                >
-                    <ShoppingCartIcon class="h-4 w-4 text-white" />
-                    <span
-                        class="absolute right-1.5 top-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-[8px] font-extrabold leading-none text-blue-600"
-                    >
-                        {cartItemCount > 9 ? '9+' : cartItemCount}
-                    </span>
                 </div>
-
-                <!-- Label -->
-                <span class="flex-1 text-left text-xs font-semibold text-white">
-                    View Cart
-                </span>
-
-                <!-- Total price chip -->
-                <div
-                    class="m-1.5 flex items-center rounded-lg bg-white/15 px-3 py-2"
-                >
-                    <span class="tabular-nums text-xs font-bold text-white">
-                        ₱{cart
-                            .reduce(
-                                (sum, i) =>
-                                    sum + parseFloat(i.price) * i.quantity,
-                                0,
-                            )
-                            .toLocaleString('en-PH', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                            })}
-                    </span>
-                </div>
-            </button>
+            </div>
         </div>
-    {/if}
+    </section>
 
-    <!-- Cart Panel -->
-    <CartPanel
-        bind:open={cartOpen}
-        bind:cart
-        onPlaceOrder={() => (orderFormOpen = true)}
-    />
+    <!-- ===== WHY CHOOSE US ===== -->
+    <section class="py-24">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6">
+            <div class="mb-14 text-center">
+                <p
+                    class="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400"
+                >
+                    Why Us
+                </p>
+                <h2
+                    class="text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl"
+                >
+                    Made with Heart &amp; Fire
+                </h2>
+                <p class="mx-auto mt-3 max-w-sm text-sm text-zinc-400">
+                    Every dish tells the story of generations of Filipino
+                    cooking.
+                </p>
+            </div>
 
-    <!-- Order Form -->
-    <OrderForm
-        bind:open={orderFormOpen}
-        {cart}
-        {advanceDays}
-        settingsLoading={settingsQuery.isPending}
-        onOrderSuccess={handleOrderSuccess}
-    />
+            <div class="features-grid grid grid-cols-2 gap-4 lg:grid-cols-4">
+                <div
+                    class="reveal-feature rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 opacity-0 transition-colors hover:border-zinc-700"
+                >
+                    <div
+                        class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10"
+                    >
+                        <FlameIcon class="h-5 w-5 text-blue-400" />
+                    </div>
+                    <h3 class="mb-1 text-sm font-semibold text-zinc-100">
+                        Fresh Daily
+                    </h3>
+                    <p class="text-xs leading-relaxed text-zinc-500">
+                        Cooked fresh on the day of your order — never
+                        pre-packaged.
+                    </p>
+                </div>
+
+                <div
+                    class="reveal-feature rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 opacity-0 transition-colors hover:border-zinc-700"
+                >
+                    <div
+                        class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10"
+                    >
+                        <StarIcon class="h-5 w-5 text-blue-400" />
+                    </div>
+                    <h3 class="mb-1 text-sm font-semibold text-zinc-100">
+                        Authentic Flavors
+                    </h3>
+                    <p class="text-xs leading-relaxed text-zinc-500">
+                        Time-honoured recipes passed down through generations.
+                    </p>
+                </div>
+
+                <div
+                    class="reveal-feature rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 opacity-0 transition-colors hover:border-zinc-700"
+                >
+                    <div
+                        class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10"
+                    >
+                        <HeartIcon class="h-5 w-5 text-blue-400" />
+                    </div>
+                    <h3 class="mb-1 text-sm font-semibold text-zinc-100">
+                        Made with Love
+                    </h3>
+                    <p class="text-xs leading-relaxed text-zinc-500">
+                        Every bilao, every plate is prepared with care — just
+                        like home.
+                    </p>
+                </div>
+
+                <div
+                    class="reveal-feature rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 opacity-0 transition-colors hover:border-zinc-700"
+                >
+                    <div
+                        class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10"
+                    >
+                        <PackageSearchIcon class="h-5 w-5 text-blue-400" />
+                    </div>
+                    <h3 class="mb-1 text-sm font-semibold text-zinc-100">
+                        Live Tracking
+                    </h3>
+                    <p class="text-xs leading-relaxed text-zinc-500">
+                        Track your order in real-time from preparation to
+                        delivery.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FINAL CTA ===== -->
+    <section class="py-24">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6">
+            <div
+                class="relative overflow-hidden rounded-3xl border border-blue-500/20 bg-linear-to-br from-blue-600/15 via-indigo-600/10 to-violet-600/5 p-10 text-center sm:p-16"
+            >
+                <!-- Inner glow -->
+                <div
+                    class="pointer-events-none absolute inset-0 flex items-center justify-center"
+                    aria-hidden="true"
+                >
+                    <div
+                        class="h-52 w-72 rounded-full bg-blue-600/12 blur-3xl"
+                    ></div>
+                </div>
+
+                <div class="relative">
+                    <div
+                        class="mx-auto mb-5 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ring-1 ring-white/10"
+                    >
+                        <img
+                            src={logoImg}
+                            alt="Cosina Ni Cacai"
+                            class="h-full w-full object-cover"
+                        />
+                    </div>
+                    <h2
+                        class="text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl"
+                    >
+                        Ready to taste the difference?
+                    </h2>
+                    <p class="mx-auto mt-3 max-w-sm text-sm text-zinc-400">
+                        Order in minutes. No account required. Just good food,
+                        made with love.
+                    </p>
+                    <a
+                        href="/order"
+                        class="group mt-8 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-700/30 transition-all hover:bg-blue-500 hover:shadow-blue-600/30 active:scale-[0.98]"
+                    >
+                        Order Now
+                        <ArrowRightIcon
+                            class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                        />
+                    </a>
+                    <p class="mt-4 text-xs text-zinc-600">
+                        No account required · Order in minutes
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="border-t border-zinc-800 py-8">
+        <div
+            class="mx-auto flex max-w-6xl flex-col items-center gap-5 px-4 text-center sm:flex-row sm:justify-between sm:px-6 sm:text-left"
+        >
+            <!-- Brand -->
+            <a
+                href="/"
+                class="flex items-center gap-2.5"
+            >
+                <img
+                    src={logoImg}
+                    alt="Cosina Ni Cacai logo"
+                    class="h-8 w-8 rounded-lg object-cover"
+                />
+                <div>
+                    <span class="text-sm font-bold text-zinc-100"
+                        >Cosina Ni Cacai</span
+                    >
+                    <p class="text-[9px] leading-none text-zinc-500">
+                        Home-cooked meals
+                    </p>
+                </div>
+            </a>
+
+            <!-- Links -->
+            <nav
+                class="flex items-center gap-5 text-xs text-zinc-500"
+                aria-label="Footer navigation"
+            >
+                <a
+                    href="/order"
+                    class="transition-colors hover:text-zinc-300">Order</a
+                >
+                <a
+                    href="/track"
+                    class="transition-colors hover:text-zinc-300">Track Order</a
+                >
+            </nav>
+
+            <!-- Copyright -->
+            <p class="text-xs text-zinc-600">© 2025 Cosina Ni Cacai</p>
+        </div>
+    </footer>
 </div>

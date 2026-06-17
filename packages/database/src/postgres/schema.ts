@@ -516,6 +516,7 @@ export const order = pgTable(
         ),
         status: orderStatusEnum('status').notNull().default('pending'),
         notes: text('notes'),
+        deliveryAddress: text('delivery_address'),
         deliveryAt: timestamp('delivery_at', {
             withTimezone: true,
             mode: 'date',

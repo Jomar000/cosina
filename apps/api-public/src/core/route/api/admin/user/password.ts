@@ -1,9 +1,13 @@
 import { password } from '@hyperion/validator/public/admin/user'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
+import type { ApplyGlobalResponse } from 'hono/client'
 
 import { AppError } from '../../../../../errors.js'
-import type { THonoInstance } from '../../../../../types.js'
+import type {
+    TGlobalApiResponses,
+    THonoInstance,
+} from '../../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
@@ -174,5 +178,10 @@ export const passwordRoute = new Hono<THonoInstance>()
             return apiResponseOkWrapper(ctx, { data: null })
         },
     )
+
+export type AdminUserPasswordRouteType = ApplyGlobalResponse<
+    typeof passwordRoute,
+    TGlobalApiResponses
+>
 
 export default passwordRoute
