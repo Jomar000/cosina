@@ -305,7 +305,7 @@ importers:
         version: 1.11.21
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.13)(valibot@1.4.1)(zod@4.4.3)
+        version: 1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.14)(valibot@1.4.1)(zod@4.4.3)
       nanoid:
         specifier: 'catalog:'
         version: 5.1.11
@@ -375,7 +375,7 @@ importers:
         version: 1.11.21
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.13)(valibot@1.4.1)(zod@4.4.3)
+        version: 1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.14)(valibot@1.4.1)(zod@4.4.3)
       nanoid:
         specifier: 'catalog:'
         version: 5.1.11
@@ -606,7 +606,7 @@ importers:
     dependencies:
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.13)(valibot@1.4.1)(zod@4.4.3)
+        version: 1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.14)(valibot@1.4.1)(zod@4.4.3)
       postgres:
         specifier: 'catalog:'
         version: 3.4.9
@@ -4010,8 +4010,8 @@ packages:
     resolution: {integrity: sha512-1URUxUqfHFM1c+zfSPsa3gnkO7Aq21qyH75SIduNYz4SzY964rn1X2vCMQaHSHhktiw+0kPa2iyb6PUpXqB6Vg==}
     engines: {node: '>=20'}
 
-  typebox@1.2.13:
-    resolution: {integrity: sha512-7bRoSs2aqbiXQ8D/xLG9HVdNqk0poSMkmXjWHi+Yex0Cg6+NQoqJTFAOWNA4mHpW57OEzRvd1pqKOIte7ICPoA==}
+  typebox@1.2.14:
+    resolution: {integrity: sha512-/ogVtZUOjV69aeVvrTCmBtDNDfvXPPi28rkrQlID+bhz1dEJ9YkcnoSqCYaPIqiNifMVuTycZlZx5X82734s7w==}
 
   typed-event-target@4.3.1:
     resolution: {integrity: sha512-X9Wx2Xd58rcnWUTMlSJVREN7hhmf5jvcr0UY4qMRRUJo5WdI66COmLgLKHlMtWw2vo1dvxL2H8gBTTeRb6rP/w==}
@@ -4432,7 +4432,7 @@ snapshots:
       '@better-auth/core': 1.6.19(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.6)(jose@6.2.3)(kysely@0.29.2)(nanostores@1.3.0)
       '@better-auth/utils': 0.4.2
     optionalDependencies:
-      drizzle-orm: 1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.13)(valibot@1.4.1)(zod@4.4.3)
+      drizzle-orm: 1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.14)(valibot@1.4.1)(zod@4.4.3)
 
   '@better-auth/kysely-adapter@1.6.19(@better-auth/core@1.6.19)(@better-auth/utils@0.4.2)(kysely@0.29.2)':
     dependencies:
@@ -5789,7 +5789,7 @@ snapshots:
       zod: 4.4.3
     optionalDependencies:
       '@sveltejs/kit': 2.65.1(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.3)(typescript@6.0.3)(vite@8.0.16)
-      drizzle-orm: 1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.13)(valibot@1.4.1)(zod@4.4.3)
+      drizzle-orm: 1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.14)(valibot@1.4.1)(zod@4.4.3)
       svelte: 5.56.3(@typescript-eslint/types@8.61.1)
       vitest: 4.1.9(@types/node@25.9.2)(@vitest/browser-playwright@4.1.9)(@vitest/coverage-istanbul@4.1.9)(@vitest/ui@4.1.9)(vite@8.0.16)
     transitivePeerDependencies:
@@ -6056,11 +6056,11 @@ snapshots:
       get-tsconfig: 4.14.0
       jiti: 2.7.0
 
-  drizzle-orm@1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.13)(valibot@1.4.1)(zod@4.4.3):
+  drizzle-orm@1.0.0-rc.3(arktype@2.2.0)(postgres@3.4.9)(typebox@1.2.14)(valibot@1.4.1)(zod@4.4.3):
     optionalDependencies:
       arktype: 2.2.0
       postgres: 3.4.9
-      typebox: 1.2.13
+      typebox: 1.2.14
       valibot: 1.4.1(typescript@6.0.3)
       zod: 4.4.3
 
@@ -7208,7 +7208,7 @@ snapshots:
       joi: 17.13.4
       json-schema-to-ts: 3.1.1
       superstruct: 2.0.2
-      typebox: 1.2.13
+      typebox: 1.2.14
       valibot: 1.4.1(typescript@6.0.3)
       yup: 1.7.1
       zod: 4.4.3
@@ -7313,7 +7313,7 @@ snapshots:
     dependencies:
       tagged-tag: 1.0.0
 
-  typebox@1.2.13:
+  typebox@1.2.14:
     optional: true
 
   typed-event-target@4.3.1:

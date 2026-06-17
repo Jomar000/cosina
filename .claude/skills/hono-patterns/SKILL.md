@@ -41,7 +41,7 @@ new Hono<THonoInstance>().get(
   - `apiResponseErrorWrapper(ctx, { code, message, validatorIssues?, status? })` returns `{ success: false, error: { requestId, code, message, validatorIssues? } }`.
 - Use `TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponsePaginated<T>`, `TApiResponsePaginatedOk<T>`, and `TApiResponseError` from `@PROJECT_NAME/types/shared`.
 - Preserve the complete response union until checking `success`; access branch-specific fields only after narrowing. Paginated success requires `count`, `limit`, and `offset`.
-- Validate output with `outputSchema(dataSchema)` or `paginatedOutputSchema(dataSchema)`. Both include the `success` discriminant and error `requestId`.
+- Do not add runtime output validation. Use typed response wrappers and Hono RPC route types for response contracts.
 - Validate requests with `validateRequest(target, schema)` from the matching app's `src/core/middleware/validateRequest.ts`. It wraps `@hono/zod-validator` and returns `DATA_VALIDATION` with Zod issues.
 - Never throw raw exceptions. Throw the matching app's `AppError`; the global `.onError` handler serializes it.
 

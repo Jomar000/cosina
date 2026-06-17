@@ -53,7 +53,7 @@ When a create endpoint needs retry safety:
 Shared exports under `@PROJECT_NAME/validator/shared`:
 
 - `field.ts`: `vBoolean(fieldName)` accepts a field-name string; `vInt`, `vNumeric`, and `vText` accept `{ fieldName, message, min, max }` option objects.
-- `base.ts`: `addressInputSchema`, `readManyInputSchema` (`limit`, `offset`, and `sortOrder`), `outputSchema<Data>`, and `paginatedOutputSchema<Data>` with required `count`, `limit`, and `offset`.
+- `base.ts`: `addressInputSchema`, `readManyInputSchema` (`limit`, `offset`, and `sortOrder`), `outputSchema<Data>`, and `paginatedOutputSchema<Data>` with required `count`, `limit`, and `offset`. Existing output schema helpers are contract/schema artifacts and are not a mandate to parse or validate API responses at runtime.
 - `refinement.ts`: `.check()` callbacks `dateString()`, `password()` (uppercase, lowercase, numeric, and symbol), `uniqueArrayValues()`, and `updatedFields()`.
 
 Domain schemas mirror app surfaces:
