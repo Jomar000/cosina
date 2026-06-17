@@ -44,7 +44,7 @@
 
 ## 4. Development Workflow
 
-- **Package Management:** pnpm (>=11.6.0) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
+- **Package Management:** pnpm (>=11.7.0) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
 - **Template Merges:** When merging this global template into downstream forks, follow `MERGING.md` before applying domain-specific skills.
 - **Running Apps:** Use `pnpm --filter=<package-name>` to target individual workspaces:
     ```bash
@@ -67,7 +67,7 @@
 
 ## 6. Project Skills
 
-Project skills live in `.agents/skills/`. Load the relevant skill before starting any task in these areas:
+Project skills live in `.agents/skills/` for Codex/Gemini and `.claude/skills/` for Claude Code. Load the relevant skill before starting any task in these areas; Claude Code should use the Skill tool.
 
 - `svelte-patterns` -- Working on frontend Svelte/SvelteKit code or UI components
 - `hono-patterns` -- Implementing or modifying Hono API routes, middleware, or error handling

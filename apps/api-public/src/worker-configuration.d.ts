@@ -16,9 +16,7 @@ interface __BaseEnv_Env {
         | 'hyperion-staging-pub'
         | 'hyperion-production-pub'
         | 'hyperion-development-pub'
-    CF_R2_BUCKET_PUBLIC_URL:
-        | 'https://hyperion-development-r2.4thdevision.tech'
-        | ''
+    CF_R2_BUCKET_PUBLIC_URL: 'https://hyperion-dev.r2.4thdevision.tech' | ''
     CF_R2_PRESIGN_EXPIRY: 300
     CF_TURNSTILE_BYPASS: 1 | 0
     CF_TURNSTILE_SITE_VERIFY: 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
@@ -59,7 +57,7 @@ declare namespace Cloudflare {
         STATUS: 'up'
         CF_R2_BUCKET_PRIVATE: 'hyperion-test-prv'
         CF_R2_BUCKET_PUBLIC: 'hyperion-test-pub'
-        CF_R2_BUCKET_PUBLIC_URL: 'https://hyperion-development-r2.4thdevision.tech'
+        CF_R2_BUCKET_PUBLIC_URL: 'https://hyperion-test.r2.4thdevision.tech'
         CF_R2_PRESIGN_EXPIRY: 300
         CF_TURNSTILE_BYPASS: 1
         CF_TURNSTILE_SITE_VERIFY: 'https://challenges.cloudflare.com/turnstile/v0/siteverify'

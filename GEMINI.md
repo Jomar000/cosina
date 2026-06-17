@@ -25,10 +25,10 @@
 - **Database:** Drizzle ORM. Schema in `packages/database/src/postgres/schema.ts`. Direct DB calls only in backend apps.
 - **Language:** TypeScript (Strict mode).
 - **Types (`packages/types`):**
-    - `@PROJECT_NAME/types/shared` — shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponsePaginated<T>`, `TApiResponsePaginatedOk<T>`, `TApiResponseError`).
-    - `@PROJECT_NAME/types/public` — public-app specific types.
-    - `@PROJECT_NAME/types/backoffice` — backoffice-app specific types.
-    - Type definitions only — no runtime code beyond type references.
+    - `@PROJECT_NAME/types/shared` -- shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponsePaginated<T>`, `TApiResponsePaginatedOk<T>`, `TApiResponseError`).
+    - `@PROJECT_NAME/types/public` -- public-app specific types.
+    - `@PROJECT_NAME/types/backoffice` -- backoffice-app specific types.
+    - Type definitions only -- no runtime code beyond type references.
 
 ## 3. File Structure & Naming
 
@@ -44,7 +44,7 @@
 
 ## 4. Development Workflow
 
-- **Package Management:** pnpm (>=11.6.0) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
+- **Package Management:** pnpm (>=11.7.0) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
 - **Template Merges:** When merging this global template into downstream forks, follow `MERGING.md` before applying domain-specific skills.
 - **Running Apps:** Use `pnpm --filter=<package-name>` to target individual workspaces:
     ```bash
@@ -53,9 +53,9 @@
     pnpm --filter=@PROJECT_NAME/database migrate:dev  # Run DB migrations (dev)
     ```
 - **Environment Variables:**
-    - `apps/api-{public,backoffice}/wrangler.toml` — non-secret vars and Cloudflare bindings. BFF deployments default to `zone_name` subdirectory routes; commented `custom_domain` routes are the alternative. Object storage uses `aws4fetch`-signed S3-compatible R2 requests, not direct R2 bindings.
-    - `apps/api-{public,backoffice}/.dev.vars` — secrets (not committed). Copy the matching `.dev.vars.example`, which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
-    - `packages/database/.env` / `.env.test` — Postgres connection strings for local dev and test migrations.
+    - `apps/api-{public,backoffice}/wrangler.toml` -- non-secret vars and Cloudflare bindings. BFF deployments default to `zone_name` subdirectory routes; commented `custom_domain` routes are the alternative. Object storage uses `aws4fetch`-signed S3-compatible R2 requests, not direct R2 bindings.
+    - `apps/api-{public,backoffice}/.dev.vars` -- secrets (not committed). Copy the matching `.dev.vars.example`, which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
+    - `packages/database/.env` / `.env.test` -- Postgres connection strings for local dev and test migrations.
 
 ## 5. Deployment & CI/CD
 
@@ -67,18 +67,18 @@
 
 ## 6. Project Skills
 
-Project skills live in `.agents/skills/`. Each skill covers a focused domain with detailed coding rules, patterns, or checklists. Load the relevant skill before starting any task in these areas:
+Project skills live in `.agents/skills/` for Codex/Gemini and `.claude/skills/` for Claude Code. Load the relevant skill before starting any task in these areas; Claude Code should use the Skill tool.
 
-- `svelte-patterns` — Working on frontend Svelte/SvelteKit code or UI components
-- `hono-patterns` — Implementing or modifying Hono API routes, middleware, or error handling
-- `database-validator-patterns` — Modifying DB schema, writing Drizzle queries, or adding/updating Zod validators
-- `auth-implementation` — Implementing auth logic or fixing auth bugs
-- `cloudflare-worker-testing` — Debugging or writing vitest tests targeting Cloudflare Workers
-- `monorepo-troubleshooting` — Fixing build errors, setting up new packages, or understanding the build graph
+- `svelte-patterns` -- Working on frontend Svelte/SvelteKit code or UI components
+- `hono-patterns` -- Implementing or modifying Hono API routes, middleware, or error handling
+- `database-validator-patterns` -- Modifying DB schema, writing Drizzle queries, or adding/updating Zod validators
+- `auth-implementation` -- Implementing auth logic or fixing auth bugs
+- `cloudflare-worker-testing` -- Debugging or writing vitest tests targeting Cloudflare Workers
+- `monorepo-troubleshooting` -- Fixing build errors, setting up new packages, or understanding the build graph
 
 ## 7. Permissions & Command Boundaries
 
-> **Note for agents and developers:** For Claude Code, these rules are **hard-enforced** by `.claude/settings.json` at the tool level — this section is a human-readable mirror of those settings. For Gemini and Codex, this section is the **project-level guidance** for safe operation. If you tighten or change `.claude/settings.json`, update this section in all root agent docs to match.
+> **Note for agents and developers:** For Claude Code, these rules are **hard-enforced** by `.claude/settings.json` at the tool level -- this section is a human-readable mirror of those settings. For Codex and Gemini, this section is the **project-level guidance** for safe operation. If you tighten or change `.claude/settings.json`, update this section in all root agent docs to match.
 
 To ensure project safety, strictly adhere to the following file access and command execution boundaries (mirrored from `.claude/settings.json`):
 
