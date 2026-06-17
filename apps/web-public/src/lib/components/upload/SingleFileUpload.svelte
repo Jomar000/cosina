@@ -29,7 +29,7 @@
         revokePreviewUrls,
         uploadQueuedFiles,
         type UploadMetadata,
-    } from './utilities/multiFileUpload'
+    } from './utilities/singleFileUpload'
 
     ////////////////////
     // 01. Properties //
