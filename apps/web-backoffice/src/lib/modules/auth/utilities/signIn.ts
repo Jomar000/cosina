@@ -56,8 +56,7 @@ export async function signInWithCaptcha({
             throw new Error(responseJson.error.message)
         }
 
-        session.set(responseJson.data)
-        if (!session.isValid()) {
+        if (!session.set(responseJson.data)) {
             throw new Error('Invalid session data.')
         }
 
