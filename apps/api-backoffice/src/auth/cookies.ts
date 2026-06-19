@@ -9,5 +9,5 @@ export const getCsrfCookieName = (environment: TEnvironment) =>
 
 export const getSessionCookieName = (environment: TEnvironment) =>
     environment === 'production'
-        ? '__Host-sentinel'
-        : `__Host-${environment}_sentinel`
+        ? '__Host-session_token'
+        : `__Host-${environment}_session_token`

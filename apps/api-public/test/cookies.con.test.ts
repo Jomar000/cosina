@@ -19,28 +19,28 @@ describe('Cookie hardening', () => {
     it.each([
         [
             'production',
-            '__Host-sentinel',
+            '__Host-session_token',
             '__Host-csrf_token',
         ],
         [
             'staging',
-            '__Host-staging_sentinel',
+            '__Host-staging_session_token',
             '__Host-staging_csrf_token',
         ],
         [
             'test',
-            '__Host-test_sentinel',
+            '__Host-test_session_token',
             '__Host-test_csrf_token',
         ],
         [
             'development',
-            '__Host-development_sentinel',
+            '__Host-development_session_token',
             '__Host-development_csrf_token',
         ],
     ] as const)(
         'maps %s cookie names',
-        (environment, authPrefix, csrfCookieName) => {
-            expect(getSessionCookieName(environment)).toBe(authPrefix)
+        (environment, sessionCookieName, csrfCookieName) => {
+            expect(getSessionCookieName(environment)).toBe(sessionCookieName)
             expect(getCsrfCookieName(environment)).toBe(csrfCookieName)
         },
     )

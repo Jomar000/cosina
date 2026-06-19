@@ -20,8 +20,8 @@ catalogs:
       specifier: ^3.12.2
       version: 3.12.2
     '@lucide/svelte':
-      specifier: ^1.20.0
-      version: 1.20.0
+      specifier: ^1.21.0
+      version: 1.21.0
     '@noble/hashes':
       specifier: ^2.2.0
       version: 2.2.0
@@ -408,7 +408,7 @@ importers:
         version: link:../../packages/validator
       '@lucide/svelte':
         specifier: 'catalog:'
-        version: 1.20.0(svelte@5.56.3)
+        version: 1.21.0(svelte@5.56.3)
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.61.0
@@ -513,7 +513,7 @@ importers:
         version: link:../../packages/validator
       '@lucide/svelte':
         specifier: 'catalog:'
-        version: 1.20.0(svelte@5.56.3)
+        version: 1.21.0(svelte@5.56.3)
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.61.0
@@ -627,7 +627,7 @@ importers:
         version: 3.12.2
       '@lucide/svelte':
         specifier: 'catalog:'
-        version: 1.20.0(svelte@5.56.3)
+        version: 1.21.0(svelte@5.56.3)
       '@sveltejs/package':
         specifier: 'catalog:'
         version: 2.5.8(svelte@5.56.3)(typescript@6.0.3)
@@ -1622,8 +1622,8 @@ packages:
   '@layerstack/utils@2.0.0-next.18':
     resolution: {integrity: sha512-EYILHpfBRYMMEahajInu9C2AXQom5IcAEdtCeucD3QIl/fdDgRbtzn6/8QW9ewumfyNZetdUvitOksmI1+gZYQ==}
 
-  '@lucide/svelte@1.20.0':
-    resolution: {integrity: sha512-s7TKCHEtFEfflOUDPRC0WBZEjoNJHtj/aUmuWxopFe3AKecEoKvMmCaO0sBDkflok8nR0BCFsm44QF+S6/gc+w==}
+  '@lucide/svelte@1.21.0':
+    resolution: {integrity: sha512-MEv//A7Jv3kHukZowv/DWp1MAtUzJKYwtJsmnQ7X98lCgtac3z3NbaToDl3Q6jO3gS9sougFpcD+t+YuxOkRMw==}
     peerDependencies:
       svelte: ^5
 
@@ -5123,7 +5123,7 @@ snapshots:
       d3-time: 3.1.0
       d3-time-format: 4.1.0
 
-  '@lucide/svelte@1.20.0(svelte@5.56.3)':
+  '@lucide/svelte@1.21.0(svelte@5.56.3)':
     dependencies:
       svelte: 5.56.3(@typescript-eslint/types@8.61.1)
 

@@ -59,9 +59,7 @@ describe('Auth Endpoint', () => {
                     const sessionCookie = response.headers
                         .getSetCookie()
                         .find((cookie) =>
-                            cookie.startsWith(
-                                '__Host-test_sentinel.session_token=',
-                            ),
+                            cookie.startsWith('__Host-test_session_token='),
                         )
 
                     expect(sessionCookie).toBeDefined()

@@ -21,7 +21,7 @@ catalog:
   '@cloudflare/vitest-pool-workers': ^0.16.16
   '@hono/zod-validator': ^0.8.0
   '@internationalized/date': ^3.12.2
-  '@lucide/svelte': ^1.20.0
+  '@lucide/svelte': ^1.21.0
   '@noble/hashes': ^2.2.0
   '@playwright/test': ^1.61.0
   '@sveltejs/adapter-static': ^3.0.10

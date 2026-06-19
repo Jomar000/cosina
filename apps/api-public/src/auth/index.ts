@@ -84,7 +84,11 @@ export const auth = async (opts: {
             throw: true,
         },
         advanced: {
-            cookiePrefix: getSessionCookieName(env.ENVIRONMENT),
+            cookies: {
+                session_token: {
+                    name: getSessionCookieName(env.ENVIRONMENT),
+                },
+            },
             defaultCookieAttributes: cookieAttrs,
             ipAddress: {
                 ipAddressHeaders: [
