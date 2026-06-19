@@ -56,6 +56,21 @@ describe('Auth Endpoint', () => {
 
                     expect(response.status).toBe(200)
                     expect(response.headers.get('set-cookie')).toBeTruthy()
+                    const sessionCookie = response.headers
+                        .getSetCookie()
+                        .find((cookie) =>
+                            cookie.startsWith(
+                                '__Host-test_sentinel.session_token=',
+                            ),
+                        )
+
+                    expect(sessionCookie).toBeDefined()
+                    expect(sessionCookie?.toLowerCase()).toContain('secure')
+                    expect(sessionCookie?.toLowerCase()).toContain('path=/')
+                    expect(sessionCookie?.toLowerCase()).not.toContain(
+                        'domain=',
+                    )
+                    expect(sessionCookie).not.toContain('__Secure-__Host-')
                     expect(responseData).toHaveProperty('data')
                     expect(responseData.data.userRoles).toEqual(['owner'])
                     expect(Object.keys(responseData.data.roles)).toEqual([

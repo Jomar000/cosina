@@ -34,7 +34,7 @@
     // 05. Queries //
     /////////////////
 
-    // Checks liveness and sets the csrf_token cookie in a single request.
+    // Checks liveness and sets the environment-scoped CSRF cookie in one request.
     const heartbeatQuery = createQuery(
         () => ({
             queryKey: [

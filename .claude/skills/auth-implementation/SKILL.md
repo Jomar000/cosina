@@ -10,4 +10,4 @@ description: Project rules for better-auth initialization, authentication strate
 3. **Organizations and ACL:** Use the `organization` plugin with DB/KV-backed custom roles and permissions built by `aclBuilder` in `src/auth/acl.ts`.
 4. **Sessions:** Store sessions primarily in Postgres and secondarily in Cloudflare KV (`PROJECT_NAME{PUB|BOFC}_KV`) through `secondaryStorage`. Clamp KV TTL values below 60 seconds to 60 seconds.
 5. **Middleware:** Run `isAuthenticated` before `isAuthorized(permissions)`. Authentication populates `session`, `user`, `role`, and `isPrivilegedRole` Hono context variables; authorization calls `auth.api.hasPermission`.
-6. **Cookies:** Use the `sentinel` prefix with `httpOnly`, `partitioned`, `sameSite: "strict"`, `secure: true`, and the domain from `env.COOKIE_DOMAIN`.
+6. **Cookies:** Use browser-enforced, host-only `__Host-` names with `secure: true`, `path: "/"`, no `domain`, `partitioned`, and `sameSite: "strict"`. Use `__Host-sentinel` and `__Host-csrf_token` in production; prefix both names with the full environment value outside production. Better Auth must not prepend `__Secure-` to these complete names.

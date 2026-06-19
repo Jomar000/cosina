@@ -7,7 +7,7 @@ import { hc } from 'hono/client'
 import ky from 'ky'
 
 import { PUBLIC_API_URL } from '$env/static/public'
-import { getCookie } from './utilities/helpers'
+import { getCookie, getCsrfCookieName } from './utilities/helpers'
 
 /**
  * @description
@@ -20,6 +20,8 @@ const SAFE_METHODS = [
     'OPTIONS',
 ]
 
+const CSRF_COOKIE_NAME = getCsrfCookieName(import.meta.env.MODE)
+
 const kyClient = ky.extend({
     throwHttpErrors: false,
     hooks: {
@@ -27,7 +29,7 @@ const kyClient = ky.extend({
             ({ request }) => {
                 if (SAFE_METHODS.includes(request.method)) return
 
-                const csrfToken = getCookie('csrf_token')
+                const csrfToken = getCookie(CSRF_COOKIE_NAME)
 
                 if (csrfToken) {
                     request.headers.set(

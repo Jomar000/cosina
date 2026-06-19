@@ -98,6 +98,11 @@ export const getCookie = (name: string) => {
     return cookies[name] ?? null
 }
 
+export const getCsrfCookieName = (environment: string) =>
+    environment === 'production'
+        ? '__Host-csrf_token'
+        : `__Host-${environment}_csrf_token`
+
 /**
  * @description
  * Format bytes to a more readable notation

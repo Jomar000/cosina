@@ -15,6 +15,7 @@ import { Resend } from 'resend'
 
 import type { THonoBindings, THonoVariables } from '../types.js'
 import type { aclBuilder } from './acl.js'
+import { getSessionCookieName } from './cookies.js'
 
 /**
  * @link
@@ -32,7 +33,6 @@ export const auth = async (opts: {
     const { organization: organizationTable } = dbSchema
 
     const cookieAttrs = {
-        domain: env.COOKIE_DOMAIN,
         httpOnly: true,
         partitioned: true,
         path: '/',
@@ -84,7 +84,7 @@ export const auth = async (opts: {
             throw: true,
         },
         advanced: {
-            cookiePrefix: 'sentinel',
+            cookiePrefix: getSessionCookieName(env.ENVIRONMENT),
             defaultCookieAttributes: cookieAttrs,
             ipAddress: {
                 ipAddressHeaders: [
@@ -92,7 +92,9 @@ export const auth = async (opts: {
                 ],
                 disableIpTracking: false,
             },
-            useSecureCookies: true,
+            // The complete cookie name already uses the browser-enforced
+            // `__Host-` prefix. Prevent Better Auth from prepending `__Secure-`.
+            useSecureCookies: false,
         },
         baseURL: env.URL_BACKEND,
         database: drizzleAdapter(db, {

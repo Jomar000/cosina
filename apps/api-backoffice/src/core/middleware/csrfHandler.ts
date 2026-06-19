@@ -4,6 +4,7 @@ import { createMiddleware } from 'hono/factory'
 import { nanoid } from 'nanoid'
 
 import type { THonoInstance } from '../../types.js'
+import { getCsrfCookieName } from '../../auth/cookies.js'
 import { apiResponseErrorWrapper } from '../../utilities/helpers.js'
 
 /**
@@ -26,9 +27,10 @@ export const csrfHandler = () => {
             'OPTIONS',
         ]
 
+        const csrfCookieName = getCsrfCookieName(ctx.env.ENVIRONMENT)
+
         if (safeMethods.includes(ctx.req.method)) {
-            setCookie(ctx, 'csrf_token', nanoid(32), {
-                domain: ctx.env.COOKIE_DOMAIN,
+            setCookie(ctx, csrfCookieName, nanoid(32), {
                 httpOnly: false,
                 partitioned: true,
                 path: '/',
@@ -51,7 +53,7 @@ export const csrfHandler = () => {
                 })
             }
 
-            const tokenFromCookie = getCookie(ctx, 'csrf_token')
+            const tokenFromCookie = getCookie(ctx, csrfCookieName)
             const tokenFromHeader = ctx.req.header('x-csrf-token')
 
             if (
