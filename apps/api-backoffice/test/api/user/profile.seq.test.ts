@@ -8,7 +8,7 @@ import { and, desc, eq, inArray } from 'drizzle-orm'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../../src/core/index.js'
-import { setTestingCookies } from '../../utilities.js'
+import { seedTestingCookies } from '../../utilities.js'
 
 let privilegedCookie: string
 let standardCookie: string
@@ -42,14 +42,7 @@ const profileUpdatePayload = {
     lastName: 'PROFILE',
 }
 
-const getDb = () =>
-    dbClient({
-        host: env.HYPERIONBOFC_HD.host,
-        port: Number(env.HYPERIONBOFC_HD.port) || 5432,
-        database: env.HYPERIONBOFC_HD.database,
-        user: env.HYPERIONBOFC_HD.user,
-        pass: env.HYPERIONBOFC_HD.password,
-    })
+let db: ReturnType<typeof dbClient>
 
 const firstAddressPayload = {
     line1: '100 TEST STREET',
@@ -70,54 +63,55 @@ const secondAddressPayload = {
 }
 
 beforeAll(async () => {
+    db = dbClient({
+        host: env.HYPERIONBOFC_HD.host,
+        port: Number(env.HYPERIONBOFC_HD.port) || 5432,
+        database: env.HYPERIONBOFC_HD.database,
+        user: env.HYPERIONBOFC_HD.user,
+        pass: env.HYPERIONBOFC_HD.password,
+    })
     ;[
         privilegedCookie,
         standardCookie,
-    ] = await setTestingCookies()
+    ] = await seedTestingCookies()
 
-    const db = getDb()
     const { address, userProfile } = dbSchema
 
-    try {
-        const [profile] = await db
+    const [profile] = await db
+        .select({
+            addressId: userProfile.addressId,
+            backupPhoneNumber: userProfile.backupPhoneNumber,
+            firstName: userProfile.firstName,
+            gender: userProfile.gender,
+            lastName: userProfile.lastName,
+            middleName: userProfile.middleName,
+            nameExtension: userProfile.nameExtension,
+        })
+        .from(userProfile)
+        .where(eq(userProfile.userId, 'USER_003'))
+
+    if (!profile) throw new Error('Seeded USER_003 profile was not found.')
+
+    const { addressId, ...profileData } = profile
+    originalMemberAddressId = addressId
+    originalMemberProfile = profileData
+
+    if (addressId) {
+        ;[originalMemberAddress] = await db
             .select({
-                addressId: userProfile.addressId,
-                backupPhoneNumber: userProfile.backupPhoneNumber,
-                firstName: userProfile.firstName,
-                gender: userProfile.gender,
-                lastName: userProfile.lastName,
-                middleName: userProfile.middleName,
-                nameExtension: userProfile.nameExtension,
+                cityMunicipality: address.cityMunicipality,
+                countryCode: address.countryCode,
+                line1: address.line1,
+                line2: address.line2,
+                postalCode: address.postalCode,
+                provinceStateRegion: address.provinceStateRegion,
             })
-            .from(userProfile)
-            .where(eq(userProfile.userId, 'USER_003'))
-
-        if (!profile) throw new Error('Seeded USER_003 profile was not found.')
-
-        const { addressId, ...profileData } = profile
-        originalMemberAddressId = addressId
-        originalMemberProfile = profileData
-
-        if (addressId) {
-            ;[originalMemberAddress] = await db
-                .select({
-                    cityMunicipality: address.cityMunicipality,
-                    countryCode: address.countryCode,
-                    line1: address.line1,
-                    line2: address.line2,
-                    postalCode: address.postalCode,
-                    provinceStateRegion: address.provinceStateRegion,
-                })
-                .from(address)
-                .where(eq(address.id, addressId))
-        }
-    } finally {
-        await db.$client.end()
+            .from(address)
+            .where(eq(address.id, addressId))
     }
 })
 
 afterAll(async () => {
-    const db = getDb()
     const { address, userProfile } = dbSchema
 
     try {
@@ -331,44 +325,34 @@ async function getLatestAuditRecords({
     action: string
     component: string
 }) {
-    const db = getDb()
     const { auditTrail } = dbSchema
 
-    try {
-        const [auditTrailEntry] = await db
-            .select({ records: auditTrail.records })
-            .from(auditTrail)
-            .where(
-                and(
-                    eq(auditTrail.component, component),
-                    eq(auditTrail.action, action),
-                ),
-            )
-            .orderBy(desc(auditTrail.id))
-            .limit(1)
+    const [auditTrailEntry] = await db
+        .select({ records: auditTrail.records })
+        .from(auditTrail)
+        .where(
+            and(
+                eq(auditTrail.component, component),
+                eq(auditTrail.action, action),
+            ),
+        )
+        .orderBy(desc(auditTrail.id))
+        .limit(1)
 
-        expect(auditTrailEntry.records).toBeTruthy()
-        return auditTrailEntry.records!
-    } finally {
-        await db.$client.end()
-    }
+    expect(auditTrailEntry.records).toBeTruthy()
+    return auditTrailEntry.records!
 }
 
 async function getMemberAddressId() {
-    const db = getDb()
     const { userProfile } = dbSchema
 
-    try {
-        const [profile] = await db
-            .select({ addressId: userProfile.addressId })
-            .from(userProfile)
-            .where(eq(userProfile.userId, 'USER_003'))
+    const [profile] = await db
+        .select({ addressId: userProfile.addressId })
+        .from(userProfile)
+        .where(eq(userProfile.userId, 'USER_003'))
 
-        expect(profile.addressId).toBeTruthy()
-        return profile.addressId!
-    } finally {
-        await db.$client.end()
-    }
+    expect(profile.addressId).toBeTruthy()
+    return profile.addressId!
 }
 
 async function updateUserAddress(body: typeof firstAddressPayload) {

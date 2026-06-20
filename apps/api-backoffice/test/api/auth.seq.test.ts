@@ -8,30 +8,32 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import app from '../../src/core/index.js'
 import { interceptPasswordResetToken } from '../utilities.js'
 
-const getDb = () =>
-    dbClient({
+let db: ReturnType<typeof dbClient>
+
+beforeAll(() => {
+    db = dbClient({
         host: env.HYPERIONBOFC_HD.host,
         port: Number(env.HYPERIONBOFC_HD.port) || 5432,
         database: env.HYPERIONBOFC_HD.database,
         user: env.HYPERIONBOFC_HD.user,
         pass: env.HYPERIONBOFC_HD.password,
     })
+})
+
+afterAll(async () => {
+    await db.$client.end()
+})
 
 const restoreMutableAuthAttribute = async () => {
-    const db = getDb()
     const { userAttribute } = dbSchema
 
-    try {
-        await db
-            .delete(userAttribute)
-            .where(eq(userAttribute.userId, 'USER_AUTH_MUTABLE'))
-        await db.insert(userAttribute).values({
-            userId: 'USER_AUTH_MUTABLE',
-            isLocked: false,
-        })
-    } finally {
-        await db.$client.end()
-    }
+    await db
+        .delete(userAttribute)
+        .where(eq(userAttribute.userId, 'USER_AUTH_MUTABLE'))
+    await db.insert(userAttribute).values({
+        userId: 'USER_AUTH_MUTABLE',
+        isLocked: false,
+    })
 }
 
 const signInMutableAuthUser = async () => {
@@ -66,8 +68,8 @@ const verificationUser = {
 
 /**
  * @description
- * Some marked tests trigger a false-positive unhandled rejection error.
- * Handled by the event listeners defined on vitest.setup.ts
+ * Expected postgres.js Worker stream-cancellation rejections are filtered by
+ * the narrow `onUnhandledError` callback in vitest.config.ts.
  */
 
 describe('Auth Endpoint', () => {
@@ -76,34 +78,19 @@ describe('Auth Endpoint', () => {
             let verificationToken = ''
 
             beforeAll(async () => {
-                const db = getDb()
                 const { user } = dbSchema
 
-                try {
-                    await db
-                        .delete(user)
-                        .where(eq(user.id, verificationUser.id))
-                    await db.insert(user).values(verificationUser)
-                    verificationToken = await createEmailVerificationToken(
-                        env.BETTER_AUTH_SECRET,
-                        verificationUser.email,
-                    )
-                } finally {
-                    await db.$client.end()
-                }
+                await db.delete(user).where(eq(user.id, verificationUser.id))
+                await db.insert(user).values(verificationUser)
+                verificationToken = await createEmailVerificationToken(
+                    env.BETTER_AUTH_SECRET,
+                    verificationUser.email,
+                )
             })
 
             afterAll(async () => {
-                const db = getDb()
                 const { user } = dbSchema
-
-                try {
-                    await db
-                        .delete(user)
-                        .where(eq(user.id, verificationUser.id))
-                } finally {
-                    await db.$client.end()
-                }
+                await db.delete(user).where(eq(user.id, verificationUser.id))
             })
 
             it('Valid token should verify the user.', async () => {
@@ -121,19 +108,13 @@ describe('Auth Endpoint', () => {
                 expect(responseData.success).toBe(true)
                 expect(responseData.data).toBeNull()
 
-                const db = getDb()
                 const { user } = dbSchema
+                const [verifiedUser] = await db
+                    .select({ emailVerified: user.emailVerified })
+                    .from(user)
+                    .where(eq(user.id, verificationUser.id))
 
-                try {
-                    const [verifiedUser] = await db
-                        .select({ emailVerified: user.emailVerified })
-                        .from(user)
-                        .where(eq(user.id, verificationUser.id))
-
-                    expect(verifiedUser.emailVerified).toBe(true)
-                } finally {
-                    await db.$client.end()
-                }
+                expect(verifiedUser.emailVerified).toBe(true)
             })
 
             it('Reusing a valid token should remain successful.', async () => {
@@ -218,7 +199,6 @@ describe('Auth Endpoint', () => {
                     signInMutableAuthUser(),
                     signInMutableAuthUser(),
                 ])
-                const db = getDb()
                 const { userAttribute } = dbSchema
 
                 try {
@@ -269,7 +249,6 @@ describe('Auth Endpoint', () => {
                         'UNAUTHORIZED',
                     )
                 } finally {
-                    await db.$client.end()
                     await restoreMutableAuthAttribute()
                 }
             })
@@ -284,7 +263,6 @@ describe('Auth Endpoint', () => {
                     signInMutableAuthUser(),
                     signInMutableAuthUser(),
                 ])
-                const db = getDb()
                 const { userAttribute } = dbSchema
 
                 try {
@@ -334,7 +312,6 @@ describe('Auth Endpoint', () => {
                         'UNAUTHORIZED',
                     )
                 } finally {
-                    await db.$client.end()
                     await restoreMutableAuthAttribute()
                 }
             })

@@ -3,7 +3,7 @@ import { env } from 'cloudflare:workers'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../../../src/core/index.js'
-import { setTestingCookies } from '../../../utilities.js'
+import { seedTestingCookies } from '../../../utilities.js'
 
 let privilegedCookie: string
 let standardCookie: string
@@ -12,7 +12,7 @@ beforeAll(async () => {
     ;[
         privilegedCookie,
         standardCookie,
-    ] = await setTestingCookies()
+    ] = await seedTestingCookies()
 })
 
 /**

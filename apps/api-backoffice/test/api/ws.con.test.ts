@@ -3,16 +3,18 @@ import { env } from 'cloudflare:workers'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../src/core/index.js'
-import { setTestingCookies } from '../utilities.js'
+import { seedTestingCookies } from '../utilities.js'
 
 let privilegedCookie: string
 let standardCookie: string
+let administratorCookie: string
 
 beforeAll(async () => {
     ;[
         privilegedCookie,
         standardCookie,
-    ] = await setTestingCookies()
+        administratorCookie,
+    ] = await seedTestingCookies()
 })
 
 describe.concurrent('WebSocket Endpoint', () => {
@@ -229,34 +231,13 @@ describe.concurrent('WebSocket Endpoint', () => {
             })
 
             it('Admin (ws.broadcast + ws.listen) connecting should return 101.', async () => {
-                const signInResponse = await app.request(
-                    '/api/auth/signIn/username',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: env.URL_FRONTEND,
-                            'content-type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            organizationId: 'superorganization',
-                            accountId: 'administrator',
-                            password: 'P@ssw0rd1234',
-                        }),
-                    },
-                    env,
-                )
-
-                const adminCookie = signInResponse.headers
-                    .getSetCookie()
-                    .join('; ')
-
                 const response = await app.request(
                     '/api/ws/general',
                     {
                         method: 'GET',
                         headers: {
                             origin: env.URL_FRONTEND,
-                            cookie: adminCookie,
+                            cookie: administratorCookie,
                             upgrade: 'websocket',
                         },
                     },

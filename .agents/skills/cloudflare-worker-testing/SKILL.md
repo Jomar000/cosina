@@ -5,62 +5,103 @@ description: Project rules for writing and debugging Vitest tests that run again
 
 # Cloudflare Worker Testing
 
-## Storage
+## Storage and Database Isolation
 
-- Manage `@cloudflare/vitest-pool-workers` through the root `pnpm-workspace.yaml` catalog and reference it with `catalog:`; read the catalog for the current version.
-- Cloudflare-bound local storage is isolated per test file, not per `it()` block. KV, Durable Object, Cache, and other local Worker writes persist between tests in one file and reset between files.
-- Setup in `beforeAll()` remains available to every test in that file. Writes from one test are visible to later tests in the same file.
-- Each API Vitest command gets a UUIDv7-suffixed Postgres database. Node-side setup derives it from `packages/database/.env.test`; the Worker never loads the env file and receives only the generated URL through Hyperdrive. Files and projects within that command share the database, separate commands are isolated, and Vitest teardown force-drops it after passing or failing runs. Before setup, best-effort cleanup drops exact matching UUIDv7 databases older than 24 hours. Do not use `beforeExit` for cleanup because it may run while Worker tests are still active; forced termination can temporarily leave an orphaned database.
-- R2 uses `aws4fetch`-signed S3-compatible HTTP requests, not a direct binding; local pool isolation does not cover it unless the test stubs or intercepts the request.
+- Cloudflare storage is isolated per test file, not per `it()` block. KV, Durable Object, and Cache writes remain available to later tests in the same file, but not to other files.
+- Put file-wide storage setup in `beforeAll()`.
+- Each API Vitest command creates its own UUIDv7-suffixed Postgres database. Files within that command share the database.
+- The concurrent and sequential commands use different databases because they are separate Vitest commands.
+- Vitest receives the generated database URL through the app's Hyperdrive binding. Do not add a test `localConnectionString` to Wrangler.
+- The global setup owns database creation, migrations, stale-database cleanup, and teardown. Do not use `beforeExit` for cleanup.
+- R2 requests use signed S3-compatible HTTP calls. Worker storage isolation does not isolate R2 unless the test stubs or intercepts those requests.
+- Manage `@cloudflare/vitest-pool-workers` through the root catalog in `pnpm-workspace.yaml`.
 
-When data is missing or unexpected:
+When data is missing:
 
-1. Check whether it was created in another test file.
-2. Move file-shared setup, such as token generation or seeding, to `beforeAll()`.
-3. For Postgres state, check whether another file in the same Vitest command created or changed it; separate commands do not share the generated database.
-4. Check whether the storage backend changed, such as better-auth moving data from Postgres to KV through `secondaryStorage`.
+1. Check whether another test file created it. Test files do not share Cloudflare storage.
+2. Move required storage setup into the current file's `beforeAll()`.
+3. Check whether another file in the same Vitest command changed shared Postgres data.
+4. Check whether the production storage path changed, such as Better Auth moving a record to KV.
 
-## Execution
+## Test Organization
 
-- Name independent files `*.con.test.ts`; they run in the `concurrent-test-files` project.
-- Name ordered or stateful files `*.seq.test.ts`; they run in `sequential-test-files` with `fileParallelism: false`.
-- Run tests through the API package scripts. The aggregate `test` script runs `test:con` and `test:seq` in parallel through pnpm's exact script selector with `--no-bail`, so one failure does not terminate the other child and the aggregate still fails after both finish. Each child remains a separate Vitest command with its own generated database. `--silent=passed-only` suppresses console logs from passing tests while failures and summaries remain visible in the terminal and CI logs. Do not redirect test output, prepend tests with `migrate:test`, or add a test `localConnectionString` to Wrangler.
-- Run `test:ui:con` or `test:ui:seq` directly; the aggregate `test:ui` script only reminds developers to select one so Vitest retains terminal input and `q` can trigger normal database teardown. Reserve strict API/UI ports `51204`/`51205` for public concurrent/sequential and `51206`/`51207` for backoffice concurrent/sequential; keep `--api.strictPort` and open the UI at `http://localhost:<port>/__vitest__/`.
-- Keep `deps.optimizer.ssr` inside each Vitest project with its distinct `cacheDir`; a root optimizer makes concurrent and sequential commands race while atomically replacing the shared dependency cache.
-- When changing the bootstrap or database lifecycle implementation rather than test behavior, also load `database-validator-patterns`.
-- Use `describe.concurrent(...)` only for suites whose tests may overlap. Use plain `describe(...)` for sequential suites.
-- In mixed files, keep the outer grouping suite plain and mark only concurrent child suites. Override inherited concurrency with `describe(name, { concurrent: false }, callback)` when a sequential suite must sit under a concurrent suite.
-- Never use deprecated `describe.sequential(...)`.
+- Name independent test files `*.con.test.ts`. They run in the `concurrent-test-files` project.
+- Name ordered or stateful test files `*.seq.test.ts`. They run in the `sequential-test-files` project with `fileParallelism: false`.
+- Use `describe.concurrent(...)` only when the enclosed tests may overlap safely.
+- Use plain `describe(...)` for sequential suites. Never use deprecated `describe.sequential(...)`.
+- In a mixed file, keep the outer suite plain. Mark only independent child suites as concurrent.
+- Use `describe(name, { concurrent: false }, callback)` when a sequential child must be placed inside a concurrent parent.
+- A large domain may use thin `.con.test.ts` and `.seq.test.ts` entrypoints backed by one `*.shared.ts` module. Export separate registration functions, and make sure each entrypoint registers only its own suites.
+- Keep setup and mutable state local to the test file through hooks. Never depend on test-file execution order.
 
-## Requests and Authentication
+## Running Tests
 
-- Set the `Origin` header from `env.URL_FRONTEND`, including WebSocket origin-guard tests.
-- Use shared `setTestingCookies()` fixtures instead of repeating seeded sign-in requests. Destructure only the roles the file needs.
-- Choose actors by domain relationship as well as permission. For example, use the seeded operator assigned to the location or tenant resource resolved by the production workflow.
-- To share another seeded role, add its cookie to the helper, append it to the returned tuple to preserve existing destructuring, and document the role and tuple order.
-- Leave seeded sign-in success assertions to authentication endpoint tests; unrelated endpoint setup should not assert them.
+- Run tests through the API package scripts.
+- The aggregate `test` script runs `test:con` and `test:seq` in parallel. Each child keeps its own database, and the aggregate command reports a failure if either child fails.
+- Keep `--silent=passed-only` so successful logs stay quiet while failures remain visible.
+- Do not redirect test output or prepend test commands with `migrate:test`.
+- Run `test:ui:con` or `test:ui:seq` directly. The aggregate `test:ui` script is only a reminder.
+- Keep strict UI ports `51204` and `51205` for public concurrent and sequential tests. Use `51206` and `51207` for backoffice.
+- Keep dependency optimization inside each Vitest project with a separate `cacheDir`. A shared optimizer cache causes races between concurrent commands.
+- Also load `database-validator-patterns` when changing test database bootstrap or lifecycle code.
 
-## Resilient Data
+## Authentication Fixtures
 
-1. Never hardcode numeric database IDs in tests that reach Postgres. Resolve reference IDs through API discovery helpers in `apps/api-backoffice/test/utilities.ts` during `beforeAll()`.
-2. Auth guard (`401`/`403`) and schema validation (`400`) tests may use positive placeholder IDs only when rejection occurs before database access.
-3. In sequential flows, capture and reuse IDs created by earlier tests instead of relying on seed IDs.
-4. Generate unique `name`, `sku`, `slug`, and `code` values with `generateUniqueName(prefix)`.
-5. Do not assert exact collection lengths when seed rows may exist. Filter to test-created records or use a lower-bound assertion.
+- Set the `Origin` header from `env.URL_FRONTEND`, including WebSocket tests.
+- Use `seedTestingCookies()` for setup authentication outside auth endpoint tests. Call it once in a file-level `beforeAll()`.
+- `seedTestingCookies()` returns `[ownerCookie, memberCookie, administratorCookie]`. Destructure only the roles the file uses.
+- Do not share returned cookies across test files. Each file has isolated KV.
+- Better Auth stores these test sessions only in KV while `secondaryStorage` is enabled and `storeSessionInDatabase` is unset. Do not insert matching session rows into Postgres.
+- Store the unsigned token as the KV key. Store `{ session, user }` under that key and the token metadata under `active-sessions-{userId}`.
+- Send an HMAC-signed and URI-encoded `token.signature` value in the request cookie. Do not use the unsigned KV token as the cookie value.
+- Use `signInTestingUser()` when an auth test needs a real sign-in. Request only the role the test uses.
+- Keep sign-in success assertions in authentication tests. Unrelated endpoint setup should not test sign-in again.
+- When adding a seeded role, append its cookie to the tuple so existing tuple positions do not change. Document the new order.
 
-Fixture ownership:
+## Direct Database Access
 
-- Put reusable, generic reference rows in the test migration. This includes shared identities, memberships, organizations, uploads, and other records used across multiple suites.
-- Create scenario-specific or mutable lifecycle state in the owning file's `beforeAll()`. This includes balances, approval flags, pending transactions, open deals, and records that the suite consumes or transitions.
-- Make `beforeAll()` setup idempotent and restore the suite's expected clean slate when rerun without rebuilding the database.
-- Clean up in foreign-key dependency order and target only records owned by that scenario.
-- Never rely on test-file execution order or another suite's Postgres mutations.
+- In a sequential test file, open at most one direct Postgres client in the outer `beforeAll()`.
+- Reuse that client for setup, assertions, and cleanup.
+- Close the client in the outer `afterAll()`.
+- Do not open and close a new client for each query.
 
-Current helpers in each app's `test/utilities.ts`:
+## Resilient Test Data
+
+- Do not hardcode numeric database IDs when a request reaches Postgres. Resolve reference IDs through shared discovery helpers during `beforeAll()`.
+- Positive placeholder IDs are allowed for `400`, `401`, or `403` tests only when rejection happens before database access.
+- In sequential flows, capture IDs created by earlier tests and reuse those values.
+- Generate unique names, SKUs, slugs, and codes with `generateUniqueName(prefix)`.
+- Do not assert exact collection sizes when seed rows may exist. Filter for test-owned rows or assert a lower bound.
+- Put reusable identities, memberships, organizations, uploads, and other shared reference rows in the test migration.
+- Create mutable scenario data in the file that owns the scenario.
+- Make `beforeAll()` setup safe to rerun and restore the expected starting state.
+- Clean up only records owned by the scenario, in foreign-key dependency order.
+
+## Errors, Timeouts, and Configuration
+
+- Keep global `hookTimeout` and `testTimeout` values at 15 seconds.
+- Add a local timeout only when the tested operation is expected to take longer.
+- Filter known infrastructure errors with Vitest's `onUnhandledError`.
+- Never install blanket `uncaughtException` or `unhandledRejection` listeners.
+- Match a filtered error by type, exact message, and dependency stack. All other unhandled errors must remain test failures.
+- Type named Vitest callbacks with `TestUserConfig` from `vitest/config`.
+- The app `check` script does not include `vitest.config.ts`. Type-check the config separately when it changes.
+
+## Completion Checklist
+
+- Run the affected API package's `check`, `lint`, and aggregate `test` scripts.
+- When `vitest.config.ts` changes, type-check it directly and run at least one Vitest project.
+- Confirm that split or moved tests are still registered.
+- Confirm that concurrent suites are independent.
+- Confirm that sequential suites own and clean up their mutable state.
+- Keep `.agents/skills/cloudflare-worker-testing/SKILL.md` and `.claude/skills/cloudflare-worker-testing/SKILL.md` identical.
+
+## Shared Test Helpers
 
 - `buildQueryPath(path, query)` encodes scalar and repeated query parameters.
-- `generateUniqueName(prefix)` returns `${prefix}_${Date.now()}_${random}`.
-- `getTestingRequest()` and `postTestingRequest()` send requests with the configured frontend origin and optional authentication data.
+- `generateUniqueName(prefix)` returns a timestamped and randomized name.
+- `getTestingRequest()` and `postTestingRequest()` send requests with the configured frontend origin and optional authentication.
 - `interceptPasswordResetToken(userId)` reads KV first, then the Postgres verification table.
-- `setTestingCookies()` returns shared seeded-role cookies in its documented tuple order.
-- `unpackError(responseData)` extracts the first validation issue or falls back to the API error message.
+- `seedTestingCookies()` creates owner, member, and administrator KV sessions and returns their cookies in that order.
+- `signInTestingUser()` performs a real sign-in for one seeded role.
+- `unpackError(responseData)` returns the first validation issue or the API error message.

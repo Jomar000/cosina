@@ -4,9 +4,8 @@ import { env } from 'cloudflare:workers'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../src/core/index.js'
-import { setTestingCookies } from '../utilities.js'
+import { signInTestingUser } from '../utilities.js'
 
-let privilegedCookie: string // eslint-disable-line @typescript-eslint/no-unused-vars
 let standardCookie: string
 
 type TSignInResponseData = {
@@ -15,16 +14,13 @@ type TSignInResponseData = {
 }
 
 beforeAll(async () => {
-    ;[
-        privilegedCookie,
-        standardCookie,
-    ] = await setTestingCookies()
+    standardCookie = await signInTestingUser('member')
 })
 
 /**
  * @description
- * Some marked tests trigger a false-positive unhandled rejection error.
- * Handled by the event listeners defined on vitest.setup.ts
+ * Expected postgres.js Worker stream-cancellation rejections are filtered by
+ * the narrow `onUnhandledError` callback in vitest.config.ts.
  */
 
 describe('Auth Endpoint', () => {

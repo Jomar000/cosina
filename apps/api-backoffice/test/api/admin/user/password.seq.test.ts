@@ -2,27 +2,31 @@ import { dbClient, dbSchema } from '@hyperion/database/postgres'
 import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
 import { env } from 'cloudflare:workers'
 import { and, desc, eq } from 'drizzle-orm'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import app from '../../../../src/core/index.js'
 import {
     interceptPasswordResetToken,
-    setTestingCookies,
+    seedTestingCookies,
 } from '../../../utilities.js'
 
 let privilegedCookie: string
 
-const getDb = () =>
-    dbClient({
+let db: ReturnType<typeof dbClient>
+
+beforeAll(async () => {
+    db = dbClient({
         host: env.HYPERIONBOFC_HD.host,
         port: Number(env.HYPERIONBOFC_HD.port) || 5432,
         database: env.HYPERIONBOFC_HD.database,
         user: env.HYPERIONBOFC_HD.user,
         pass: env.HYPERIONBOFC_HD.password,
     })
+    ;[privilegedCookie] = await seedTestingCookies()
+})
 
-beforeAll(async () => {
-    ;[privilegedCookie] = await setTestingCookies()
+afterAll(async () => {
+    await db.$client.end()
 })
 
 /**
@@ -101,45 +105,40 @@ describe('Admin User Password Endpoint', () => {
             })
 
             it('Direct password reset should write a redacted account audit trail record.', async () => {
-                const db = getDb()
                 const { account, auditTrail } = dbSchema
 
-                try {
-                    const [credential] = await db
-                        .select({ id: account.id })
-                        .from(account)
-                        .where(
-                            and(
-                                eq(account.userId, 'USER_PASSWORD_MUTABLE'),
-                                eq(account.providerId, 'credential'),
-                            ),
-                        )
+                const [credential] = await db
+                    .select({ id: account.id })
+                    .from(account)
+                    .where(
+                        and(
+                            eq(account.userId, 'USER_PASSWORD_MUTABLE'),
+                            eq(account.providerId, 'credential'),
+                        ),
+                    )
 
-                    const [auditTrailEntry] = await db
-                        .select({ records: auditTrail.records })
-                        .from(auditTrail)
-                        .where(
-                            and(
-                                eq(auditTrail.component, 'admin.user.password'),
-                                eq(auditTrail.action, 'reset'),
-                            ),
-                        )
-                        .orderBy(desc(auditTrail.id))
-                        .limit(1)
+                const [auditTrailEntry] = await db
+                    .select({ records: auditTrail.records })
+                    .from(auditTrail)
+                    .where(
+                        and(
+                            eq(auditTrail.component, 'admin.user.password'),
+                            eq(auditTrail.action, 'reset'),
+                        ),
+                    )
+                    .orderBy(desc(auditTrail.id))
+                    .limit(1)
 
-                    expect(credential).toBeTruthy()
-                    expect(auditTrailEntry.records).toEqual([
-                        {
-                            table: 'account',
-                            id: credential.id,
-                            oldData: {
-                                password: '[REDACTED]',
-                            },
+                expect(credential).toBeTruthy()
+                expect(auditTrailEntry.records).toEqual([
+                    {
+                        table: 'account',
+                        id: credential.id,
+                        oldData: {
+                            password: '[REDACTED]',
                         },
-                    ])
-                } finally {
-                    await db.$client.end()
-                }
+                    },
+                ])
             })
 
             it('Sign-in with the new password after direct reset should pass.', async () => {

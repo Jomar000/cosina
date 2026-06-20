@@ -5,7 +5,7 @@
 // https://developers.cloudflare.com/workers/testing/vitest-integration
 
 import { cloudflareTest } from '@cloudflare/vitest-pool-workers'
-import { defineConfig } from 'vitest/config'
+import { defineConfig, type TestUserConfig } from 'vitest/config'
 
 import { prepareTestDatabaseEnvironment } from '../../packages/database/src/postgres/bootstrap.js'
 
@@ -23,6 +23,22 @@ const workerDependencyOptimization = () => ({
         },
     },
 })
+
+/**
+ * postgres.js' Cloudflare stream polyfill rejects cancelled reads after
+ * expected auth failures close their request streams. Ignore only that known
+ * Worker-bridge rejection; every other unhandled error remains test-fatal.
+ */
+const onUnhandledError: NonNullable<TestUserConfig['onUnhandledError']> = (
+    error,
+) => {
+    if (
+        error.type === 'Unhandled Rejection' &&
+        error.message === 'Stream was cancelled.' &&
+        error.stack?.includes('/postgres/cf/polyfills.js')
+    )
+        return false
+}
 
 prepareTestDatabaseEnvironment('HYPERIONBOFC_HD')
 
@@ -66,7 +82,7 @@ export default defineConfig({
         ],
         globalSetup: '../../packages/database/src/postgres/bootstrap.ts',
         hookTimeout: 15000,
-        setupFiles: ['./vitest.setup.ts'],
+        onUnhandledError,
         testTimeout: 15000,
     },
 })

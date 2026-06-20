@@ -1,8 +1,11 @@
 import { dbClient, dbSchema } from '@hyperion/database/postgres'
 import type { TApiResponseError } from '@hyperion/types/shared'
+import { makeSignature } from 'better-auth/crypto'
 import { env } from 'cloudflare:workers'
-import { and, eq, like } from 'drizzle-orm'
+import { and, eq, inArray, like } from 'drizzle-orm'
+import { nanoid } from 'nanoid'
 
+import { getSessionCookieName } from '../src/auth/cookies.js'
 import app from '../src/core/index.js'
 
 type QueryValue =
@@ -180,51 +183,136 @@ export const interceptPasswordResetToken = async (
     }
 }
 
-/**
- * @description
- * Signs in as both `superadministrator` and `member` in parallel and returns
- * their session cookies as a readonly tuple `[adminCookie, memberCookie]`.
- */
-export const setTestingCookies = async () => {
-    const response = await Promise.all([
-        app.request(
-            '/api/auth/signIn/username',
-            {
-                method: 'POST',
-                headers: {
-                    origin: env.URL_FRONTEND,
-                    'content-type': 'application/json',
-                },
-                body: JSON.stringify({
-                    organizationId: 'superorganization',
-                    accountId: 'superadministrator',
-                    password: 'P@ssw0rd1234',
-                }),
+/** Signs in one seeded identity for tests that exercise authentication itself. */
+export const signInTestingUser = async (
+    accountId: 'superadministrator' | 'administrator' | 'member',
+) => {
+    const response = await app.request(
+        '/api/auth/signIn/username',
+        {
+            method: 'POST',
+            headers: {
+                origin: env.URL_FRONTEND,
+                'content-type': 'application/json',
             },
-            env,
-        ),
-        app.request(
-            '/api/auth/signIn/username',
-            {
-                method: 'POST',
-                headers: {
-                    origin: env.URL_FRONTEND,
-                    'content-type': 'application/json',
-                },
-                body: JSON.stringify({
-                    organizationId: 'superorganization',
-                    accountId: 'member',
-                    password: 'P@ssw0rd1234',
-                }),
-            },
-            env,
-        ),
-    ])
+            body: JSON.stringify({
+                organizationId: 'superorganization',
+                accountId,
+                password: 'P@ssw0rd1234',
+            }),
+        },
+        env,
+    )
 
-    return [
-        response[0].headers.getSetCookie().join('; '),
-        response[1].headers.getSetCookie().join('; '),
-    ] as const
+    return response.headers.getSetCookie().join('; ')
+}
+
+/**
+ * Seeds Better Auth's KV-only session cache for the shared owner, member, and
+ * administrator identities. The tuple order is owner, member, administrator.
+ */
+export const seedTestingCookies = async (): Promise<
+    readonly [
+        string,
+        string,
+        string,
+    ]
+> => {
+    const db = dbClient({
+        host: env.HYPERIONPUB_HD.host,
+        port: Number(env.HYPERIONPUB_HD.port) || 5432,
+        database: env.HYPERIONPUB_HD.database,
+        user: env.HYPERIONPUB_HD.user,
+        pass: env.HYPERIONPUB_HD.password,
+    })
+    const { organization, user } = dbSchema
+
+    try {
+        const users = await db
+            .select()
+            .from(user)
+            .where(
+                inArray(user.id, [
+                    'USER_001',
+                    'USER_002',
+                    'USER_003',
+                ]),
+            )
+        const [activeOrganization] = await db
+            .select({ id: organization.id })
+            .from(organization)
+            .where(eq(organization.id, 'ORGANIZATION_001'))
+
+        if (users.length !== 3 || !activeOrganization)
+            throw new Error('Shared authentication seed data is incomplete.')
+
+        const usersById = new Map(
+            users.map((record) => [
+                record.id,
+                record,
+            ]),
+        )
+        const expiresIn = Number(env.SESSION_EXPIRATION)
+        const cookieName = getSessionCookieName(env.ENVIRONMENT)
+
+        const cookies = await Promise.all(
+            [
+                'USER_001',
+                'USER_003',
+                'USER_002',
+            ].map(async (userId) => {
+                const seededUser = usersById.get(userId)
+                if (!seededUser)
+                    throw new Error(`Seeded user "${userId}" was not found.`)
+
+                const now = new Date()
+                const expiresAt = new Date(now.getTime() + expiresIn * 1000)
+                const token = nanoid(32)
+                const session = {
+                    id: nanoid(),
+                    token,
+                    userId,
+                    expiresAt,
+                    ipAddress: '',
+                    userAgent: '',
+                    activeOrganizationId: activeOrganization.id,
+                    createdAt: now,
+                    updatedAt: now,
+                }
+
+                await Promise.all([
+                    env.HYPERIONPUB_KV.put(
+                        token,
+                        JSON.stringify({ session, user: seededUser }),
+                        { expirationTtl: expiresIn },
+                    ),
+                    env.HYPERIONPUB_KV.put(
+                        `active-sessions-${userId}`,
+                        JSON.stringify([
+                            { token, expiresAt: expiresAt.getTime() },
+                        ]),
+                        { expirationTtl: expiresIn },
+                    ),
+                ])
+
+                const signature = await makeSignature(
+                    token,
+                    env.BETTER_AUTH_SECRET,
+                )
+                const signedToken = encodeURIComponent(`${token}.${signature}`)
+
+                return `${cookieName}=${signedToken}`
+            }),
+        )
+
+        return [
+            cookies[0],
+            cookies[1],
+            cookies[2],
+        ]
+    } finally {
+        await db.$client.end()
+    }
 }
 
 /**
