@@ -84,7 +84,7 @@ When data is missing:
 - Filter known infrastructure errors with Vitest's `onUnhandledError`.
 - Never install blanket `uncaughtException` or `unhandledRejection` listeners.
 - Match a filtered error by type, exact message, and dependency stack. All other unhandled errors must remain test failures.
-- Type named Vitest callbacks with `TestUserConfig` from `vitest/config`.
+- Define Vitest callbacks inline when practical so TypeScript can infer their types. If a callback must be extracted, type it with `TestUserConfig` from `vitest/config`.
 - The app `check` script does not include `vitest.config.ts`. Type-check the config separately when it changes.
 
 ## Completion Checklist

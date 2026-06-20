@@ -114,8 +114,7 @@ export const postTestingRequest = async (
  * versions that store verification tokens in either location.
  *
  * When using KV, this must be called within the same test file that
- * triggered the reset request, as storage is isolated per test file
- * (see @cloudflare/vitest-pool-workers v0.13.0).
+ * triggered the reset request, as storage is isolated per test file.
  *
  * - better-auth >=1.5.3 with secondaryStorage: KV key pattern
  *   "verification:reset-password:{token}"

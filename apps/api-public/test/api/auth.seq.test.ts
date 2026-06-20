@@ -463,8 +463,7 @@ describe('Auth Endpoint', () => {
          *
          * The reset request and token interception are performed in
          * `beforeAll()` so the KV write persists across all `it()` blocks
-         * within this `describe()`. Storage isolation is per test file
-         * (see @cloudflare/vitest-pool-workers v0.13.0).
+         * within this `describe()`. Storage isolation is per test file.
          */
         describe('Full Password Reset Flow (Token Interception)', () => {
             let interceptedToken: string

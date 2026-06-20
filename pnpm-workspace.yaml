@@ -18,7 +18,7 @@ engineStrict: true
 
 catalog:
   '@better-auth/drizzle-adapter': ^1.6.19
-  '@cloudflare/vitest-pool-workers': ^0.16.17
+  '@cloudflare/vitest-pool-workers': ^0.16.18
   '@hono/zod-validator': ^0.8.0
   '@internationalized/date': ^3.12.2
   '@lucide/svelte': ^1.21.0
