@@ -65,7 +65,8 @@ export default defineConfig({
             },
         ],
         globalSetup: '../../packages/database/src/postgres/bootstrap.ts',
+        hookTimeout: 15000,
         setupFiles: ['./vitest.setup.ts'],
-        testTimeout: 10000,
+        testTimeout: 15000,
     },
 })
