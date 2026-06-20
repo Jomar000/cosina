@@ -113,7 +113,6 @@ id = "00000000000000000000000000000001"
 [[env.test.hyperdrive]]
 binding = "HYPERIONPUB_HD"
 id = "00000000000000000000000000000001"
-localConnectionString = "postgres://postgres:12345678@localhost:5432/hyperion_test"
 
 [[env.test.durable_objects.bindings]]
 name = "HYPERIONPUB_DO_WSS"

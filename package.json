@@ -16,7 +16,7 @@
         "format": "pnpm run --recursive --stream --if-present format",
         "lint": "pnpm run --recursive --stream --if-present lint",
         "prepare": "pnpm exec husky",
-        "test": "echo 'Tests must be run per-app to ensure a clean DB state per session'"
+        "test": "echo 'Run tests per API app; concurrent and sequential Vitest commands run in parallel on isolated databases'"
     },
     "devDependencies": {
         "@changesets/cli": "^2.31.0",
@@ -36,6 +36,6 @@
         "tsx": "^4.22.4",
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.61.1",
-        "wrangler": "^4.101.0"
+        "wrangler": "^4.102.0"
     }
 }

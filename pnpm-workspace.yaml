@@ -18,14 +18,14 @@ engineStrict: true
 
 catalog:
   '@better-auth/drizzle-adapter': ^1.6.19
-  '@cloudflare/vitest-pool-workers': ^0.16.16
+  '@cloudflare/vitest-pool-workers': ^0.16.17
   '@hono/zod-validator': ^0.8.0
   '@internationalized/date': ^3.12.2
   '@lucide/svelte': ^1.21.0
   '@noble/hashes': ^2.2.0
   '@playwright/test': ^1.61.0
   '@sveltejs/adapter-static': ^3.0.10
-  '@sveltejs/kit': ^2.65.2
+  '@sveltejs/kit': ^2.66.0
   '@sveltejs/package': ^2.5.8
   '@sveltejs/vite-plugin-svelte': ^7.1.2
   '@tailwindcss/vite': ^4.3.1
@@ -54,7 +54,7 @@ catalog:
   layerchart: 2.0.0-next.65
   libphonenumber-js: ^1.13.6
   mode-watcher: ^1.1.0
-  nanoid: ^5.1.11
+  nanoid: ^5.1.14
   p-queue: ^9.3.0
   paneforge: ^1.0.2
   perfect-debounce: ^2.1.0

@@ -1,6 +1,6 @@
 ---
 name: database-validator-patterns
-description: Project rules for Drizzle schemas and queries, PostgreSQL constraints and tenancy, create idempotency, and Zod validators. Use when changing database structures, writing queries, or adding and modifying validators.
+description: Project rules for Drizzle schemas and queries, PostgreSQL constraints and tenancy, local/test database bootstrap and migrations, create idempotency, and Zod validators. Use when changing database structures, writing queries, modifying bootstrap or migration behavior, configuring test database lifecycles, or adding and modifying validators.
 ---
 
 # Database and Validators
@@ -12,6 +12,21 @@ description: Project rules for Drizzle schemas and queries, PostgreSQL constrain
 - In Hono handlers, use the initialized request context: `ctx.get('dbClient')` for typed `select`, `insert`, `update`, `delete`, and transactions; `ctx.get('dbSchema')` for table references.
 - Use `db.query.*` only where already configured and materially clearer.
 - Avoid raw `sql` except for schema defaults/checks, atomic expressions, or queries the typed builder cannot express cleanly.
+
+## Local and Test Bootstrap
+
+- Use `packages/database/.env` and `.env.test` only as Node-side bootstrap/migration inputs; Worker runtime code must never load either file. Vitest reads `.env.test` in Node configuration to derive an ephemeral database URL, and the Worker receives only that generated URL through Hyperdrive.
+- Keep `packages/database/src/postgres/bootstrap.ts` and `utilities.ts` Node-only, excluded from the Worker-facing database build and package exports. Put orchestration in `bootstrap.ts` and reusable recreate/drop operations in `utilities.ts`.
+- Keep direct `migrate:dev` and `migrate:test` execution behind the `import.meta.main` path in `bootstrap.ts`; staging and production continue to use Drizzle Kit.
+
+For each API Vitest command:
+
+1. Call `prepareTestDatabaseEnvironment()` with the app's Hyperdrive binding before creating the Cloudflare test plugin. It derives a randomly suffixed URL from `.env.test` and sets `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_<BINDING>`.
+2. Register `bootstrap.ts` as `globalSetup`; its default `manageTestDatabaseLifecycle()` export owns provisioning and teardown.
+3. Preserve the process-scoped lifecycle guard because Vitest may initialize the inherited global setup more than once.
+4. Recreate the generated database, apply default and test migrations, and force-drop it after setup failure or Vitest teardown. Do not use `beforeExit` for cleanup because it may run while Worker tests are still active; forced termination can leave an orphaned database.
+
+Do not duplicate the test URL in Wrangler `localConnectionString` or prepend API test scripts with `migrate:test`.
 
 ## Ownership and Tenancy
 

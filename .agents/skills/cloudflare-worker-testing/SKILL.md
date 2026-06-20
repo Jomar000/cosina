@@ -1,28 +1,33 @@
 ---
 name: cloudflare-worker-testing
-description: Project rules for writing and debugging Vitest tests that run against Cloudflare Workers, including storage isolation, concurrency, authentication fixtures, and resilient test data.
+description: Project rules for writing and debugging Vitest tests that run against Cloudflare Workers, including storage and database isolation, concurrency, authentication fixtures, and resilient test data.
 ---
 
 # Cloudflare Worker Testing
 
 ## Storage
 
-- `@cloudflare/vitest-pool-workers` is managed in the root `pnpm-workspace.yaml` catalog (currently `^0.16.15`).
+- Manage `@cloudflare/vitest-pool-workers` through the root `pnpm-workspace.yaml` catalog and reference it with `catalog:`; read the catalog for the current version.
 - Cloudflare-bound local storage is isolated per test file, not per `it()` block. KV, Durable Object, Cache, and other local Worker writes persist between tests in one file and reset between files.
 - Setup in `beforeAll()` remains available to every test in that file. Writes from one test are visible to later tests in the same file.
-- Postgres writes through Hyperdrive are never isolated and persist globally.
+- Each API Vitest command gets a randomly suffixed Postgres database. Node-side setup derives it from `packages/database/.env.test`; the Worker never loads the env file and receives only the generated URL through Hyperdrive. Files and projects within that command share the database, separate commands are isolated, and Vitest teardown force-drops it after passing or failing runs. Do not use `beforeExit` for cleanup because it may run while Worker tests are still active; forced termination can leave an orphaned database.
 - R2 uses `aws4fetch`-signed S3-compatible HTTP requests, not a direct binding; local pool isolation does not cover it unless the test stubs or intercepts the request.
 
 When data is missing or unexpected:
 
 1. Check whether it was created in another test file.
 2. Move file-shared setup, such as token generation or seeding, to `beforeAll()`.
-3. Check whether the storage backend changed, such as better-auth moving data from Postgres to KV through `secondaryStorage`.
+3. For Postgres state, check whether another file in the same Vitest command created or changed it; separate commands do not share the generated database.
+4. Check whether the storage backend changed, such as better-auth moving data from Postgres to KV through `secondaryStorage`.
 
 ## Execution
 
 - Name independent files `*.con.test.ts`; they run in the `concurrent-test-files` project.
 - Name ordered or stateful files `*.seq.test.ts`; they run in `sequential-test-files` with `fileParallelism: false`.
+- Run tests through the API package scripts. The aggregate `test` script runs `test:con` and `test:seq` in parallel through pnpm's exact script selector; each child remains a separate Vitest command with its own generated database. Their plain-text CLI output overwrites the ignored `test-con.out` and `test-seq.out` files in the API app, suppressing logs from passing tests while retaining failure logs and summaries. Do not prepend them with `migrate:test` or add a test `localConnectionString` to Wrangler.
+- Run `test:ui:con` or `test:ui:seq` directly; the aggregate `test:ui` script only reminds developers to select one so Vitest retains terminal input and `q` can trigger normal database teardown. Reserve strict API/UI ports `51204`/`51205` for public concurrent/sequential and `51206`/`51207` for backoffice concurrent/sequential; keep `--api.strictPort` and open the UI at `http://localhost:<port>/__vitest__/`.
+- Keep `deps.optimizer.ssr` inside each Vitest project with its distinct `cacheDir`; a root optimizer makes concurrent and sequential commands race while atomically replacing the shared dependency cache.
+- When changing the bootstrap or database lifecycle implementation rather than test behavior, also load `database-validator-patterns`.
 - Use `describe.concurrent(...)` only for suites whose tests may overlap. Use plain `describe(...)` for sequential suites.
 - In mixed files, keep the outer grouping suite plain and mark only concurrent child suites. Override inherited concurrency with `describe(name, { concurrent: false }, callback)` when a sequential suite must sit under a concurrent suite.
 - Never use deprecated `describe.sequential(...)`.
@@ -53,6 +58,9 @@ Fixture ownership:
 
 Current helpers in each app's `test/utilities.ts`:
 
+- `buildQueryPath(path, query)` encodes scalar and repeated query parameters.
 - `generateUniqueName(prefix)` returns `${prefix}_${Date.now()}_${random}`.
-- `setTestingCookies()` returns shared seeded-role cookies in its documented tuple order.
+- `getTestingRequest()` and `postTestingRequest()` send requests with the configured frontend origin and optional authentication data.
 - `interceptPasswordResetToken(userId)` reads KV first, then the Postgres verification table.
+- `setTestingCookies()` returns shared seeded-role cookies in its documented tuple order.
+- `unpackError(responseData)` extracts the first validation issue or falls back to the API error message.

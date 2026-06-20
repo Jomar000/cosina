@@ -10,7 +10,7 @@
 - **Runtime Environment:**
     - **Production:** Cloudflare Workers (Edge).
     - **Development/Scripting:** Node.js (>=24.16.0).
-    - **Constraint:** Code imported into Cloudflare Worker bundles must be runtime-agnostic and must not use Node-specific APIs such as `fs` or `process.env`. Node-only development and migration entrypoints, such as the database bootstrap script, may use Node APIs when they are not exported into Worker runtime code.
+    - **Constraint:** Code imported into Cloudflare Worker bundles must be runtime-agnostic and must not use Node-specific APIs such as `fs` or `process.env`. Node-only development and test modules, such as the database bootstrap and utilities, may use Node APIs while excluded from the Worker-facing build and package exports.
 
 ### Template Tokens
 
@@ -44,18 +44,19 @@
 
 ## 4. Development Workflow
 
-- **Package Management:** pnpm (>=11.7.0) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
+- **Package Management:** pnpm (>=11.8.0) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
 - **Template Merges:** When merging this global template into downstream forks, follow `MERGING.md` before applying domain-specific skills.
 - **Running Apps:** Use `pnpm --filter=<package-name>` to target individual workspaces:
     ```bash
     pnpm --filter=@PROJECT_NAME/api-public dev     # Hono on :8081 (wrangler dev)
     pnpm --filter=@PROJECT_NAME/web-public dev     # SvelteKit on :5174 (vite dev)
     pnpm --filter=@PROJECT_NAME/database migrate:dev  # Run DB migrations (dev)
+    pnpm --filter=@PROJECT_NAME/api-public test    # Concurrent/sequential projects run in parallel on isolated databases
     ```
 - **Environment Variables:**
     - `apps/api-{public,backoffice}/wrangler.toml` -- non-secret vars and Cloudflare bindings. BFF deployments default to `zone_name` subdirectory routes; commented `custom_domain` routes are the alternative. Object storage uses `aws4fetch`-signed S3-compatible R2 requests, not direct R2 bindings.
     - `apps/api-{public,backoffice}/.dev.vars` -- secrets (not committed). Copy the matching `.dev.vars.example`, which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
-    - `packages/database/.env` / `.env.test` -- Postgres connection strings for local dev and test migrations.
+    - `packages/database/.env` / `.env.test` -- Node-only inputs for development/test bootstrap and migrations, never Worker runtime configuration. Vitest derives a randomly suffixed URL from `.env.test`, injects that generated URL into local Hyperdrive, and drops the database during teardown; development runtime uses Wrangler's `localConnectionString`.
 
 ## 5. Deployment & CI/CD
 
@@ -71,7 +72,7 @@ Project skills live in `.agents/skills/` for Codex/Gemini and `.claude/skills/` 
 
 - `svelte-patterns` -- Working on frontend Svelte/SvelteKit code or UI components
 - `hono-patterns` -- Implementing or modifying Hono API routes, middleware, or error handling
-- `database-validator-patterns` -- Modifying DB schema, writing Drizzle queries, or adding/updating Zod validators
+- `database-validator-patterns` -- Modifying DB schema, Drizzle queries, database bootstrap/migrations, test database lifecycles, or Zod validators
 - `auth-implementation` -- Implementing auth logic or fixing auth bugs
 - `cloudflare-worker-testing` -- Debugging or writing vitest tests targeting Cloudflare Workers
 - `monorepo-troubleshooting` -- Fixing build errors, setting up new packages, or understanding the build graph
