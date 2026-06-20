@@ -1,13 +1,19 @@
 /* istanbul ignore file -- @preserve */
 
-import { randomUUID } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { parseEnv } from 'node:util'
 
-import { dropDatabase, recreateDatabase } from './utilities.js'
+import {
+    cleanupTestDatabases,
+    createTestDatabaseName,
+    databaseNameFrom,
+    dropDatabase,
+    recreateDatabase,
+} from './utilities.js'
 
 const envPath = fileURLToPath(new URL('../../.env.test', import.meta.url))
+const baseConnectionStringKey = 'HYPERION_TEST_DATABASE_BASE_URL'
 const setupStateKey = 'HYPERION_TEST_DATABASE_SETUP'
 
 const connectionStringFromEnv = () => {
@@ -23,22 +29,17 @@ const connectionStringFromEnv = () => {
 }
 
 export const prepareTestDatabaseEnvironment = (hyperdriveBinding: string) => {
-    const connectionUrl = new URL(connectionStringFromEnv())
-    const baseName = decodeURIComponent(
-        connectionUrl.pathname.replace(/^\/+/, ''),
+    const baseConnectionString = connectionStringFromEnv()
+    const connectionUrl = new URL(baseConnectionString)
+    const databaseName = createTestDatabaseName(
+        databaseNameFrom(baseConnectionString),
     )
-    const databaseName = `${baseName}_${randomUUID().replaceAll('-', '')}`
-
-    if (databaseName.length > 63) {
-        throw new Error(
-            `Generated test database name exceeds PostgreSQL's 63-character limit: ${databaseName}`,
-        )
-    }
 
     connectionUrl.pathname = `/${databaseName}`
 
     const connectionString = connectionUrl.toString()
 
+    process.env[baseConnectionStringKey] = baseConnectionString
     process.env.DATABASE_URL = connectionString
     process.env[
         `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_${hyperdriveBinding}`
@@ -46,14 +47,39 @@ export const prepareTestDatabaseEnvironment = (hyperdriveBinding: string) => {
 }
 
 export default async function manageTestDatabaseLifecycle() {
+    const baseConnectionString = process.env[baseConnectionStringKey]
     const connectionString = process.env.DATABASE_URL
 
-    if (!connectionString) {
-        throw new Error('Test DATABASE_URL was not configured by Vitest')
+    if (!baseConnectionString || !connectionString) {
+        throw new Error(
+            'Test database environment was not configured by Vitest',
+        )
     }
 
     if (process.env[setupStateKey] === connectionString) {
         return
+    }
+
+    try {
+        const cleanupResult = await cleanupTestDatabases(baseConnectionString)
+
+        if (cleanupResult.droppedCount > 0) {
+            console.log(
+                `bootstrap: Dropped ${cleanupResult.droppedCount} stale test database(s).`,
+            )
+        }
+
+        for (const failure of cleanupResult.failures) {
+            console.error(
+                `bootstrap: Failed to drop stale test database "${failure.databaseName}".`,
+                failure.error,
+            )
+        }
+    } catch (error) {
+        console.error(
+            'bootstrap: Stale test database discovery failed; continuing with test setup.',
+            error,
+        )
     }
 
     try {
@@ -86,6 +112,7 @@ export default async function manageTestDatabaseLifecycle() {
 if (import.meta.main) {
     const connectionString = process.env.DATABASE_URL ?? ''
     const environment = process.env.NODE_ENV ?? ''
+    const cleanupStaleTests = process.argv.includes('--cleanup-stale-tests')
 
     // This bootstrapper is purely for DEV & TEST environments
     // Use the drizzle-kit CLI for processing STAGING & PRODUCTION environments
@@ -100,7 +127,22 @@ if (import.meta.main) {
         )
     }
 
-    await recreateDatabase(connectionString)
+    if (cleanupStaleTests) {
+        const cleanupResult = await cleanupTestDatabases(connectionString)
 
-    console.log('bootstrap: OPERATION COMPLETED. 🚀')
+        console.log(
+            `bootstrap: Dropped ${cleanupResult.droppedCount} test database(s).`,
+        )
+
+        if (cleanupResult.failures.length > 0) {
+            throw new AggregateError(
+                cleanupResult.failures.map(({ error }) => error),
+                `Failed to drop ${cleanupResult.failures.length} test database(s)`,
+            )
+        }
+    } else {
+        await recreateDatabase(connectionString)
+
+        console.log('bootstrap: OPERATION COMPLETED. 🚀')
+    }
 }

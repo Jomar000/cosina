@@ -51,12 +51,13 @@
     pnpm --filter=@PROJECT_NAME/api-public dev     # Hono on :8081 (wrangler dev)
     pnpm --filter=@PROJECT_NAME/web-public dev     # SvelteKit on :5174 (vite dev)
     pnpm --filter=@PROJECT_NAME/database migrate:dev  # Run DB migrations (dev)
+    pnpm --filter=@PROJECT_NAME/database cleanup:test # Drop test databases older than 24 hours
     pnpm --filter=@PROJECT_NAME/api-public test    # Concurrent/sequential projects run in parallel on isolated databases
     ```
 - **Environment Variables:**
     - `apps/api-{public,backoffice}/wrangler.toml` -- non-secret vars and Cloudflare bindings. BFF deployments default to `zone_name` subdirectory routes; commented `custom_domain` routes are the alternative. Object storage uses `aws4fetch`-signed S3-compatible R2 requests, not direct R2 bindings.
     - `apps/api-{public,backoffice}/.dev.vars` -- secrets (not committed). Copy the matching `.dev.vars.example`, which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
-    - `packages/database/.env` / `.env.test` -- Node-only inputs for development/test bootstrap and migrations, never Worker runtime configuration. Vitest derives a randomly suffixed URL from `.env.test`, injects that generated URL into local Hyperdrive, and drops the database during teardown; development runtime uses Wrangler's `localConnectionString`.
+    - `packages/database/.env` / `.env.test` -- Node-only inputs for development/test bootstrap and migrations, never Worker runtime configuration. Vitest derives a UUIDv7-suffixed URL from `.env.test`, injects that generated URL into local Hyperdrive, drops the database during teardown, and removes matching orphaned databases after 24 hours on later test starts. Use `cleanup:test` for manual stale cleanup; development runtime uses Wrangler's `localConnectionString`.
 
 ## 5. Deployment & CI/CD
 

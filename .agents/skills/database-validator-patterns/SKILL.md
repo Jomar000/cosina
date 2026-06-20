@@ -17,14 +17,15 @@ description: Project rules for Drizzle schemas and queries, PostgreSQL constrain
 
 - Use `packages/database/.env` and `.env.test` only as Node-side bootstrap/migration inputs; Worker runtime code must never load either file. Vitest reads `.env.test` in Node configuration to derive an ephemeral database URL, and the Worker receives only that generated URL through Hyperdrive.
 - Keep `packages/database/src/postgres/bootstrap.ts` and `utilities.ts` Node-only, excluded from the Worker-facing database build and package exports. Put orchestration in `bootstrap.ts` and reusable recreate/drop operations in `utilities.ts`.
-- Keep direct `migrate:dev` and `migrate:test` execution behind the `import.meta.main` path in `bootstrap.ts`; staging and production continue to use Drizzle Kit.
+- Keep direct `migrate:dev`, `migrate:test`, and test cleanup execution behind the `import.meta.main` path in `bootstrap.ts`; staging and production continue to use Drizzle Kit.
 
 For each API Vitest command:
 
-1. Call `prepareTestDatabaseEnvironment()` with the app's Hyperdrive binding before creating the Cloudflare test plugin. It derives a randomly suffixed URL from `.env.test` and sets `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_<BINDING>`.
+1. Call `prepareTestDatabaseEnvironment()` with the app's Hyperdrive binding before creating the Cloudflare test plugin. It derives a UUIDv7-suffixed URL from `.env.test` and sets `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_<BINDING>`.
 2. Register `bootstrap.ts` as `globalSetup`; its default `manageTestDatabaseLifecycle()` export owns provisioning and teardown.
 3. Preserve the process-scoped lifecycle guard because Vitest may initialize the inherited global setup more than once.
 4. Recreate the generated database, apply default and test migrations, and force-drop it after setup failure or Vitest teardown. Do not use `beforeExit` for cleanup because it may run while Worker tests are still active; forced termination can leave an orphaned database.
+5. Before provisioning, best-effort cleanup drops only exact UUIDv7 test database names older than 24 hours. Use `cleanup:test` for manual stale cleanup.
 
 Do not duplicate the test URL in Wrangler `localConnectionString` or prepend API test scripts with `migrate:test`.
 

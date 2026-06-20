@@ -22,8 +22,8 @@
         "secret:prod": "wrangler secret bulk .dev.vars.production --env=production --config=wrangler-production.toml",
         "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging --config=wrangler-staging.toml",
         "test": "pnpm run --no-bail \"/^test:(con|seq)$/\"",
-        "test:con": "vitest run --no-color --silent=passed-only --project=concurrent-test-files > test-con.out 2>&1",
-        "test:seq": "vitest run --no-color --silent=passed-only --project=sequential-test-files > test-seq.out 2>&1",
+        "test:con": "vitest run --no-color --silent=passed-only --project=concurrent-test-files",
+        "test:seq": "vitest run --no-color --silent=passed-only --project=sequential-test-files",
         "test:ui": "echo Use `test:ui:con` or `test:ui:seq` instead",
         "test:ui:con": "vitest watch --ui --api.port=51206 --api.strictPort --project=concurrent-test-files",
         "test:ui:seq": "vitest watch --ui --api.port=51207 --api.strictPort --project=sequential-test-files"
