@@ -13,6 +13,7 @@
     "scripts": {
         "dev": "pnpm run --recursive --parallel --if-present dev",
         "build": "pnpm run --recursive --stream --if-present build",
+        "build:force": "pnpm run --recursive --stream --if-present build:force",
         "format": "pnpm run --recursive --stream --if-present format",
         "lint": "pnpm run --recursive --stream --if-present lint",
         "prepare": "pnpm exec husky",
