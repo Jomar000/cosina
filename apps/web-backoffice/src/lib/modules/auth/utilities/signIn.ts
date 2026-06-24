@@ -59,10 +59,6 @@ export async function signInWithCaptcha({
         if (!session.set(responseJson.data)) {
             throw new Error('Invalid session data.')
         }
-
-        return session.data.userRoles.length === 1
-            ? `/app/${session.data.userRoles[0]}/dashboard`
-            : '/app'
     } catch (err) {
         showSignInErrorToast({
             errorCopyLabel,

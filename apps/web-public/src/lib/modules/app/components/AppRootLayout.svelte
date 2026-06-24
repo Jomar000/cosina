@@ -8,8 +8,8 @@
     import { ModeWatcher } from 'mode-watcher'
 
     import { heartbeatClient } from '$lib/clients'
-    import LoadingScreen from '$lib/components/loader/LoadingScreen.svelte'
     import { SessionProvider } from '$lib/states/session'
+    import NavigationGate from './NavigationGate.svelte'
 
     ////////////////////
     // 01. Properties //
@@ -40,11 +40,16 @@
             queryKey: [
                 'heartbeat',
             ],
+            gcTime: Infinity,
             queryFn: async () => {
                 const response = await heartbeatClient.index.$get()
                 if (!response.ok) throw new Error('API unavailable.')
                 return response
             },
+            refetchOnMount: false,
+            refetchOnReconnect: false,
+            refetchOnWindowFocus: false,
+            staleTime: Infinity,
         }),
         () => queryClient,
     )
@@ -53,20 +58,19 @@
 <ModeWatcher defaultMode="dark" />
 
 <div class="size-full bg-muted">
-    {#if heartbeatQuery.isFetching}
-        <LoadingScreen />
-    {:else if heartbeatQuery.isSuccess}
-        <QueryClientProvider client={queryClient}>
-            <SessionProvider>
+    <QueryClientProvider client={queryClient}>
+        <SessionProvider>
+            <NavigationGate
+                heartbeatFailed={heartbeatQuery.isError}
+                heartbeatReady={heartbeatQuery.isSuccess}
+            >
                 <Sonner
                     closeButton={true}
                     duration={30000}
                     position="top-center"
                 />
                 {@render children()}
-            </SessionProvider>
-        </QueryClientProvider>
-    {:else}
-        UNAVAILABLE
-    {/if}
+            </NavigationGate>
+        </SessionProvider>
+    </QueryClientProvider>
 </div>

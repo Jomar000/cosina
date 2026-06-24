@@ -21,7 +21,6 @@
     import { toast } from 'svelte-sonner'
     import type { HTMLAttributes } from 'svelte/elements'
 
-    import { goto } from '$app/navigation'
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
     import type { SessionState } from '$lib/states/session'
     import { signInWithCaptcha, type SignInPayload } from '../utilities/signIn'
@@ -115,10 +114,7 @@
         isSubmitting = true
         try {
             toast.dismiss()
-            const redirect = await authSignInMutation.mutateAsync(value)
-            if (redirect) {
-                goto(redirect)
-            }
+            await authSignInMutation.mutateAsync(value)
         } finally {
             isSubmitting = false
         }

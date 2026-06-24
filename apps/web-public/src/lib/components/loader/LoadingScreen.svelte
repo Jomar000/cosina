@@ -1,4 +1,8 @@
-<div class="flex h-screen w-full items-center justify-center">
+<div
+    aria-label="Loading"
+    class="fixed inset-0 z-50 flex min-h-svh w-full items-center justify-center bg-muted"
+    role="status"
+>
     <div class="loader">
         <div class="circle circle-1"></div>
         <div class="circle circle-2"></div>

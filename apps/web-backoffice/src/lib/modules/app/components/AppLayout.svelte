@@ -1,8 +1,7 @@
 <script lang="ts">
     import { useQueryClient } from '@tanstack/svelte-query'
-    import { onMount, setContext, tick } from 'svelte'
+    import { onMount, setContext, untrack } from 'svelte'
 
-    import { goto } from '$app/navigation'
     import { authClient } from '$lib/clients'
     import { useSessionContext } from '$lib/states/session'
 
@@ -19,8 +18,6 @@
     const session = useSessionContext()
 
     const queryClient = useQueryClient()
-
-    let render = $state(false)
 
     let isClearingSession = false
 
@@ -42,26 +39,29 @@
     // 09. Handlers //
     //////////////////
 
-    async function clearSessionDataAndRedirect({
+    async function clearSessionData({
         revokeServerSession = false,
     }: { revokeServerSession?: boolean } = {}) {
         if (isClearingSession) return
 
         isClearingSession = true
         clearSessionExpiryTimeout()
-        render = false
-        await tick()
+        session.clear()
 
-        await queryClient.cancelQueries()
+        await queryClient.cancelQueries({
+            predicate: (query) => query.queryKey[0] !== 'heartbeat',
+        })
 
         try {
             if (revokeServerSession) {
                 await authClient.signOut.$post()
             }
         } finally {
-            queryClient.clear()
-            session.clear()
-            await goto('/sign-in')
+            queryClient.removeQueries({
+                predicate: (query) => query.queryKey[0] !== 'heartbeat',
+            })
+            queryClient.getMutationCache().clear()
+            isClearingSession = false
         }
     }
 
@@ -77,11 +77,8 @@
     }
 
     function initializeSession() {
-        if (session.isValid()) {
-            render = true
+        if (untrack(() => session.isValid())) {
             scheduleSessionExpiryClear()
-        } else {
-            void clearSessionDataAndRedirect()
         }
     }
 
@@ -91,20 +88,18 @@
         const delay = session.getMillisecondsUntilExpiry()
 
         if (delay <= 0) {
-            void clearSessionDataAndRedirect()
+            void clearSessionData()
             return
         }
 
         sessionExpiryTimeout = setTimeout(() => {
-            void clearSessionDataAndRedirect()
+            void clearSessionData()
         }, delay)
     }
 
     async function signOut() {
-        await clearSessionDataAndRedirect({ revokeServerSession: true })
+        await clearSessionData({ revokeServerSession: true })
     }
 </script>
 
-{#if render}
-    {@render children()}
-{/if}
+{@render children()}

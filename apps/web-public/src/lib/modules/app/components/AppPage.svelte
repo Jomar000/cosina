@@ -4,7 +4,6 @@
     import * as Select from '@hyperion/ui/components/select'
     import GalleryVerticalEndIcon from '@lucide/svelte/icons/gallery-vertical-end'
     import UserStarIcon from '@lucide/svelte/icons/user-star'
-    import { onMount } from 'svelte'
 
     import { goto } from '$app/navigation'
     import { useSessionContext } from '$lib/states/session'
@@ -15,21 +14,7 @@
 
     const session = useSessionContext()
 
-    let render = $state(false)
-
     let selectedRole = $state('')
-
-    /////////////////
-    // 08. Effects //
-    /////////////////
-
-    onMount(() => {
-        if (session.data.userRoles.length > 1) {
-            render = true
-        } else {
-            goto(`/app/${session.data.userRoles[0]}/dashboard`)
-        }
-    })
 
     //////////////////
     // 09. Handlers //
@@ -40,70 +25,68 @@
     }
 </script>
 
-{#if render}
-    <div
-        class="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10"
-    >
-        <div class="flex w-full max-w-sm flex-col gap-6">
-            <a
-                href="##"
-                class="flex items-center gap-2 self-center font-medium"
+<div
+    class="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10"
+>
+    <div class="flex w-full max-w-sm flex-col gap-6">
+        <a
+            href="##"
+            class="flex items-center gap-2 self-center font-medium"
+        >
+            <div
+                class="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground"
             >
-                <div
-                    class="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground"
-                >
-                    <GalleryVerticalEndIcon class="size-4" />
+                <GalleryVerticalEndIcon class="size-4" />
+            </div>
+            Acme Inc.
+        </a>
+        <Card.Root class="w-full max-w-sm">
+            <Card.Header class="m-auto w-full">
+                <div class="flex items-center justify-center">
+                    <UserStarIcon size={56} />
                 </div>
-                Acme Inc.
-            </a>
-            <Card.Root class="w-full max-w-sm">
-                <Card.Header class="m-auto w-full">
-                    <div class="flex items-center justify-center">
-                        <UserStarIcon size={56} />
-                    </div>
-                    <Card.Title class="text-center text-xl"
-                        >Role Selection</Card.Title
-                    >
-                </Card.Header>
-                <Card.Content>
-                    <form>
-                        <div class="flex flex-col gap-6">
-                            <div class="grid gap-2">
-                                <Select.Root
-                                    bind:value={selectedRole}
+                <Card.Title class="text-center text-xl"
+                    >Role Selection</Card.Title
+                >
+            </Card.Header>
+            <Card.Content>
+                <form>
+                    <div class="flex flex-col gap-6">
+                        <div class="grid gap-2">
+                            <Select.Root
+                                bind:value={selectedRole}
+                                name="role"
+                                required
+                                type="single"
+                            >
+                                <Select.Trigger
+                                    class="w-full"
+                                    id="role"
                                     name="role"
-                                    required
-                                    type="single"
                                 >
-                                    <Select.Trigger
-                                        class="w-full"
-                                        id="role"
-                                        name="role"
-                                    >
-                                        {selectedRole.toUpperCase() ||
-                                            '--- SELECT ---'}
-                                    </Select.Trigger>
-                                    <Select.Content>
-                                        {#each session.data.userRoles as role (role)}
-                                            <Select.Item value={role}
-                                                >{role.toUpperCase()}</Select.Item
-                                            >
-                                        {/each}
-                                    </Select.Content>
-                                </Select.Root>
-                            </div>
+                                    {selectedRole.toUpperCase() ||
+                                        '--- SELECT ---'}
+                                </Select.Trigger>
+                                <Select.Content>
+                                    {#each session.data.userRoles as role (role)}
+                                        <Select.Item value={role}
+                                            >{role.toUpperCase()}</Select.Item
+                                        >
+                                    {/each}
+                                </Select.Content>
+                            </Select.Root>
                         </div>
-                    </form>
-                </Card.Content>
-                <Card.Footer class="flex-col">
-                    <Button
-                        class="w-full"
-                        disabled={selectedRole === ''}
-                        onclick={handleProceedToDashboard}
-                        type="submit">Proceed to Dashboard</Button
-                    >
-                </Card.Footer>
-            </Card.Root>
-        </div>
+                    </div>
+                </form>
+            </Card.Content>
+            <Card.Footer class="flex-col">
+                <Button
+                    class="w-full"
+                    disabled={selectedRole === ''}
+                    onclick={handleProceedToDashboard}
+                    type="submit">Proceed to Dashboard</Button
+                >
+            </Card.Footer>
+        </Card.Root>
     </div>
-{/if}
+</div>
