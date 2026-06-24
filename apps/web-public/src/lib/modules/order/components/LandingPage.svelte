@@ -219,6 +219,349 @@
     }
 </script>
 
+<!-- ===== FOOD DECORATION SNIPPETS ===== -->
+<!-- UI note: parent opacity 0.20–0.22, SVG fill-opacity 0.55 → ~12 % actual fill + ~21 % stroke on dark bg -->
+
+{#snippet ingGarlic(size: number, cls: string)}
+    <div
+        class="pointer-events-none {cls}"
+        aria-hidden="true"
+    >
+        <!-- Garlic head — 3 distinct cloves, papery base, root hairs, tiny sprout -->
+        <svg
+            width={size}
+            height={size}
+            viewBox="-38 -62 76 108"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path
+                d="M-18,-30 C-30,-30 -36,-20 -36,-10 C-36,0 -28,8 -18,10 C-10,8 -6,2 -6,-8 C-6,-20 -12,-30 -18,-30Z"
+                fill="currentColor"
+                fill-opacity="0.55"
+                stroke-width="2"
+            />
+            <path
+                d="M0,-46 C-12,-46 -18,-34 -18,-22 C-18,-10 -10,2 0,6 C10,2 18,-10 18,-22 C18,-34 12,-46 0,-46Z"
+                fill="currentColor"
+                fill-opacity="0.55"
+                stroke-width="2.2"
+            />
+            <path
+                d="M18,-30 C30,-30 36,-20 36,-10 C36,0 28,8 18,10 C10,8 6,2 6,-8 C6,-20 12,-30 18,-30Z"
+                fill="currentColor"
+                fill-opacity="0.55"
+                stroke-width="2"
+            />
+            <path
+                d="M-32,16 C-24,34 -12,40 0,40 C12,40 24,34 32,16"
+                fill="currentColor"
+                fill-opacity="0.30"
+                stroke-width="1.8"
+            />
+            <ellipse
+                cx="0"
+                cy="38"
+                rx="16"
+                ry="5"
+                stroke-width="1.4"
+            />
+            <path
+                d="M-12,42 L-14,50 M-6,43 L-6,52 M0,43 L0,52 M6,43 L6,52 M12,42 L14,50"
+                stroke-width="1.1"
+            />
+            <path
+                d="M0,-46 C-2,-52 -2,-58 0,-60 C2,-58 2,-52 0,-46"
+                fill="currentColor"
+                fill-opacity="0.55"
+                stroke-width="1.4"
+            />
+        </svg>
+    </div>
+{/snippet}
+
+{#snippet ingBread(size: number, cls: string)}
+    <div
+        class="pointer-events-none {cls}"
+        aria-hidden="true"
+    >
+        <!-- Bread loaf — domed top, baker's scoring slashes, crust base -->
+        <svg
+            width={size}
+            height={size}
+            viewBox="-46 -38 92 80"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <!-- Loaf dome -->
+            <path
+                d="M-44,22 C-44,6 -36,-34 0,-34 C36,-34 44,6 44,22Z"
+                fill="currentColor"
+                fill-opacity="0.55"
+                stroke-width="2.5"
+            />
+            <!-- Baker's scoring slash (top) -->
+            <path
+                d="M-24,-20 C-8,-34 8,-34 24,-20"
+                stroke-width="2"
+            />
+            <!-- Second score indent -->
+            <path
+                d="M-10,-28 C0,-36 10,-28"
+                stroke-width="1.6"
+            />
+            <!-- Horizontal base line -->
+            <line
+                x1="-44"
+                y1="22"
+                x2="44"
+                y2="22"
+                stroke-width="2"
+            />
+            <!-- Bottom crust -->
+            <path
+                d="M-44,22 C-44,36 -24,38 0,38 C24,38 44,36 44,22"
+                fill="currentColor"
+                fill-opacity="0.35"
+                stroke-width="1.8"
+            />
+        </svg>
+    </div>
+{/snippet}
+
+{#snippet ingOnion(size: number, cls: string)}
+    <div
+        class="pointer-events-none {cls}"
+        aria-hidden="true"
+    >
+        <!-- Bulb onion — round body, concentric layer arcs, neck, green shoots, root hairs -->
+        <svg
+            width={size}
+            height={size}
+            viewBox="-34 -62 68 108"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <!-- Main bulb -->
+            <path
+                d="M0,-30 C-24,-30 -32,-16 -32,6 C-32,26 -18,42 0,42 C18,42 32,26 32,6 C32,-16 24,-30 0,-30Z"
+                fill="currentColor"
+                fill-opacity="0.55"
+                stroke-width="2.5"
+            />
+            <!-- Upper layer arc -->
+            <path
+                d="M-22,-14 C-16,-24 -8,-28 0,-28 C8,-28 16,-24 22,-14"
+                stroke-width="1.3"
+            />
+            <!-- Lower layer arc -->
+            <path
+                d="M-26,12 C-20,26 -10,36 0,40 C10,36 20,26 26,12"
+                stroke-width="1.1"
+            />
+            <!-- Neck -->
+            <path
+                d="M-10,-30 C-8,-38 -4,-42 0,-44 C4,-42 8,-38 10,-30"
+                fill="currentColor"
+                fill-opacity="0.55"
+                stroke-width="2"
+            />
+            <!-- Green shoots -->
+            <path
+                d="M-4,-44 C-8,-50 -4,-58 0,-56"
+                stroke-width="2.2"
+            />
+            <path
+                d="M4,-44 C8,-50 4,-58 0,-56"
+                stroke-width="2.2"
+            />
+            <!-- Root hairs -->
+            <path
+                d="M-12,42 L-14,50 M-6,43 L-6,52 M0,42 L0,52 M6,43 L6,52 M12,42 L14,50"
+                stroke-width="1.2"
+            />
+        </svg>
+    </div>
+{/snippet}
+
+{#snippet ingNoodleCup(size: number, cls: string)}
+    <div
+        class="pointer-events-none {cls}"
+        aria-hidden="true"
+    >
+        <!-- Instant noodle cup — trapezoidal cup, oval rim, noodle wisps, steam wisps -->
+        <svg
+            width={size}
+            height={size}
+            viewBox="-40 -58 80 110"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <!-- Cup body (wider top → narrower bottom) -->
+            <path
+                d="M-38,-12 L-28,46 L28,46 L38,-12Z"
+                fill="currentColor"
+                fill-opacity="0.55"
+                stroke-width="2.5"
+            />
+            <!-- Lid / rim ellipse -->
+            <ellipse
+                cx="0"
+                cy="-12"
+                rx="38"
+                ry="10"
+                fill="currentColor"
+                fill-opacity="0.45"
+                stroke-width="2.5"
+            />
+            <!-- Noodle wisps peeking out from lid -->
+            <path
+                d="M-28,-14 C-16,-28 -4,-12 8,-24 C18,-34 26,-20 28,-12"
+                stroke-width="2.2"
+            />
+            <path
+                d="M-22,-8 C-10,-22 2,-6 14,-18 C22,-28 28,-14 24,-8"
+                stroke-width="2"
+            />
+            <!-- Steam wisps -->
+            <path
+                d="M-12,-28 C-14,-38 -10,-44 -12,-54"
+                stroke-width="1.8"
+            />
+            <path
+                d="M0,-30 C2,-40 -2,-46 0,-56"
+                stroke-width="1.8"
+            />
+            <path
+                d="M12,-28 C14,-38 10,-44 12,-54"
+                stroke-width="1.8"
+            />
+            <!-- Decorative label band -->
+            <path
+                d="M-35,6 L-31,28 L31,28 L35,6Z"
+                fill="currentColor"
+                fill-opacity="0.20"
+                stroke-width="0.8"
+                stroke-opacity="0.5"
+            />
+        </svg>
+    </div>
+{/snippet}
+
+{#snippet ingNoodles(size: number, cls: string)}
+    <div
+        class="pointer-events-none {cls}"
+        aria-hidden="true"
+    >
+        <!-- Noodle strands — 5 parallel wavy lines (sine-wave pattern) -->
+        <svg
+            width={size}
+            height={size}
+            viewBox="-50 -30 100 60"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+        >
+            <path
+                d="M-50,-20 C-38,-29 -26,-11 -14,-20 C-2,-29 10,-11 22,-20 C34,-29 46,-11 50,-20"
+                stroke-width="3"
+            />
+            <path
+                d="M-50,-10 C-38,-19 -26,-1 -14,-10 C-2,-19 10,-1 22,-10 C34,-19 46,-1 50,-10"
+                stroke-width="3"
+            />
+            <path
+                d="M-50,0 C-38,-9 -26,9 -14,0 C-2,-9 10,9 22,0 C34,-9 46,9 50,0"
+                stroke-width="3"
+            />
+            <path
+                d="M-50,10 C-38,1 -26,19 -14,10 C-2,1 10,19 22,10 C34,1 46,19 50,10"
+                stroke-width="3"
+            />
+            <path
+                d="M-50,20 C-38,11 -26,29 -14,20 C-2,11 10,29 22,20 C34,11 46,29 50,20"
+                stroke-width="3"
+            />
+        </svg>
+    </div>
+{/snippet}
+
+{#snippet ingChopsticks(size: number, cls: string)}
+    <div
+        class="pointer-events-none {cls}"
+        aria-hidden="true"
+    >
+        <!-- Chopsticks — two tapered sticks with lacquer grip bands near the top -->
+        <svg
+            width={size}
+            height={size}
+            viewBox="-26 -56 52 112"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+        >
+            <!-- Left chopstick (converges inward toward the tip) -->
+            <line
+                x1="-14"
+                y1="-54"
+                x2="-10"
+                y2="54"
+                stroke-width="4"
+            />
+            <!-- Right chopstick -->
+            <line
+                x1="14"
+                y1="-54"
+                x2="10"
+                y2="54"
+                stroke-width="4"
+            />
+            <!-- Grip decoration bands — left stick -->
+            <line
+                x1="-14"
+                y1="-40"
+                x2="-13"
+                y2="-30"
+                stroke-width="2"
+                stroke-opacity="0.55"
+            />
+            <line
+                x1="-14"
+                y1="-26"
+                x2="-13"
+                y2="-16"
+                stroke-width="2"
+                stroke-opacity="0.55"
+            />
+            <!-- Grip decoration bands — right stick -->
+            <line
+                x1="14"
+                y1="-40"
+                x2="13"
+                y2="-30"
+                stroke-width="2"
+                stroke-opacity="0.55"
+            />
+            <line
+                x1="14"
+                y1="-26"
+                x2="13"
+                y2="-16"
+                stroke-width="2"
+                stroke-opacity="0.55"
+            />
+        </svg>
+    </div>
+{/snippet}
+
 <!-- ===== NAVBAR ===== -->
 <header
     class="fixed top-0 z-50 w-full border-b border-white/5 bg-zinc-950/80 backdrop-blur-md"
@@ -334,6 +677,19 @@
 <div class="bg-zinc-950 text-zinc-100">
     <!-- ===== HERO ===== -->
     <section class="relative min-h-dvh overflow-hidden pb-16 pt-20">
+        <!-- Ingredient decorations -->
+        {@render ingBread(
+            140,
+            'absolute -top-10 -left-12 -rotate-[15deg] text-amber-200 opacity-[0.09]',
+        )}
+        {@render ingGarlic(
+            170,
+            'absolute -bottom-10 -right-14 rotate-[20deg] text-amber-200 opacity-[0.10]',
+        )}
+        {@render ingChopsticks(
+            96,
+            'absolute top-1/3 -right-2 rotate-[6deg] text-amber-200 opacity-[0.08]',
+        )}
         <!-- Ambient glow -->
         <div
             class="pointer-events-none absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-indigo-600/10 blur-3xl"
@@ -448,7 +804,19 @@
     </section>
 
     <!-- ===== WHAT WE OFFER ===== -->
-    <section class="py-24">
+    <section class="relative overflow-hidden py-24">
+        {@render ingNoodleCup(
+            180,
+            'absolute -top-12 -right-12 text-amber-200 opacity-[0.09]',
+        )}
+        {@render ingNoodles(
+            100,
+            'absolute -bottom-2 -left-4 rotate-[35deg] text-amber-200 opacity-[0.10]',
+        )}
+        {@render ingNoodles(
+            84,
+            'absolute bottom-6 left-16 rotate-[55deg] text-amber-200 opacity-[0.08]',
+        )}
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
             <div class="mb-14 text-center">
                 <p
@@ -545,7 +913,15 @@
     </section>
 
     <!-- ===== OUR STORY ===== -->
-    <section class="py-24">
+    <section class="relative overflow-hidden py-24">
+        {@render ingOnion(
+            176,
+            'absolute -bottom-12 -left-12 text-amber-200 opacity-[0.09]',
+        )}
+        {@render ingBread(
+            108,
+            'absolute top-6 -right-6 rotate-[40deg] text-amber-200 opacity-[0.10]',
+        )}
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
             <div
                 class="story-content flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16"
@@ -623,7 +999,15 @@
     </section>
 
     <!-- ===== HOW IT WORKS ===== -->
-    <section class="bg-zinc-900/30 py-24">
+    <section class="relative overflow-hidden bg-zinc-900/30 py-24">
+        {@render ingGarlic(
+            148,
+            'absolute top-4 -left-10 -rotate-[10deg] text-amber-200 opacity-[0.09]',
+        )}
+        {@render ingChopsticks(
+            160,
+            'absolute -bottom-12 -right-8 rotate-[25deg] text-amber-200 opacity-[0.10]',
+        )}
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
             <div
                 class="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16"
@@ -769,7 +1153,27 @@
     </section>
 
     <!-- ===== WHY CHOOSE US ===== -->
-    <section class="py-24">
+    <section class="relative overflow-hidden py-24">
+        {@render ingNoodleCup(
+            220,
+            'absolute top-1/2 -right-4 -translate-y-1/2 text-amber-200 opacity-[0.07]',
+        )}
+        {@render ingNoodles(
+            88,
+            'absolute top-8 -left-6 rotate-[15deg] text-amber-200 opacity-[0.09]',
+        )}
+        {@render ingNoodles(
+            80,
+            'absolute bottom-10 left-[48%] rotate-[20deg] text-amber-200 opacity-[0.08]',
+        )}
+        {@render ingNoodles(
+            80,
+            'absolute bottom-6 left-[55%] -rotate-[12deg] text-amber-200 opacity-[0.07]',
+        )}
+        {@render ingNoodles(
+            80,
+            'absolute bottom-14 left-[41%] rotate-[38deg] text-amber-200 opacity-[0.08]',
+        )}
         <div class="mx-auto max-w-5xl px-4 sm:px-6">
             <div class="mb-14 text-center">
                 <p
@@ -865,6 +1269,27 @@
             <div
                 class="relative overflow-hidden rounded-3xl border border-blue-500/20 bg-linear-to-br from-blue-600/15 via-indigo-600/10 to-violet-600/5 p-10 text-center sm:p-16"
             >
+                <!-- Ingredient decorations -->
+                {@render ingNoodleCup(
+                    120,
+                    'absolute -top-6 -left-6 text-blue-200 opacity-[0.12]',
+                )}
+                {@render ingNoodleCup(
+                    100,
+                    'absolute -bottom-4 -right-4 rotate-[45deg] text-blue-200 opacity-[0.10]',
+                )}
+                {@render ingNoodles(
+                    72,
+                    'absolute top-6 right-12 rotate-[20deg] text-blue-200 opacity-[0.12]',
+                )}
+                {@render ingNoodles(
+                    64,
+                    'absolute top-20 right-4 -rotate-[15deg] text-blue-200 opacity-[0.10]',
+                )}
+                {@render ingNoodles(
+                    68,
+                    'absolute bottom-8 left-8 rotate-[40deg] text-blue-200 opacity-[0.10]',
+                )}
                 <!-- Inner glow -->
                 <div
                     class="pointer-events-none absolute inset-0 flex items-center justify-center"

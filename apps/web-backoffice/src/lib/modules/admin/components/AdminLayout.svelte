@@ -3,6 +3,7 @@
     import HistoryIcon from '@lucide/svelte/icons/history'
     import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
     import PackageIcon from '@lucide/svelte/icons/package'
+    import SettingsIcon from '@lucide/svelte/icons/settings'
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart'
     import { onMount } from 'svelte'
 
@@ -42,6 +43,12 @@
             title: 'Order History',
             url: '/app/admin/orders/history',
             icon: HistoryIcon,
+        },
+        {
+            title: 'Settings',
+            url: '/app/admin/settings',
+            icon: SettingsIcon,
+            exact: true,
         },
     ]
 

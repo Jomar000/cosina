@@ -320,6 +320,25 @@ export const orderRoute = new Hono<THonoInstance>()
 const ADVANCE_DAYS_KEY = 'order:settings:advanceDays'
 const DEFAULT_ADVANCE_DAYS = 3
 const RESTAURANT_ADDRESS_KEY = 'order:settings:restaurantAddress'
+const CLOSING_DAYS_KEY = 'order:settings:closingDays'
+
+type TClosingDayItem = {
+    id: string
+    startDate: string
+    endDate: string
+    reason?: string
+}
+
+function parseClosingDays(raw: string | null | undefined): TClosingDayItem[] {
+    if (!raw) return []
+    try {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) return parsed as TClosingDayItem[]
+    } catch {
+        // ignore
+    }
+    return []
+}
 
 export const trackOrderRoute = orderRoute
     .get('/settings', async (ctx) => {
@@ -334,6 +353,7 @@ export const trackOrderRoute = orderRoute
                     inArray(keyValue.key, [
                         ADVANCE_DAYS_KEY,
                         RESTAURANT_ADDRESS_KEY,
+                        CLOSING_DAYS_KEY,
                     ]),
                 )
 
@@ -349,15 +369,17 @@ export const trackOrderRoute = orderRoute
                 : DEFAULT_ADVANCE_DAYS
 
             const restaurantAddress = byKey[RESTAURANT_ADDRESS_KEY] ?? null
+            const closingDays = parseClosingDays(byKey[CLOSING_DAYS_KEY])
 
             return apiResponseOkWrapper(ctx, {
-                data: { advanceDays, restaurantAddress },
+                data: { advanceDays, restaurantAddress, closingDays },
             })
         } catch {
             return apiResponseOkWrapper(ctx, {
                 data: {
                     advanceDays: DEFAULT_ADVANCE_DAYS,
                     restaurantAddress: null,
+                    closingDays: [],
                 },
             })
         }

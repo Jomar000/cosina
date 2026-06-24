@@ -17,6 +17,20 @@ export const categoryEnum = z.enum(
     },
 )
 
+export const tagEnum = z.enum(
+    [
+        'new',
+        'best_seller',
+        'seasonal',
+        'limited',
+    ],
+    {
+        error: () => ({
+            message: 'Tag must be new, best_seller, seasonal, or limited.',
+        }),
+    },
+)
+
 export const sizeItemSchema = z.object({
     name: field.vText({ fieldName: 'Size Name', max: 64 }),
     price: field.vNumeric({ fieldName: 'Size Price', min: 0 }),
@@ -38,6 +52,7 @@ export const createInputSchema = z.object({
     imageObjectStorageId: z.string().min(1).max(64).nullable().optional(),
     isAvailable: field.vBoolean('Status'),
     sizes: z.array(sizeItemSchema).optional().default([]),
+    tags: z.array(tagEnum).optional().default([]),
 })
 
 export const updateInputSchema = z.object({
@@ -51,6 +66,7 @@ export const updateInputSchema = z.object({
     imageObjectStorageId: z.string().min(1).max(64).nullable().optional(),
     isAvailable: field.vBoolean('Status').optional(),
     sizes: z.array(sizeItemSchema).optional(),
+    tags: z.array(tagEnum).optional(),
 })
 
 export const deleteInputSchema = z.object({

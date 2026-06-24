@@ -40,6 +40,13 @@ export const productCategoryEnum = pgEnum('product_category', [
     'single_order',
 ])
 
+export const productTagEnum = pgEnum('product_tag', [
+    'new',
+    'best_seller',
+    'seasonal',
+    'limited',
+])
+
 export const orderStatusEnum = pgEnum('order_status', [
     'pending',
     'cooking',
@@ -429,6 +436,7 @@ export const product = pgTable(
         price: numeric('price').notNull(),
         imageObjectStorageId: text('image_object_storage_id'),
         isAvailable: boolean('is_available').notNull().default(true),
+        tags: productTagEnum('tags').array().notNull().default([]),
         createdAt: timestamp('created_at', {
             withTimezone: true,
             mode: 'date',

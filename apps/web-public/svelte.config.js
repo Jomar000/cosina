@@ -47,6 +47,7 @@ const config = {
                     'self',
                     'blob:',
                     'data:',
+                    `${env.PUBLIC_API_URL}/`,
                 ],
                 'manifest-src': ['self'],
                 'media-src': [

@@ -39,12 +39,20 @@
 
     type TDeliveryType = 'self_pickup' | 'lalamove' | 'other_courier'
 
+    type TClosingDayItem = {
+        id: string
+        startDate: string
+        endDate: string
+        reason?: string
+    }
+
     let {
         open = $bindable(false),
         cart,
         onOrderSuccess,
         advanceDays = 3,
         restaurantAddress = null,
+        closingDays = [],
         settingsLoading = false,
     }: {
         open: boolean
@@ -52,6 +60,7 @@
         onOrderSuccess: () => void
         advanceDays?: number
         restaurantAddress?: string | null
+        closingDays?: TClosingDayItem[]
         settingsLoading?: boolean
     } = $props()
 
@@ -300,7 +309,33 @@
     /////////////////
 
     function isDateDisabled(date: DateValue): boolean {
-        return date.compare(minDeliveryDate) < 0
+        if (date.compare(minDeliveryDate) < 0) return true
+        // Disable dates that fall within any closing day range
+        const dateStr = date.toString() // YYYY-MM-DD
+        for (const range of closingDays) {
+            if (dateStr >= range.startDate && dateStr <= range.endDate)
+                return true
+        }
+        return false
+    }
+
+    function formatClosingRangeLabel(
+        startDate: string,
+        endDate: string,
+    ): string {
+        const fmt = (s: string) => {
+            const [
+                y,
+                m,
+                d,
+            ] = s.split('-').map(Number)
+            return new Intl.DateTimeFormat('en-PH', {
+                dateStyle: 'medium',
+            }).format(new Date(y, m - 1, d))
+        }
+        return startDate === endDate
+            ? fmt(startDate)
+            : `${fmt(startDate)} – ${fmt(endDate)}`
     }
 
     function resetForm() {
@@ -774,6 +809,52 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Closing Days Notice -->
+                            {#if closingDays.length > 0}
+                                <div
+                                    class="flex flex-col gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3.5 py-3"
+                                >
+                                    <div class="flex items-center gap-2">
+                                        <TriangleAlertIcon
+                                            class="h-4 w-4 shrink-0 text-amber-400"
+                                        />
+                                        <p
+                                            class="text-xs font-semibold text-amber-300"
+                                        >
+                                            Unavailable Delivery Dates
+                                        </p>
+                                    </div>
+                                    <ul class="flex flex-col gap-1">
+                                        {#each closingDays as range (range.id)}
+                                            <li
+                                                class="flex items-start gap-2 text-xs"
+                                            >
+                                                <span
+                                                    class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/60"
+                                                ></span>
+                                                <span class="text-zinc-300">
+                                                    {formatClosingRangeLabel(
+                                                        range.startDate,
+                                                        range.endDate,
+                                                    )}
+                                                    {#if range.reason}
+                                                        <span
+                                                            class="text-zinc-500"
+                                                        >
+                                                            — {range.reason}
+                                                        </span>
+                                                    {/if}
+                                                </span>
+                                            </li>
+                                        {/each}
+                                    </ul>
+                                    <p class="text-[11px] text-zinc-500">
+                                        These dates are grayed out in the
+                                        calendar.
+                                    </p>
+                                </div>
+                            {/if}
                         {/if}
 
                         <!-- ── Step 3: Payment & Review ── -->

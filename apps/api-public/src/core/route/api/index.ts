@@ -24,6 +24,22 @@ export const apiRoute = new Hono<THonoInstance>()
      * @description
      * Routes
      */
+    .get('/image/view/:id', async (ctx) => {
+        const id = ctx.req.param('id')
+        const result = await ctx
+            .get('kvClient')
+            .getWithMetadata<{ mimeType: string }>(`img:${id}`, 'arrayBuffer')
+        if (!result.value) {
+            return ctx.text('Not found', 404)
+        }
+        return new Response(result.value as ArrayBuffer, {
+            headers: {
+                'Content-Type':
+                    result.metadata?.mimeType ?? 'application/octet-stream',
+                'Cache-Control': 'public, max-age=31536000, immutable',
+            },
+        })
+    })
     .route('/admin', adminRoute)
     .route('/auth', authRoute)
     .route('/objectStorage', objectStorageRoute)

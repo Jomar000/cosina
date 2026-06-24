@@ -395,6 +395,9 @@ importers:
       '@hyperion/validator':
         specifier: workspace:*
         version: link:../../packages/validator
+      '@internationalized/date':
+        specifier: 'catalog:'
+        version: 3.12.2
       '@lucide/svelte':
         specifier: 'catalog:'
         version: 1.17.0(svelte@5.56.0)

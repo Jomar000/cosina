@@ -69,7 +69,7 @@ id = "00000000000000000000000000000000"
 [[hyperdrive]]
 binding = "HYPERIONBOFC_HD"
 id = "00000000000000000000000000000000"
-localConnectionString = "postgres://postgres:password123@localhost:5432/hyperion"
+localConnectionString = "postgres://postgres:password123@localhost:5432/cosina"
 
 [[durable_objects.bindings]]
 name = "HYPERIONBOFC_DO_WSS"

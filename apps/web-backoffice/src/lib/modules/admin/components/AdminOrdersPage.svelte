@@ -3,21 +3,16 @@
     import * as Dialog from '@hyperion/ui/components/dialog'
     import * as DropdownMenu from '@hyperion/ui/components/dropdown-menu'
     import { Input } from '@hyperion/ui/components/input'
-    import { Label } from '@hyperion/ui/components/label'
-    import { Textarea } from '@hyperion/ui/components/textarea'
     import { Separator } from '@hyperion/ui/components/separator'
     import { Skeleton } from '@hyperion/ui/components/skeleton'
     import CalendarClockIcon from '@lucide/svelte/icons/calendar-clock'
-    import CalendarIcon from '@lucide/svelte/icons/calendar'
     import CheckIcon from '@lucide/svelte/icons/check'
     import CopyIcon from '@lucide/svelte/icons/copy'
     import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical'
     import HistoryIcon from '@lucide/svelte/icons/history'
     import ImageOffIcon from '@lucide/svelte/icons/image-off'
-    import InfoIcon from '@lucide/svelte/icons/info'
     import PhoneIcon from '@lucide/svelte/icons/phone'
     import SearchIcon from '@lucide/svelte/icons/search'
-    import Settings2Icon from '@lucide/svelte/icons/settings-2'
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart'
     import TruckIcon from '@lucide/svelte/icons/truck'
     import {
@@ -29,11 +24,6 @@
 
     import { adminClient } from '$lib/clients'
     import { wsClientManager } from '$lib/utilities/wsClientManager'
-
-    type TSettingsData = {
-        advanceDays: number
-        restaurantAddress: string | null
-    }
 
     ///////////////////
     // 02. Constants //
@@ -153,16 +143,12 @@
 
     let detailDialogOpen = $state(false)
     let proofDialogOpen = $state(false)
-    let settingsOpen = $state(false)
     let viewingOrder = $state<TOrder | null>(null)
     let proofImageUrl = $state<string | null>(null)
     let copiedPublicId = $state<string | null>(null)
 
     let searchQuery = $state('')
     let filterStatus = $state<TOrderStatus | 'all'>('all')
-
-    let advanceDaysInput = $state(3)
-    let restaurantAddressInput = $state('')
 
     const ordersQuery = createQuery(() => ({
         queryKey: [
@@ -205,30 +191,9 @@
         ).length,
     )
 
-    const previewMinDateLabel = $derived.by(() => {
-        const timestamp = Date.now() + advanceDaysInput * 24 * 60 * 60 * 1000
-        return new Intl.DateTimeFormat('en-PH', { dateStyle: 'long' }).format(
-            timestamp,
-        )
-    })
-
     /////////////////
     // 05. Queries //
     /////////////////
-
-    const settingsQuery = createQuery(() => ({
-        queryKey: [
-            'admin',
-            'order',
-            'settings',
-        ],
-        queryFn: async () => {
-            const response = await adminClient.settings.read.$get()
-            const { data, error, success } = await response.json()
-            if (!success) throw new Error(error.message)
-            return data as TSettingsData
-        },
-    }))
 
     ///////////////////
     // 06. Mutations //
@@ -263,50 +228,9 @@
         onError: (err: Error) => toast.error(err.message),
     }))
 
-    const updateSettingsMutation = createMutation(() => ({
-        mutationKey: [
-            'admin',
-            'order',
-            'settings',
-            'update',
-        ],
-        mutationFn: async (payload: {
-            advanceDays: number
-            restaurantAddress?: string
-        }) => {
-            const response = await adminClient.settings.update.$post({
-                json: payload,
-            })
-            const { data, error, success } = await response.json()
-            if (!success) throw new Error(error.message)
-            return data as TSettingsData
-        },
-        onSuccess: (data) => {
-            queryClient.setQueryData(
-                [
-                    'admin',
-                    'order',
-                    'settings',
-                ],
-                data,
-            )
-            settingsOpen = false
-            toast.success('Order settings saved and broadcast to customers.')
-        },
-        onError: (err: Error) => toast.error(err.message),
-    }))
-
     /////////////////
     // 08. Effects //
     /////////////////
-
-    $effect(() => {
-        const fetched = settingsQuery.data
-        if (fetched !== undefined) {
-            advanceDaysInput = fetched.advanceDays
-            restaurantAddressInput = fetched.restaurantAddress ?? ''
-        }
-    })
 
     $effect(() => {
         const ws = wsClientManager.connect('orders')
@@ -376,23 +300,6 @@
         setTimeout(() => (copiedPublicId = null), 2500)
     }
 
-    function openSettings() {
-        const data = settingsQuery.data
-        advanceDaysInput = data?.advanceDays ?? advanceDaysInput
-        restaurantAddressInput =
-            data?.restaurantAddress ?? restaurantAddressInput
-        settingsOpen = true
-    }
-
-    function saveSettings() {
-        const clamped = Math.max(1, Math.min(30, advanceDaysInput))
-        advanceDaysInput = clamped
-        updateSettingsMutation.mutate({
-            advanceDays: clamped,
-            restaurantAddress: restaurantAddressInput.trim() || undefined,
-        })
-    }
-
     /////////////////
     // 10. Helpers //
     /////////////////
@@ -453,14 +360,6 @@
                 {/if}
             </p>
         </div>
-        <Button
-            variant="outline"
-            size="icon"
-            onclick={openSettings}
-            aria-label="Order settings"
-        >
-            <Settings2Icon class="size-4" />
-        </Button>
     </div>
 
     <!-- History callout -->
@@ -1080,140 +979,6 @@
                 onclick={() => (proofDialogOpen = false)}
             >
                 Close
-            </Button>
-        </Dialog.Footer>
-    </Dialog.Content>
-</Dialog.Root>
-
-<!-- Order Settings Dialog -->
-<Dialog.Root bind:open={settingsOpen}>
-    <Dialog.Content class="sm:max-w-md">
-        <Dialog.Header>
-            <Dialog.Title>Order Settings</Dialog.Title>
-            <Dialog.Description>
-                Configure how the customer-facing order form behaves.
-            </Dialog.Description>
-        </Dialog.Header>
-
-        <div class="flex flex-col gap-5">
-            <!-- Advance order days -->
-            <div class="flex flex-col gap-3">
-                <div class="flex flex-col gap-1">
-                    <Label
-                        for="advanceDays"
-                        class="text-sm font-medium"
-                    >
-                        Minimum Advance Order Days
-                    </Label>
-                    <p class="text-muted-foreground text-xs">
-                        Customers must place orders at least this many days
-                        before their requested delivery date.
-                    </p>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <Input
-                        id="advanceDays"
-                        type="number"
-                        min="1"
-                        max="30"
-                        bind:value={advanceDaysInput}
-                        class="w-24 text-center tabular-nums"
-                    />
-                    <span class="text-muted-foreground text-sm">
-                        {advanceDaysInput === 1 ? 'day' : 'days'} in advance
-                    </span>
-                </div>
-
-                <!-- Preview banner -->
-                <div
-                    class="flex items-start gap-2.5 rounded-lg border border-blue-500/20 bg-blue-500/5 px-3.5 py-3"
-                >
-                    <CalendarIcon
-                        class="mt-0.5 size-4 shrink-0 text-blue-500"
-                    />
-                    <div class="flex flex-col gap-0.5">
-                        <p
-                            class="text-xs font-semibold text-blue-700 dark:text-blue-300"
-                        >
-                            Customer Preview
-                        </p>
-                        <p
-                            class="text-xs leading-relaxed text-blue-700/80 dark:text-blue-300/80"
-                        >
-                            Orders must be placed at least
-                            <span
-                                class="font-semibold text-blue-800 dark:text-blue-200"
-                            >
-                                {advanceDaysInput}
-                                {advanceDaysInput === 1 ? 'day' : 'days'} in advance
-                            </span>. The earliest available delivery date will
-                            be
-                            <span
-                                class="font-semibold text-blue-800 dark:text-blue-200"
-                            >
-                                {previewMinDateLabel}
-                            </span>.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Real-time note -->
-                <div
-                    class="flex items-start gap-2.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2.5"
-                >
-                    <InfoIcon
-                        class="mt-0.5 size-3.5 shrink-0 text-emerald-500"
-                    />
-                    <p
-                        class="text-xs leading-relaxed text-emerald-700 dark:text-emerald-400"
-                    >
-                        Saving will broadcast the new value to all connected
-                        customer devices in real time via WebSocket.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Restaurant address -->
-            <div class="flex flex-col gap-3">
-                <div class="flex flex-col gap-1">
-                    <Label
-                        for="restaurantAddress"
-                        class="text-sm font-medium"
-                    >
-                        Restaurant / Pickup Address
-                    </Label>
-                    <p class="text-muted-foreground text-xs">
-                        Shown to customers who select Self Pickup as their
-                        delivery option.
-                    </p>
-                </div>
-
-                <Textarea
-                    id="restaurantAddress"
-                    placeholder="e.g. 123 Main St, Barangay Sample, Makati City, Metro Manila"
-                    bind:value={restaurantAddressInput}
-                    rows={3}
-                    class="resize-none text-sm"
-                />
-            </div>
-        </div>
-
-        <Dialog.Footer>
-            <Button
-                variant="outline"
-                onclick={() => (settingsOpen = false)}
-                disabled={updateSettingsMutation.isPending}
-            >
-                Cancel
-            </Button>
-            <Button
-                onclick={saveSettings}
-                disabled={updateSettingsMutation.isPending}
-            >
-                {updateSettingsMutation.isPending
-                    ? 'Saving…'
-                    : 'Save & Broadcast'}
             </Button>
         </Dialog.Footer>
     </Dialog.Content>

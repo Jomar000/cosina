@@ -8,6 +8,8 @@ export type TCartItem = {
     imageUrl?: string | null
 }
 
+export type TProductTag = 'new' | 'best_seller' | 'seasonal' | 'limited'
+
 export type TProduct = {
     id: number
     publicId: string
@@ -18,5 +20,6 @@ export type TProduct = {
     imageObjectStorageId: string | null
     imageUrl: string | null
     isAvailable: boolean
+    tags: TProductTag[]
     sizes: { id: number; name: string; price: string }[]
 }

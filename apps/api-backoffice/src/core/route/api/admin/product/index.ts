@@ -44,7 +44,7 @@ async function broadcastProductEvent(
 
 function imageUrl(ctx: Context<THonoInstance>, objectStorageId: string | null) {
     if (!objectStorageId) return null
-    return `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${objectStorageId}`
+    return `${ctx.env.URL_BACKEND}/api/image/view/${objectStorageId}`
 }
 
 export const productRoute = new Hono<THonoInstance>()
@@ -72,6 +72,7 @@ export const productRoute = new Hono<THonoInstance>()
                         price: productTable.price,
                         imageObjectStorageId: productTable.imageObjectStorageId,
                         isAvailable: productTable.isAvailable,
+                        tags: productTable.tags,
                     })
                     .from(productTable)
                     .where(eq(productTable.id, productId))
@@ -158,6 +159,7 @@ export const productRoute = new Hono<THonoInstance>()
                         price: productTable.price,
                         imageObjectStorageId: productTable.imageObjectStorageId,
                         isAvailable: productTable.isAvailable,
+                        tags: productTable.tags,
                     })
                     .from(productTable)
                     .innerJoin(subquery, eq(subquery.id, productTable.id))
@@ -217,6 +219,7 @@ export const productRoute = new Hono<THonoInstance>()
                 imageObjectStorageId,
                 isAvailable,
                 sizes,
+                tags,
             } = ctx.req.valid('json')
 
             const {
@@ -266,6 +269,7 @@ export const productRoute = new Hono<THonoInstance>()
                                 imageObjectStorageId:
                                     imageObjectStorageId ?? null,
                                 isAvailable,
+                                tags,
                             })
                             .returning({
                                 id: productTable.id,
@@ -277,6 +281,7 @@ export const productRoute = new Hono<THonoInstance>()
                                 imageObjectStorageId:
                                     productTable.imageObjectStorageId,
                                 isAvailable: productTable.isAvailable,
+                                tags: productTable.tags,
                             })
 
                         const insertedSizes =
@@ -351,6 +356,7 @@ export const productRoute = new Hono<THonoInstance>()
                 imageObjectStorageId,
                 isAvailable,
                 sizes,
+                tags,
             } = ctx.req.valid('json')
 
             const { product: productTable, productSize } = ctx.get('dbSchema')
@@ -402,6 +408,7 @@ export const productRoute = new Hono<THonoInstance>()
                                 ...(isAvailable !== undefined && {
                                     isAvailable,
                                 }),
+                                ...(tags !== undefined && { tags }),
                             })
                             .where(eq(productTable.id, productId))
                             .returning({
@@ -414,6 +421,7 @@ export const productRoute = new Hono<THonoInstance>()
                                 imageObjectStorageId:
                                     productTable.imageObjectStorageId,
                                 isAvailable: productTable.isAvailable,
+                                tags: productTable.tags,
                             })
 
                         let updatedSizes: {
@@ -603,11 +611,6 @@ export const productRoute = new Hono<THonoInstance>()
         const hashHex = Array.from(new Uint8Array(hashBuffer))
             .map((b) => b.toString(16).padStart(2, '0'))
             .join('')
-        let base64Str = ''
-        for (const byte of new Uint8Array(hashBuffer)) {
-            base64Str += String.fromCharCode(byte)
-        }
-        const hashBase64 = btoa(base64Str)
 
         const { objectStorage: objectStorageTable } = ctx.get('dbSchema')
 
@@ -625,7 +628,7 @@ export const productRoute = new Hono<THonoInstance>()
         let objectId: string
 
         if (existing?.isUploaded) {
-            // Identical file already in R2 — reuse it, nothing to upload
+            // Identical file already in KV — reuse it, nothing to upload
             objectId = existing.id
         } else {
             try {
@@ -649,31 +652,10 @@ export const productRoute = new Hono<THonoInstance>()
                         })
                 }
 
-                // Upload server-side to R2 — no browser CORS involved
-                const uploadUrl = `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET_PUBLIC}/${objectId}`
-
-                const signedReq = await ctx
-                    .get('aws4FetchClient')
-                    .sign(uploadUrl, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': mimeType,
-                            'x-amz-checksum-sha256': hashBase64,
-                        },
-                        body: buffer,
-                        aws: { service: 's3' },
-                    })
-
-                const r2Response = await fetch(signedReq)
-
-                if (!r2Response.ok) {
-                    const r2ErrorBody = await r2Response.text().catch(() => '')
-                    throw new AppError({
-                        status: 500,
-                        code: 'R2_UPLOAD_FAILED',
-                        message: `R2 upload failed: ${r2Response.status} ${r2Response.statusText}${r2ErrorBody ? ` — ${r2ErrorBody}` : ''}`,
-                    })
-                }
+                // Store image bytes in KV keyed by object ID
+                await ctx
+                    .get('kvClient')
+                    .put(`img:${objectId}`, buffer, { metadata: { mimeType } })
 
                 await ctx
                     .get('dbClient')
@@ -704,7 +686,7 @@ export const productRoute = new Hono<THonoInstance>()
         return apiResponseOkWrapper(ctx, {
             data: {
                 objectStorageId: objectId,
-                imageUrl: `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${objectId}`,
+                imageUrl: `${ctx.env.URL_BACKEND}/api/image/view/${objectId}`,
             },
         })
     })

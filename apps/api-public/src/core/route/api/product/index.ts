@@ -11,7 +11,7 @@ import { validateRequest } from '../../../middleware/validateRequest.js'
 
 function imageUrl(ctx: Context<THonoInstance>, objectStorageId: string | null) {
     if (!objectStorageId) return null
-    return `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${objectStorageId}`
+    return `${ctx.env.URL_BACKEND}/api/image/view/${objectStorageId}`
 }
 
 export const productRoute = new Hono<THonoInstance>().get(
@@ -56,6 +56,7 @@ export const productRoute = new Hono<THonoInstance>().get(
                     price: productTable.price,
                     imageObjectStorageId: productTable.imageObjectStorageId,
                     isAvailable: productTable.isAvailable,
+                    tags: productTable.tags,
                 })
                 .from(productTable)
                 .innerJoin(subquery, eq(subquery.id, productTable.id))

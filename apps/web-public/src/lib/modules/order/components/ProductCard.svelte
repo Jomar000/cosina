@@ -1,6 +1,9 @@
 <script lang="ts">
     import { Button } from '@hyperion/ui/components/button'
+    import * as Drawer from '@hyperion/ui/components/drawer'
     import { cn } from '@hyperion/ui/utils'
+    import CheckIcon from '@lucide/svelte/icons/check'
+    import ChevronDownIcon from '@lucide/svelte/icons/chevron-down'
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart'
     import UtensilsIcon from '@lucide/svelte/icons/utensils'
 
@@ -10,6 +13,8 @@
 
     type TSize = { id: number; name: string; price: string }
 
+    type TTag = 'new' | 'best_seller' | 'seasonal' | 'limited'
+
     type TProduct = {
         id: number
         name: string
@@ -17,6 +22,7 @@
         category: 'bilao_package' | 'bundle_package' | 'single_order'
         price: string
         imageUrl: string | null
+        tags: TTag[]
         sizes: TSize[]
     }
 
@@ -55,11 +61,26 @@
         single_order: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     }
 
+    const TAG_LABELS: Record<TTag, string> = {
+        new: 'New',
+        best_seller: 'Best Seller',
+        seasonal: 'Seasonal',
+        limited: 'Limited',
+    }
+
+    const TAG_COLORS: Record<TTag, string> = {
+        new: 'bg-green-500',
+        best_seller: 'bg-orange-500',
+        seasonal: 'bg-sky-500',
+        limited: 'bg-rose-500',
+    }
+
     ///////////////
     // 03. State //
     ///////////////
 
     let selectedSizeId = $state<number | null>(null)
+    let drawerOpen = $state(false)
 
     /////////////////
     // 04. Derived //
@@ -84,6 +105,11 @@
     //////////////////
     // 09. Handlers //
     //////////////////
+
+    function selectSize(sizeId: number) {
+        selectedSizeId = sizeId
+        drawerOpen = false
+    }
 
     function handleAddToCart() {
         onAddToCart({
@@ -111,10 +137,12 @@
             />
         {:else}
             <div
-                class="flex h-full w-full flex-col items-center justify-center gap-1.5 text-zinc-700"
+                class="flex h-full w-full flex-col items-center justify-center gap-2"
             >
-                <UtensilsIcon class="h-10 w-10 opacity-30" />
-                <span class="text-[10px] font-medium opacity-40">No photo</span>
+                <UtensilsIcon class="h-8 w-8 text-zinc-600" />
+                <span class="text-[10px] font-medium text-zinc-600"
+                    >No photo</span
+                >
             </div>
         {/if}
         <!-- Category Badge -->
@@ -147,6 +175,19 @@
             <h3 class="text-sm font-semibold leading-tight text-zinc-100">
                 {product.name}
             </h3>
+            {#if product.tags.length > 0}
+                <div class="mt-1 flex flex-wrap gap-1">
+                    {#each product.tags as tag (tag)}
+                        <span
+                            class="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white {TAG_COLORS[
+                                tag
+                            ]}"
+                        >
+                            {TAG_LABELS[tag]}
+                        </span>
+                    {/each}
+                </div>
+            {/if}
             {#if product.ingredients}
                 <p
                     class="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-zinc-500"
@@ -157,31 +198,100 @@
         </div>
 
         <!-- Size Selector -->
-        {#if product.sizes.length > 0}
-            <div class="flex flex-wrap gap-1.5">
-                {#each product.sizes as size (size.id)}
-                    <button
-                        type="button"
-                        class={cn(
-                            'flex min-h-11 flex-col items-center justify-center rounded border px-3 py-1 transition-all sm:min-h-0 sm:py-0.5',
-                            selectedSizeId === size.id
-                                ? 'border-blue-500 bg-blue-500/15 text-blue-400'
-                                : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600',
-                        )}
-                        onclick={() => (selectedSizeId = size.id)}
-                    >
-                        <span class="text-xs font-medium">{size.name}</span>
-                        <span
-                            class="tabular-nums text-[10px] leading-tight opacity-70"
+        {#if product.sizes.length === 1}
+            <div
+                class="flex items-center justify-between rounded border border-zinc-700 bg-zinc-800 px-3 py-2"
+            >
+                <span class="text-xs font-medium text-zinc-300"
+                    >{product.sizes[0].name}</span
+                >
+                <span class="tabular-nums text-[11px] text-zinc-400">
+                    ₱{Number(product.sizes[0].price).toLocaleString('en-PH', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                    })}
+                </span>
+            </div>
+        {:else if product.sizes.length > 1}
+            <Drawer.Root
+                bind:open={drawerOpen}
+                shouldScaleBackground={false}
+            >
+                <Drawer.Trigger
+                    class={cn(
+                        'flex w-full items-center justify-between rounded border px-3 py-2 text-left transition-colors',
+                        'border-blue-500/60 bg-blue-500/10 hover:bg-blue-500/15',
+                    )}
+                >
+                    <div class="min-w-0">
+                        <span class="text-xs font-medium text-blue-300"
+                            >{selectedSize?.name}</span
                         >
-                            ₱{Number(size.price).toLocaleString('en-PH', {
+                        <span
+                            class="ml-1.5 tabular-nums text-[11px] text-blue-300/70"
+                        >
+                            ₱{Number(
+                                selectedSize?.price ?? product.price,
+                            ).toLocaleString('en-PH', {
                                 minimumFractionDigits: 0,
                                 maximumFractionDigits: 0,
                             })}
                         </span>
-                    </button>
-                {/each}
-            </div>
+                    </div>
+                    <ChevronDownIcon
+                        class={cn(
+                            'h-3.5 w-3.5 shrink-0 text-blue-400 transition-transform duration-200',
+                            drawerOpen && 'rotate-180',
+                        )}
+                    />
+                </Drawer.Trigger>
+
+                <Drawer.Content>
+                    <Drawer.Header class="pb-2">
+                        <Drawer.Title class="text-sm font-semibold"
+                            >Select a size</Drawer.Title
+                        >
+                        <p class="text-[11px] text-zinc-500">{product.name}</p>
+                    </Drawer.Header>
+                    <div class="flex flex-col px-4 pb-6">
+                        {#each product.sizes as size (size.id)}
+                            <button
+                                type="button"
+                                class={cn(
+                                    'flex min-h-12 w-full items-center justify-between border-b border-zinc-800 px-1 py-3 text-left transition-colors last:border-b-0',
+                                    selectedSizeId === size.id
+                                        ? 'text-blue-400'
+                                        : 'text-zinc-300 hover:text-zinc-100',
+                                )}
+                                onclick={() => selectSize(size.id)}
+                            >
+                                <span class="text-sm font-medium"
+                                    >{size.name}</span
+                                >
+                                <div class="flex items-center gap-2.5">
+                                    <span class="tabular-nums text-sm">
+                                        ₱{Number(size.price).toLocaleString(
+                                            'en-PH',
+                                            {
+                                                minimumFractionDigits: 0,
+                                                maximumFractionDigits: 0,
+                                            },
+                                        )}
+                                    </span>
+                                    <CheckIcon
+                                        class={cn(
+                                            'h-4 w-4 transition-opacity',
+                                            selectedSizeId === size.id
+                                                ? 'opacity-100'
+                                                : 'opacity-0',
+                                        )}
+                                    />
+                                </div>
+                            </button>
+                        {/each}
+                    </div>
+                </Drawer.Content>
+            </Drawer.Root>
         {/if}
 
         <!-- Price + Add to Cart -->

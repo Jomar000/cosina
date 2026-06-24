@@ -30,6 +30,7 @@
     ///////////////////
 
     type TCategory = 'bilao_package' | 'bundle_package' | 'single_order'
+    type TTag = 'new' | 'best_seller' | 'seasonal' | 'limited'
     type TSizeRow = { _key: number; name: string; price: string }
     type TSizePayload = { name: string; price: string }
     type TProduct = {
@@ -42,6 +43,7 @@
         imageObjectStorageId: string | null
         imageUrl: string | null
         isAvailable: boolean
+        tags: TTag[]
         sizes: { id: number; name: string; price: string }[]
     }
 
@@ -63,6 +65,27 @@
         single_order: 'bg-blue-500',
     }
 
+    const TAG_LABELS: Record<TTag, string> = {
+        new: 'New',
+        best_seller: 'Best Seller',
+        seasonal: 'Seasonal',
+        limited: 'Limited',
+    }
+
+    const TAG_COLORS: Record<TTag, string> = {
+        new: 'bg-green-500',
+        best_seller: 'bg-orange-500',
+        seasonal: 'bg-sky-500',
+        limited: 'bg-rose-500',
+    }
+
+    const TAG_OPTIONS: TTag[] = [
+        'new',
+        'best_seller',
+        'seasonal',
+        'limited',
+    ]
+
     ///////////////
     // 03. State //
     ///////////////
@@ -80,6 +103,7 @@
     let formCategory = $state<TCategory>('single_order')
     let formPrice = $state('')
     let formIsAvailable = $state(true)
+    let formTags = $state<TTag[]>([])
     let formSizes = $state<TSizeRow[]>([])
     let nextSizeKey = 0
     let formImageObjectStorageId = $state<string | null>(null)
@@ -122,6 +146,7 @@
             price: string
             imageObjectStorageId?: string | null
             isAvailable: boolean
+            tags: TTag[]
             sizes: TSizePayload[]
         }) => {
             const response = await adminClient.product.create.$post({
@@ -158,6 +183,7 @@
             price?: string
             imageObjectStorageId?: string | null
             isAvailable?: boolean
+            tags?: TTag[]
             sizes: TSizePayload[]
         }) => {
             const response = await adminClient.product.update.$post({
@@ -254,6 +280,7 @@
         formCategory = 'single_order'
         formPrice = ''
         formIsAvailable = true
+        formTags = []
         formSizes = []
         formImageObjectStorageId = null
         formInitialImageUrl = null
@@ -267,6 +294,7 @@
         formCategory = p.category
         formPrice = p.price
         formIsAvailable = p.isAvailable
+        formTags = [...p.tags]
         formSizes = p.sizes.map((s) => ({
             _key: nextSizeKey++,
             name: s.name,
@@ -315,6 +343,7 @@
             price: formPrice,
             imageObjectStorageId: formImageObjectStorageId,
             isAvailable: formIsAvailable,
+            tags: formTags,
             sizes: validSizes,
         }
 
@@ -493,6 +522,21 @@
                                 {CATEGORY_LABELS[p.category]}
                             </span>
                         </div>
+
+                        <!-- Tags -->
+                        {#if p.tags.length > 0}
+                            <div class="flex flex-wrap gap-1">
+                                {#each p.tags as tag (tag)}
+                                    <span
+                                        class="rounded-full px-2 py-0.5 text-[10px] font-bold text-white {TAG_COLORS[
+                                            tag
+                                        ]}"
+                                    >
+                                        {TAG_LABELS[tag]}
+                                    </span>
+                                {/each}
+                            </div>
+                        {/if}
 
                         <!-- Name -->
                         <h3 class="line-clamp-2 font-semibold leading-snug">
@@ -709,6 +753,32 @@
                     bind:value={formIngredients}
                     class="resize-none text-sm"
                 />
+            </div>
+
+            <!-- Tags -->
+            <div class="flex flex-col gap-2">
+                <Label class="text-xs font-medium">
+                    Tags
+                    <span class="text-muted-foreground font-normal"
+                        >(optional)</span
+                    >
+                </Label>
+                <div class="flex flex-wrap gap-x-4 gap-y-2">
+                    {#each TAG_OPTIONS as tag (tag)}
+                        <label
+                            class="flex cursor-pointer select-none items-center gap-1.5"
+                        >
+                            <Checkbox
+                                checked={formTags.includes(tag)}
+                                onCheckedChange={(v) =>
+                                    (formTags = v
+                                        ? [...formTags, tag]
+                                        : formTags.filter((t) => t !== tag))}
+                            />
+                            <span class="text-sm">{TAG_LABELS[tag]}</span>
+                        </label>
+                    {/each}
+                </div>
             </div>
 
             <!-- Sizes -->

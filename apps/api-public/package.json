@@ -15,7 +15,7 @@
         "prepare": "tsc --build ./tsconfig.build.json",
         "deploy:prod": "wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
         "deploy:staging": "wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
-        "dev": "wrangler dev",
+        "dev": "wrangler dev --persist-to ../../.wrangler/state",
         "format": "prettier --write .",
         "lint": "prettier --check . && eslint .",
         "secret:prod": "wrangler secret bulk .dev.vars.production --env=production --config=wrangler-production.toml",
