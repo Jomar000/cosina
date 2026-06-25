@@ -20,14 +20,23 @@
         }[]
     }
 
+    type Role = 'admin' | 'member' | 'owner'
+
+    type RoleShellConfig = {
+        navItems: NavItem[]
+    }
+
     ////////////////////
     // 01. Properties //
     ////////////////////
 
-    let { role, children } = $props<{
-        role: string
+    let {
+        role,
+        children,
+    }: {
+        role: Role
         children: Snippet
-    }>()
+    } = $props()
 
     ///////////////////
     // 02. Constants //
@@ -60,50 +69,52 @@
         },
     ]
 
-    const adminNavItems: NavItem[] = [
-        ...baseNavItems,
-        {
-            title: 'Object Storage',
-            url: '#',
-            icon: CloudUploadIcon,
-            isActive: true,
-            items: [
+    const roleShellConfig: Record<Role, RoleShellConfig> = {
+        admin: {
+            navItems: [
+                ...baseNavItems,
                 {
-                    title: 'Download',
-                    url: '/app/admin/object-storage/download',
-                },
-                {
-                    title: 'Upload',
-                    url: '/app/admin/object-storage/upload',
-                },
-            ],
-        },
-    ]
-
-    const ownerNavItems: NavItem[] = [
-        ...baseNavItems,
-        {
-            title: 'Object Storage',
-            url: '#',
-            icon: CloudUploadIcon,
-            isActive: true,
-            items: [
-                {
-                    title: 'Download',
-                    url: '/app/owner/object-storage/download',
-                },
-                {
-                    title: 'Upload',
-                    url: '/app/owner/object-storage/upload',
+                    title: 'Object Storage',
+                    url: '#',
+                    icon: CloudUploadIcon,
+                    isActive: true,
+                    items: [
+                        {
+                            title: 'Download',
+                            url: '/app/admin/object-storage/download',
+                        },
+                        {
+                            title: 'Upload',
+                            url: '/app/admin/object-storage/upload',
+                        },
+                    ],
                 },
             ],
         },
-    ]
-
-    const navItemsByRole: Record<string, NavItem[]> = {
-        admin: adminNavItems,
-        member: baseNavItems,
-        owner: ownerNavItems,
+        member: {
+            navItems: baseNavItems,
+        },
+        owner: {
+            navItems: [
+                ...baseNavItems,
+                {
+                    title: 'Object Storage',
+                    url: '#',
+                    icon: CloudUploadIcon,
+                    isActive: true,
+                    items: [
+                        {
+                            title: 'Download',
+                            url: '/app/owner/object-storage/download',
+                        },
+                        {
+                            title: 'Upload',
+                            url: '/app/owner/object-storage/upload',
+                        },
+                    ],
+                },
+            ],
+        },
     }
 
     ///////////////
@@ -116,13 +127,13 @@
     // 04. Derived //
     /////////////////
 
-    const navItems = $derived(navItemsByRole[role] ?? baseNavItems)
+    const roleConfig = $derived(roleShellConfig[role])
 </script>
 
 <Sidebar.Provider>
     <AppSidebar
         {session}
-        {navItems}
+        navItems={roleConfig.navItems}
     />
     <Sidebar.Inset>
         <SiteHeader />

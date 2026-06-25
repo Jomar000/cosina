@@ -20,11 +20,6 @@
     const session = new SessionState()
     const queryClient = useQueryClient()
 
-    session.loadFromLocalStorage()
-
-    setSessionContext(session)
-    setContext('signOut', signOut)
-
     ///////////////
     // 03. State //
     ///////////////
@@ -35,6 +30,11 @@
     /////////////////
     // 08. Effects //
     /////////////////
+
+    session.loadFromLocalStorage()
+
+    setSessionContext(session)
+    setContext('signOut', signOut)
 
     onMount(() => clearSessionExpiryTimeout)
 

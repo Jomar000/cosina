@@ -19,20 +19,29 @@
         }[]
     }
 
+    type Role = 'admin' | 'member' | 'owner'
+
+    type RoleShellConfig = {
+        navItems: NavItem[]
+    }
+
     ////////////////////
     // 01. Properties //
     ////////////////////
 
-    let { role, children } = $props<{
-        role: string
+    let {
+        role,
+        children,
+    }: {
+        role: Role
         children: Snippet
-    }>()
+    } = $props()
 
     ///////////////////
     // 02. Constants //
     ///////////////////
 
-    const commonNavItems: NavItem[] = [
+    const baseNavItems: NavItem[] = [
         {
             title: 'Transactions',
             url: '#',
@@ -59,10 +68,16 @@
         },
     ]
 
-    const navItemsByRole: Record<string, NavItem[]> = {
-        admin: commonNavItems,
-        member: commonNavItems,
-        owner: commonNavItems,
+    const roleShellConfig: Record<Role, RoleShellConfig> = {
+        admin: {
+            navItems: baseNavItems,
+        },
+        member: {
+            navItems: baseNavItems,
+        },
+        owner: {
+            navItems: baseNavItems,
+        },
     }
 
     ///////////////
@@ -75,13 +90,13 @@
     // 04. Derived //
     /////////////////
 
-    const navItems = $derived(navItemsByRole[role] ?? commonNavItems)
+    const roleConfig = $derived(roleShellConfig[role])
 </script>
 
 <Sidebar.Provider>
     <AppSidebar
         {session}
-        {navItems}
+        navItems={roleConfig.navItems}
     />
     <Sidebar.Inset>
         <SiteHeader />
