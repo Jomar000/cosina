@@ -9,7 +9,7 @@
 
     import { heartbeatClient } from '$lib/clients'
     import { SessionProvider } from '$lib/states/session'
-    import NavigationGate from './NavigationGate.svelte'
+    import AppNavigationProvider from './AppNavigationProvider.svelte'
 
     ////////////////////
     // 01. Properties //
@@ -60,7 +60,7 @@
 <div class="size-full bg-muted">
     <QueryClientProvider client={queryClient}>
         <SessionProvider>
-            <NavigationGate
+            <AppNavigationProvider
                 heartbeatFailed={heartbeatQuery.isError}
                 heartbeatReady={heartbeatQuery.isSuccess}
             >
@@ -70,7 +70,7 @@
                     position="top-center"
                 />
                 {@render children()}
-            </NavigationGate>
+            </AppNavigationProvider>
         </SessionProvider>
     </QueryClientProvider>
 </div>

@@ -1,80 +1,14 @@
 <script lang="ts">
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
-    import CloudUploadIcon from '@lucide/svelte/icons/cloud-upload'
-    import ListIcon from '@lucide/svelte/icons/list'
-    import UsersIcon from '@lucide/svelte/icons/users'
-
-    import AppSidebar from '$lib/components/sidebar/Sidebar.svelte'
-    import SiteHeader from '$lib/components/sidebar/SiteHeader.svelte'
-    import { useSessionContext } from '$lib/states/session'
+    import AppRoleShell from '$lib/modules/app/components/AppRoleShell.svelte'
 
     ////////////////////
     // 01. Properties //
     ////////////////////
 
     let { children } = $props()
-
-    ///////////////////
-    // 02. Constants //
-    ///////////////////
-
-    const navItems = [
-        {
-            title: 'Transactions',
-            url: '#',
-            icon: ListIcon,
-            isActive: true,
-            items: [
-                {
-                    title: 'History',
-                    url: '#',
-                },
-            ],
-        },
-        {
-            title: 'Visitors',
-            url: '#',
-            icon: UsersIcon,
-            isActive: true,
-            items: [
-                {
-                    title: 'History',
-                    url: '#',
-                },
-            ],
-        },
-        {
-            title: 'Object Storage',
-            url: '#',
-            icon: CloudUploadIcon,
-            isActive: true,
-            items: [
-                {
-                    title: 'Download',
-                    url: '/app/admin/object-storage/download',
-                },
-                {
-                    title: 'Upload',
-                    url: '/app/admin/object-storage/upload',
-                },
-            ],
-        },
-    ]
-
-    ///////////////
-    // 03. State //
-    ///////////////
-
-    const session = useSessionContext()
 </script>
 
-<Sidebar.Provider>
-    <AppSidebar
-        {session}
-        {navItems}
-    />
-    <Sidebar.Inset>
-        <SiteHeader />
-        {@render children()}
-    </Sidebar.Inset>
-</Sidebar.Provider>
+<AppRoleShell
+    role="admin"
+    {children}
+/>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import AppPage from '$lib/modules/app/components/AppPage.svelte'
+    import AppRoleSelector from '$lib/modules/app/components/AppRoleSelector.svelte'
 </script>
 
-<AppPage />
+<AppRoleSelector />
