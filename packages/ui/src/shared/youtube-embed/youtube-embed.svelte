@@ -75,14 +75,14 @@
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin"
                 allowfullscreen
-                class="absolute inset-0 h-full w-full animate-in duration-500 fade-in"
+                class="absolute inset-0 size-full animate-in duration-500 fade-in"
             ></iframe>
         {:else}
             <img
                 loading="lazy"
                 src="https://img.youtube.com/vi/{videoId}/{thumbnailQuality}.jpg"
                 alt={title}
-                class="h-full w-full object-cover opacity-80 transition-opacity group-hover:opacity-60"
+                class="size-full object-cover opacity-80 transition-opacity group-hover:opacity-60"
             />
             <div
                 class="absolute inset-0 flex flex-col items-center justify-center"
@@ -95,7 +95,7 @@
                     class="group/btn flex flex-col items-center gap-2 transition-transform hover:scale-110 active:scale-95"
                 >
                     <PlayCircle
-                        class="h-16 w-16 text-white opacity-90 transition-transform duration-200 group-hover/btn:scale-110"
+                        class="size-16 text-white opacity-90 transition-transform duration-200 group-hover/btn:scale-110"
                     />
                     <span
                         class="rounded bg-black/60 px-4 py-1.5 text-[10px] font-bold tracking-widest text-white uppercase backdrop-blur-sm sm:text-xs"
