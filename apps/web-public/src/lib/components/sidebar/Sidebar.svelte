@@ -75,9 +75,7 @@
         className,
     )}
 >
-    <div
-        class="flex h-[60px] shrink-0 items-center border-b border-sidebar-border"
-    >
+    <div class="flex h-15 shrink-0 items-center border-b border-sidebar-border">
         {#if isCollapsed}
             <div class="flex w-full justify-center">
                 <Tooltip.Root>

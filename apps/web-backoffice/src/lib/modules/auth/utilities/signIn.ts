@@ -82,7 +82,7 @@ function showSignInErrorToast({
     setErrorCopyLabel: (label: string) => void
 }) {
     toast.error('Something went wrong', {
-        class: 'min-w-[360px]',
+        class: 'min-w-90',
         description: message,
         action: {
             label: errorCopyLabel,

@@ -79,7 +79,7 @@
 
         <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
             <div
-                class="flex h-[60px] shrink-0 items-center gap-3 border-b border-border bg-background px-4 md:hidden"
+                class="flex h-15 shrink-0 items-center gap-3 border-b border-border bg-background px-4 md:hidden"
             >
                 <Button
                     aria-label="Open navigation"

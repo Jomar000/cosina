@@ -19,7 +19,7 @@
     <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content
-            class="w-[360px]"
+            class="w-90"
             escapeKeydownBehavior="ignore"
             interactOutsideBehavior="ignore"
             showCloseButton={false}

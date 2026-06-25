@@ -55,7 +55,7 @@
 </script>
 
 <header
-    class="flex h-[60px] shrink-0 items-center gap-4 border-b border-border bg-background px-4 sm:px-6"
+    class="flex h-15 shrink-0 items-center gap-4 border-b border-border bg-background px-4 sm:px-6"
 >
     <div class="mr-auto flex min-w-0 flex-col justify-center">
         {#if routeMeta.breadcrumb?.length}
