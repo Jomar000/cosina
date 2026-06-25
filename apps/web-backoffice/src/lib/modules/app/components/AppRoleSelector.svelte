@@ -30,7 +30,7 @@
 >
     <div class="flex w-full max-w-sm flex-col gap-6">
         <a
-            href="##"
+            href="/app"
             class="flex items-center gap-2 self-center font-medium"
         >
             <div
@@ -38,7 +38,7 @@
             >
                 <GalleryVerticalEndIcon class="size-4" />
             </div>
-            Acme Inc.
+            Hyperion
         </a>
         <Card.Root class="w-full max-w-sm">
             <Card.Header class="m-auto w-full">

@@ -1,30 +1,20 @@
 <script lang="ts">
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
-    import CloudUploadIcon from '@lucide/svelte/icons/cloud-upload'
-    import ListIcon from '@lucide/svelte/icons/list'
-    import UsersIcon from '@lucide/svelte/icons/users'
-    import { type Component, type Snippet } from 'svelte'
+    import { Button } from '@hyperion/ui/components/button'
+    import * as Sheet from '@hyperion/ui/components/sheet'
+    import * as Tooltip from '@hyperion/ui/components/tooltip'
+    import MenuIcon from '@lucide/svelte/icons/menu'
+    import type { Snippet } from 'svelte'
 
+    import { page } from '$app/state'
     import AppSidebar from '$lib/components/sidebar/Sidebar.svelte'
+    import {
+        createRoleNavigation,
+        getRouteMeta,
+    } from '$lib/components/sidebar/navigation'
     import SiteHeader from '$lib/components/sidebar/SiteHeader.svelte'
     import { useSessionContext } from '$lib/states/session'
 
-    type NavItem = {
-        title: string
-        url: string
-        icon: Component
-        isActive?: boolean
-        items?: {
-            title: string
-            url: string
-        }[]
-    }
-
     type Role = 'admin' | 'member' | 'owner'
-
-    type RoleShellConfig = {
-        navItems: NavItem[]
-    }
 
     ////////////////////
     // 01. Properties //
@@ -38,105 +28,82 @@
         children: Snippet
     } = $props()
 
-    ///////////////////
-    // 02. Constants //
-    ///////////////////
-
-    const baseNavItems: NavItem[] = [
-        {
-            title: 'Transactions',
-            url: '#',
-            icon: ListIcon,
-            isActive: true,
-            items: [
-                {
-                    title: 'History',
-                    url: '#',
-                },
-            ],
-        },
-        {
-            title: 'Visitors',
-            url: '#',
-            icon: UsersIcon,
-            isActive: true,
-            items: [
-                {
-                    title: 'History',
-                    url: '#',
-                },
-            ],
-        },
-    ]
-
-    const roleShellConfig: Record<Role, RoleShellConfig> = {
-        admin: {
-            navItems: [
-                ...baseNavItems,
-                {
-                    title: 'Object Storage',
-                    url: '#',
-                    icon: CloudUploadIcon,
-                    isActive: true,
-                    items: [
-                        {
-                            title: 'Download',
-                            url: '/app/admin/object-storage/download',
-                        },
-                        {
-                            title: 'Upload',
-                            url: '/app/admin/object-storage/upload',
-                        },
-                    ],
-                },
-            ],
-        },
-        member: {
-            navItems: baseNavItems,
-        },
-        owner: {
-            navItems: [
-                ...baseNavItems,
-                {
-                    title: 'Object Storage',
-                    url: '#',
-                    icon: CloudUploadIcon,
-                    isActive: true,
-                    items: [
-                        {
-                            title: 'Download',
-                            url: '/app/owner/object-storage/download',
-                        },
-                        {
-                            title: 'Upload',
-                            url: '/app/owner/object-storage/upload',
-                        },
-                    ],
-                },
-            ],
-        },
-    }
-
     ///////////////
     // 03. State //
     ///////////////
 
     const session = useSessionContext()
+    let collapsed = $state(false)
+    let mobileOpen = $state(false)
 
     /////////////////
     // 04. Derived //
     /////////////////
 
-    const roleConfig = $derived(roleShellConfig[role])
+    const navItems = $derived(createRoleNavigation(role))
+    const routeMeta = $derived(getRouteMeta(page.url.pathname))
+
+    //////////////////
+    // 09. Handlers //
+    //////////////////
+
+    function closeMobileNavigation() {
+        mobileOpen = false
+    }
 </script>
 
-<Sidebar.Provider>
-    <AppSidebar
-        {session}
-        navItems={roleConfig.navItems}
-    />
-    <Sidebar.Inset>
-        <SiteHeader />
-        {@render children()}
-    </Sidebar.Inset>
-</Sidebar.Provider>
+<Tooltip.Provider delayDuration={300}>
+    <div class="flex h-svh w-full overflow-hidden bg-background">
+        <div class="hidden h-full shrink-0 md:flex">
+            <AppSidebar
+                bind:collapsed
+                {navItems}
+            />
+        </div>
+
+        <Sheet.Root bind:open={mobileOpen}>
+            <Sheet.Content
+                class="w-60! max-w-60! gap-0 border-r-0 p-0"
+                showCloseButton={false}
+                side="left"
+            >
+                <Sheet.Title class="sr-only">Navigation</Sheet.Title>
+                <AppSidebar
+                    class="w-full border-r-0"
+                    mobile
+                    {navItems}
+                    onNavigate={closeMobileNavigation}
+                />
+            </Sheet.Content>
+        </Sheet.Root>
+
+        <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+            <div
+                class="flex h-[60px] shrink-0 items-center gap-3 border-b border-border bg-background px-4 md:hidden"
+            >
+                <Button
+                    aria-label="Open navigation"
+                    onclick={() => (mobileOpen = true)}
+                    size="icon"
+                    variant="ghost"
+                >
+                    <MenuIcon class="size-5" />
+                </Button>
+                <span class="truncate text-sm font-semibold text-foreground">
+                    {routeMeta.title}
+                </span>
+            </div>
+
+            <div class="hidden shrink-0 md:block">
+                <SiteHeader
+                    {role}
+                    {session}
+                />
+            </div>
+
+            <main class="flex min-h-0 flex-1 flex-col overflow-hidden">
+                {@render children()}
+            </main>
+        </div>
+    </div>
+</Tooltip.Provider>
