@@ -57,13 +57,13 @@
 - **Environment Variables:**
     - `apps/api-{public,backoffice}/wrangler.toml` -- non-secret vars and Cloudflare bindings. BFF deployments default to `zone_name` subdirectory routes; commented `custom_domain` routes are the alternative. Object storage uses `aws4fetch`-signed S3-compatible R2 requests, not direct R2 bindings.
     - `apps/api-{public,backoffice}/.dev.vars` -- secrets (not committed). Copy the matching `.dev.vars.example`, which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
-    - `packages/database/.env` / `.env.test` -- Node-only inputs for development/test bootstrap and migrations, never Worker runtime configuration. Vitest derives a UUIDv7-suffixed URL from `.env.test`, injects that generated URL into local Hyperdrive, drops the database during teardown, and removes matching orphaned databases after 24 hours on later test starts. Use `cleanup:test` for manual stale cleanup; development runtime uses Wrangler's `localConnectionString`.
+    - `packages/database/.env` / `.env.test` -- Node-only inputs for development/test bootstrap and migrations, never Worker runtime configuration. Copy or rename `.env.example` to `.env.test`, set `NODE_ENV="test"`, and point `DATABASE_URL` at the local test database. Vitest derives a UUIDv7-suffixed URL from `.env.test`, injects that generated URL into local Hyperdrive, drops the database during teardown, and removes matching orphaned databases after 24 hours on later test starts. Use `cleanup:test` for manual stale cleanup; development runtime uses Wrangler's `localConnectionString`.
 
 ## 5. Deployment & CI/CD
 
-- App scripts provide `deploy:staging` and `deploy:prod` using `wrangler-staging.toml` and `wrangler-production.toml`.
+- App scripts provide `deploy:staging` and `deploy:prod` using `wrangler-staging.toml` and `wrangler-production.toml`. These files are intentionally ignored and supplied only on deployment machines; local development uses the committed `wrangler.toml`.
 - API scripts provide `secret:staging` and `secret:prod` for `wrangler secret bulk`.
-- Database scripts provide `migrate:staging` and `migrate:prod`.
+- Database scripts provide `migrate:staging` and `migrate:prod` using intentionally ignored deployment-machine configs (`drizzle-staging.config.ts` and `drizzle-production.config.ts`).
 - Deployment, secret-management, and staging/production migration commands require explicit human approval and must never be auto-run.
 - No repository-wide CI pipeline convention is established yet. Preserve existing `.github/` or `.gitlab-ci.yaml` behavior when one is introduced or modified.
 
@@ -84,7 +84,7 @@ Project skills live in `.agents/skills/` for Codex/Gemini and `.claude/skills/` 
 
 To ensure project safety, strictly adhere to the following file access and command execution boundaries (mirrored from `.claude/settings.json`):
 
-- **Allowed Scope:** `apps/`, `packages/`, both skill directories, and root configuration files (`*.json`, `*.yaml`, `*.toml`, `*.js`, `*.ts`, `*.md`).
+- **Allowed Scope:** `apps/`, `packages/`, both skill directories, `.claude/settings.json`, and root configuration files (`*.json`, `*.yaml`, `*.toml`, `*.js`, `*.ts`, `*.md`).
 - **Forbidden Files:** NEVER edit or write to ANY files inside the `.git/` directory.
 - **Allowed Commands:** You may execute pnpm install, build, check, lint, test, format, and dev workflows, plus development/test database migrations. Read-only Git access is limited to `git status`, `git log`, `git diff`, `git show`, `git stash list`, `git branch --show-current`, and `git branch --list`.
 - **Approval-Required Commands:** Mutating Git commands, deployments, secret changes, and staging/production migrations require explicit human approval. Do not infer approval from a general implementation request.
