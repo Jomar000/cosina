@@ -1,5 +1,6 @@
 <script lang="ts">
     import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import ClipboardListIcon from '@lucide/svelte/icons/clipboard-list'
     import HistoryIcon from '@lucide/svelte/icons/history'
     import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
     import PackageIcon from '@lucide/svelte/icons/package'
@@ -49,6 +50,11 @@
             url: '/app/admin/settings',
             icon: SettingsIcon,
             exact: true,
+        },
+        {
+            title: 'Audit Trail',
+            url: '/app/admin/audit',
+            icon: ClipboardListIcon,
         },
     ]
 

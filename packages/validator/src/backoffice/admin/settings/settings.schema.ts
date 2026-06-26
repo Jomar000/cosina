@@ -29,4 +29,7 @@ export const updateSettingsInputSchema = z.object({
         max: 30,
     }),
     restaurantAddress: z.string().trim().max(512).optional(),
+    gcashAccountName: z.string().trim().max(128).optional(),
+    gcashNumber: z.string().trim().max(32).optional(),
+    paymentInstructions: z.string().trim().max(512).optional(),
 })

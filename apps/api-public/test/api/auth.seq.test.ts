@@ -4,7 +4,7 @@ import { env } from 'cloudflare:workers'
 import { eq } from 'drizzle-orm'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import app from '../../src/core/index.js'
+import { app } from '../../src/core/index.js'
 import { interceptPasswordResetToken, setTestingCookies } from '../utilities.js'
 
 let privilegedCookie: string // eslint-disable-line @typescript-eslint/no-unused-vars

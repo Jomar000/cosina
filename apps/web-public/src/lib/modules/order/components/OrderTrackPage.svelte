@@ -3,21 +3,27 @@
     import { Input } from '@hyperion/ui/components/input'
     import { Separator } from '@hyperion/ui/components/separator'
     import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left'
+    import BanknoteIcon from '@lucide/svelte/icons/banknote'
     import CalendarClockIcon from '@lucide/svelte/icons/calendar-clock'
     import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2'
     import CookingPotIcon from '@lucide/svelte/icons/cooking-pot'
+    import CircleAlertIcon from '@lucide/svelte/icons/circle-alert'
     import CircleXIcon from '@lucide/svelte/icons/circle-x'
     import ClockIcon from '@lucide/svelte/icons/clock'
     import PackageCheckIcon from '@lucide/svelte/icons/package-check'
     import SearchIcon from '@lucide/svelte/icons/search'
+    import ShieldCheckIcon from '@lucide/svelte/icons/shield-check'
+    import SmartphoneIcon from '@lucide/svelte/icons/smartphone'
     import TruckIcon from '@lucide/svelte/icons/truck'
     import WifiIcon from '@lucide/svelte/icons/wifi'
     import WifiOffIcon from '@lucide/svelte/icons/wifi-off'
     import { createQuery, useQueryClient } from '@tanstack/svelte-query'
     import { page } from '$app/state'
+    import { toast } from 'svelte-sonner'
 
     import { orderClient } from '$lib/clients'
     import { wsClientManager } from '$lib/utilities/wsClientManager'
+    import PayRemainingBalanceDialog from './PayRemainingBalanceDialog.svelte'
 
     ///////////////////
     // 02. Constants //
@@ -34,6 +40,8 @@
 
     type TDeliveryType = 'self_pickup' | 'lalamove' | 'other_courier'
 
+    type TProofStatus = 'received' | 'accepted' | 'fake' | null
+
     type TTrackedOrder = {
         id: number
         trackingCode: string
@@ -42,6 +50,9 @@
         deliveryAt: string | null
         downpayment: string | null
         amountToPay: string
+        remainingBalancePaymentMethod: string | null
+        proofOfPaymentStatus: TProofStatus
+        remainingBalanceProofStatus: TProofStatus
         status: TOrderStatus
         notes: string | null
         createdAt: string
@@ -52,6 +63,15 @@
             quantity: number
             price: string
         }[]
+    }
+
+    type TOrderSettings = {
+        advanceDays: number
+        restaurantAddress: string | null
+        closingDays: unknown[]
+        gcashAccountName: string | null
+        gcashNumber: string | null
+        paymentInstructions: string | null
     }
 
     const STATUS_LABELS: Record<TOrderStatus, string> = {
@@ -125,6 +145,7 @@
     let wsConnected = $state(false)
     let isSearching = $state(!!page.url.searchParams.get('code'))
     let searchStartTime = $state(0)
+    let payDialogOpen = $state(false)
 
     /////////////////
     // 05. Queries //
@@ -146,6 +167,20 @@
             return data as TTrackedOrder
         },
         retry: false,
+    }))
+
+    const settingsQuery = createQuery<TOrderSettings>(() => ({
+        queryKey: [
+            'order',
+            'settings',
+        ],
+        queryFn: async () => {
+            const response = await orderClient.settings.$get()
+            const { data, error, success } = await response.json()
+            if (!success) throw new Error(error.message)
+            return data as TOrderSettings
+        },
+        staleTime: 5 * 60 * 1000,
     }))
 
     /////////////////
@@ -208,6 +243,75 @@
                                 : current,
                     )
                 }
+
+                if (
+                    eventType === 'order.remainingBalanceSubmit' &&
+                    trackQuery.data &&
+                    data?.id === trackQuery.data.id
+                ) {
+                    queryClient.setQueryData(
+                        [
+                            'order',
+                            'track',
+                            searchedCode,
+                        ],
+                        (current: TTrackedOrder | undefined) =>
+                            current
+                                ? {
+                                      ...current,
+                                      remainingBalancePaymentMethod:
+                                          data.paymentMethod,
+                                  }
+                                : current,
+                    )
+                }
+
+                if (
+                    eventType === 'order.proofStatusUpdated' &&
+                    trackQuery.data &&
+                    data?.trackingCode === trackQuery.data.trackingCode
+                ) {
+                    const proofType = data.proofType as
+                        | 'downpayment'
+                        | 'remaining_balance'
+                    const status = data.status as TProofStatus
+
+                    if (status === 'accepted') {
+                        toast.success(
+                            proofType === 'downpayment'
+                                ? 'Your downpayment proof has been accepted!'
+                                : 'Your remaining balance proof has been accepted!',
+                            { duration: 6000 },
+                        )
+                    } else if (status === 'fake') {
+                        toast.error(
+                            proofType === 'downpayment'
+                                ? 'Your downpayment proof was rejected. Please contact us.'
+                                : 'Your remaining balance proof was rejected. Please contact us.',
+                            { duration: 8000 },
+                        )
+                    }
+
+                    queryClient.setQueryData(
+                        [
+                            'order',
+                            'track',
+                            searchedCode,
+                        ],
+                        (current: TTrackedOrder | undefined) =>
+                            current
+                                ? {
+                                      ...current,
+                                      ...(proofType === 'downpayment'
+                                          ? { proofOfPaymentStatus: status }
+                                          : {
+                                                remainingBalanceProofStatus:
+                                                    status,
+                                            }),
+                                  }
+                                : current,
+                    )
+                }
             } catch {
                 // ignore malformed messages
             }
@@ -240,6 +344,23 @@
         isSearching = true
         searchStartTime = Date.now()
         searchedCode = code
+    }
+
+    function handlePaySuccess(paymentMethod: 'gcash' | 'cash_on_pickup') {
+        queryClient.setQueryData(
+            [
+                'order',
+                'track',
+                searchedCode,
+            ],
+            (current: TTrackedOrder | undefined) =>
+                current
+                    ? {
+                          ...current,
+                          remainingBalancePaymentMethod: paymentMethod,
+                      }
+                    : current,
+        )
     }
 
     /////////////////
@@ -763,6 +884,74 @@
                             {/if}
                         </div>
 
+                        <!-- Downpayment proof status -->
+                        {#if o.downpayment && o.proofOfPaymentStatus}
+                            <div class="mt-3">
+                                {#if o.proofOfPaymentStatus === 'accepted'}
+                                    <div
+                                        class="flex items-center gap-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3.5 py-3"
+                                    >
+                                        <ShieldCheckIcon
+                                            class="size-4 shrink-0 text-emerald-400"
+                                        />
+                                        <div class="flex flex-col gap-0.5">
+                                            <p
+                                                class="text-xs font-semibold text-emerald-300"
+                                            >
+                                                Downpayment Verified
+                                            </p>
+                                            <p
+                                                class="text-xs text-emerald-400/70"
+                                            >
+                                                Your downpayment proof has been
+                                                accepted.
+                                            </p>
+                                        </div>
+                                    </div>
+                                {:else if o.proofOfPaymentStatus === 'fake'}
+                                    <div
+                                        class="flex items-center gap-2.5 rounded-lg border border-red-500/30 bg-red-500/5 px-3.5 py-3"
+                                    >
+                                        <CircleXIcon
+                                            class="size-4 shrink-0 text-red-400"
+                                        />
+                                        <div class="flex flex-col gap-0.5">
+                                            <p
+                                                class="text-xs font-semibold text-red-300"
+                                            >
+                                                Downpayment Proof Rejected
+                                            </p>
+                                            <p class="text-xs text-red-400/70">
+                                                Your proof was not accepted.
+                                                Please contact the restaurant.
+                                            </p>
+                                        </div>
+                                    </div>
+                                {:else}
+                                    <div
+                                        class="flex items-center gap-2.5 rounded-lg border border-yellow-500/20 bg-yellow-500/5 px-3.5 py-3"
+                                    >
+                                        <CircleAlertIcon
+                                            class="size-4 shrink-0 text-yellow-500"
+                                        />
+                                        <div class="flex flex-col gap-0.5">
+                                            <p
+                                                class="text-xs font-semibold text-yellow-400"
+                                            >
+                                                Proof Under Review
+                                            </p>
+                                            <p
+                                                class="text-xs text-yellow-500/70"
+                                            >
+                                                We received your proof and are
+                                                reviewing it.
+                                            </p>
+                                        </div>
+                                    </div>
+                                {/if}
+                            </div>
+                        {/if}
+
                         {#if o.notes}
                             <div
                                 class="mt-4 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3.5 py-3 text-sm text-zinc-400"
@@ -770,6 +959,111 @@
                                 <span class="font-medium text-zinc-500"
                                     >Note:
                                 </span>{o.notes}
+                            </div>
+                        {/if}
+
+                        <!-- Remaining balance payment section -->
+                        {#if o.downpayment && Number(o.amountToPay) - Number(o.downpayment) > 0}
+                            {@const balance =
+                                Number(o.amountToPay) - Number(o.downpayment)}
+                            <Separator class="mt-4 bg-zinc-800" />
+                            <div class="mt-4 flex flex-col gap-3">
+                                {#if o.remainingBalancePaymentMethod === 'gcash'}
+                                    {#if o.remainingBalanceProofStatus === 'accepted'}
+                                        <div
+                                            class="flex items-center gap-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3.5 py-3"
+                                        >
+                                            <ShieldCheckIcon
+                                                class="size-4 shrink-0 text-emerald-400"
+                                            />
+                                            <div class="flex flex-col gap-0.5">
+                                                <p
+                                                    class="text-xs font-semibold text-emerald-300"
+                                                >
+                                                    GCash Payment Verified
+                                                </p>
+                                                <p
+                                                    class="text-xs text-emerald-400/70"
+                                                >
+                                                    Your remaining balance proof
+                                                    has been accepted.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    {:else if o.remainingBalanceProofStatus === 'fake'}
+                                        <div
+                                            class="flex items-center gap-2.5 rounded-lg border border-red-500/30 bg-red-500/5 px-3.5 py-3"
+                                        >
+                                            <CircleXIcon
+                                                class="size-4 shrink-0 text-red-400"
+                                            />
+                                            <div class="flex flex-col gap-0.5">
+                                                <p
+                                                    class="text-xs font-semibold text-red-300"
+                                                >
+                                                    GCash Proof Rejected
+                                                </p>
+                                                <p
+                                                    class="text-xs text-red-400/70"
+                                                >
+                                                    Your proof was not accepted.
+                                                    Please contact the
+                                                    restaurant.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    {:else}
+                                        <div
+                                            class="flex items-center gap-2.5 rounded-lg border border-blue-500/30 bg-blue-500/5 px-3.5 py-3"
+                                        >
+                                            <SmartphoneIcon
+                                                class="size-4 shrink-0 text-blue-400"
+                                            />
+                                            <div class="flex flex-col gap-0.5">
+                                                <p
+                                                    class="text-xs font-semibold text-blue-300"
+                                                >
+                                                    GCash Proof Submitted
+                                                </p>
+                                                <p
+                                                    class="text-xs text-blue-400/70"
+                                                >
+                                                    Your payment screenshot is
+                                                    being verified.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    {/if}
+                                {:else if o.remainingBalancePaymentMethod === 'cash_on_pickup'}
+                                    <div
+                                        class="flex items-center gap-2.5 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3.5 py-3"
+                                    >
+                                        <BanknoteIcon
+                                            class="size-4 shrink-0 text-amber-400"
+                                        />
+                                        <div class="flex flex-col gap-0.5">
+                                            <p
+                                                class="text-xs font-semibold text-amber-300"
+                                            >
+                                                Cash on Pickup
+                                            </p>
+                                            <p
+                                                class="text-xs text-amber-400/70"
+                                            >
+                                                Bring {formatAmount(
+                                                    String(balance),
+                                                )} in cash when you pick up.
+                                            </p>
+                                        </div>
+                                    </div>
+                                {:else if o.status !== 'cancelled' && o.status !== 'completed'}
+                                    <Button
+                                        onclick={() => (payDialogOpen = true)}
+                                        class="w-full bg-blue-600 text-white hover:bg-blue-500"
+                                    >
+                                        Pay Remaining Balance
+                                    </Button>
+                                {/if}
                             </div>
                         {/if}
                     </div>
@@ -790,6 +1084,20 @@
         </div>
     </main>
 </div>
+
+{#if trackQuery.data && payDialogOpen}
+    {@const o = trackQuery.data}
+    {@const balance = Number(o.amountToPay) - Number(o.downpayment ?? 0)}
+    <PayRemainingBalanceDialog
+        bind:open={payDialogOpen}
+        trackingCode={o.trackingCode}
+        remainingBalance={balance}
+        gcashAccountName={settingsQuery.data?.gcashAccountName ?? null}
+        gcashNumber={settingsQuery.data?.gcashNumber ?? null}
+        paymentInstructions={settingsQuery.data?.paymentInstructions ?? null}
+        onSuccess={handlePaySuccess}
+    />
+{/if}
 
 <style>
     /* finding order — animated ellipsis */

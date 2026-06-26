@@ -3,7 +3,7 @@ import type { TApiResponseError } from '@hyperion/types/shared'
 import { env } from 'cloudflare:workers'
 import { and, eq, like } from 'drizzle-orm'
 
-import app from '../src/core/index.js'
+import { app } from '../src/core/index.js'
 
 type QueryValue =
     | string

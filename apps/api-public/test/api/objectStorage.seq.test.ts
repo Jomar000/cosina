@@ -2,7 +2,7 @@ import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
 import { env } from 'cloudflare:workers'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import app from '../../src/core/index.js'
+import { app } from '../../src/core/index.js'
 import { setTestingCookies } from '../utilities.js'
 
 let privilegedCookie: string

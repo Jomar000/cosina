@@ -47,9 +47,13 @@ export const readInputSchema = z.object({
     orderId: field.vInt({ fieldName: 'Order ID', min: 1 }),
 })
 
-export const readManyInputSchema = base.readManyInputSchema.extend({
-    status: orderStatusEnum.optional(),
-})
+export const readManyInputSchema = base.readManyInputSchema
+    .extend({
+        status: orderStatusEnum.optional(),
+    })
+    .extend({
+        limit: z.coerce.number().int().min(1).max(500).optional().default(100),
+    })
 
 export const createInputSchema = z.object({
     customerName: field.vText({ fieldName: 'Customer Name', max: 128 }),
@@ -110,6 +114,21 @@ export const updateInputSchema = z.object({
 export const updateStatusInputSchema = z.object({
     orderId: field.vInt({ fieldName: 'Order ID', min: 1 }),
     status: orderStatusEnum,
+})
+
+export const proofStatusEnum = z.enum([
+    'accepted',
+    'fake',
+    'received',
+])
+
+export const updateProofStatusInputSchema = z.object({
+    orderId: field.vInt({ fieldName: 'Order ID', min: 1 }),
+    proofType: z.enum([
+        'downpayment',
+        'remaining_balance',
+    ]),
+    status: proofStatusEnum,
 })
 
 export const deleteInputSchema = z.object({

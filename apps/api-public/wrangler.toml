@@ -32,6 +32,9 @@ watch_dir = [
     "../../packages/database/src/",
 ]
 
+[triggers]
+crons = ["0 0 * * 0"] # Every Sunday at 00:00 UTC — proof image cleanup
+
 [dev]
 port = 8081
 
@@ -167,6 +170,9 @@ id = "00000000000000000000000000000002"
 name = "HYPERIONPUB_DO_WSS"
 class_name = "WebSocketServer"
 
+[env.staging.triggers]
+crons = ["0 0 * * 0"] # Every Sunday at 00:00 UTC — proof image cleanup
+
 ##############
 # PRODUCTION #
 ##############
@@ -211,3 +217,6 @@ id = "00000000000000000000000000000003"
 [[env.production.durable_objects.bindings]]
 name = "HYPERIONPUB_DO_WSS"
 class_name = "WebSocketServer"
+
+[env.production.triggers]
+crons = ["0 0 * * 0"] # Every Sunday at 00:00 UTC — proof image cleanup

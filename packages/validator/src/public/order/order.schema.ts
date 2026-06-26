@@ -30,6 +30,29 @@ export const trackInputSchema = z.object({
     trackingCode: field.vText({ fieldName: 'Tracking Code', min: 1, max: 20 }),
 })
 
+export const remainingBalancePaymentMethodEnum = z.enum(
+    [
+        'gcash',
+        'cash_on_pickup',
+    ],
+    {
+        error: () => ({
+            message: 'Payment method must be gcash or cash_on_pickup.',
+        }),
+    },
+)
+
+export const submitRemainingBalanceInputSchema = z.object({
+    trackingCode: field.vText({ fieldName: 'Tracking Code', min: 1, max: 20 }),
+    paymentMethod: remainingBalancePaymentMethodEnum,
+    proofObjectStorageId: z.string().trim().min(1).max(64).optional(),
+    senderName: field.vText({ fieldName: 'GCash Name', max: 128 }).optional(),
+    senderNumber: field
+        .vText({ fieldName: 'GCash Number', max: 20 })
+        .optional(),
+    amountSent: field.vNumeric({ fieldName: 'Amount Sent', min: 0 }).optional(),
+})
+
 export const createInputSchema = z.object({
     customerName: field.vText({ fieldName: 'Customer Name', max: 128 }),
     contactNumber: field.vText({ fieldName: 'Contact Number', max: 20 }),

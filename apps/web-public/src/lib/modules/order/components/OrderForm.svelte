@@ -12,25 +12,22 @@
         today,
         type DateValue,
     } from '@internationalized/date'
+    import BanknoteIcon from '@lucide/svelte/icons/banknote'
     import CalendarIcon from '@lucide/svelte/icons/calendar'
     import CheckIcon from '@lucide/svelte/icons/check'
     import ChevronLeftIcon from '@lucide/svelte/icons/chevron-left'
     import ChevronRightIcon from '@lucide/svelte/icons/chevron-right'
     import ClockIcon from '@lucide/svelte/icons/clock'
     import CopyIcon from '@lucide/svelte/icons/copy'
-    import ImageIcon from '@lucide/svelte/icons/image'
     import InfoIcon from '@lucide/svelte/icons/info'
     import MapPinIcon from '@lucide/svelte/icons/map-pin'
     import SmartphoneIcon from '@lucide/svelte/icons/smartphone'
     import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert'
-    import UploadIcon from '@lucide/svelte/icons/upload'
-    import XIcon from '@lucide/svelte/icons/x'
     import { createMutation } from '@tanstack/svelte-query'
     import { toast } from 'svelte-sonner'
 
-    import { PUBLIC_API_URL } from '$env/static/public'
     import { orderClient } from '$lib/clients'
-    import { getCookie } from '$lib/utilities/helpers'
+    import ProofImageUploader from '$lib/components/upload/ProofImageUploader.svelte'
     import type { TCartItem } from '../types.js'
 
     ////////////////////
@@ -54,6 +51,8 @@
         restaurantAddress = null,
         closingDays = [],
         settingsLoading = false,
+        gcashAccountName = null,
+        gcashNumber = null,
     }: {
         open: boolean
         cart: TCartItem[]
@@ -62,6 +61,8 @@
         restaurantAddress?: string | null
         closingDays?: TClosingDayItem[]
         settingsLoading?: boolean
+        gcashAccountName?: string | null
+        gcashNumber?: string | null
     } = $props()
 
     ///////////////////
@@ -80,8 +81,10 @@
         { value: 'other_courier', label: 'Other Courier' },
     ]
 
-    const GCASH_ACCOUNT_NAME = 'Cosina Home Cooking'
-    const GCASH_NUMBER = '0917-450-5619'
+    const GCASH_ACCOUNT_NAME = $derived(
+        gcashAccountName ?? 'Cosina Home Cooking',
+    )
+    const GCASH_NUMBER = $derived(gcashNumber ?? '0917-450-5619')
 
     const STEPS: { num: number; label: string }[] = [
         { num: 1, label: 'Contact' },
@@ -105,11 +108,13 @@
     let deliveryAddress = $state('')
     let downpayment = $state('')
     let notes = $state('')
-    let proofOfPayment = $state<File | null>(null)
-    let proofPreviewUrl = $state<string | null>(null)
+    let proofObjectStorageId = $state<string | null>(null)
+    let proofUploading = $state(false)
     let gcashCopied = $state(false)
     // Success screen state
     let placedOrderCode = $state<string | null>(null)
+    let placedOrderTotal = $state<number | null>(null)
+    let placedOrderDownpayment = $state<number | null>(null)
     let orderCodeCopied = $state(false)
 
     /////////////////
@@ -160,7 +165,13 @@
         !!deliveryDate && (!isDelivery || deliveryAddress.trim().length > 0),
     )
 
-    const isFormValid = $derived(step1Valid && step2Valid)
+    const step3Valid = $derived(
+        proofObjectStorageId !== null &&
+            !proofUploading &&
+            Number(downpayment) > 0,
+    )
+
+    const isFormValid = $derived(step1Valid && step2Valid && step3Valid)
 
     ///////////////////
     // 06. Mutations //
@@ -172,44 +183,6 @@
             'create',
         ],
         mutationFn: async () => {
-            let proofOfPaymentObjectStorageId: string | undefined
-
-            if (proofOfPayment) {
-                const formData = new FormData()
-                formData.append('file', proofOfPayment)
-
-                const csrfToken = getCookie('csrf_token')
-                const uploadHeaders: Record<string, string> = {}
-                if (csrfToken) {
-                    uploadHeaders['x-csrf-token'] =
-                        decodeURIComponent(csrfToken)
-                }
-
-                const uploadRes = await fetch(
-                    `${PUBLIC_API_URL}/api/order/proof/upload`,
-                    {
-                        method: 'POST',
-                        body: formData,
-                        headers: uploadHeaders,
-                        credentials: 'include',
-                    },
-                )
-                const uploadJson = (await uploadRes.json()) as {
-                    success: boolean
-                    data?: { objectStorageId: string }
-                    error?: { message: string }
-                }
-
-                if (!uploadJson.success) {
-                    throw new Error(
-                        uploadJson.error?.message ??
-                            'Proof of payment upload failed.',
-                    )
-                }
-
-                proofOfPaymentObjectStorageId = uploadJson.data?.objectStorageId
-            }
-
             const response = await orderClient.create.$post({
                 json: {
                     customerName: customerName.trim(),
@@ -218,7 +191,8 @@
                     deliveryType,
                     deliveryAt,
                     downpayment: downpayment || undefined,
-                    proofOfPaymentObjectStorageId,
+                    proofOfPaymentObjectStorageId:
+                        proofObjectStorageId ?? undefined,
                     notes: notes.trim() || undefined,
                     deliveryAddress: deliveryAddress.trim() || undefined,
                     items: cart.map((item) => ({
@@ -237,6 +211,8 @@
         onSuccess: (data) => {
             onOrderSuccess()
             placedOrderCode = data.trackingCode
+            placedOrderTotal = data.amountToPay
+            placedOrderDownpayment = data.downpayment
             resetForm()
         },
         onError: (err: Error) => {
@@ -247,17 +223,6 @@
     /////////////////
     // 08. Effects //
     /////////////////
-
-    $effect(() => {
-        const file = proofOfPayment
-        if (file) {
-            const url = URL.createObjectURL(file)
-            proofPreviewUrl = url
-            return () => URL.revokeObjectURL(url)
-        } else {
-            proofPreviewUrl = null
-        }
-    })
 
     //////////////////
     // 09. Handlers //
@@ -276,15 +241,6 @@
         createOrderMutation.mutate()
     }
 
-    function handleProofFileChange(e: Event) {
-        const input = e.currentTarget as HTMLInputElement
-        proofOfPayment = input.files?.[0] ?? null
-    }
-
-    function clearProofFile() {
-        proofOfPayment = null
-    }
-
     async function copyGcashNumber() {
         await navigator.clipboard.writeText(GCASH_NUMBER.replace(/-/g, ''))
         gcashCopied = true
@@ -301,6 +257,8 @@
     function closeSuccessScreen() {
         open = false
         placedOrderCode = null
+        placedOrderTotal = null
+        placedOrderDownpayment = null
         orderCodeCopied = false
     }
 
@@ -348,7 +306,7 @@
         deliveryTime = '12:00'
         downpayment = ''
         notes = ''
-        proofOfPayment = null
+        proofObjectStorageId = null
         currentStep = 1
     }
 </script>
@@ -415,6 +373,46 @@
                         {/if}
                     </button>
                 </div>
+
+                {#if placedOrderTotal !== null && placedOrderDownpayment !== null && placedOrderDownpayment < placedOrderTotal}
+                    {@const remaining =
+                        placedOrderTotal - placedOrderDownpayment}
+                    <div
+                        class="w-full rounded-2xl border border-amber-500/30 bg-amber-500/5 px-5 py-4"
+                    >
+                        <div class="flex items-start gap-3">
+                            <div
+                                class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/15"
+                            >
+                                <BanknoteIcon class="size-4 text-amber-400" />
+                            </div>
+                            <div class="flex flex-col gap-1 text-left">
+                                <p class="text-sm font-semibold text-amber-300">
+                                    Remaining Balance Due
+                                </p>
+                                <p
+                                    class="text-xs leading-relaxed text-amber-300/70"
+                                >
+                                    You paid a downpayment of
+                                    <span class="font-semibold text-amber-200">
+                                        {new Intl.NumberFormat('en-PH', {
+                                            style: 'currency',
+                                            currency: 'PHP',
+                                        }).format(placedOrderDownpayment)}
+                                    </span>. The remaining
+                                    <span class="font-semibold text-amber-200">
+                                        {new Intl.NumberFormat('en-PH', {
+                                            style: 'currency',
+                                            currency: 'PHP',
+                                        }).format(remaining)}
+                                    </span>
+                                    can be settled via GCash or cash on pickup — use
+                                    your tracking page to pay.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
 
                 <a
                     href="/track?code={placedOrderCode}"
@@ -500,9 +498,7 @@
                         class="h-9 w-9 animate-spin rounded-full border-2 border-zinc-700 border-t-blue-400"
                     ></div>
                     <p class="text-sm font-medium text-zinc-300">
-                        {proofOfPayment
-                            ? 'Uploading & placing order…'
-                            : 'Placing your order…'}
+                        Placing your order…
                     </p>
                 </div>
             {:else}
@@ -1015,7 +1011,9 @@
                                     for="downpayment"
                                     class="text-xs font-medium text-zinc-400"
                                 >
-                                    Downpayment (₱)
+                                    Downpayment (₱) <span class="text-red-400"
+                                        >*</span
+                                    >
                                 </Label>
                                 <div
                                     class="flex items-start gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2"
@@ -1061,71 +1059,14 @@
                                 <Label
                                     class="text-xs font-medium text-zinc-400"
                                 >
-                                    Proof of Payment
+                                    Proof of Payment <span class="text-red-400"
+                                        >*</span
+                                    >
                                 </Label>
-                                {#if proofPreviewUrl}
-                                    <div
-                                        class="relative overflow-hidden rounded-xl border border-zinc-700"
-                                    >
-                                        <img
-                                            src={proofPreviewUrl}
-                                            alt="Proof of payment preview"
-                                            class="max-h-48 w-full bg-zinc-900 object-contain"
-                                        />
-                                        <button
-                                            type="button"
-                                            onclick={clearProofFile}
-                                            class="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/80 text-zinc-300 backdrop-blur-sm transition-colors hover:bg-zinc-800 hover:text-zinc-100"
-                                            aria-label="Remove image"
-                                        >
-                                            <XIcon class="h-4 w-4" />
-                                        </button>
-                                        <div
-                                            class="border-t border-zinc-800 bg-zinc-900/80 px-3 py-1.5"
-                                        >
-                                            <p
-                                                class="truncate text-xs text-zinc-500"
-                                            >
-                                                {proofOfPayment?.name}
-                                            </p>
-                                        </div>
-                                    </div>
-                                {:else}
-                                    <label
-                                        for="proofOfPayment"
-                                        class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-700 bg-zinc-900/50 px-4 py-6 text-center transition-colors hover:border-zinc-600 hover:bg-zinc-900"
-                                    >
-                                        <div
-                                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-800"
-                                        >
-                                            <ImageIcon
-                                                class="h-5 w-5 text-zinc-500"
-                                            />
-                                        </div>
-                                        <div>
-                                            <p
-                                                class="flex items-center gap-1.5 text-sm font-medium text-zinc-300"
-                                            >
-                                                <UploadIcon
-                                                    class="h-3.5 w-3.5"
-                                                />
-                                                Upload screenshot
-                                            </p>
-                                            <p
-                                                class="mt-0.5 text-xs text-zinc-600"
-                                            >
-                                                PNG, JPG or WEBP up to 10 MB
-                                            </p>
-                                        </div>
-                                        <input
-                                            id="proofOfPayment"
-                                            type="file"
-                                            accept="image/*"
-                                            class="sr-only"
-                                            onchange={handleProofFileChange}
-                                        />
-                                    </label>
-                                {/if}
+                                <ProofImageUploader
+                                    bind:objectStorageId={proofObjectStorageId}
+                                    bind:isUploading={proofUploading}
+                                />
                             </div>
 
                             <!-- Special Instructions -->
@@ -1198,6 +1139,7 @@
                             onclick={handleConfirm}
                             disabled={!isFormValid ||
                                 cart.length === 0 ||
+                                proofUploading ||
                                 createOrderMutation.isPending}
                             class="bg-blue-600 text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
                         >

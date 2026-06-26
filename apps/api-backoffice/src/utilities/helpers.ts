@@ -69,6 +69,27 @@ export const auditTrailLogger = async (
         ipAddress: ctx.get('ipAddress') ?? null,
         userAgent: ctx.get('userAgent') ?? null,
     })
+
+    // Non-blocking real-time broadcast to the audit WS channel
+    void (async () => {
+        try {
+            const doId = ctx.env.HYPERIONPUB_DO_WSS.idFromName('audit')
+            const stub = ctx.env.HYPERIONPUB_DO_WSS.get(doId)
+            await stub.sendMessage(
+                JSON.stringify({
+                    event: 'audit.new',
+                    data: {
+                        component: data.component,
+                        action: data.action,
+                        description: data.description,
+                        loggedAt: new Date().toISOString(),
+                    },
+                }),
+            )
+        } catch {
+            // Non-fatal: WS broadcast failure should not abort the operation
+        }
+    })()
 }
 
 /**

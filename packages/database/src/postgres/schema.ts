@@ -522,6 +522,15 @@ export const order = pgTable(
         proofOfPaymentObjectStorageId: text(
             'proof_of_payment_object_storage_id',
         ),
+        remainingBalancePaymentMethod: text('remaining_balance_payment_method'),
+        remainingBalanceProofObjectStorageId: text(
+            'remaining_balance_proof_object_storage_id',
+        ),
+        proofOfPaymentStatus: text('proof_of_payment_status'),
+        remainingBalanceProofStatus: text('remaining_balance_proof_status'),
+        remainingBalanceSenderName: text('remaining_balance_sender_name'),
+        remainingBalanceSenderNumber: text('remaining_balance_sender_number'),
+        remainingBalanceAmountSent: numeric('remaining_balance_amount_sent'),
         status: orderStatusEnum('status').notNull().default('pending'),
         notes: text('notes'),
         deliveryAddress: text('delivery_address'),
@@ -555,6 +564,12 @@ export const order = pgTable(
         index().on(t.createdAt),
         foreignKey({
             columns: [t.proofOfPaymentObjectStorageId],
+            foreignColumns: [objectStorage.id],
+        })
+            .onDelete('set null')
+            .onUpdate('no action'),
+        foreignKey({
+            columns: [t.remainingBalanceProofObjectStorageId],
             foreignColumns: [objectStorage.id],
         })
             .onDelete('set null')

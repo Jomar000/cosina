@@ -5,12 +5,14 @@
     import { Button } from '@hyperion/ui/components/button'
     import { Input } from '@hyperion/ui/components/input'
     import { Label } from '@hyperion/ui/components/label'
+    import { Separator } from '@hyperion/ui/components/separator'
     import { Textarea } from '@hyperion/ui/components/textarea'
     import { Skeleton } from '@hyperion/ui/components/skeleton'
     import CalendarIcon from '@lucide/svelte/icons/calendar'
     import CalendarOffIcon from '@lucide/svelte/icons/calendar-off'
     import InfoIcon from '@lucide/svelte/icons/info'
     import PlusIcon from '@lucide/svelte/icons/plus'
+    import SmartphoneIcon from '@lucide/svelte/icons/smartphone'
     import Trash2Icon from '@lucide/svelte/icons/trash-2'
     import {
         today,
@@ -43,6 +45,9 @@
         advanceDays: number
         restaurantAddress: string | null
         closingDays: TClosingDayItem[]
+        gcashAccountName: string | null
+        gcashNumber: string | null
+        paymentInstructions: string | null
     }
 
     type TDateRange = {
@@ -59,6 +64,11 @@
     // Order Settings form state
     let advanceDaysInput = $state(3)
     let restaurantAddressInput = $state('')
+
+    // Payment Details form state
+    let gcashAccountNameInput = $state('')
+    let gcashNumberInput = $state('')
+    let paymentInstructionsInput = $state('')
 
     // Closing Days add-form state
     let addFormOpen = $state(false)
@@ -117,6 +127,9 @@
         mutationFn: async (payload: {
             advanceDays: number
             restaurantAddress?: string
+            gcashAccountName?: string
+            gcashNumber?: string
+            paymentInstructions?: string
         }) => {
             const response = await adminClient.settings.update.$post({
                 json: payload,
@@ -189,12 +202,15 @@
     // 08. Effects //
     /////////////////
 
-    // Sync query data into local order settings inputs (one-way)
+    // Sync query data into local inputs (one-way, runs once on first load)
     $effect(() => {
         const fetched = settingsQuery.data
         if (fetched !== undefined) {
             advanceDaysInput = fetched.advanceDays
             restaurantAddressInput = fetched.restaurantAddress ?? ''
+            gcashAccountNameInput = fetched.gcashAccountName ?? ''
+            gcashNumberInput = fetched.gcashNumber ?? ''
+            paymentInstructionsInput = fetched.paymentInstructions ?? ''
         }
     })
 
@@ -227,6 +243,18 @@
                             closingDays: Array.isArray(data.closingDays)
                                 ? (data.closingDays as TClosingDayItem[])
                                 : (current?.closingDays ?? []),
+                            gcashAccountName:
+                                'gcashAccountName' in data
+                                    ? (data.gcashAccountName ?? null)
+                                    : (current?.gcashAccountName ?? null),
+                            gcashNumber:
+                                'gcashNumber' in data
+                                    ? (data.gcashNumber ?? null)
+                                    : (current?.gcashNumber ?? null),
+                            paymentInstructions:
+                                'paymentInstructions' in data
+                                    ? (data.paymentInstructions ?? null)
+                                    : (current?.paymentInstructions ?? null),
                         }),
                     )
                 }
@@ -253,6 +281,9 @@
         updateSettingsMutation.mutate({
             advanceDays: clamped,
             restaurantAddress: restaurantAddressInput.trim() || undefined,
+            gcashAccountName: gcashAccountNameInput.trim() || undefined,
+            gcashNumber: gcashNumberInput.trim() || undefined,
+            paymentInstructions: paymentInstructionsInput.trim() || undefined,
         })
     }
 
@@ -457,7 +488,115 @@
         </Card.Footer>
     </Card.Root>
 
-    <!-- ── Card 2: Closing Days ────────────────────────────────────── -->
+    <!-- ── Card 2: Payment Details ───────────────────────────────── -->
+    <Card.Root>
+        <Card.Header>
+            <Card.Title>Payment Details</Card.Title>
+            <Card.Description>
+                GCash account info shown to customers when they pay their
+                remaining balance. Changes are broadcast to customers.
+            </Card.Description>
+        </Card.Header>
+
+        <Card.Content class="flex flex-col gap-5">
+            {#if settingsQuery.isPending}
+                <div class="flex flex-col gap-3">
+                    <Skeleton class="h-4 w-40" />
+                    <Skeleton class="h-9 w-full" />
+                </div>
+                <div class="flex flex-col gap-3">
+                    <Skeleton class="h-4 w-32" />
+                    <Skeleton class="h-9 w-full" />
+                </div>
+            {:else}
+                <!-- GCash account -->
+                <div class="flex flex-col gap-4">
+                    <div
+                        class="flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400"
+                    >
+                        <SmartphoneIcon class="size-4 shrink-0" />
+                        GCash
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="flex flex-col gap-2">
+                            <Label
+                                for="gcashAccountName"
+                                class="text-sm font-medium"
+                            >
+                                Account Name
+                            </Label>
+                            <Input
+                                id="gcashAccountName"
+                                placeholder="e.g. Cosina Home Cooking"
+                                maxlength={128}
+                                bind:value={gcashAccountNameInput}
+                                class="text-sm"
+                            />
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <Label
+                                for="gcashNumber"
+                                class="text-sm font-medium"
+                            >
+                                GCash Number
+                            </Label>
+                            <Input
+                                id="gcashNumber"
+                                placeholder="e.g. 0917-450-5619"
+                                maxlength={32}
+                                bind:value={gcashNumberInput}
+                                class="text-sm"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <Separator />
+
+                <!-- Additional instructions -->
+                <div class="flex flex-col gap-2">
+                    <Label
+                        for="paymentInstructions"
+                        class="text-sm font-medium"
+                    >
+                        Payment Instructions
+                        <span class="text-muted-foreground font-normal"
+                            >(optional)</span
+                        >
+                    </Label>
+                    <p class="text-muted-foreground text-xs">
+                        Extra notes shown to customers when paying the remaining
+                        balance (e.g. "Include your order code in the GCash
+                        message").
+                    </p>
+                    <Textarea
+                        id="paymentInstructions"
+                        placeholder="e.g. Include your tracking code in the GCash note/message."
+                        bind:value={paymentInstructionsInput}
+                        rows={3}
+                        maxlength={512}
+                        class="resize-none text-sm"
+                    />
+                </div>
+            {/if}
+        </Card.Content>
+
+        <Card.Footer class="justify-end border-t pt-4">
+            <Button
+                onclick={saveOrderSettings}
+                disabled={updateSettingsMutation.isPending ||
+                    settingsQuery.isPending}
+            >
+                {updateSettingsMutation.isPending
+                    ? 'Saving…'
+                    : 'Save & Broadcast'}
+            </Button>
+        </Card.Footer>
+    </Card.Root>
+
+    <!-- ── Card 3: Closing Days ────────────────────────────────────── -->
     <Card.Root>
         <Card.Header>
             <Card.Title>Closing Days</Card.Title>

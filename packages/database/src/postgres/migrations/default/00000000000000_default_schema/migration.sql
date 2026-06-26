@@ -534,4 +534,17 @@ ALTER TABLE "order" ADD COLUMN "delivery_at" timestamp with time zone;--> statem
 ALTER TABLE "order" ADD COLUMN "tracking_code" text NOT NULL DEFAULT '';--> statement-breakpoint
 CREATE UNIQUE INDEX "order_tracking_code_unique" ON "order" ("tracking_code");--> statement-breakpoint
 CREATE INDEX "order_delivery_at_index" ON "order" ("delivery_at");--> statement-breakpoint
-ALTER TABLE "order" ALTER COLUMN "tracking_code" DROP DEFAULT;
+ALTER TABLE "order" ALTER COLUMN "tracking_code" DROP DEFAULT;--> statement-breakpoint
+-- Remaining balance payment method and proof
+ALTER TABLE "order" ADD COLUMN "remaining_balance_payment_method" text;--> statement-breakpoint
+ALTER TABLE "order" ADD COLUMN "remaining_balance_proof_object_storage_id" text;--> statement-breakpoint
+ALTER TABLE "order" ADD CONSTRAINT "order_remaining_balance_proof_fk" FOREIGN KEY ("remaining_balance_proof_object_storage_id") REFERENCES "object_storage"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
+
+--> statement-breakpoint
+-- Proof of payment status tracking
+ALTER TABLE "order" ADD COLUMN "proof_of_payment_status" text;--> statement-breakpoint
+ALTER TABLE "order" ADD COLUMN "remaining_balance_proof_status" text;--> statement-breakpoint
+-- Remaining balance GCash sender info
+ALTER TABLE "order" ADD COLUMN "remaining_balance_sender_name" text;--> statement-breakpoint
+ALTER TABLE "order" ADD COLUMN "remaining_balance_sender_number" text;--> statement-breakpoint
+ALTER TABLE "order" ADD COLUMN "remaining_balance_amount_sent" numeric;

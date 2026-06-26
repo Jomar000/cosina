@@ -145,7 +145,7 @@ export const orderRoute = new Hono<THonoInstance>()
                             ...created,
                             proofOfPaymentUrl:
                                 created.proofOfPaymentObjectStorageId
-                                    ? `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${created.proofOfPaymentObjectStorageId}`
+                                    ? `${ctx.env.URL_BACKEND}/api/image/view/${created.proofOfPaymentObjectStorageId}`
                                     : null,
                             items: insertedItems,
                         }
@@ -216,11 +216,6 @@ export const orderRoute = new Hono<THonoInstance>()
         const hashHex = Array.from(new Uint8Array(hashBuffer))
             .map((b) => b.toString(16).padStart(2, '0'))
             .join('')
-        let base64Str = ''
-        for (const byte of new Uint8Array(hashBuffer)) {
-            base64Str += String.fromCharCode(byte)
-        }
-        const hashBase64 = btoa(base64Str)
 
         const { objectStorage: objectStorageTable } = ctx.get('dbSchema')
 
@@ -258,30 +253,9 @@ export const orderRoute = new Hono<THonoInstance>()
                         })
                 }
 
-                const uploadUrl = `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET_PUBLIC}/${objectId}`
-
-                const signedReq = await ctx
-                    .get('aws4FetchClient')
-                    .sign(uploadUrl, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': mimeType,
-                            'x-amz-checksum-sha256': hashBase64,
-                        },
-                        body: buffer,
-                        aws: { service: 's3' },
-                    })
-
-                const r2Response = await fetch(signedReq)
-
-                if (!r2Response.ok) {
-                    const r2ErrorBody = await r2Response.text().catch(() => '')
-                    throw new AppError({
-                        status: 500,
-                        code: 'R2_UPLOAD_FAILED',
-                        message: `R2 upload failed: ${r2Response.status} ${r2Response.statusText}${r2ErrorBody ? ` — ${r2ErrorBody}` : ''}`,
-                    })
-                }
+                await ctx
+                    .get('kvClient')
+                    .put(`img:${objectId}`, buffer, { metadata: { mimeType } })
 
                 await ctx
                     .get('dbClient')
@@ -312,7 +286,7 @@ export const orderRoute = new Hono<THonoInstance>()
         return apiResponseOkWrapper(ctx, {
             data: {
                 objectStorageId: objectId,
-                proofOfPaymentUrl: `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${objectId}`,
+                proofOfPaymentUrl: `${ctx.env.URL_BACKEND}/api/image/view/${objectId}`,
             },
         })
     })
@@ -321,6 +295,9 @@ const ADVANCE_DAYS_KEY = 'order:settings:advanceDays'
 const DEFAULT_ADVANCE_DAYS = 3
 const RESTAURANT_ADDRESS_KEY = 'order:settings:restaurantAddress'
 const CLOSING_DAYS_KEY = 'order:settings:closingDays'
+const GCASH_ACCOUNT_NAME_KEY = 'order:settings:gcashAccountName'
+const GCASH_NUMBER_KEY = 'order:settings:gcashNumber'
+const PAYMENT_INSTRUCTIONS_KEY = 'order:settings:paymentInstructions'
 
 type TClosingDayItem = {
     id: string
@@ -354,6 +331,9 @@ export const trackOrderRoute = orderRoute
                         ADVANCE_DAYS_KEY,
                         RESTAURANT_ADDRESS_KEY,
                         CLOSING_DAYS_KEY,
+                        GCASH_ACCOUNT_NAME_KEY,
+                        GCASH_NUMBER_KEY,
+                        PAYMENT_INSTRUCTIONS_KEY,
                     ]),
                 )
 
@@ -370,16 +350,33 @@ export const trackOrderRoute = orderRoute
 
             const restaurantAddress = byKey[RESTAURANT_ADDRESS_KEY] ?? null
             const closingDays = parseClosingDays(byKey[CLOSING_DAYS_KEY])
+            const gcashAccountName = byKey[GCASH_ACCOUNT_NAME_KEY] ?? null
+            const gcashNumber = byKey[GCASH_NUMBER_KEY] ?? null
+            const paymentInstructions = byKey[PAYMENT_INSTRUCTIONS_KEY] ?? null
 
             return apiResponseOkWrapper(ctx, {
-                data: { advanceDays, restaurantAddress, closingDays },
+                data: {
+                    advanceDays,
+                    restaurantAddress,
+                    closingDays,
+                    gcashAccountName,
+                    gcashNumber,
+                    paymentInstructions,
+                },
             })
-        } catch {
+        } catch (err) {
+            console.error(
+                '[order/settings] Failed to fetch settings, returning defaults',
+                err,
+            )
             return apiResponseOkWrapper(ctx, {
                 data: {
                     advanceDays: DEFAULT_ADVANCE_DAYS,
                     restaurantAddress: null,
                     closingDays: [],
+                    gcashAccountName: null,
+                    gcashNumber: null,
+                    paymentInstructions: null,
                 },
             })
         }
@@ -405,6 +402,11 @@ export const trackOrderRoute = orderRoute
                     status: orderTable.status,
                     notes: orderTable.notes,
                     createdAt: orderTable.createdAt,
+                    remainingBalancePaymentMethod:
+                        orderTable.remainingBalancePaymentMethod,
+                    proofOfPaymentStatus: orderTable.proofOfPaymentStatus,
+                    remainingBalanceProofStatus:
+                        orderTable.remainingBalanceProofStatus,
                 })
                 .from(orderTable)
                 .where(eq(orderTable.trackingCode, trackingCode))
@@ -433,6 +435,133 @@ export const trackOrderRoute = orderRoute
                 .orderBy(asc(orderItemTable.id))
 
             return apiResponseOkWrapper(ctx, { data: { ...row, items } })
+        },
+    )
+    .post(
+        '/remaining-balance/submit',
+        validateRequest('json', order.submitRemainingBalanceInputSchema),
+        async (ctx) => {
+            const {
+                trackingCode,
+                paymentMethod,
+                proofObjectStorageId,
+                senderName,
+                senderNumber,
+                amountSent,
+            } = ctx.req.valid('json')
+
+            if (paymentMethod === 'gcash') {
+                if (!proofObjectStorageId) {
+                    return apiResponseErrorWrapper(ctx, {
+                        code: 'PROOF_REQUIRED',
+                        message:
+                            'A proof of payment screenshot is required for GCash payments.',
+                        status: 400,
+                    })
+                }
+                if (!senderName || !senderNumber || !amountSent) {
+                    return apiResponseErrorWrapper(ctx, {
+                        code: 'SENDER_INFO_REQUIRED',
+                        message:
+                            'Your GCash name, number, and the amount you sent are required.',
+                        status: 400,
+                    })
+                }
+            }
+
+            const { order: orderTable } = ctx.get('dbSchema')
+
+            const [existing] = await ctx
+                .get('dbClient')
+                .select({
+                    id: orderTable.id,
+                    status: orderTable.status,
+                    remainingBalancePaymentMethod:
+                        orderTable.remainingBalancePaymentMethod,
+                })
+                .from(orderTable)
+                .where(eq(orderTable.trackingCode, trackingCode))
+                .limit(1)
+
+            if (!existing) {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
+                    message:
+                        'Order not found. Please check your Tracking Code.',
+                    status: 404,
+                })
+            }
+
+            if (existing.status === 'cancelled') {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'ORDER_CANCELLED',
+                    message:
+                        'This order has been cancelled and cannot accept payment.',
+                    status: 409,
+                })
+            }
+
+            if (existing.remainingBalancePaymentMethod !== null) {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'ALREADY_SUBMITTED',
+                    message:
+                        'A remaining balance payment has already been submitted for this order.',
+                    status: 409,
+                })
+            }
+
+            try {
+                await ctx
+                    .get('dbClient')
+                    .update(orderTable)
+                    .set({
+                        remainingBalancePaymentMethod: paymentMethod,
+                        remainingBalanceProofObjectStorageId:
+                            proofObjectStorageId ?? null,
+                        remainingBalanceSenderName: senderName ?? null,
+                        remainingBalanceSenderNumber: senderNumber ?? null,
+                        remainingBalanceAmountSent: amountSent ?? null,
+                        updatedAt: new Date(),
+                    })
+                    .where(eq(orderTable.id, existing.id))
+
+                console.log(
+                    JSON.stringify({
+                        type: 'REMAINING_BALANCE_SUBMITTED',
+                        requestId: ctx.get('requestId'),
+                        orderId: existing.id,
+                        paymentMethod,
+                    }),
+                )
+
+                await broadcastOrderEvent(ctx, 'order.remainingBalanceSubmit', {
+                    id: existing.id,
+                    trackingCode,
+                    paymentMethod,
+                })
+
+                await auditTrailLogger(ctx, {
+                    component: 'order',
+                    action: 'remainingBalance.submit',
+                    description: `Customer submitted remaining balance payment via ${paymentMethod}`,
+                    records: { table: 'order', id: String(existing.id) },
+                })
+
+                return apiResponseOkWrapper(ctx, {
+                    data: { trackingCode, paymentMethod },
+                })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'REMAINING_BALANCE_SUBMIT_FAILED',
+                        message: 'Failed to submit remaining balance payment.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
         },
     )
 

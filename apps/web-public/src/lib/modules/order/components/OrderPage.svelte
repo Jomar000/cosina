@@ -16,6 +16,7 @@
     import SlidersHorizontalIcon from '@lucide/svelte/icons/sliders-horizontal'
     import UtensilsIcon from '@lucide/svelte/icons/utensils'
     import XIcon from '@lucide/svelte/icons/x'
+    import { onMount } from 'svelte'
     import { createQuery, useQueryClient } from '@tanstack/svelte-query'
 
     import { orderClient, productClient } from '$lib/clients'
@@ -79,8 +80,8 @@
     let selectedCategory = $state<TCategory>('all')
     let selectedTag = $state<TProductTag | 'all'>('all')
     let nextKey = 0
-    let closedDialogOpen = $state(false)
     let closedDialogDismissed = $state(false)
+    let closedDialogOpen = $state(false)
 
     /////////////////
     // 05. Queries //
@@ -104,11 +105,14 @@
                 advanceDays: number
                 restaurantAddress: string | null
                 closingDays: TClosingDayItem[]
+                gcashAccountName: string | null
+                gcashNumber: string | null
+                paymentInstructions: string | null
             }>
             if (!json.success) throw new Error(json.error.message)
             return json.data
         },
-        staleTime: 5 * 60 * 1000,
+        staleTime: 0,
     }))
 
     /////////////////
@@ -132,15 +136,20 @@
     )
 
     const activeClosingRange = $derived.by(() => {
-        const d = new Date()
-        const todayStr = [
-            d.getFullYear(),
-            String(d.getMonth() + 1).padStart(2, '0'),
-            String(d.getDate()).padStart(2, '0'),
-        ].join('-')
+        const toDateStr = (d: Date) =>
+            [
+                d.getFullYear(),
+                String(d.getMonth() + 1).padStart(2, '0'),
+                String(d.getDate()).padStart(2, '0'),
+            ].join('-')
+        const today = new Date()
+        const todayStr = toDateStr(today)
+        const lookaheadStr = toDateStr(
+            new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000),
+        )
         return (
             closingDays.find(
-                (r) => todayStr >= r.startDate && todayStr <= r.endDate,
+                (r) => r.endDate >= todayStr && r.startDate <= lookaheadStr,
             ) ?? null
         )
     })
@@ -161,6 +170,16 @@
     /////////////////
     // 08. Effects //
     /////////////////
+
+    onMount(() => {
+        closedDialogDismissed = false
+    })
+
+    $effect(() => {
+        if (activeClosingRange && !closedDialogDismissed) {
+            closedDialogOpen = true
+        }
+    })
 
     $effect(() => {
         const ws = wsClientManager.connect('products')
@@ -225,17 +244,6 @@
         }
     })
 
-    // Auto-open the "closed" dialog once settings are loaded and today is a closing day
-    $effect(() => {
-        if (
-            activeClosingRange &&
-            !settingsQuery.isPending &&
-            !closedDialogDismissed
-        ) {
-            closedDialogOpen = true
-        }
-    })
-
     //////////////////
     // 09. Handlers //
     //////////////////
@@ -252,8 +260,8 @@
     }
 
     function dismissClosedDialog() {
-        closedDialogOpen = false
         closedDialogDismissed = true
+        closedDialogOpen = false
     }
 
     /////////////////
@@ -900,6 +908,8 @@
         {restaurantAddress}
         {closingDays}
         settingsLoading={settingsQuery.isPending}
+        gcashAccountName={settingsQuery.data?.gcashAccountName ?? null}
+        gcashNumber={settingsQuery.data?.gcashNumber ?? null}
         onOrderSuccess={handleOrderSuccess}
     />
 
@@ -907,7 +917,7 @@
     {#if activeClosingRange}
         <Dialog.Root
             bind:open={closedDialogOpen}
-            onOpenChange={(open) => {
+            onOpenChange={(open: boolean) => {
                 if (!open) dismissClosedDialog()
             }}
         >

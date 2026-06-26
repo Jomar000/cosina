@@ -18,6 +18,9 @@ const ADVANCE_DAYS_KEY = 'order:settings:advanceDays'
 const DEFAULT_ADVANCE_DAYS = 3
 const RESTAURANT_ADDRESS_KEY = 'order:settings:restaurantAddress'
 const CLOSING_DAYS_KEY = 'order:settings:closingDays'
+const GCASH_ACCOUNT_NAME_KEY = 'order:settings:gcashAccountName'
+const GCASH_NUMBER_KEY = 'order:settings:gcashNumber'
+const PAYMENT_INSTRUCTIONS_KEY = 'order:settings:paymentInstructions'
 
 async function broadcastSettingsEvent(
     env: THonoInstance['Bindings'],
@@ -29,8 +32,12 @@ async function broadcastSettingsEvent(
         await stub.sendMessage(
             JSON.stringify({ event: 'settings.update', data }),
         )
-    } catch {
+    } catch (err) {
         // Non-fatal: WS broadcast failure should not abort the HTTP response
+        console.error(
+            '[broadcastSettingsEvent] Failed to broadcast settings update',
+            err,
+        )
     }
 }
 
@@ -61,6 +68,9 @@ export const settingsRoute = new Hono<THonoInstance>()
                         ADVANCE_DAYS_KEY,
                         RESTAURANT_ADDRESS_KEY,
                         CLOSING_DAYS_KEY,
+                        GCASH_ACCOUNT_NAME_KEY,
+                        GCASH_NUMBER_KEY,
+                        PAYMENT_INSTRUCTIONS_KEY,
                     ]),
                 )
 
@@ -77,9 +87,19 @@ export const settingsRoute = new Hono<THonoInstance>()
 
             const restaurantAddress = byKey[RESTAURANT_ADDRESS_KEY] ?? null
             const closingDays = parseClosingDays(byKey[CLOSING_DAYS_KEY])
+            const gcashAccountName = byKey[GCASH_ACCOUNT_NAME_KEY] ?? null
+            const gcashNumber = byKey[GCASH_NUMBER_KEY] ?? null
+            const paymentInstructions = byKey[PAYMENT_INSTRUCTIONS_KEY] ?? null
 
             return apiResponseOkWrapper(ctx, {
-                data: { advanceDays, restaurantAddress, closingDays },
+                data: {
+                    advanceDays,
+                    restaurantAddress,
+                    closingDays,
+                    gcashAccountName,
+                    gcashNumber,
+                    paymentInstructions,
+                },
             })
         } catch (err) {
             if (err instanceof AppError) throw err
@@ -98,7 +118,13 @@ export const settingsRoute = new Hono<THonoInstance>()
         '/update',
         validateRequest('json', settings.updateSettingsInputSchema),
         async (ctx) => {
-            const { advanceDays, restaurantAddress } = ctx.req.valid('json')
+            const {
+                advanceDays,
+                restaurantAddress,
+                gcashAccountName,
+                gcashNumber,
+                paymentInstructions,
+            } = ctx.req.valid('json')
 
             const { keyValue } = ctx.get('dbSchema')
 
@@ -130,6 +156,57 @@ export const settingsRoute = new Hono<THonoInstance>()
                             target: keyValue.key,
                             set: {
                                 value: restaurantAddress,
+                                updatedAt: sql`now()`,
+                            },
+                        })
+                }
+
+                if (gcashAccountName !== undefined) {
+                    await ctx
+                        .get('dbClient')
+                        .insert(keyValue)
+                        .values({
+                            key: GCASH_ACCOUNT_NAME_KEY,
+                            value: gcashAccountName,
+                        })
+                        .onConflictDoUpdate({
+                            target: keyValue.key,
+                            set: {
+                                value: gcashAccountName,
+                                updatedAt: sql`now()`,
+                            },
+                        })
+                }
+
+                if (gcashNumber !== undefined) {
+                    await ctx
+                        .get('dbClient')
+                        .insert(keyValue)
+                        .values({
+                            key: GCASH_NUMBER_KEY,
+                            value: gcashNumber,
+                        })
+                        .onConflictDoUpdate({
+                            target: keyValue.key,
+                            set: {
+                                value: gcashNumber,
+                                updatedAt: sql`now()`,
+                            },
+                        })
+                }
+
+                if (paymentInstructions !== undefined) {
+                    await ctx
+                        .get('dbClient')
+                        .insert(keyValue)
+                        .values({
+                            key: PAYMENT_INSTRUCTIONS_KEY,
+                            value: paymentInstructions,
+                        })
+                        .onConflictDoUpdate({
+                            target: keyValue.key,
+                            set: {
+                                value: paymentInstructions,
                                 updatedAt: sql`now()`,
                             },
                         })
@@ -171,10 +248,57 @@ export const settingsRoute = new Hono<THonoInstance>()
                     closingDaysRows[0]?.value ?? undefined,
                 )
 
+                // Resolve payment fields for broadcast
+                const resolvedGcashAccountName =
+                    gcashAccountName !== undefined
+                        ? gcashAccountName
+                        : ((
+                              await ctx
+                                  .get('dbClient')
+                                  .select({ value: keyValue.value })
+                                  .from(keyValue)
+                                  .where(
+                                      eq(keyValue.key, GCASH_ACCOUNT_NAME_KEY),
+                                  )
+                                  .limit(1)
+                          )[0]?.value ?? null)
+
+                const resolvedGcashNumber =
+                    gcashNumber !== undefined
+                        ? gcashNumber
+                        : ((
+                              await ctx
+                                  .get('dbClient')
+                                  .select({ value: keyValue.value })
+                                  .from(keyValue)
+                                  .where(eq(keyValue.key, GCASH_NUMBER_KEY))
+                                  .limit(1)
+                          )[0]?.value ?? null)
+
+                const resolvedPaymentInstructions =
+                    paymentInstructions !== undefined
+                        ? paymentInstructions
+                        : ((
+                              await ctx
+                                  .get('dbClient')
+                                  .select({ value: keyValue.value })
+                                  .from(keyValue)
+                                  .where(
+                                      eq(
+                                          keyValue.key,
+                                          PAYMENT_INSTRUCTIONS_KEY,
+                                      ),
+                                  )
+                                  .limit(1)
+                          )[0]?.value ?? null)
+
                 await broadcastSettingsEvent(ctx.env, {
                     advanceDays,
                     restaurantAddress: resolvedAddress,
                     closingDays,
+                    gcashAccountName: resolvedGcashAccountName,
+                    gcashNumber: resolvedGcashNumber,
+                    paymentInstructions: resolvedPaymentInstructions,
                 })
 
                 return apiResponseOkWrapper(ctx, {
@@ -182,6 +306,9 @@ export const settingsRoute = new Hono<THonoInstance>()
                         advanceDays,
                         restaurantAddress: resolvedAddress,
                         closingDays,
+                        gcashAccountName: resolvedGcashAccountName,
+                        gcashNumber: resolvedGcashNumber,
+                        paymentInstructions: resolvedPaymentInstructions,
                     },
                 })
             } catch (err) {
@@ -231,7 +358,7 @@ export const settingsRoute = new Hono<THonoInstance>()
                     },
                 })
 
-                // Fetch advanceDays + restaurantAddress for the broadcast snapshot
+                // Fetch other settings for the broadcast snapshot
                 const otherRows = await ctx
                     .get('dbClient')
                     .select({ key: keyValue.key, value: keyValue.value })
@@ -240,6 +367,9 @@ export const settingsRoute = new Hono<THonoInstance>()
                         inArray(keyValue.key, [
                             ADVANCE_DAYS_KEY,
                             RESTAURANT_ADDRESS_KEY,
+                            GCASH_ACCOUNT_NAME_KEY,
+                            GCASH_NUMBER_KEY,
+                            PAYMENT_INSTRUCTIONS_KEY,
                         ]),
                     )
 
@@ -260,6 +390,10 @@ export const settingsRoute = new Hono<THonoInstance>()
                     advanceDays,
                     restaurantAddress,
                     closingDays,
+                    gcashAccountName: byKey[GCASH_ACCOUNT_NAME_KEY] ?? null,
+                    gcashNumber: byKey[GCASH_NUMBER_KEY] ?? null,
+                    paymentInstructions:
+                        byKey[PAYMENT_INSTRUCTIONS_KEY] ?? null,
                 })
 
                 return apiResponseOkWrapper(ctx, {

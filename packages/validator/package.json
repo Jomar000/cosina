@@ -29,6 +29,10 @@
             "types": "./dist/backoffice/auth.schema.d.ts",
             "default": "./dist/backoffice/auth.schema.js"
         },
+        "./backoffice/admin/audit": {
+            "types": "./dist/backoffice/admin/audit/index.d.ts",
+            "default": "./dist/backoffice/admin/audit/index.js"
+        },
         "./backoffice/admin/dashboard": {
             "types": "./dist/backoffice/admin/dashboard/index.d.ts",
             "default": "./dist/backoffice/admin/dashboard/index.js"

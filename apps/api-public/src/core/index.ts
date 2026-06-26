@@ -11,6 +11,7 @@ import { requestTimer } from './middleware/requestTimer.js'
 import { apiRoute } from './route/api/index.js'
 import { rootRoute } from './route/root/index.js'
 import { v1Route } from './route/v1/index.js'
+import { cleanupProofImages } from './scheduled/cleanupProofImages.js'
 
 export const app = new Hono<THonoInstance>()
     /**
@@ -74,5 +75,10 @@ export const app = new Hono<THonoInstance>()
     .route('/api', apiRoute)
     .route('/v1', v1Route)
 
-export default app
+export default {
+    fetch: app.fetch.bind(app),
+    async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
+        ctx.waitUntil(cleanupProofImages(env))
+    },
+}
 export { WebSocketServer }

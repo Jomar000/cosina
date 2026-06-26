@@ -35,7 +35,7 @@ async function broadcastOrderEvent(
 
 function proofUrl(ctx: Context<THonoInstance>, objectStorageId: string | null) {
     if (!objectStorageId) return null
-    return `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${objectStorageId}`
+    return `${ctx.env.URL_BACKEND}/api/image/view/${objectStorageId}`
 }
 
 export const orderRoute = new Hono<THonoInstance>()
@@ -64,6 +64,19 @@ export const orderRoute = new Hono<THonoInstance>()
                         amountToPay: orderTable.amountToPay,
                         proofOfPaymentObjectStorageId:
                             orderTable.proofOfPaymentObjectStorageId,
+                        remainingBalancePaymentMethod:
+                            orderTable.remainingBalancePaymentMethod,
+                        remainingBalanceProofObjectStorageId:
+                            orderTable.remainingBalanceProofObjectStorageId,
+                        proofOfPaymentStatus: orderTable.proofOfPaymentStatus,
+                        remainingBalanceProofStatus:
+                            orderTable.remainingBalanceProofStatus,
+                        remainingBalanceSenderName:
+                            orderTable.remainingBalanceSenderName,
+                        remainingBalanceSenderNumber:
+                            orderTable.remainingBalanceSenderNumber,
+                        remainingBalanceAmountSent:
+                            orderTable.remainingBalanceAmountSent,
                         status: orderTable.status,
                         notes: orderTable.notes,
                         createdAt: orderTable.createdAt,
@@ -99,6 +112,10 @@ export const orderRoute = new Hono<THonoInstance>()
                         proofOfPaymentUrl: proofUrl(
                             ctx,
                             row.proofOfPaymentObjectStorageId,
+                        ),
+                        remainingBalanceProofUrl: proofUrl(
+                            ctx,
+                            row.remainingBalanceProofObjectStorageId,
                         ),
                         items,
                     },
@@ -177,6 +194,19 @@ export const orderRoute = new Hono<THonoInstance>()
                         amountToPay: orderTable.amountToPay,
                         proofOfPaymentObjectStorageId:
                             orderTable.proofOfPaymentObjectStorageId,
+                        remainingBalancePaymentMethod:
+                            orderTable.remainingBalancePaymentMethod,
+                        remainingBalanceProofObjectStorageId:
+                            orderTable.remainingBalanceProofObjectStorageId,
+                        proofOfPaymentStatus: orderTable.proofOfPaymentStatus,
+                        remainingBalanceProofStatus:
+                            orderTable.remainingBalanceProofStatus,
+                        remainingBalanceSenderName:
+                            orderTable.remainingBalanceSenderName,
+                        remainingBalanceSenderNumber:
+                            orderTable.remainingBalanceSenderNumber,
+                        remainingBalanceAmountSent:
+                            orderTable.remainingBalanceAmountSent,
                         status: orderTable.status,
                         notes: orderTable.notes,
                         createdAt: orderTable.createdAt,
@@ -210,6 +240,10 @@ export const orderRoute = new Hono<THonoInstance>()
                     proofOfPaymentUrl: proofUrl(
                         ctx,
                         row.proofOfPaymentObjectStorageId,
+                    ),
+                    remainingBalanceProofUrl: proofUrl(
+                        ctx,
+                        row.remainingBalanceProofObjectStorageId,
                     ),
                     items: allItems.filter((item) => item.orderId === row.id),
                 }))
@@ -702,11 +736,6 @@ export const orderRoute = new Hono<THonoInstance>()
         const hashHex = Array.from(new Uint8Array(hashBuffer))
             .map((b) => b.toString(16).padStart(2, '0'))
             .join('')
-        let base64Str = ''
-        for (const byte of new Uint8Array(hashBuffer)) {
-            base64Str += String.fromCharCode(byte)
-        }
-        const hashBase64 = btoa(base64Str)
 
         const { objectStorage: objectStorageTable } = ctx.get('dbSchema')
 
@@ -744,30 +773,9 @@ export const orderRoute = new Hono<THonoInstance>()
                         })
                 }
 
-                const uploadUrl = `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET_PUBLIC}/${objectId}`
-
-                const signedReq = await ctx
-                    .get('aws4FetchClient')
-                    .sign(uploadUrl, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': mimeType,
-                            'x-amz-checksum-sha256': hashBase64,
-                        },
-                        body: buffer,
-                        aws: { service: 's3' },
-                    })
-
-                const r2Response = await fetch(signedReq)
-
-                if (!r2Response.ok) {
-                    const r2ErrorBody = await r2Response.text().catch(() => '')
-                    throw new AppError({
-                        status: 500,
-                        code: 'R2_UPLOAD_FAILED',
-                        message: `R2 upload failed: ${r2Response.status} ${r2Response.statusText}${r2ErrorBody ? ` — ${r2ErrorBody}` : ''}`,
-                    })
-                }
+                await ctx
+                    .get('kvClient')
+                    .put(`img:${objectId}`, buffer, { metadata: { mimeType } })
 
                 await ctx
                     .get('dbClient')
@@ -798,10 +806,81 @@ export const orderRoute = new Hono<THonoInstance>()
         return apiResponseOkWrapper(ctx, {
             data: {
                 objectStorageId: objectId,
-                proofOfPaymentUrl: `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${objectId}`,
+                proofOfPaymentUrl: `${ctx.env.URL_BACKEND}/api/image/view/${objectId}`,
             },
         })
     })
+    .post(
+        '/proof/updateStatus',
+        validateRequest('json', order.updateProofStatusInputSchema),
+        async (ctx) => {
+            const { orderId, proofType, status } = ctx.req.valid('json')
+
+            const { order: orderTable } = ctx.get('dbSchema')
+
+            const existing = (
+                await ctx
+                    .get('dbClient')
+                    .select({ count: countFn(orderTable.id) })
+                    .from(orderTable)
+                    .where(eq(orderTable.id, orderId))
+            )[0].count
+
+            if (existing === 0) {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
+                    message: 'Order not found.',
+                    status: 404,
+                })
+            }
+
+            try {
+                const setFields =
+                    proofType === 'downpayment'
+                        ? { proofOfPaymentStatus: status }
+                        : { remainingBalanceProofStatus: status }
+
+                const [updated] = await ctx
+                    .get('dbClient')
+                    .update(orderTable)
+                    .set(setFields)
+                    .where(eq(orderTable.id, orderId))
+                    .returning({
+                        id: orderTable.id,
+                        publicId: orderTable.publicId,
+                        trackingCode: orderTable.trackingCode,
+                    })
+
+                await auditTrailLogger(ctx, {
+                    component: 'admin.order',
+                    action: 'proof.updateStatus',
+                    description: `Admin marked ${proofType} proof as ${status}`,
+                    records: { table: 'order', id: String(updated.id) },
+                })
+
+                await broadcastOrderEvent(ctx, 'order.proofStatusUpdated', {
+                    trackingCode: updated.trackingCode,
+                    proofType,
+                    status,
+                })
+
+                return apiResponseOkWrapper(ctx, {
+                    data: { orderId, proofType, status },
+                })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'PROOF_STATUS_UPDATE_FAILED',
+                        message: 'Proof status update failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
 
 export type AdminOrderRouteType = ApplyGlobalResponse<
     typeof orderRoute,
