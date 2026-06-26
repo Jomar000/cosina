@@ -75,10 +75,12 @@ localConnectionString = "postgres://postgres:password123@localhost:5432/cosina"
 name = "HYPERIONBOFC_DO_WSS"
 class_name = "WebSocketServer"
 
+# No script_name in dev — resolves to a local DO instance so api-public does
+# not need to be running. Staging/production bindings below add script_name to
+# point at the shared api-public DO.
 [[durable_objects.bindings]]
 name = "HYPERIONPUB_DO_WSS"
 class_name = "WebSocketServer"
-script_name = "hyperion-api-public"
 
 ########
 # TEST #

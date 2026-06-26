@@ -16,6 +16,7 @@
             url: string
             icon: Component
             exact?: boolean
+            badge?: number
         }[]
     } = $props()
 
@@ -40,11 +41,25 @@
                             {...props}
                             data-active={isItemActive || undefined}
                         >
-                            <item.icon />
+                            <div class="relative">
+                                <item.icon />
+                                {#if item.badge}
+                                    <span
+                                        class="absolute -right-1 -top-1 hidden size-2 rounded-full bg-destructive group-data-[collapsible=icon]:block"
+                                    />
+                                {/if}
+                            </div>
                             <span>{item.title}</span>
                         </a>
                     {/snippet}
                 </Sidebar.MenuButton>
+                {#if item.badge}
+                    <Sidebar.MenuBadge
+                        class="rounded-full bg-destructive text-destructive-foreground"
+                    >
+                        {item.badge > 99 ? '99+' : item.badge}
+                    </Sidebar.MenuBadge>
+                {/if}
             </Sidebar.MenuItem>
         {/each}
     </Sidebar.Menu>

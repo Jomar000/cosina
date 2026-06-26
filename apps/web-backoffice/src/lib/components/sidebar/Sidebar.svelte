@@ -25,6 +25,8 @@
             title: string
             url: string
             icon: Component
+            exact?: boolean
+            badge?: number
         }[]
     } = $props()
 </script>
