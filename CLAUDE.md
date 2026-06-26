@@ -9,24 +9,32 @@
     - `packages/`: Shared libraries (`types`, `validator`, `database`, `ui`).
 - **Runtime Environment:**
     - **Production:** Cloudflare Workers (Edge).
-    - **Development/Scripting:** Node.js (>=24.15.0).
-    - **Constraint:** All shared code must be runtime-agnostic (no Node-specific APIs like `fs` inside Cloudflare-targeted packages).
+    - **Development/Scripting:** Node.js (>=24.16.0).
+    - **Constraint:** Code imported into Cloudflare Worker bundles must be runtime-agnostic and must not use Node-specific APIs such as `fs` or `process.env`. Node-only development and test modules, such as the database bootstrap and utilities, may use Node APIs while excluded from the Worker-facing build and package exports.
+
+### Template Tokens
+
+- Agent guidance and skills remain reusable by downstream template forks.
+- `PROJECT_NAME` is a documentation token for the package scope and uppercase binding prefix. In this repository, package examples resolve to `@hyperion/*`, while app-specific bindings include `HYPERIONPUB_KV` and `HYPERIONBOFC_KV`.
+- Commands copied into a concrete repository must replace `@PROJECT_NAME` with that repository's actual package scope.
 
 ## 2. Tech Stack & Standards
 
 - **Frontend:** Svelte (SvelteKit), SPA mode (`adapter-static`). CSP via `kit.csp` in `svelte.config.js` (hash mode, build-time).
-- **Backend:** Hono. BFF pattern — separate instances for `public` (client-facing) and `admin` (dashboard) APIs. Use Hono RPC or shared Zod validators for contract safety.
+- **Backend:** Hono BFFs for public and backoffice clients. Mount all HTTP endpoints below `/api`, including heartbeat and v1. Use Hono RPC or shared Zod validators for contract safety.
 - **Database:** Drizzle ORM. Schema in `packages/database/src/postgres/schema.ts`. Direct DB calls only in backend apps.
 - **Language:** TypeScript (Strict mode).
 - **Types (`packages/types`):**
-    - `@PROJECT_NAME/types/shared` — shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponseError`).
-    - `@PROJECT_NAME/types/public` — public-app specific types.
-    - Type definitions only — no runtime code beyond type references.
+    - `@PROJECT_NAME/types/shared` -- shared API response types (`TApiResponse<T>`, `TApiResponseOk<T>`, `TApiResponsePaginated<T>`, `TApiResponsePaginatedOk<T>`, `TApiResponseError`).
+    - `@PROJECT_NAME/types/public` -- public-app specific types.
+    - `@PROJECT_NAME/types/backoffice` -- backoffice-app specific types.
+    - Type definitions only -- no runtime code beyond type references.
 
 ## 3. File Structure & Naming
 
 - **Directories:**
     - `src/routes`: SvelteKit routes.
+    - `apps/api-*/src/core/route/api/`: Hono route modules mounted below `/api`.
     - `packages/ui/src/components/`: shadcn-svelte UI primitives (managed by the `shadcn-svelte` CLI).
     - `apps/*/src/lib/components/`: Custom/project-specific reusable components.
 - **Styling:** Tailwind CSS v4 with `@tailwindcss/vite` and `tw-animate-css`.
@@ -36,53 +44,52 @@
 
 ## 4. Development Workflow
 
-- **Package Management:** pnpm (>=11.1.2) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
+- **Package Management:** pnpm (>=11.8.0) is the primary package manager. Use the root lockfile (`pnpm-lock.yaml`). Do not create nested lockfiles.
 - **Template Merges:** When merging this global template into downstream forks, follow `MERGING.md` before applying domain-specific skills.
 - **Running Apps:** Use `pnpm --filter=<package-name>` to target individual workspaces:
     ```bash
     pnpm --filter=@PROJECT_NAME/api-public dev     # Hono on :8081 (wrangler dev)
     pnpm --filter=@PROJECT_NAME/web-public dev     # SvelteKit on :5174 (vite dev)
     pnpm --filter=@PROJECT_NAME/database migrate:dev  # Run DB migrations (dev)
+    pnpm --filter=@PROJECT_NAME/database cleanup:test # Drop test databases older than 24 hours
+    pnpm --filter=@PROJECT_NAME/api-public test    # Concurrent/sequential projects run in parallel on isolated databases
     ```
 - **Environment Variables:**
-    - `apps/api-{public,backoffice}/wrangler.toml` — non-secret `[vars]` (CORS, cookie, URLs, R2 bucket names/public URL/presign expiry, etc.) and CF bindings (`PROJECT_NAME{PUB|BOFC}_KV`, `PROJECT_NAME{PUB|BOFC}_HD`, `PROJECT_NAME{PUB|BOFC}_DO_WSS`). Object storage uses S3-compatible R2 requests signed with `aws4fetch`; do not add direct R2 bucket bindings.
-    - `apps/api-public/.dev.vars` — secrets (not committed). Copy from `.dev.vars.example` which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
-    - `packages/database/.env` / `.env.test` — Postgres connection strings for local dev and test migrations.
+    - `apps/api-{public,backoffice}/wrangler.toml` -- non-secret vars and Cloudflare bindings. BFF deployments default to `zone_name` subdirectory routes; commented `custom_domain` routes are the alternative. Object storage uses `aws4fetch`-signed S3-compatible R2 requests, not direct R2 bindings.
+    - `apps/api-{public,backoffice}/.dev.vars` -- secrets (not committed). Copy the matching `.dev.vars.example`, which documents all required keys (`BETTER_AUTH_SECRET`, `CF_TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, R2 S3 API keys, OAuth keys).
+    - `packages/database/.env` / `.env.test` -- Node-only inputs for development/test bootstrap and migrations, never Worker runtime configuration. Copy or rename `.env.example` to `.env.test`, set `NODE_ENV="test"`, and point `DATABASE_URL` at the local test database. Vitest derives a UUIDv7-suffixed URL from `.env.test`, injects that generated URL into local Hyperdrive, drops the database during teardown, and removes matching orphaned databases after 24 hours on later test starts. Use `cleanup:test` for manual stale cleanup; development runtime uses Wrangler's `localConnectionString`.
 
-## 5. Available Skills
+## 5. Deployment & CI/CD
 
-Use the Skill tool to load the relevant skill before starting any task in these areas:
+- App scripts provide `deploy:staging` and `deploy:prod` using `wrangler-staging.toml` and `wrangler-production.toml`. These files are intentionally ignored and supplied only on deployment machines; local development uses the committed `wrangler.toml`.
+- API scripts provide `secret:staging` and `secret:prod` for `wrangler secret bulk`.
+- Database scripts provide `migrate:staging` and `migrate:prod` using intentionally ignored deployment-machine configs (`drizzle-staging.config.ts` and `drizzle-production.config.ts`).
+- Deployment, secret-management, and staging/production migration commands require explicit human approval and must never be auto-run.
+- No repository-wide CI pipeline convention is established yet. Preserve existing `.github/` or `.gitlab-ci.yaml` behavior when one is introduced or modified.
 
-| Skill                         | When to use                                                                     |
-| ----------------------------- | ------------------------------------------------------------------------------- |
-| `svelte-patterns`             | Working on frontend Svelte/SvelteKit code or UI components                      |
-| `hono-patterns`               | Implementing or modifying Hono API routes, middleware, or error handling        |
-| `database-validator-patterns` | Modifying DB schema, writing Drizzle queries, or adding/updating Zod validators |
-| `auth-implementation`         | Implementing auth logic or fixing auth bugs                                     |
-| `cloudflare-worker-testing`   | Debugging or writing vitest tests targeting Cloudflare Workers                  |
-| `monorepo-troubleshooting`    | Fixing build errors, setting up new packages, or understanding the build graph  |
+## 6. Project Skills
 
-## 6. Permissions & Command Boundaries
+Project skills live in `.agents/skills/` for Codex/Gemini and `.claude/skills/` for Claude Code. Load the relevant skill before starting any task in these areas; Claude Code should use the Skill tool.
 
-> **Note for agents and developers:** For Claude Code, these rules are **hard-enforced** by `.claude/settings.json` at the tool level — this section is a human-readable mirror of those settings. For Codex and Gemini, this section is the **project-level guidance** for safe operation. If you tighten or change `.claude/settings.json`, update this section in all root agent docs to match.
+- `svelte-patterns` -- Working on frontend Svelte/SvelteKit code or UI components
+- `hono-patterns` -- Implementing or modifying Hono API routes, middleware, or error handling
+- `database-validator-patterns` -- Modifying DB schema, Drizzle queries, database bootstrap/migrations, test database lifecycles, or Zod validators
+- `auth-implementation` -- Implementing auth logic or fixing auth bugs
+- `cloudflare-worker-testing` -- Debugging or writing vitest tests targeting Cloudflare Workers
+- `monorepo-troubleshooting` -- Fixing build errors, setting up new packages, or understanding the build graph
+
+## 7. Permissions & Command Boundaries
+
+> **Note for agents and developers:** For Claude Code, these rules are **hard-enforced** by `.claude/settings.json` at the tool level -- this section is a human-readable mirror of those settings. For Codex and Gemini, this section is the **project-level guidance** for safe operation. If you tighten or change `.claude/settings.json`, update this section in all root agent docs to match.
 
 To ensure project safety, strictly adhere to the following file access and command execution boundaries (mirrored from `.claude/settings.json`):
 
-- **Allowed Scope:** Focus your file reads and edits within `apps/` and `packages/`, as well as root configuration files (`*.json`, `*.yaml`, `*.toml`, `*.js`, `*.ts`, `*.md`).
+- **Allowed Scope:** `apps/`, `packages/`, both skill directories, `.claude/settings.json`, and root configuration files (`*.json`, `*.yaml`, `*.toml`, `*.js`, `*.ts`, `*.md`).
 - **Forbidden Files:** NEVER edit or write to ANY files inside the `.git/` directory.
-- **Allowed Commands:** You may safely execute generic package manager commands (`pnpm *`) and read-only Git commands (`git status`, `git log`, `git diff`, `git branch`, `git show`, `git stash list`).
+- **Allowed Commands:** You may execute pnpm install, build, check, lint, test, format, and dev workflows, plus development/test database migrations. Read-only Git access is limited to `git status`, `git log`, `git diff`, `git show`, `git stash list`, `git branch --show-current`, and `git branch --list`.
+- **Approval-Required Commands:** Mutating Git commands, deployments, secret changes, and staging/production migrations require explicit human approval. Do not infer approval from a general implementation request.
 - **Forbidden Commands:** NEVER auto-run or propose the following destructive commands:
     - `git reset --hard *`
     - `git push --force` or `git push -f`
     - `git clean *`
     - `rm -rf *` or `rimraf *`
-
----
-
-> **TODO — Future Iterations:** Add a **Deployment & CI/CD** section covering:
->
-> - `wrangler deploy` workflows for staging/production (scripts already exist per app).
-> - Environment-specific wrangler configs (`wrangler-staging.toml`, `wrangler-production.toml`).
-> - Secret management (`wrangler secret bulk .dev.vars.<env>`).
-> - Database migration promotion (`migrate:staging`, `migrate:prod`).
-> - CI/CD pipeline conventions (`.gitlab-ci.yaml`, `.github/` workflows).

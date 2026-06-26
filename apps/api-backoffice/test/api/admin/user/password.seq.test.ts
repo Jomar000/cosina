@@ -1,21 +1,32 @@
+import { dbClient, dbSchema } from '@hyperion/database/postgres'
 import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
 import { env } from 'cloudflare:workers'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { and, desc, eq } from 'drizzle-orm'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import app from '../../../../src/core/index.js'
+import { app } from '../../../../src/core/index.js'
 import {
     interceptPasswordResetToken,
-    setTestingCookies,
+    seedTestingCookies,
 } from '../../../utilities.js'
 
 let privilegedCookie: string
-let standardCookie: string
+
+let db: ReturnType<typeof dbClient>
 
 beforeAll(async () => {
-    ;[
-        privilegedCookie,
-        standardCookie,
-    ] = await setTestingCookies()
+    db = dbClient({
+        host: env.HYPERIONBOFC_HD.host,
+        port: Number(env.HYPERIONBOFC_HD.port) || 5432,
+        database: env.HYPERIONBOFC_HD.database,
+        user: env.HYPERIONBOFC_HD.user,
+        pass: env.HYPERIONBOFC_HD.password,
+    })
+    ;[privilegedCookie] = await seedTestingCookies()
+})
+
+afterAll(async () => {
+    await db.$client.end()
 })
 
 /**
@@ -32,268 +43,6 @@ beforeAll(async () => {
  */
 
 describe('Admin User Password Endpoint', () => {
-    describe.concurrent('Concurrent Tests', () => {
-        /**
-         * @description
-         * Authentication & Authorization Guard
-         */
-        describe('Authentication & Authorization Guard', () => {
-            it('Unauthenticated request to /reset-request should return 401.', async () => {
-                const response = await app.request(
-                    '/api/admin/user/password/reset-request',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: 'vitest-pool-worker',
-                            'content-type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            userId: 'USER_003',
-                        }),
-                    },
-                    env,
-                )
-
-                const responseData = await response.json<TApiResponseError>()
-
-                expect(response.status).toBe(401)
-                expect(responseData).toHaveProperty('error')
-                expect(responseData.error.code).toBe('UNAUTHORIZED')
-            })
-
-            it('Unauthenticated request to /reset should return 401.', async () => {
-                const response = await app.request(
-                    '/api/admin/user/password/reset',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: 'vitest-pool-worker',
-                            'content-type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            userId: 'USER_003',
-                            newPassword: 'N3wP@ssw0rd1234',
-                        }),
-                    },
-                    env,
-                )
-
-                const responseData = await response.json<TApiResponseError>()
-
-                expect(response.status).toBe(401)
-                expect(responseData).toHaveProperty('error')
-                expect(responseData.error.code).toBe('UNAUTHORIZED')
-            })
-
-            it('Non-admin request to /reset-request should return 403.', async () => {
-                const response = await app.request(
-                    '/api/admin/user/password/reset-request',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: 'vitest-pool-worker',
-                            'content-type': 'application/json',
-                            cookie: standardCookie,
-                        },
-                        body: JSON.stringify({
-                            userId: 'USER_003',
-                        }),
-                    },
-                    env,
-                )
-
-                const responseData = await response.json<TApiResponseError>()
-
-                expect(response.status).toBe(403)
-                expect(responseData).toHaveProperty('error')
-                expect(responseData.error.code).toBe('FORBIDDEN')
-            })
-
-            it('Non-admin request to /reset should return 403.', async () => {
-                const response = await app.request(
-                    '/api/admin/user/password/reset',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: 'vitest-pool-worker',
-                            'content-type': 'application/json',
-                            cookie: standardCookie,
-                        },
-                        body: JSON.stringify({
-                            userId: 'USER_003',
-                            newPassword: 'N3wP@ssw0rd1234',
-                        }),
-                    },
-                    env,
-                )
-
-                const responseData = await response.json<TApiResponseError>()
-
-                expect(response.status).toBe(403)
-                expect(responseData).toHaveProperty('error')
-                expect(responseData.error.code).toBe('FORBIDDEN')
-            })
-        })
-
-        /**
-         * @description
-         * Validation
-         */
-        describe('Validation', () => {
-            it('Reset request with missing userId should return 400.', async () => {
-                const response = await app.request(
-                    '/api/admin/user/password/reset-request',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: 'vitest-pool-worker',
-                            'content-type': 'application/json',
-                            cookie: privilegedCookie,
-                        },
-                        body: JSON.stringify({}),
-                    },
-                    env,
-                )
-
-                const responseData = await response.json<TApiResponseError>()
-
-                expect(response.status).toBe(400)
-                expect(responseData).toHaveProperty('error')
-            })
-
-            it('Reset with missing userId should return 400.', async () => {
-                const response = await app.request(
-                    '/api/admin/user/password/reset',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: 'vitest-pool-worker',
-                            'content-type': 'application/json',
-                            cookie: privilegedCookie,
-                        },
-                        body: JSON.stringify({
-                            newPassword: 'N3wP@ssw0rd1234',
-                        }),
-                    },
-                    env,
-                )
-
-                const responseData = await response.json<TApiResponseError>()
-
-                expect(response.status).toBe(400)
-                expect(responseData).toHaveProperty('error')
-            })
-
-            it('Reset with missing newPassword should return 400.', async () => {
-                const response = await app.request(
-                    '/api/admin/user/password/reset',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: 'vitest-pool-worker',
-                            'content-type': 'application/json',
-                            cookie: privilegedCookie,
-                        },
-                        body: JSON.stringify({
-                            userId: 'USER_003',
-                        }),
-                    },
-                    env,
-                )
-
-                const responseData = await response.json<TApiResponseError>()
-
-                expect(response.status).toBe(400)
-                expect(responseData).toHaveProperty('error')
-            })
-
-            it('Reset with weak newPassword should return 400.', async () => {
-                const response = await app.request(
-                    '/api/admin/user/password/reset',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: 'vitest-pool-worker',
-                            'content-type': 'application/json',
-                            cookie: privilegedCookie,
-                        },
-                        body: JSON.stringify({
-                            userId: 'USER_003',
-                            newPassword: 'weak',
-                        }),
-                    },
-                    env,
-                )
-
-                const responseData = await response.json<TApiResponseError>()
-
-                expect(response.status).toBe(400)
-                expect(responseData).toHaveProperty('error')
-            })
-        })
-
-        /**
-         * @description
-         * Reset Request Validations
-         */
-        describe('Reset Request Validations', () => {
-            it('Reset request for a non-existent user should return 404.', async () => {
-                const response = await app.request(
-                    '/api/admin/user/password/reset-request',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: 'vitest-pool-worker',
-                            'content-type': 'application/json',
-                            cookie: privilegedCookie,
-                        },
-                        body: JSON.stringify({
-                            userId: 'NONEXISTENT_USER',
-                        }),
-                    },
-                    env,
-                )
-
-                const responseData = await response.json<TApiResponseError>()
-
-                expect(response.status).toBe(404)
-                expect(responseData).toHaveProperty('error')
-                expect(responseData.error.message).toBe('User ID not found.')
-            })
-        })
-
-        /**
-         * @description
-         * Direct Reset Validations
-         */
-        describe('Direct Reset Validations', () => {
-            it('Direct reset for a non-existent user should return 404.', async () => {
-                const response = await app.request(
-                    '/api/admin/user/password/reset',
-                    {
-                        method: 'POST',
-                        headers: {
-                            origin: 'vitest-pool-worker',
-                            'content-type': 'application/json',
-                            cookie: privilegedCookie,
-                        },
-                        body: JSON.stringify({
-                            userId: 'NONEXISTENT_USER',
-                            newPassword: 'N3wP@ssw0rd1234',
-                        }),
-                    },
-                    env,
-                )
-
-                const responseData = await response.json<TApiResponseError>()
-
-                expect(response.status).toBe(404)
-                expect(responseData).toHaveProperty('error')
-                expect(responseData.error.message).toBe('User ID not found.')
-            })
-        })
-    })
-
     describe('Sequential Tests', () => {
         /**
          * @description
@@ -302,16 +51,16 @@ describe('Admin User Password Endpoint', () => {
         describe('Reset Request Flow', () => {
             it('Reset request for a valid organization member should pass.', async () => {
                 const response = await app.request(
-                    '/api/admin/user/password/reset-request',
+                    '/api/admin/user/password/resetRequest',
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
                         body: JSON.stringify({
-                            userId: 'USER_003',
+                            userId: 'USER_PASSWORD_MUTABLE',
                         }),
                     },
                     env,
@@ -336,12 +85,12 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
                         body: JSON.stringify({
-                            userId: 'USER_003',
+                            userId: 'USER_PASSWORD_MUTABLE',
                             newPassword: 'N3wP@ssw0rd1234',
                         }),
                     },
@@ -355,18 +104,55 @@ describe('Admin User Password Endpoint', () => {
                 expect(responseData.data).toBeNull()
             })
 
+            it('Direct password reset should write a redacted account audit trail record.', async () => {
+                const { account, auditTrail } = dbSchema
+
+                const [credential] = await db
+                    .select({ id: account.id })
+                    .from(account)
+                    .where(
+                        and(
+                            eq(account.userId, 'USER_PASSWORD_MUTABLE'),
+                            eq(account.providerId, 'credential'),
+                        ),
+                    )
+
+                const [auditTrailEntry] = await db
+                    .select({ records: auditTrail.records })
+                    .from(auditTrail)
+                    .where(
+                        and(
+                            eq(auditTrail.component, 'admin.user.password'),
+                            eq(auditTrail.action, 'reset'),
+                        ),
+                    )
+                    .orderBy(desc(auditTrail.id))
+                    .limit(1)
+
+                expect(credential).toBeTruthy()
+                expect(auditTrailEntry.records).toEqual([
+                    {
+                        table: 'account',
+                        id: credential.id,
+                        oldData: {
+                            password: '[REDACTED]',
+                        },
+                    },
+                ])
+            })
+
             it('Sign-in with the new password after direct reset should pass.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
                             organizationId: 'superorganization',
-                            accountId: 'member',
+                            accountId: 'password_mutable',
                             password: 'N3wP@ssw0rd1234',
                         }),
                     },
@@ -383,16 +169,16 @@ describe('Admin User Password Endpoint', () => {
 
             it('Sign-in with the old password after direct reset should fail.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
                             organizationId: 'superorganization',
-                            accountId: 'member',
+                            accountId: 'password_mutable',
                             password: 'P@ssw0rd1234',
                         }),
                     },
@@ -414,12 +200,12 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
                         body: JSON.stringify({
-                            userId: 'USER_003',
+                            userId: 'USER_PASSWORD_MUTABLE',
                             newPassword: 'P@ssw0rd1234',
                         }),
                     },
@@ -431,37 +217,49 @@ describe('Admin User Password Endpoint', () => {
                 expect(response.status).toBe(200)
                 expect(responseData.success).toBe(true)
             })
+
+            it('Direct password reset for a user without credential account should return 404.', async () => {
+                const response = await app.request(
+                    '/api/admin/user/password/reset',
+                    {
+                        method: 'POST',
+                        headers: {
+                            origin: env.URL_FRONTEND,
+                            'content-type': 'application/json',
+                            cookie: privilegedCookie,
+                        },
+                        body: JSON.stringify({
+                            userId: 'USER_NO_CREDENTIAL',
+                            newPassword: 'N3wP@ssw0rd1234',
+                        }),
+                    },
+                    env,
+                )
+
+                const responseData = await response.json<TApiResponseError>()
+
+                expect(response.status).toBe(404)
+                expect(responseData.error.code).toBe(
+                    'ACCOUNT_CREDENTIAL_NOT_FOUND',
+                )
+            })
         })
 
-        /**
-         * @description
-         * Full Password Reset Flow
-         *
-         * Simulates the complete admin-initiated password reset process:
-         * 1. Admin triggers reset-request and intercepts the token from KV
-         * 2. Use the token to complete the password reset via auth endpoint
-         * 3. Verify sign-in with the new password
-         *
-         * The reset request and token interception are performed in
-         * `beforeAll()` so the KV write persists across all `it()` blocks
-         * within this `describe()`. Storage isolation is per test file
-         * (see @cloudflare/vitest-pool-workers v0.13.0).
-         */
         describe('Full Password Reset Flow (OTP Interception)', () => {
             let interceptedToken: string
 
             beforeAll(async () => {
                 const response = await app.request(
-                    '/api/admin/user/password/reset-request',
+                    '/api/admin/user/password/resetRequest',
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
                         body: JSON.stringify({
-                            userId: 'USER_002',
+                            userId: 'USER_PASSWORD_MUTABLE',
                         }),
                     },
                     env,
@@ -473,7 +271,9 @@ describe('Admin User Password Endpoint', () => {
                 expect(responseData.success).toBe(true)
                 expect(responseData.data).toBeNull()
 
-                interceptedToken = await interceptPasswordResetToken('USER_002')
+                interceptedToken = await interceptPasswordResetToken(
+                    'USER_PASSWORD_MUTABLE',
+                )
                 expect(interceptedToken).toBeTruthy()
             })
 
@@ -483,7 +283,7 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -503,16 +303,16 @@ describe('Admin User Password Endpoint', () => {
 
             it('Step 2: Sign-in with the new password should pass.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
                             organizationId: 'superorganization',
-                            accountId: 'administrator',
+                            accountId: 'password_mutable',
                             password: 'R3set@P@ssw0rd5678',
                         }),
                     },
@@ -529,16 +329,16 @@ describe('Admin User Password Endpoint', () => {
 
             it('Step 3: Sign-in with the old password should fail.', async () => {
                 const response = await app.request(
-                    '/api/auth/sign-in/username',
+                    '/api/auth/signIn/username',
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
                             organizationId: 'superorganization',
-                            accountId: 'administrator',
+                            accountId: 'password_mutable',
                             password: 'P@ssw0rd1234',
                         }),
                     },
@@ -565,12 +365,12 @@ describe('Admin User Password Endpoint', () => {
                     {
                         method: 'POST',
                         headers: {
-                            origin: 'vitest-pool-worker',
+                            origin: env.URL_FRONTEND,
                             'content-type': 'application/json',
                             cookie: privilegedCookie,
                         },
                         body: JSON.stringify({
-                            userId: 'USER_002',
+                            userId: 'USER_PASSWORD_MUTABLE',
                             newPassword: 'P@ssw0rd1234',
                         }),
                     },

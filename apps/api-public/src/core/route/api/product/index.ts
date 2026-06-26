@@ -6,7 +6,7 @@ import type { ApplyGlobalResponse } from 'hono/client'
 
 import { AppError } from '../../../../errors.js'
 import type { TGlobalApiResponses, THonoInstance } from '../../../../types.js'
-import { apiResponseOkWrapper } from '../../../../utilities/helpers.js'
+import { apiResponsePaginatedOkWrapper } from '../../../../utilities/helpers.js'
 import { validateRequest } from '../../../middleware/validateRequest.js'
 
 function imageUrl(ctx: Context<THonoInstance>, objectStorageId: string | null) {
@@ -89,7 +89,12 @@ export const productRoute = new Hono<THonoInstance>().get(
                 sizes: allSizes.filter((s) => s.productId === row.id),
             }))
 
-            return apiResponseOkWrapper(ctx, { data, count, limit, offset })
+            return apiResponsePaginatedOkWrapper(ctx, {
+                data,
+                count,
+                limit,
+                offset,
+            })
         } catch (err) {
             if (err instanceof AppError) throw err
 

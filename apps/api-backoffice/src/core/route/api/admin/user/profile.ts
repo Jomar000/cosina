@@ -2,16 +2,13 @@ import { profile } from '@hyperion/validator/backoffice/admin/user'
 import { and, asc, count as countFn, desc, eq } from 'drizzle-orm'
 import { getColumns } from 'drizzle-orm/utils'
 import { Hono } from 'hono'
-import type { ApplyGlobalResponse } from 'hono/client'
 
 import { AppError } from '../../../../../errors.js'
-import type {
-    TGlobalApiResponses,
-    THonoInstance,
-} from '../../../../../types.js'
+import type { THonoInstance } from '../../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    apiResponsePaginatedOkWrapper,
     auditTrailLogger,
 } from '../../../../../utilities/helpers.js'
 import { validateRequest } from '../../../../middleware/validateRequest.js'
@@ -41,7 +38,7 @@ export const profileRoute = new Hono<THonoInstance>()
                 const { createdAt, updatedAt, ...selectedColumns } =
                     getColumns(userProfile)
 
-                const data = await ctx
+                const [data] = await ctx
                     .get('dbClient')
                     .select(selectedColumns)
                     .from(userProfile)
@@ -121,7 +118,12 @@ export const profileRoute = new Hono<THonoInstance>()
                             : desc(userProfile.userId),
                     )
 
-                return apiResponseOkWrapper(ctx, { data, count, limit, offset })
+                return apiResponsePaginatedOkWrapper(ctx, {
+                    data,
+                    count,
+                    limit,
+                    offset,
+                })
             } catch (err) {
                 if (err instanceof AppError) throw err
 
@@ -204,7 +206,6 @@ export const profileRoute = new Hono<THonoInstance>()
                                 gender,
                                 backupPhoneNumber,
                             })
-                            .from(member)
                             .where(eq(userProfile.userId, userId))
                             .returning({
                                 firstName: userProfile.firstName,
@@ -370,7 +371,15 @@ export const profileRoute = new Hono<THonoInstance>()
                                 action: 'update.address',
                                 description: 'Admin updated user address',
                                 records: [
-                                    { table: 'user_profile', id: userId },
+                                    {
+                                        table: 'user_profile',
+                                        id: userId,
+                                        oldData: {
+                                            addressId:
+                                                existingAddressId?.addressId ??
+                                                null,
+                                        },
+                                    },
                                     {
                                         table: 'address',
                                         id: String(resolvedAddressId),
@@ -406,10 +415,5 @@ export const profileRoute = new Hono<THonoInstance>()
             }
         },
     )
-
-export type AdminUserProfileRouteType = ApplyGlobalResponse<
-    typeof profileRoute,
-    TGlobalApiResponses
->
 
 export default profileRoute

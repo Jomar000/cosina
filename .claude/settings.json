@@ -1,33 +1,38 @@
 {
-    "permissions": {
-        "allow": [
-            "Edit(apps/**)",
-            "Edit(packages/**)",
-            "Read(apps/**)",
-            "Read(packages/**)",
-            "Read(*.json)",
-            "Read(*.yaml)",
-            "Read(*.toml)",
-            "Read(*.js)",
-            "Read(*.ts)",
-            "Read(*.md)",
-            "Bash(pnpm *)",
-            "Bash(git status)",
-            "Bash(git log *)",
-            "Bash(git diff *)",
-            "Bash(git branch *)",
-            "Bash(git show *)",
-            "Bash(git stash list)"
-        ],
-        "deny": [
-            "Edit(.git/**)",
-            "Write(.git/**)",
-            "Bash(git reset --hard *)",
-            "Bash(git push --force*)",
-            "Bash(git push -f*)",
-            "Bash(git clean *)",
-            "Bash(rm -rf *)",
-            "Bash(rimraf *)"
-        ]
-    }
+  "permissions": {
+    "allow": [
+      "Edit(apps/**)",
+      "Edit(packages/**)",
+      "Read(apps/**)",
+      "Read(packages/**)",
+      "Read(*.json)",
+      "Read(*.yaml)",
+      "Read(*.toml)",
+      "Read(*.js)",
+      "Read(*.ts)",
+      "Read(*.md)",
+      "Bash(pnpm *)",
+      "Bash(git status)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git branch *)",
+      "Bash(git show *)",
+      "Bash(git stash list)",
+      "Bash(pnpm --filter=@hyperion/web-backoffice check)",
+      "Bash(pnpm --filter=@hyperion/web-public check)",
+      "Bash(pnpm check *)",
+      "Bash(pnpm --filter=@hyperion/web-backoffice --filter=@hyperion/web-public lint)",
+      "Bash(git add *)"
+    ],
+    "deny": [
+      "Edit(.git/**)",
+      "Write(.git/**)",
+      "Bash(git reset --hard *)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git clean *)",
+      "Bash(rm -rf *)",
+      "Bash(rimraf *)"
+    ]
+  }
 }

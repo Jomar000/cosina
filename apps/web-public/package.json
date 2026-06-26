@@ -7,8 +7,8 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "node": ">=24.15.0",
-        "pnpm": ">=11.5.0"
+        "node": ">=24.16.0",
+        "pnpm": ">=11.9.0"
     },
     "scripts": {
         "build": "vite build",
@@ -17,18 +17,19 @@
         "deploy:prod": "vite build --mode=production && wrangler deploy --outdir=dist --env=production --config=wrangler-production.toml",
         "deploy:staging": "vite build --mode=staging && wrangler deploy --outdir=dist --env=staging --config=wrangler-staging.toml",
         "dev": "vite dev --host",
-        "format": "prettier --write .",
-        "lint": "prettier --check . && eslint .",
+        "format": "eslint . --fix && prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+        "lint": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore && eslint .",
         "prepare": "svelte-kit sync || echo ''",
         "preview": "vite preview --host",
         "test:e2e": "playwright test"
     },
     "devDependencies": {
         "@hyperion/api-public": "workspace:*",
+        "@internationalized/date": "catalog:",
+        "motion": "^12.40.0",
         "@hyperion/types": "workspace:*",
         "@hyperion/ui": "workspace:*",
         "@hyperion/validator": "workspace:*",
-        "@internationalized/date": "catalog:",
         "@lucide/svelte": "catalog:",
         "@playwright/test": "catalog:",
         "@sveltejs/adapter-static": "catalog:",
@@ -53,13 +54,11 @@
         "svelte-check": "catalog:",
         "svelte-sonner": "catalog:",
         "tailwindcss": "catalog:",
+        "uuid": "catalog:",
         "vite": "catalog:",
         "vite-imagetools": "catalog:",
         "vitest": "catalog:",
         "vitest-browser-svelte": "catalog:",
         "zod": "catalog:"
-    },
-    "dependencies": {
-        "motion": "^12.40.0"
     }
 }

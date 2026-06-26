@@ -1,13 +1,12 @@
 import { auth as authValidator } from '@hyperion/validator/public'
 import { createContext } from 'svelte'
-import { SvelteDate } from 'svelte/reactivity'
 
 export class SessionState {
     ////////////
     // Fields //
     ////////////
 
-    #sessionInitValue = {
+    #sessionInitValue: TSessionData = {
         name: '{{name}}',
         email: '{{email}}',
         permissions: {},
@@ -40,30 +39,55 @@ export class SessionState {
     }
 
     isValid = (): this is { data: TSessionData } => {
-        return (
-            this.#session.expiresAt >
-            Math.floor(new SvelteDate().getTime() / 1000)
-        )
+        const isValid = this.#session.expiresAt > this.#getCurrentEpochSeconds()
+
+        if (!isValid) {
+            this.clear()
+        }
+
+        return isValid
     }
 
     loadFromLocalStorage = () => {
         try {
-            this.#session = this.#parseData(
-                JSON.parse(localStorage.getItem('session_data')!),
-            )
+            const storedSession = localStorage.getItem('session_data')
+            if (!storedSession) return
+
+            this.#session = this.#parseData(JSON.parse(storedSession))
+            this.isValid()
         } catch {
-            /* EMPTY */
+            this.clear()
         }
     }
 
     set = (newState: TSessionData) => {
         try {
-            this.#session = this.#parseData(newState)
-            localStorage.setItem('session_data', JSON.stringify(this.#session))
+            const parsedState = this.#parseData(newState)
+            if (!this.#isSessionDataValid(parsedState)) {
+                this.clear()
+                return false
+            }
+
+            this.#session = parsedState
+            localStorage.setItem('session_data', JSON.stringify(parsedState))
+
+            return true
         } catch {
-            /* EMPTY */
+            this.clear()
+            return false
         }
     }
+
+    getMillisecondsUntilExpiry = () =>
+        Math.max(
+            (this.#session.expiresAt - this.#getCurrentEpochSeconds()) * 1000,
+            0,
+        )
+
+    #getCurrentEpochSeconds = () => Math.floor(Date.now() / 1000)
+
+    #isSessionDataValid = (session: TSessionData) =>
+        session.expiresAt > this.#getCurrentEpochSeconds()
 }
 
 export const [

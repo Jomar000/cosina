@@ -60,7 +60,7 @@
         await queryClient.cancelQueries()
 
         try {
-            await authClient['sign-out'].$post()
+            await authClient.signOut.$post()
         } finally {
             await clearSessionDataAndRedirect()
         }

@@ -3,6 +3,7 @@ import {
     passwordResetInputSchema,
     passwordResetRequestInputSchema,
     signInInputSchema,
+    verifyEmailInputSchema,
 } from '@hyperion/validator/public/auth'
 import { and, eq } from 'drizzle-orm'
 import type { Context } from 'hono'
@@ -16,11 +17,15 @@ import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     auditTrailLogger,
+    canLoginAuthRole,
     parseAuthRoles,
 } from '../../../utilities/helpers.js'
 import { captchaHandler } from '../../middleware/captchaHandler.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 import { validateRequest } from '../../middleware/validateRequest.js'
+
+// Roles allowed to authenticate on this API surface.
+const loginAuthRoles = [] as const
 
 const signInHandler = async (
     ctx: Context<THonoInstance>,
@@ -68,6 +73,14 @@ const signInHandler = async (
         })
     }
 
+    if (!canLoginAuthRole(orgMemberData.member.role, loginAuthRoles)) {
+        return apiResponseErrorWrapper(ctx, {
+            code: 'FORBIDDEN',
+            message: 'You are not allowed to access this resource.',
+            status: 403,
+        })
+    }
+
     await assertUserUnlocked(ctx, orgMemberData.user.id)
 
     /**
@@ -110,6 +123,19 @@ const signInHandler = async (
     }
 
     const { permissions, roles } = ctx.get('acl')
+    const userRoles = parseAuthRoles(orgMemberData.member.role)
+    const userRoleDefinitions = Object.fromEntries(
+        userRoles.flatMap((role) =>
+            roles[role]
+                ? [
+                      [
+                          role,
+                          roles[role],
+                      ] as const,
+                  ]
+                : [],
+        ),
+    )
 
     /**
      * @description
@@ -131,8 +157,8 @@ const signInHandler = async (
             email: orgMemberData.user.email,
             avatar: orgMemberData.user.image ?? '',
             permissions,
-            roles,
-            userRoles: parseAuthRoles(orgMemberData.member.role),
+            roles: userRoleDefinitions,
+            userRoles,
             expiresAt:
                 Math.floor(new Date().getTime() / 1000) +
                 Number(ctx.env.SESSION_EXPIRATION),
@@ -182,7 +208,7 @@ export const authRoute = new Hono<THonoInstance>()
         },
     )
     .post(
-        '/password/reset-request',
+        '/password/resetRequest',
         validateRequest('json', passwordResetRequestInputSchema),
         async (ctx) => {
             const { email } = ctx.req.valid('json')
@@ -240,18 +266,18 @@ export const authRoute = new Hono<THonoInstance>()
         },
     )
     .post(
-        '/sign-in/email',
+        '/signIn/email',
         captchaHandler('sign-in-email'),
         validateRequest('json', signInInputSchema),
         async (ctx) => signInHandler(ctx, ctx.req.valid('json'), 'email'),
     )
     .post(
-        '/sign-in/username',
+        '/signIn/username',
         captchaHandler('sign-in-username'),
         validateRequest('json', signInInputSchema),
         async (ctx) => signInHandler(ctx, ctx.req.valid('json'), 'username'),
     )
-    .post('/sign-out', async (ctx) => {
+    .post('/signOut', async (ctx) => {
         const auth = ctx.get('auth')
 
         const betterAuthResponse = await auth.api.signOut({
@@ -271,6 +297,36 @@ export const authRoute = new Hono<THonoInstance>()
 
         return apiResponseOkWrapper(ctx, { data: null })
     })
+    .get(
+        '/verifyEmail',
+        validateRequest('query', verifyEmailInputSchema),
+        async (ctx) => {
+            const { token } = ctx.req.valid('query')
+            const auth = ctx.get('auth')
+
+            try {
+                // Since onAPIError.throw is true, this will throw on failure
+                await auth.api.verifyEmail({
+                    query: { token },
+                })
+            } catch {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'UNPROCESSABLE_CONTENT',
+                    message:
+                        'Email verification failed. The token may be invalid or expired.',
+                    status: 422,
+                })
+            }
+
+            await auditTrailLogger(ctx, {
+                component: 'auth',
+                action: 'verifyEmail',
+                description: 'User verified their email address',
+            })
+
+            return apiResponseOkWrapper(ctx, { data: null })
+        },
+    )
 
 export default authRoute
 export type AuthRouteType = ApplyGlobalResponse<

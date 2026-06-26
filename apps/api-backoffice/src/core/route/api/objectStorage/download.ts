@@ -1,12 +1,16 @@
-import { downloadLinkCreateInputSchema } from '@hyperion/validator/backoffice/objectStorage'
-import { and, eq } from 'drizzle-orm'
+import {
+    downloadLinkCreateInputSchema,
+    downloadReadManyInputSchema,
+} from '@hyperion/validator/backoffice/objectStorage'
+import { and, asc, count as countFn, desc, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
-import type { ApplyGlobalResponse } from 'hono/client'
 
-import type { TGlobalApiResponses, THonoInstance } from '../../../../types.js'
+import { AppError } from '../../../../errors.js'
+import type { THonoInstance } from '../../../../types.js'
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    apiResponsePaginatedOkWrapper,
 } from '../../../../utilities/helpers.js'
 import { validateRequest } from '../../../middleware/validateRequest.js'
 
@@ -52,6 +56,8 @@ export const downloadRoute = new Hono<THonoInstance>()
                 .where(
                     and(
                         eq(upload.id, uploadId),
+                        eq(upload.isCommitted, true),
+                        eq(objectStorage.isUploaded, true),
                         ctx.get('isPrivilegedRole')
                             ? undefined
                             : eq(upload.userId, ctx.get('user')!.id),
@@ -81,6 +87,17 @@ export const downloadRoute = new Hono<THonoInstance>()
                             isPublicObject ||
                             hasObjectPermission
                         ) {
+                            if (
+                                isPublicObject &&
+                                !ctx.env.CF_R2_BUCKET_PUBLIC_URL
+                            ) {
+                                throw new AppError({
+                                    status: 500,
+                                    code: 'PUBLIC_R2_URL_NOT_CONFIGURED',
+                                    message: 'Public R2 URL is not configured.',
+                                })
+                            }
+
                             const downloadUrl = isPublicObject
                                 ? `${ctx.env.CF_R2_BUCKET_PUBLIC_URL}/${os.id}`
                                 : (
@@ -119,10 +136,91 @@ export const downloadRoute = new Hono<THonoInstance>()
             })
         },
     )
+    .get(
+        '/readMany',
+        validateRequest('query', downloadReadManyInputSchema),
+        async (ctx) => {
+            const { limit, offset, sortOrder } = ctx.req.valid('query')
 
-export type DownloadRouteType = ApplyGlobalResponse<
-    typeof downloadRoute,
-    TGlobalApiResponses
->
+            const { objectStorage, upload, uploadAttachment } =
+                ctx.get('dbSchema')
+
+            try {
+                const searchCondition = and(
+                    eq(upload.isCommitted, true),
+                    eq(objectStorage.isUploaded, true),
+                    ctx.get('isPrivilegedRole')
+                        ? undefined
+                        : eq(upload.userId, ctx.get('user')!.id),
+                )
+
+                const count = (
+                    await ctx
+                        .get('dbClient')
+                        .select({
+                            count: countFn(uploadAttachment.objectStorageId),
+                        })
+                        .from(uploadAttachment)
+                        .innerJoin(
+                            objectStorage,
+                            eq(
+                                objectStorage.id,
+                                uploadAttachment.objectStorageId,
+                            ),
+                        )
+                        .innerJoin(
+                            upload,
+                            eq(upload.id, uploadAttachment.uploadId),
+                        )
+                        .where(searchCondition)
+                )[0].count
+
+                const data = await ctx
+                    .get('dbClient')
+                    .select({
+                        uploadId: upload.id,
+                        objectStorageId: objectStorage.id,
+                        size: objectStorage.size,
+                        mimeType: objectStorage.mimeType,
+                        hashSha256: objectStorage.hashSha256,
+                        isPublic: objectStorage.isPublic,
+                        objectCreatedAt: objectStorage.createdAt,
+                        uploadCreatedAt: upload.createdAt,
+                    })
+                    .from(uploadAttachment)
+                    .innerJoin(
+                        objectStorage,
+                        eq(objectStorage.id, uploadAttachment.objectStorageId),
+                    )
+                    .innerJoin(upload, eq(upload.id, uploadAttachment.uploadId))
+                    .where(searchCondition)
+                    .limit(limit)
+                    .offset(offset)
+                    .orderBy(
+                        sortOrder === 'asc'
+                            ? asc(upload.createdAt)
+                            : desc(upload.createdAt),
+                    )
+
+                return apiResponsePaginatedOkWrapper(ctx, {
+                    data,
+                    count,
+                    limit,
+                    offset,
+                })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'DOWNLOAD_LIST_RETRIEVAL_FAILED',
+                        message: 'Download list retrieval failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
 
 export default downloadRoute

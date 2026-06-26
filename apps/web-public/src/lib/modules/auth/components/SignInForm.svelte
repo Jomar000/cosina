@@ -85,8 +85,8 @@
             try {
                 const endpoint =
                     action === 'sign-in-email'
-                        ? authClient['sign-in'].email
-                        : authClient['sign-in'].username
+                        ? authClient.signIn.email
+                        : authClient.signIn.username
 
                 const response = await endpoint.$post(
                     {

@@ -4,8 +4,10 @@ import type { THonoInstance } from '../../../types.js'
 import { corsHandler } from '../../middleware/corsHandler.js'
 import { csrfHandler } from '../../middleware/csrfHandler.js'
 import { initContext } from '../../middleware/initContext.js'
+import { wsOriginGuard } from '../../middleware/wsOriginGuard.js'
 import { adminRoute } from './admin/index.js'
 import { authRoute } from './auth.js'
+import { heartbeatRoute } from './heartbeat.js'
 import { objectStorageRoute } from './objectStorage/index.js'
 import { userRoute } from './user/index.js'
 import { wsRoute } from './ws.js'
@@ -18,6 +20,7 @@ export const apiRoute = new Hono<THonoInstance>()
     .use('/*', corsHandler('default'))
     .use('/*', csrfHandler())
     .use('/*', initContext())
+    .use('/ws/*', wsOriginGuard())
     /**
      * @description
      * Routes
@@ -40,6 +43,7 @@ export const apiRoute = new Hono<THonoInstance>()
     })
     .route('/admin', adminRoute)
     .route('/auth', authRoute)
+    .route('/heartbeat', heartbeatRoute)
     .route('/objectStorage', objectStorageRoute)
     .route('/user', userRoute)
     .route('/ws', wsRoute)

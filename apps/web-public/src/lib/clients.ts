@@ -1,15 +1,15 @@
 import type { AdminRouteType } from '@hyperion/api-public/api/admin'
 import type { AuthRouteType } from '@hyperion/api-public/api/auth'
+import type { HeartbeatRouteType } from '@hyperion/api-public/api/heartbeat'
 import type { ObjectStorageRouteType } from '@hyperion/api-public/api/objectStorage'
 import type { OrderRouteType } from '@hyperion/api-public/api/order'
 import type { ProductRouteType } from '@hyperion/api-public/api/product'
 import type { UserRouteType } from '@hyperion/api-public/api/user'
-import type { HeartbeatRouteType } from '@hyperion/api-public/root/heartbeat'
 import { hc } from 'hono/client'
 import ky from 'ky'
 
 import { PUBLIC_API_URL } from '$env/static/public'
-import { getCookie } from './utilities/helpers'
+import { getCookie, getCsrfCookieName } from './utilities/helpers'
 
 /**
  * @description
@@ -22,6 +22,8 @@ const SAFE_METHODS = [
     'OPTIONS',
 ]
 
+const CSRF_COOKIE_NAME = getCsrfCookieName(import.meta.env.MODE)
+
 const kyClient = ky.extend({
     throwHttpErrors: false,
     hooks: {
@@ -29,7 +31,7 @@ const kyClient = ky.extend({
             ({ request }) => {
                 if (SAFE_METHODS.includes(request.method)) return
 
-                const csrfToken = getCookie('csrf_token')
+                const csrfToken = getCookie(CSRF_COOKIE_NAME)
 
                 if (csrfToken) {
                     request.headers.set(
@@ -65,7 +67,7 @@ export const authClient = hc<AuthRouteType>(`${PUBLIC_API_URL}/api/auth`, {
  * Heartbeat RPC Client
  */
 export const heartbeatClient = hc<HeartbeatRouteType>(
-    `${PUBLIC_API_URL}/heartbeat`,
+    `${PUBLIC_API_URL}/api/heartbeat`,
     {
         init: { credentials: 'include' },
         fetch: kyClient,

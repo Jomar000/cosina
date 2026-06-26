@@ -26,7 +26,7 @@
             class="cn-input-otp-caret pointer-events-none absolute inset-0 flex items-center justify-center"
         >
             <div
-                class="animate-caret-blink bg-foreground h-4 w-px duration-1000 bg-foreground h-4 w-px"
+                class="animate-caret-blink bg-foreground h-4 w-px duration-1000"
             ></div>
         </div>
     {/if}

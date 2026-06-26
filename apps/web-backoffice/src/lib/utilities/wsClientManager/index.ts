@@ -1,6 +1,6 @@
+import { PUBLIC_API_URL } from '$env/static/public'
 import { createWsClientManager } from './core'
 import type { TWebSocketNativeClient } from './types'
-import { PUBLIC_API_URL } from '$env/static/public'
 
 export type { TWebSocketNativeClient } from './types'
 

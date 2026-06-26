@@ -211,8 +211,9 @@
         onSuccess: (data) => {
             onOrderSuccess()
             placedOrderCode = data.trackingCode
-            placedOrderTotal = data.amountToPay
-            placedOrderDownpayment = data.downpayment
+            placedOrderTotal = parseFloat(data.amountToPay)
+            placedOrderDownpayment =
+                data.downpayment !== null ? parseFloat(data.downpayment) : null
             resetForm()
         },
         onError: (err: Error) => {

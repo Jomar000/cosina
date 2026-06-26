@@ -7,13 +7,14 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "node": ">=24.15.0",
-        "pnpm": ">=11.5.0"
+        "node": ">=24.16.0",
+        "pnpm": ">=11.9.0"
     },
     "scripts": {
         "build": "tsc --build ./tsconfig.json",
-        "format": "prettier --write .",
-        "lint": "prettier --check . && eslint .",
+        "build:force": "tsc --build ./tsconfig.json --clean && pnpm run build",
+        "format": "eslint . --fix && prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+        "lint": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore && eslint .",
         "prepare": "pnpm build"
     },
     "dependencies": {},

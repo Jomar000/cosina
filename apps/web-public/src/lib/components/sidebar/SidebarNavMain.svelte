@@ -2,7 +2,9 @@
     import * as Collapsible from '@hyperion/ui/components/collapsible'
     import * as Sidebar from '@hyperion/ui/components/sidebar'
     import ChevronRightIcon from '@lucide/svelte/icons/chevron-right'
-    import type { Component } from 'svelte'
+
+    import { page } from '$app/state'
+    import type { AppNavItem } from './types'
 
     ////////////////////
     // 01. Properties //
@@ -10,27 +12,26 @@
 
     let {
         items,
+        onNavigate,
     }: {
-        items: {
-            title: string
-            url: string
-            icon: Component
-            isActive?: boolean
-            items?: {
-                title: string
-                url: string
-            }[]
-        }[]
+        items: AppNavItem[]
+        onNavigate?: () => void
     } = $props()
+
+    /////////////////
+    // 04. Derived //
+    /////////////////
+
+    const activeUrl = $derived(page.url.pathname)
 </script>
 
 <Sidebar.Group>
     <Sidebar.GroupLabel>Platform</Sidebar.GroupLabel>
     <Sidebar.Menu>
         {#each items as item (item.title)}
-            {#if (item.items?.length ?? 0) > 0}
+            {#if (item.children?.length ?? 0) > 0}
                 <Collapsible.Root
-                    open={item.isActive}
+                    open={item.url ? activeUrl.startsWith(item.url) : false}
                     class="group/collapsible"
                 >
                     {#snippet child({ props })}
@@ -53,7 +54,7 @@
                             </Collapsible.Trigger>
                             <Collapsible.Content>
                                 <Sidebar.MenuSub>
-                                    {#each item.items ?? [] as subItem (subItem.title)}
+                                    {#each item.children ?? [] as subItem (subItem.title)}
                                         <Sidebar.MenuSubItem>
                                             <Sidebar.MenuSubButton>
                                                 {#snippet child({ props })}
@@ -77,13 +78,18 @@
             {:else}
                 <Sidebar.MenuItem>
                     <Sidebar.MenuButton
-                        isActive={item.isActive ?? false}
+                        isActive={item.url
+                            ? item.exact
+                                ? activeUrl === item.url
+                                : activeUrl.startsWith(item.url)
+                            : false}
                         tooltipContent={item.title}
                     >
                         {#snippet child({ props })}
                             <a
                                 href={item.url}
                                 {...props}
+                                onclick={onNavigate}
                             >
                                 {#if item.icon}
                                     <item.icon />

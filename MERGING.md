@@ -17,6 +17,8 @@ This repository is a global template. Downstream projects may have local product
     git fetch template
     ```
 
+    These commands mutate repository configuration and contact a remote. Run them manually or with explicit approval.
+
 3. Create an integration branch from the fork's target branch.
 
     ```bash
@@ -25,11 +27,15 @@ This repository is a global template. Downstream projects may have local product
     git checkout -b chore/merge-template-updates
     ```
 
+    Branch checkout, pull, and creation are mutating Git operations. Run them manually or with explicit approval.
+
 4. Merge the template branch without committing immediately.
 
     ```bash
     git merge --no-commit --no-ff template/main
     ```
+
+    Run the merge manually or with explicit approval.
 
 5. Resolve conflicts by keeping fork-specific product behavior and applying template structure changes around it.
 
@@ -59,6 +65,8 @@ This repository is a global template. Downstream projects may have local product
     git status
     git commit
     ```
+
+    Committing is a developer-run or explicitly approved action.
 
 ## Conflict Resolution Rules
 
@@ -186,8 +194,7 @@ Avoid adding new barrel files for component folders unless the fork already has 
 - Confirm shared skill files match across agent variants:
 
     ```bash
-    git diff --no-index -- .agents/skills/svelte-patterns/SKILL.md .claude/skills/svelte-patterns/SKILL.md
-    git diff --no-index -- .agents/skills/hono-patterns/SKILL.md .claude/skills/hono-patterns/SKILL.md
+    git diff --no-index -- .agents/skills .claude/skills
     ```
 
 - Run app checks and lint.

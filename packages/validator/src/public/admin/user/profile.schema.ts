@@ -10,10 +10,22 @@ export const readInputSchema = z.object({
 
 export const readManyInputSchema = base.readManyInputSchema
 
-export const updateInputSchema = profile.updateInputSchema.extend({
-    userId: field.vText({ fieldName: 'User ID' }),
-})
+export const readManyOutputSchema = base.paginatedOutputSchema(
+    base.objectArrayOutputDataSchema,
+)
+
+export const readOutputSchema = base.outputSchema(base.objectOutputDataSchema)
 
 export const updateAddressInputSchema = base.addressInputSchema.extend({
     userId: field.vText({ fieldName: 'User ID' }),
 })
+
+export const updateAddressOutputSchema = base.outputSchema(
+    base.objectOutputDataSchema,
+)
+
+export const updateInputSchema = profile.updateInputSchema.extend({
+    userId: field.vText({ fieldName: 'User ID' }),
+})
+
+export const updateOutputSchema = base.outputSchema(base.objectOutputDataSchema)

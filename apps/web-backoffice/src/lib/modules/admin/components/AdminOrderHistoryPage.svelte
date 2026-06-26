@@ -112,6 +112,25 @@
     let filterStatus = $state<'completed' | 'cancelled' | 'all'>('all')
 
     /////////////////
+    // 05. Queries //
+    /////////////////
+
+    const ordersQuery = createQuery(() => ({
+        queryKey: [
+            'admin',
+            'orders',
+        ],
+        queryFn: async () => {
+            const response = await adminClient.order.readMany.$get({
+                query: { limit: '200', offset: '0', sortOrder: 'asc' },
+            })
+            const { data, error, success } = await response.json()
+            if (!success) throw new Error(error.message)
+            return data as TOrder[]
+        },
+    }))
+
+    /////////////////
     // 04. Derived //
     /////////////////
 
@@ -144,25 +163,6 @@
     const cancelledCount = $derived(
         (ordersQuery.data ?? []).filter((o) => o.status === 'cancelled').length,
     )
-
-    /////////////////
-    // 05. Queries //
-    /////////////////
-
-    const ordersQuery = createQuery(() => ({
-        queryKey: [
-            'admin',
-            'orders',
-        ],
-        queryFn: async () => {
-            const response = await adminClient.order.readMany.$get({
-                query: { limit: '200', offset: '0', sortOrder: 'asc' },
-            })
-            const { data, error, success } = await response.json()
-            if (!success) throw new Error(error.message)
-            return data as TOrder[]
-        },
-    }))
 
     /////////////////
     // 08. Effects //

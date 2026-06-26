@@ -1,44 +1,88 @@
 ---
 name: database-validator-patterns
-description: Rules for Drizzle ORM schema changes and queries, and for adding or modifying Zod validators. Use this when modifying the database schema, writing Drizzle queries, or adding/updating Zod validators.
+description: Project rules for Drizzle schemas and queries, PostgreSQL constraints and tenancy, local/test database bootstrap and migrations, create idempotency, and Zod validators. Use when changing database structures, writing queries, modifying bootstrap or migration behavior, configuring test database lifecycles, or adding and modifying validators.
 ---
 
-# Drizzle & Database
+# Database and Validators
 
-1.  **Schema Changes:** Strictly modify schema in `packages/database/src/postgres/schema.ts`.
-2.  **Queries:**
-    - Follow the existing typed Drizzle builder style in the API apps: `ctx.get('dbClient').select(...).from(...).where(...)`, `insert`, `update`, `delete`, and `.transaction(...)`.
-    - Use `ctx.get('dbSchema')` inside Hono request handlers so table references come from the initialized request context.
-    - Use the relational `db.query.*` API only where it is already configured and materially improves readability.
-    - Avoid raw SQL (`sql` template tag) except for schema defaults/checks, atomic expressions, or cases where the typed builder cannot express the query cleanly.
-3.  **Constraints & Indexes:**
-    - Before adding a table or ownership column, classify the record as `global`, `identity-owned`, `user-owned`, or `organization-owned`; only organization-owned domain records should default to `organization_id`.
-    - Keep shared identity/auth/system tables global unless a concrete product requirement makes them tenant-specific. Current examples include `user`, `account`, `verification`, `two_factor`, `role`, `permission`, `key_counter`, and `key_value`.
-    - Organization-owned domain records should carry `organization_id`, scope common reads/writes through the active organization, and use tenant-aware uniqueness/indexes such as `(organization_id, slug)` or `(organization_id, created_at)` when those are the real access patterns.
-    - User-owned records may stay keyed by `user_id` when the data is intentionally shared across the user's organizations. If the data can differ per organization, model it as organization-owned, usually keyed or constrained by `(organization_id, user_id)`.
-    - Tenant-scoped actor references such as `created_by`, `updated_by`, `approved_by`, or `deleted_by` should include `organization_id` and use composite foreign keys to the tenant membership relationship, currently `member(organization_id, user_id)`.
-    - Treat `_by` as actor-reference guidance only when the field represents a user actor, not domain/display text fields such as `posted_by`, `filed_by`, or `requested_by` unless they are intentionally modeled as user references.
-    - Add matching composite indexes only when they support common tenant-scoped queries or foreign-key maintenance paths.
-    - When a predicted Drizzle/Postgres constraint or index name would exceed 63 characters, generate and pass an explicit name instead of relying on default naming. Use `table_name_<INDEX_TYPE>_<random_6_alphanumeric>`, where `<INDEX_TYPE>` matches the construct (`idx`, `unique`, `fk`, `pk`, or `check`) and `<random_6_alphanumeric>` is 6 random lowercase `a-z`/`0-9` characters.
-    - Do not add a separate index for a primary key column.
-    - Do not add duplicate single-column indexes when a primary key, unique constraint, or existing index already covers the access pattern.
-    - Before adding an index, check whether an existing composite index or unique constraint already provides left-prefix coverage, such as `(organization_id, user_id)` covering filters by `organization_id`.
+## Drizzle
 
-# Validators (`packages/validator`)
+- Change database structure only in `packages/database/src/postgres/schema.ts`.
+- After changing the schema, generate the matching Drizzle migration and snapshot artifacts and commit them with the schema change. Do not hand-edit an existing applied migration.
+- In Hono handlers, use the initialized request context: `ctx.get('dbClient')` for typed `select`, `insert`, `update`, `delete`, and transactions; `ctx.get('dbSchema')` for table references.
+- Use `db.query.*` only where already configured and materially clearer.
+- Avoid raw `sql` except for schema defaults/checks, atomic expressions, or queries the typed builder cannot express cleanly.
 
-- **Depends on:** `@PROJECT_NAME/types` (tsconfig project reference + workspace dependency).
+## Local and Test Bootstrap
 
-1.  **Shared Validators (`@PROJECT_NAME/validator/shared`):**
-    - `field.ts` — Low-level Zod field builders (`vBoolean`, `vInt`, `vNumeric`, `vText`) accepting `{ fieldName, message, min, max }`.
-    - `base.ts` — Composed schemas: `addressInputSchema`, `readManyInputSchema` (limit/offset/sort), `outputSchema<Data>`.
-    - `refinement.ts` — Custom `.check()` callbacks: `dateString()`, `password()` (uppercase + lowercase + numeric + symbol), `updatedFields()`.
-2.  **App Validators:** Domain-specific schemas are mirrored by app surface:
-    - `@PROJECT_NAME/validator/public/*` from `packages/validator/src/public`.
-    - `@PROJECT_NAME/validator/backoffice/*` from `packages/validator/src/backoffice`.
-    - Current feature groups include `auth`, `user`, `admin/user`, and `objectStorage`.
-3.  **Adding a New Validator:**
-    - Create `*.schema.ts` in the appropriate `public/` or `backoffice/` subdirectory using shared field builders and refinements.
-    - Prefer composing schemas from shared base fields (`vBoolean`, `vInt`, `vNumeric`, `vText`) and shared composed schemas from `base.ts` wherever they fit. Reach for raw `z.*` primitives only when the validator needs behavior not covered by the shared builders.
-    - Re-export from the nearest `index.ts`.
-    - Add a named export entry to `packages/validator/package.json` exports map.
-    - Rebuild: `pnpm --filter=@PROJECT_NAME/validator build`.
+- Use `packages/database/.env` and `.env.test` only as Node-side bootstrap/migration inputs; Worker runtime code must never load either file. Vitest reads `.env.test` in Node configuration to derive an ephemeral database URL, and the Worker receives only that generated URL through Hyperdrive.
+- Keep `packages/database/src/postgres/bootstrap.ts` and `utilities.ts` Node-only, excluded from the Worker-facing database build and package exports. Put orchestration in `bootstrap.ts` and reusable recreate/drop operations in `utilities.ts`.
+- Keep direct `migrate:dev`, `migrate:test`, and test cleanup execution behind the `import.meta.main` path in `bootstrap.ts`; staging and production continue to use Drizzle Kit.
+
+For each API Vitest command:
+
+1. Call `prepareTestDatabaseEnvironment()` with the app's Hyperdrive binding before creating the Cloudflare test plugin. It derives a UUIDv7-suffixed URL from `.env.test` and sets `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_<BINDING>`.
+2. Register `bootstrap.ts` as `globalSetup`; its default `manageTestDatabaseLifecycle()` export owns provisioning and teardown.
+3. Preserve the process-scoped lifecycle guard because Vitest may initialize the inherited global setup more than once.
+4. Recreate the generated database, apply default and test migrations, and force-drop it after setup failure or Vitest teardown. Do not use `beforeExit` for cleanup because it may run while Worker tests are still active; forced termination can leave an orphaned database.
+5. Before provisioning, best-effort cleanup drops only exact UUIDv7 test database names older than 24 hours. Use `cleanup:test` for manual stale cleanup.
+
+Do not duplicate the test URL in Wrangler `localConnectionString` or prepend API test scripts with `migrate:test`.
+
+## Ownership and Tenancy
+
+Before adding a table or ownership column, classify its records:
+
+- **Global:** Keep shared identity, auth, and system tables global unless a product requirement makes them tenant-specific. Examples: `user`, `account`, `verification`, `two_factor`, `role`, `permission`, `key_counter`, and `key_value`.
+- **Identity-owned:** Model ownership according to the identity relationship; do not add `organization_id` by default.
+- **User-owned:** Key by `user_id` when data is intentionally shared across the user's organizations. If values may differ by organization, model them as organization-owned, usually with `(organization_id, user_id)`.
+- **Organization-owned:** Add `organization_id`, scope common reads and writes to the active organization, and use tenant-aware uniqueness and indexes, such as `(organization_id, slug)` or `(organization_id, created_at)`, when they match real access patterns.
+
+For tenant-scoped user actors:
+
+- Pair `created_by`, `updated_by`, `approved_by`, and `deleted_by` with `organization_id`.
+- Use composite foreign keys to `member(organization_id, user_id)`.
+- Apply this `_by` rule only to user references, not display text such as `posted_by`, `filed_by`, or `requested_by` unless intentionally modeled as actors.
+- Add matching composite indexes only when required by common tenant queries or foreign-key maintenance.
+
+## Constraints and Indexes
+
+- Give any predicted Drizzle/Postgres name over 63 characters an explicit name: `table_name_<INDEX_TYPE>_<random_6_alphanumeric>`, where the type is `idx`, `unique`, `fk`, `pk`, or `check`, and the suffix contains six random lowercase `a-z`/`0-9` characters.
+- Do not index a primary-key column separately.
+- Do not duplicate coverage already provided by a primary key, unique constraint, or index.
+- Check left-prefix coverage before adding an index; `(organization_id, user_id)` already covers filters by `organization_id`.
+
+## Create Idempotency
+
+When a create endpoint needs retry safety:
+
+- Add a nullable, unique `idempotency_key uuid` column to the primary created table in `packages/database/src/postgres/schema.ts`.
+- Require the key through API validation while leaving the database column nullable for legacy and manual rows.
+- Do not add idempotency columns to status-transition endpoints protected by atomic update conditions.
+
+## Zod Validators
+
+`PROJECT_NAME` is the reusable template token for the repository package scope; it resolves to `hyperion` in this repository.
+
+`@PROJECT_NAME/validator` depends on `@PROJECT_NAME/types` through a workspace dependency and TypeScript project reference.
+
+Shared exports under `@PROJECT_NAME/validator/shared`:
+
+- `field.ts`: `vBoolean(fieldName)` accepts a field-name string; `vInt`, `vNumeric`, and `vText` accept `{ fieldName, message, min, max }` option objects.
+- `base.ts`: `addressInputSchema`, `readManyInputSchema` (`limit`, `offset`, and `sortOrder`), `outputSchema<Data>`, and `paginatedOutputSchema<Data>` with required `count`, `limit`, and `offset`. Existing output schema helpers are contract/schema artifacts and are not a mandate to parse or validate API responses at runtime.
+- `refinement.ts`: `.check()` callbacks `dateString()`, `password()` (uppercase, lowercase, numeric, and symbol), `uniqueArrayValues()`, and `updatedFields()`.
+
+Domain schemas mirror app surfaces:
+
+- `@PROJECT_NAME/validator/public/*` maps to `packages/validator/src/public`.
+- `@PROJECT_NAME/validator/backoffice/*` maps to `packages/validator/src/backoffice`.
+- Existing groups include `auth`, `user`, `admin/user`, and `objectStorage`.
+
+To add a validator:
+
+1. Create `*.schema.ts` in the appropriate public or backoffice directory.
+2. Compose shared field builders, base schemas, and refinements where they fit; use raw `z.*` only for unsupported behavior.
+3. Alphabetize all named schema exports within your `.schema.ts` files.
+4. Re-export it from the nearest `index.ts`, keeping the re-exports alphabetized as well.
+5. Add a `packages/validator/package.json` export only when introducing a new public package subpath; named schemas within an existing subpath do not need separate export-map entries.
+6. Run `pnpm --filter=@PROJECT_NAME/validator build`.

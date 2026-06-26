@@ -7,25 +7,26 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "node": ">=24.15.0",
-        "pnpm": ">=11.5.0"
+        "node": ">=24.16.0",
+        "pnpm": ">=11.9.0"
     },
     "scripts": {
         "build": "wrangler deploy --outdir=./dist/$worker --dry-run --env=",
-        "prepare": "tsc --build ./tsconfig.build.json",
-        "deploy:prod": "wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
-        "deploy:staging": "wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
-        "dev": "wrangler dev --persist-to ../../.wrangler/state",
-        "format": "prettier --write .",
-        "lint": "prettier --check . && eslint .",
+        "build:force": "tsc --build ./tsconfig.build.json --clean && pnpm run build",
+        "check": "tsc --noEmit",
+        "deploy:prod": "tsc --build ./tsconfig.build.json --clean && wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
+        "deploy:staging": "tsc --build ./tsconfig.build.json --clean && wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
+        "dev": "wrangler dev",
+        "format": "eslint . --fix && prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+        "lint": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore && eslint .",
         "secret:prod": "wrangler secret bulk .dev.vars.production --env=production --config=wrangler-production.toml",
         "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging --config=wrangler-staging.toml",
-        "test": "pnpm run test:con && pnpm run test:seq",
-        "test:con": "pnpm --filter=@hyperion/database run migrate:test && vitest run --project=concurrent-test-files",
-        "test:seq": "pnpm --filter=@hyperion/database run migrate:test && vitest run --project=sequential-test-files",
+        "test": "pnpm run --no-bail \"/^test:(con|seq)$/\"",
+        "test:con": "vitest run --no-color --silent=passed-only --project=concurrent-test-files",
+        "test:seq": "vitest run --no-color --silent=passed-only --project=sequential-test-files",
         "test:ui": "echo Use `test:ui:con` or `test:ui:seq` instead",
-        "test:ui:con": "pnpm --filter=@hyperion/database run migrate:test && vitest --ui --project=concurrent-test-files",
-        "test:ui:seq": "pnpm --filter=@hyperion/database run migrate:test && vitest --ui --project=sequential-test-files"
+        "test:ui:con": "vitest watch --ui --api.port=51204 --api.strictPort --project=concurrent-test-files",
+        "test:ui:seq": "vitest watch --ui --api.port=51205 --api.strictPort --project=sequential-test-files"
     },
     "README": "This is a private package bundled by wrangler — the deps/devDeps split has no effect on its own build. dependencies lists only what consumers need for type resolution of the exported Hono routes. Server-only packages live in devDependencies to avoid leaking them transitively into frontend apps.",
     "dependencies": {
@@ -67,6 +68,14 @@
             "types": "./dist/core/route/api/objectStorage/index.d.ts",
             "default": "./dist/core/route/api/objectStorage/index.js"
         },
+        "./api/user": {
+            "types": "./dist/core/route/api/user/index.d.ts",
+            "default": "./dist/core/route/api/user/index.js"
+        },
+        "./api/heartbeat": {
+            "types": "./dist/core/route/api/heartbeat.d.ts",
+            "default": "./dist/core/route/api/heartbeat.js"
+        },
         "./api/order": {
             "types": "./dist/core/route/api/order/index.d.ts",
             "default": "./dist/core/route/api/order/index.js"
@@ -74,10 +83,6 @@
         "./api/product": {
             "types": "./dist/core/route/api/product/index.d.ts",
             "default": "./dist/core/route/api/product/index.js"
-        },
-        "./api/user": {
-            "types": "./dist/core/route/api/user/index.d.ts",
-            "default": "./dist/core/route/api/user/index.js"
         },
         "./root/heartbeat": {
             "types": "./dist/core/route/root/heartbeat.d.ts",

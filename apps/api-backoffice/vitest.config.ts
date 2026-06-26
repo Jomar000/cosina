@@ -5,7 +5,42 @@
 // https://developers.cloudflare.com/workers/testing/vitest-integration
 
 import { cloudflareTest } from '@cloudflare/vitest-pool-workers'
-import { defineConfig } from 'vitest/config'
+import { defineConfig, type TestUserConfig } from 'vitest/config'
+
+import { prepareTestDatabaseEnvironment } from '../../packages/database/src/postgres/bootstrap.js'
+
+const workerDependencyOptimization = () => ({
+    // Workerd only runs ESM — CJS dependencies must be pre-bundled via Vite's
+    // SSR optimizer so they are converted to ESM before workerd loads them.
+    // resend → svix (pure CJS) → uuid
+    // https://developers.cloudflare.com/workers/testing/vitest-integration/known-issues/#module-resolution
+    optimizer: {
+        ssr: {
+            enabled: true,
+            include: [
+                'resend',
+            ],
+        },
+    },
+})
+
+/**
+ * postgres.js' Cloudflare stream polyfill rejects cancelled reads after
+ * expected auth failures close their request streams. Ignore only that known
+ * Worker-bridge rejection; every other unhandled error remains test-fatal.
+ */
+const onUnhandledError: NonNullable<TestUserConfig['onUnhandledError']> = (
+    error,
+) => {
+    if (
+        error.type === 'Unhandled Rejection' &&
+        error.message === 'Stream was cancelled.' &&
+        error.stack?.includes('/postgres/cf/polyfills.js')
+    )
+        return false
+}
+
+prepareTestDatabaseEnvironment('HYPERIONBOFC_HD')
 
 export default defineConfig({
     plugins: [
@@ -20,24 +55,12 @@ export default defineConfig({
         coverage: {
             provider: 'istanbul',
         },
-        deps: {
-            // Workerd only runs ESM — CJS dependencies must be pre-bundled via Vite's
-            // SSR optimizer so they are converted to ESM before workerd loads them.
-            // resend → svix (pure CJS) → uuid
-            // https://developers.cloudflare.com/workers/testing/vitest-integration/known-issues/#module-resolution
-            optimizer: {
-                ssr: {
-                    enabled: true,
-                    include: [
-                        'resend',
-                    ],
-                },
-            },
-        },
         projects: [
             {
+                cacheDir: './node_modules/.vite/vitest-concurrent-test-files',
                 extends: true,
                 test: {
+                    deps: workerDependencyOptimization(),
                     name: 'concurrent-test-files',
                     include: [
                         '**/*.con.test.ts',
@@ -45,8 +68,10 @@ export default defineConfig({
                 },
             },
             {
+                cacheDir: './node_modules/.vite/vitest-sequential-test-files',
                 extends: true,
                 test: {
+                    deps: workerDependencyOptimization(),
                     name: 'sequential-test-files',
                     include: [
                         '**/*.seq.test.ts',
@@ -55,7 +80,9 @@ export default defineConfig({
                 },
             },
         ],
-        setupFiles: ['./vitest.setup.ts'],
-        testTimeout: 10000,
+        globalSetup: '../../packages/database/src/postgres/bootstrap.ts',
+        hookTimeout: 15000,
+        onUnhandledError,
+        testTimeout: 15000,
     },
 })

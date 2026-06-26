@@ -11,6 +11,7 @@ import type {
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    apiResponsePaginatedOkWrapper,
     auditTrailLogger,
     nanoidCustom,
     nanoidOrderCode,
@@ -248,7 +249,12 @@ export const orderRoute = new Hono<THonoInstance>()
                     items: allItems.filter((item) => item.orderId === row.id),
                 }))
 
-                return apiResponseOkWrapper(ctx, { data, count, limit, offset })
+                return apiResponsePaginatedOkWrapper(ctx, {
+                    data,
+                    count,
+                    limit,
+                    offset,
+                })
             } catch (err) {
                 if (err instanceof AppError) throw err
 

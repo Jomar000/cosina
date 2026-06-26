@@ -14,7 +14,7 @@
     import type { Snippet } from 'svelte'
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function defaultFormatter(value: any, _payload: TooltipPayload[]) {
+    function defaultFormatter(value: any) {
         return `${value}`
     }
 
@@ -40,9 +40,9 @@
         labelKey?: string
         hideIndicator?: boolean
         labelClassName?: string
-        labelFormatter?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        labelFormatter?:
             | ((
-                  value: any,
+                  value: any, // eslint-disable-line @typescript-eslint/no-explicit-any
                   payload: TooltipPayload[],
               ) => string | number | Snippet)
             | null
@@ -78,7 +78,7 @@
 
         // Get the x-axis label value from the raw tooltip data (e.g. a Date or month string)
         const dataLabel =
-            tooltipData != null ? chartCtx.x(tooltipData) : undefined
+            tooltipData !== null ? chartCtx.x(tooltipData) : undefined
 
         const key = labelKey ?? item?.label ?? item?.key ?? 'value'
         const itemConfig = getPayloadConfigFromPayload(
@@ -124,7 +124,7 @@
     <div
         bind:this={ref}
         class={cn(
-            'border-border/50 bg-background grid min-w-[9rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl',
+            'border-border/50 bg-background grid min-w-36 items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl',
             className,
         )}
         {...restProps}
@@ -164,7 +164,7 @@
                             <div
                                 style="--color-bg: {indicatorColor}; --color-border: {indicatorColor};"
                                 class={cn(
-                                    'shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)',
+                                    'shrink-0 rounded-[2px] border-border bg-(--color-bg)',
                                     {
                                         'size-2.5': indicator === 'dot',
                                         'h-full w-1': indicator === 'line',

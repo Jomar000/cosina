@@ -9,13 +9,13 @@ import { DurableObject } from 'cloudflare:workers'
 
 import type { THonoBindings } from '../../types.js'
 
-const wsLog = (entry: Record<string, unknown>) =>
+export const wsLog = (entry: Record<string, unknown>) =>
     console.log(JSON.stringify(entry))
 
-const wsError = (entry: Record<string, unknown>) =>
+export const wsError = (entry: Record<string, unknown>) =>
     console.error(JSON.stringify(entry))
 
-const serializeError = (err: unknown) => ({
+export const serializeError = (err: unknown) => ({
     name: err instanceof Error ? err.name : 'UNKNOWN_ERROR',
     message: err instanceof Error ? err.message : String(err),
     stack: err instanceof Error ? err.stack : undefined,

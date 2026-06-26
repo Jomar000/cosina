@@ -5,12 +5,13 @@
     import AudioWaveformIcon from '@lucide/svelte/icons/audio-waveform'
     import CommandIcon from '@lucide/svelte/icons/command'
     import GalleryVerticalEndIcon from '@lucide/svelte/icons/gallery-vertical-end'
-    import { type Component, type ComponentProps } from 'svelte'
+    import { type ComponentProps } from 'svelte'
 
     import type { SessionState } from '$lib/states/session'
     import NavMain from './SidebarNavMain.svelte'
     import NavUser from './SidebarNavUser.svelte'
     import TeamSwitcher from './SidebarTeamSwitcher.svelte'
+    import type { AppNavItem } from './types'
 
     ////////////////////
     // 01. Properties //
@@ -21,20 +22,17 @@
         collapsible = 'icon',
         session,
         navItems,
+        mobile = false,
+        onNavigate,
         ...restProps
     }: ComponentProps<typeof Sidebar.Root> & {
         session: SessionState
-        navItems: {
-            title: string
-            url: string
-            icon: Component
-            isActive?: boolean
-            items?: {
-                title: string
-                url: string
-            }[]
-        }[]
+        navItems: AppNavItem[]
+        mobile?: boolean
+        onNavigate?: () => void
     } = $props()
+
+    const resolvedCollapsible = mobile ? 'none' : collapsible
 
     ///////////////////
     // 02. Constants //
@@ -63,14 +61,17 @@
 
 <Sidebar.Root
     bind:ref
-    {collapsible}
+    collapsible={resolvedCollapsible}
     {...restProps}
 >
     <Sidebar.Header>
         <TeamSwitcher teams={data.teams} />
     </Sidebar.Header>
     <Sidebar.Content>
-        <NavMain items={navItems} />
+        <NavMain
+            items={navItems}
+            {onNavigate}
+        />
     </Sidebar.Content>
     <Sidebar.Footer>
         <NavUser user={session.data} />

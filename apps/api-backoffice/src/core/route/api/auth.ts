@@ -3,8 +3,9 @@ import {
     passwordResetInputSchema,
     passwordResetRequestInputSchema,
     signInInputSchema,
+    verifyEmailInputSchema,
 } from '@hyperion/validator/backoffice/auth'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'
@@ -16,27 +17,33 @@ import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     auditTrailLogger,
+    canLoginAuthRole,
     parseAuthRoles,
 } from '../../../utilities/helpers.js'
 import { captchaHandler } from '../../middleware/captchaHandler.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 import { validateRequest } from '../../middleware/validateRequest.js'
 
+// Roles allowed to authenticate on this API surface.
+const loginAuthRoles = [] as const
+
 const signInHandler = async (
     ctx: Context<THonoInstance>,
     input: z.output<typeof signInInputSchema>,
     credentialType: 'email' | 'username',
 ) => {
-    const { accountId, password } = input
+    const { organizationId, accountId, password } = input
 
     const db = ctx.get('dbClient')
-    const { member, user } = ctx.get('dbSchema')
+    const {
+        member,
+        organization: organizationTable,
+        user,
+    } = ctx.get('dbSchema')
 
     /**
      * @description
-     * Verify the user exists and has an organization membership.
-     * Organization ID is not required at sign-in — the session hook derives
-     * it from the member table automatically.
+     * Verify organization membership
      */
     const orgMemberData =
         (
@@ -44,12 +51,18 @@ const signInHandler = async (
                 .select({ member, user })
                 .from(user)
                 .innerJoin(member, eq(user.id, member.userId))
-                .where(
-                    credentialType === 'email'
-                        ? eq(user.email, accountId)
-                        : eq(user.username, accountId),
+                .innerJoin(
+                    organizationTable,
+                    eq(member.organizationId, organizationTable.id),
                 )
-                .limit(1)
+                .where(
+                    and(
+                        credentialType === 'email'
+                            ? eq(user.email, accountId)
+                            : eq(user.username, accountId),
+                        eq(organizationTable.slug, organizationId),
+                    ),
+                )
         )[0] ?? null
 
     if (!orgMemberData) {
@@ -57,6 +70,14 @@ const signInHandler = async (
             code: 'UNPROCESSABLE_CONTENT',
             message: 'Invalid credentials provided.',
             status: 422,
+        })
+    }
+
+    if (!canLoginAuthRole(orgMemberData.member.role, loginAuthRoles)) {
+        return apiResponseErrorWrapper(ctx, {
+            code: 'FORBIDDEN',
+            message: 'You are not allowed to access this resource.',
+            status: 403,
         })
     }
 
@@ -73,12 +94,14 @@ const signInHandler = async (
         if (credentialType === 'email') {
             betterAuthResponse = await auth.api.signInEmail({
                 body: { email: accountId, password },
+                query: { organizationId },
                 headers: ctx.req.raw.headers,
                 asResponse: true,
             })
         } else {
             betterAuthResponse = await auth.api.signInUsername({
                 body: { username: accountId, password },
+                query: { organizationId },
                 headers: ctx.req.raw.headers,
                 asResponse: true,
             })
@@ -100,6 +123,19 @@ const signInHandler = async (
     }
 
     const { permissions, roles } = ctx.get('acl')
+    const userRoles = parseAuthRoles(orgMemberData.member.role)
+    const userRoleDefinitions = Object.fromEntries(
+        userRoles.flatMap((role) =>
+            roles[role]
+                ? [
+                      [
+                          role,
+                          roles[role],
+                      ] as const,
+                  ]
+                : [],
+        ),
+    )
 
     /**
      * @description
@@ -121,8 +157,8 @@ const signInHandler = async (
             email: orgMemberData.user.email,
             avatar: orgMemberData.user.image ?? '',
             permissions,
-            roles,
-            userRoles: parseAuthRoles(orgMemberData.member.role),
+            roles: userRoleDefinitions,
+            userRoles,
             expiresAt:
                 Math.floor(new Date().getTime() / 1000) +
                 Number(ctx.env.SESSION_EXPIRATION),
@@ -172,7 +208,7 @@ export const authRoute = new Hono<THonoInstance>()
         },
     )
     .post(
-        '/password/reset-request',
+        '/password/resetRequest',
         validateRequest('json', passwordResetRequestInputSchema),
         async (ctx) => {
             const { email } = ctx.req.valid('json')
@@ -230,18 +266,18 @@ export const authRoute = new Hono<THonoInstance>()
         },
     )
     .post(
-        '/sign-in/email',
+        '/signIn/email',
         captchaHandler('sign-in-email'),
         validateRequest('json', signInInputSchema),
         async (ctx) => signInHandler(ctx, ctx.req.valid('json'), 'email'),
     )
     .post(
-        '/sign-in/username',
+        '/signIn/username',
         captchaHandler('sign-in-username'),
         validateRequest('json', signInInputSchema),
         async (ctx) => signInHandler(ctx, ctx.req.valid('json'), 'username'),
     )
-    .post('/sign-out', async (ctx) => {
+    .post('/signOut', async (ctx) => {
         const auth = ctx.get('auth')
 
         const betterAuthResponse = await auth.api.signOut({
@@ -261,6 +297,36 @@ export const authRoute = new Hono<THonoInstance>()
 
         return apiResponseOkWrapper(ctx, { data: null })
     })
+    .get(
+        '/verifyEmail',
+        validateRequest('query', verifyEmailInputSchema),
+        async (ctx) => {
+            const { token } = ctx.req.valid('query')
+            const auth = ctx.get('auth')
+
+            try {
+                // Since onAPIError.throw is true, this will throw on failure
+                await auth.api.verifyEmail({
+                    query: { token },
+                })
+            } catch {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'UNPROCESSABLE_CONTENT',
+                    message:
+                        'Email verification failed. The token may be invalid or expired.',
+                    status: 422,
+                })
+            }
+
+            await auditTrailLogger(ctx, {
+                component: 'auth',
+                action: 'verifyEmail',
+                description: 'User verified their email address',
+            })
+
+            return apiResponseOkWrapper(ctx, { data: null })
+        },
+    )
 
 export default authRoute
 export type AuthRouteType = ApplyGlobalResponse<

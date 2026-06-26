@@ -2,6 +2,7 @@ import { dbSchema } from '@hyperion/database/postgres'
 import type {
     TApiResponseError,
     TApiResponseOk,
+    TApiResponsePaginatedOk,
     TValidatorIssue,
 } from '@hyperion/types/shared'
 import { sql } from 'drizzle-orm'
@@ -25,7 +26,6 @@ export const nanoidCustom = customAlphabet(
     12,
 )
 
-// Uppercase + digits only so tracking codes are case-insensitive to type.
 export const nanoidOrderCode = customAlphabet(
     '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     10,
@@ -69,27 +69,6 @@ export const auditTrailLogger = async (
         ipAddress: ctx.get('ipAddress') ?? null,
         userAgent: ctx.get('userAgent') ?? null,
     })
-
-    // Non-blocking real-time broadcast to the audit WS channel
-    void (async () => {
-        try {
-            const doId = ctx.env.HYPERIONPUB_DO_WSS.idFromName('audit')
-            const stub = ctx.env.HYPERIONPUB_DO_WSS.get(doId)
-            await stub.sendMessage(
-                JSON.stringify({
-                    event: 'audit.new',
-                    data: {
-                        component: data.component,
-                        action: data.action,
-                        description: data.description,
-                        loggedAt: new Date().toISOString(),
-                    },
-                }),
-            )
-        } catch {
-            // Non-fatal: WS broadcast failure should not abort the operation
-        }
-    })()
 }
 
 /**
@@ -169,19 +148,44 @@ export const apiResponseOkWrapper = <T = unknown>(
     ctx: Context<THonoInstance>,
     {
         data,
+        status = 200,
+    }: {
+        data: T
+        status?: ContentfulStatusCode
+    },
+) => {
+    return ctx.json<TApiResponseOk<T>>(
+        {
+            success: true,
+            data,
+        },
+        status,
+    )
+}
+
+/**
+ * API Paginated Response Success Wrapper
+ *
+ * @description
+ * Wrapper for successful paginated API responses.
+ */
+export const apiResponsePaginatedOkWrapper = <T = unknown>(
+    ctx: Context<THonoInstance>,
+    {
+        data,
         count,
         limit,
         offset,
         status = 200,
     }: {
         data: T
-        count?: number
-        limit?: number
-        offset?: number
+        count: number
+        limit: number
+        offset: number
         status?: ContentfulStatusCode
     },
 ) => {
-    return ctx.json<TApiResponseOk<T>>(
+    return ctx.json<TApiResponsePaginatedOk<T>>(
         {
             success: true,
             data,
@@ -205,6 +209,16 @@ export const parseAuthRoles = (role: string) =>
         .split(',')
         .map((value) => value.trim())
         .filter((value) => value.length > 0)
+
+/**
+ * Checks whether any parsed Better Auth organization role can login.
+ */
+export const canLoginAuthRole = (
+    role: string,
+    allowedRoles: readonly string[] = [],
+) =>
+    allowedRoles.length === 0 ||
+    parseAuthRoles(role).some((value) => allowedRoles.includes(value))
 
 /**
  * Checks whether any parsed Better Auth organization role is privileged.

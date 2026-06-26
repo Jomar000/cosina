@@ -2,7 +2,7 @@
     import * as Dialog from '@hyperion/ui/components/dialog'
 
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
-    import logoImg from '$lib/assets/image/logo.jpg'
+    import { IMG_default } from '$lib/assets/image'
 
     ////////////////////
     // 01. Properties //
@@ -19,7 +19,7 @@
     <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content
-            class="w-[360px]"
+            class="w-90"
             escapeKeydownBehavior="ignore"
             interactOutsideBehavior="ignore"
             showCloseButton={false}
@@ -31,9 +31,9 @@
                 class="relative mx-auto h-auto w-full space-y-2 overflow-auto rounded-md md:space-y-4"
             >
                 <img
-                    src={logoImg}
-                    class="mx-auto mb-2 h-20 rounded-full object-cover"
-                    alt="Cosina ni Cacai logo"
+                    src={IMG_default}
+                    class="mx-auto mb-2 h-20"
+                    alt=""
                 />
                 <p
                     class="mb-2 text-center text-sm font-normal text-neutral-900 dark:text-neutral-200"

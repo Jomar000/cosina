@@ -1,6 +1,5 @@
 <script lang="ts">
     import * as Sidebar from '@hyperion/ui/components/sidebar'
-    import type { Component } from 'svelte'
 
     import { page } from '$app/state'
 
@@ -8,16 +7,14 @@
     // 01. Properties //
     ////////////////////
 
+    import type { AppNavItem } from './types'
+
     let {
         items,
+        onNavigate,
     }: {
-        items: {
-            title: string
-            url: string
-            icon: Component
-            exact?: boolean
-            badge?: number
-        }[]
+        items: AppNavItem[]
+        onNavigate?: () => void
     } = $props()
 
     /////////////////
@@ -30,9 +27,11 @@
 <Sidebar.Group>
     <Sidebar.Menu class="gap-1">
         {#each items as item (item.title)}
-            {@const isItemActive = item.exact
-                ? activeUrl === item.url
-                : activeUrl.startsWith(item.url)}
+            {@const isItemActive = item.url
+                ? item.exact
+                    ? activeUrl === item.url
+                    : activeUrl.startsWith(item.url)
+                : false}
             <Sidebar.MenuItem>
                 <Sidebar.MenuButton tooltipContent={item.title}>
                     {#snippet child({ props })}
@@ -40,6 +39,7 @@
                             href={item.url}
                             {...props}
                             data-active={isItemActive || undefined}
+                            onclick={onNavigate}
                         >
                             <div class="relative">
                                 <item.icon />

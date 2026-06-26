@@ -11,6 +11,7 @@ import type {
 import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
+    apiResponsePaginatedOkWrapper,
     auditTrailLogger,
     nanoidCustom,
 } from '../../../../../utilities/helpers.js'
@@ -192,7 +193,12 @@ export const productRoute = new Hono<THonoInstance>()
                     sizes: allSizes.filter((s) => s.productId === row.id),
                 }))
 
-                return apiResponseOkWrapper(ctx, { data, count, limit, offset })
+                return apiResponsePaginatedOkWrapper(ctx, {
+                    data,
+                    count,
+                    limit,
+                    offset,
+                })
             } catch (err) {
                 if (err instanceof AppError) throw err
 

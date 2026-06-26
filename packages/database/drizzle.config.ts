@@ -7,7 +7,7 @@ export default defineConfig({
     dbCredentials: {
         host: 'localhost',
         port: 5432,
-        database: 'cosina',
+        database: 'hyperion',
         user: 'postgres',
         password: 'password',
     },

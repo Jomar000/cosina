@@ -8,7 +8,7 @@ import type {
     TGlobalApiResponses,
     THonoInstance,
 } from '../../../../../types.js'
-import { apiResponseOkWrapper } from '../../../../../utilities/helpers.js'
+import { apiResponsePaginatedOkWrapper } from '../../../../../utilities/helpers.js'
 import { validateRequest } from '../../../../middleware/validateRequest.js'
 
 export const auditRoute = new Hono<THonoInstance>().get(
@@ -61,7 +61,7 @@ export const auditRoute = new Hono<THonoInstance>().get(
                 .limit(limit)
                 .offset(offset)
 
-            return apiResponseOkWrapper(ctx, {
+            return apiResponsePaginatedOkWrapper(ctx, {
                 data: rows,
                 count,
                 limit,

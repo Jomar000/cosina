@@ -7,13 +7,15 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "node": ">=24.15.0",
-        "pnpm": ">=11.5.0"
+        "node": ">=24.16.0",
+        "pnpm": ">=11.9.0"
     },
     "scripts": {
         "build": "tsc --build ./tsconfig.build.json",
-        "format": "prettier --write .",
-        "lint": "prettier --check . && eslint .",
+        "build:force": "tsc --build ./tsconfig.build.json --clean && pnpm run build",
+        "cleanup:test": "tsx --env-file=.env.test ./src/postgres/bootstrap.ts --cleanup-stale-tests",
+        "format": "eslint . --fix && prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+        "lint": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore && eslint .",
         "migrate:dev": "tsx --env-file=.env ./src/postgres/bootstrap.ts",
         "migrate:prod": "drizzle-kit migrate --config=drizzle-production.config.ts",
         "migrate:staging": "drizzle-kit migrate --config=drizzle-staging.config.ts",
@@ -22,7 +24,7 @@
     },
     "dependencies": {
         "drizzle-orm": "catalog:",
-        "postgres": "^3.4.9",
+        "postgres": "catalog:",
         "uuid": "catalog:"
     },
     "devDependencies": {

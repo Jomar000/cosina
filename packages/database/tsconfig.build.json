@@ -12,6 +12,7 @@
     ],
     "exclude": [
         "./src/postgres/bootstrap.ts",
+        "./src/postgres/utilities.ts",
         "./src/postgres/migrations/*"
     ]
 }

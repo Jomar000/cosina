@@ -7,34 +7,36 @@
     "private": true,
     "license": "ISC",
     "engines": {
-        "node": ">=24.15.0",
-        "pnpm": ">=11.5.0"
+        "node": ">=24.16.0",
+        "pnpm": ">=11.1.2"
     },
     "scripts": {
         "dev": "pnpm run --recursive --parallel --if-present dev",
         "build": "pnpm run --recursive --stream --if-present build",
+        "build:force": "pnpm run --recursive --stream --if-present build:force",
         "format": "pnpm run --recursive --stream --if-present format",
         "lint": "pnpm run --recursive --stream --if-present lint",
         "prepare": "pnpm exec husky",
-        "test": "echo 'Tests must be run per-app to ensure a clean DB state per session'"
+        "test": "echo 'Run tests per API app; concurrent and sequential Vitest commands run in parallel on isolated databases'"
     },
     "devDependencies": {
         "@changesets/cli": "^2.31.0",
         "@eslint/compat": "^2.1.0",
         "@eslint/js": "^10.0.1",
-        "@types/node": "^24.12.4",
-        "eslint": "^10.4.1",
+        "@types/node": "^24.13.2",
+        "eslint": "^10.5.0",
         "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-better-tailwindcss": "^4.6.0",
         "eslint-plugin-svelte": "^3.19.0",
-        "globals": "^17.6.0",
+        "globals": "^17.7.0",
         "husky": "^9.1.7",
-        "prettier": "^3.8.3",
-        "prettier-plugin-multiline-arrays": "^4.1.8",
-        "prettier-plugin-svelte": "^4.0.1",
+        "prettier": "^3.8.4",
+        "prettier-plugin-multiline-arrays": "^4.1.9",
+        "prettier-plugin-svelte": "^4.1.1",
         "prettier-plugin-tailwindcss": "^0.8.0",
-        "tsx": "^4.22.3",
+        "tsx": "^4.22.4",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.60.0",
-        "wrangler": "^4.95.0"
+        "typescript-eslint": "^8.62.0",
+        "wrangler": "^4.104.0"
     }
 }

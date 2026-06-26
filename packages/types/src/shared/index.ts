@@ -13,9 +13,12 @@ export type TApiResponseOk<T> = {
     success: true
     data: T
     error?: null
-    count?: number
-    limit?: number
-    offset?: number
+}
+
+export type TApiResponsePaginatedOk<T> = TApiResponseOk<T> & {
+    count: number
+    limit: number
+    offset: number
 }
 
 export type TApiResponseError = {
@@ -30,6 +33,10 @@ export type TApiResponseError = {
 }
 
 export type TApiResponse<T> = TApiResponseOk<T> | TApiResponseError
+
+export type TApiResponsePaginated<T> =
+    | TApiResponsePaginatedOk<T>
+    | TApiResponseError
 
 /**
  * Hono
