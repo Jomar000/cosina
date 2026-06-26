@@ -25,6 +25,7 @@
     import CartPanel from './CartPanel.svelte'
     import OrderForm from './OrderForm.svelte'
     import ProductCard from './ProductCard.svelte'
+    import { IMG_logo } from '$lib/assets/image/index.js'
 
     ///////////////////
     // 02. Constants //
@@ -352,9 +353,13 @@
                 class="flex items-center gap-2"
             >
                 <div
-                    class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600"
+                    class="flex h-9 w-9 items-center justify-center rounded-full"
                 >
-                    <UtensilsIcon class="h-4 w-4 text-white" />
+                    <img
+                        src={IMG_logo}
+                        alt="Cosina logo"
+                        class="w-full rounded-full"
+                    />
                 </div>
                 <div>
                     <h1 class="text-sm font-bold leading-none text-zinc-100">

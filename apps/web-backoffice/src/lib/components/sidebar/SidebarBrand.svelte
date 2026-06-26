@@ -1,6 +1,6 @@
 <script lang="ts">
+    import { IMG_logo } from '$lib/assets/image/index'
     import * as Sidebar from '@hyperion/ui/components/sidebar'
-    import UtensilsCrossedIcon from '@lucide/svelte/icons/utensils-crossed'
 </script>
 
 <Sidebar.Menu>
@@ -12,7 +12,13 @@
             <div
                 class="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
             >
-                <UtensilsCrossedIcon class="size-4" />
+                <div class="flex h-9 w-9 items-center justify-center">
+                    <img
+                        src={IMG_logo}
+                        alt="Cosina logo"
+                        class="w-full h-full rounded-full"
+                    />
+                </div>
             </div>
             <div class="grid flex-1 text-left text-sm leading-tight">
                 <span class="truncate font-semibold">Cosina Admin</span>
