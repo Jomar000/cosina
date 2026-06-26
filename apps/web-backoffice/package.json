@@ -17,7 +17,7 @@
         "deploy:prod": "vite build --mode=production && wrangler deploy --outdir=dist --env=production --config=wrangler-production.toml",
         "deploy:staging": "vite build --mode=staging && wrangler deploy --outdir=dist --env=staging --config=wrangler-staging.toml",
         "dev": "vite dev --host",
-        "format": "prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+        "format": "eslint . --fix && prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
         "lint": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore && eslint .",
         "prepare": "svelte-kit sync || echo ''",
         "preview": "vite preview --host",

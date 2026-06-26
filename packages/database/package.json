@@ -14,7 +14,7 @@
         "build": "tsc --build ./tsconfig.build.json",
         "build:force": "tsc --build ./tsconfig.build.json --clean && pnpm run build",
         "cleanup:test": "tsx --env-file=.env.test ./src/postgres/bootstrap.ts --cleanup-stale-tests",
-        "format": "prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+        "format": "eslint . --fix && prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
         "lint": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore && eslint .",
         "migrate:dev": "tsx --env-file=.env ./src/postgres/bootstrap.ts",
         "migrate:prod": "drizzle-kit migrate --config=drizzle-production.config.ts",

@@ -17,7 +17,7 @@
         "deploy:prod": "tsc --build ./tsconfig.build.json --clean && wrangler deploy --minify --outdir=./dist/$worker --env=production --config=wrangler-production.toml",
         "deploy:staging": "tsc --build ./tsconfig.build.json --clean && wrangler deploy --minify --outdir=./dist/$worker --env=staging --config=wrangler-staging.toml",
         "dev": "wrangler dev",
-        "format": "prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+        "format": "eslint . --fix && prettier --write . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
         "lint": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore && eslint .",
         "secret:prod": "wrangler secret bulk .dev.vars.production --env=production --config=wrangler-production.toml",
         "secret:staging": "wrangler secret bulk .dev.vars.staging --env=staging --config=wrangler-staging.toml",
