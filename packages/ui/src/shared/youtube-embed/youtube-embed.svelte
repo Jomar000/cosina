@@ -98,7 +98,7 @@
                         class="size-16 text-white opacity-90 transition-transform duration-200 group-hover/btn:scale-110"
                     />
                     <span
-                        class="rounded bg-black/60 px-4 py-1.5 text-[10px] font-bold tracking-widest text-white uppercase backdrop-blur-sm sm:text-xs"
+                        class="rounded-sm bg-black/60 px-4 py-1.5 text-[10px] font-bold tracking-widest text-white uppercase backdrop-blur-sm sm:text-xs"
                     >
                         Watch Video
                     </span>

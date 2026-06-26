@@ -25,8 +25,8 @@
     class={cn(
         'rounded-full absolute touch-manipulation',
         emblaCtx.orientation === 'horizontal'
-            ? '-end-12 top-1/2 -translate-y-1/2'
-            : 'start-1/2 -bottom-12 -translate-x-1/2 rotate-90',
+            ? '-inset-e-12 top-1/2 -translate-y-1/2'
+            : 'inset-s-1/2 -bottom-12 -translate-x-1/2 rotate-90',
         className,
     )}
     onclick={emblaCtx.scrollNext}

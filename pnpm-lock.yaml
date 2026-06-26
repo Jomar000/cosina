@@ -32,8 +32,8 @@ catalogs:
       specifier: ^3.0.10
       version: 3.0.10
     '@sveltejs/kit':
-      specifier: ^2.67.0
-      version: 2.67.0
+      specifier: ^2.68.0
+      version: 2.68.0
     '@sveltejs/package':
       specifier: ^2.5.8
       version: 2.5.8
@@ -116,8 +116,8 @@ catalogs:
       specifier: ^1.1.0
       version: 1.1.0
     nanoid:
-      specifier: ^5.1.15
-      version: 5.1.15
+      specifier: ^5.1.16
+      version: 5.1.16
     p-queue:
       specifier: ^9.3.0
       version: 9.3.0
@@ -222,7 +222,7 @@ importers:
         specifier: ^3.19.0
         version: 3.19.0(eslint@10.5.0)(svelte@5.56.4)
       globals:
-        specifier: ^17.7.0
+        specifier: ^17.6.0
         version: 17.7.0
       husky:
         specifier: ^9.1.7
@@ -299,7 +299,7 @@ importers:
         version: 1.0.20
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.20(@sveltejs/kit@2.67.0)(drizzle-orm@1.0.0-rc.3)(svelte@5.56.4)(vitest@4.1.9)
+        version: 1.6.20(@sveltejs/kit@2.68.0)(drizzle-orm@1.0.0-rc.3)(svelte@5.56.4)(vitest@4.1.9)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.21
@@ -308,7 +308,7 @@ importers:
         version: 1.0.0-rc.3(arktype@2.2.1)(postgres@3.4.9)(typebox@1.3.0)(valibot@1.4.1)(zod@4.4.3)
       nanoid:
         specifier: 'catalog:'
-        version: 5.1.15
+        version: 5.1.16
       resend:
         specifier: 'catalog:'
         version: 6.14.0
@@ -369,7 +369,7 @@ importers:
         version: 1.0.20
       better-auth:
         specifier: 'catalog:'
-        version: 1.6.20(@sveltejs/kit@2.67.0)(drizzle-orm@1.0.0-rc.3)(svelte@5.56.4)(vitest@4.1.9)
+        version: 1.6.20(@sveltejs/kit@2.68.0)(drizzle-orm@1.0.0-rc.3)(svelte@5.56.4)(vitest@4.1.9)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.21
@@ -378,7 +378,7 @@ importers:
         version: 1.0.0-rc.3(arktype@2.2.1)(postgres@3.4.9)(typebox@1.3.0)(valibot@1.4.1)(zod@4.4.3)
       nanoid:
         specifier: 'catalog:'
-        version: 5.1.15
+        version: 5.1.16
       resend:
         specifier: 'catalog:'
         version: 6.14.0
@@ -414,10 +414,10 @@ importers:
         version: 1.61.1
       '@sveltejs/adapter-static':
         specifier: 'catalog:'
-        version: 3.0.10(@sveltejs/kit@2.67.0)
+        version: 3.0.10(@sveltejs/kit@2.68.0)
       '@sveltejs/kit':
         specifier: 'catalog:'
-        version: 2.67.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
+        version: 2.68.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
       '@sveltejs/vite-plugin-svelte':
         specifier: 'catalog:'
         version: 7.1.2(svelte@5.56.4)(vite@8.1.0)
@@ -456,7 +456,7 @@ importers:
         version: 1.1.0(svelte@5.56.4)
       nanoid:
         specifier: 'catalog:'
-        version: 5.1.15
+        version: 5.1.16
       p-queue:
         specifier: 'catalog:'
         version: 9.3.0
@@ -519,10 +519,10 @@ importers:
         version: 1.61.1
       '@sveltejs/adapter-static':
         specifier: 'catalog:'
-        version: 3.0.10(@sveltejs/kit@2.67.0)
+        version: 3.0.10(@sveltejs/kit@2.68.0)
       '@sveltejs/kit':
         specifier: 'catalog:'
-        version: 2.67.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
+        version: 2.68.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
       '@sveltejs/vite-plugin-svelte':
         specifier: 'catalog:'
         version: 7.1.2(svelte@5.56.4)(vite@8.1.0)
@@ -561,7 +561,7 @@ importers:
         version: 1.1.0(svelte@5.56.4)
       nanoid:
         specifier: 'catalog:'
-        version: 5.1.15
+        version: 5.1.16
       p-queue:
         specifier: 'catalog:'
         version: 9.3.0
@@ -639,7 +639,7 @@ importers:
         version: 8.21.3
       bits-ui:
         specifier: 'catalog:'
-        version: 2.18.1(@internationalized/date@3.12.2)(@sveltejs/kit@2.67.0)(svelte@5.56.4)
+        version: 2.18.1(@internationalized/date@3.12.2)(@sveltejs/kit@2.68.0)(svelte@5.56.4)
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -651,7 +651,7 @@ importers:
         version: 2.0.1(svelte@5.56.4)(sveltekit-superforms@2.30.1)
       layerchart:
         specifier: 'catalog:'
-        version: 2.0.0-next.65(@sveltejs/kit@2.67.0)(svelte@5.56.4)(zod@4.4.3)
+        version: 2.0.0-next.65(@sveltejs/kit@2.68.0)(svelte@5.56.4)(zod@4.4.3)
       mode-watcher:
         specifier: 'catalog:'
         version: 1.1.0(svelte@5.56.4)
@@ -672,7 +672,7 @@ importers:
         version: 1.1.1(svelte@5.56.4)
       sveltekit-superforms:
         specifier: 'catalog:'
-        version: 2.30.1(@sveltejs/kit@2.67.0)(@types/json-schema@7.0.15)(svelte@5.56.4)(typescript@6.0.3)
+        version: 2.30.1(@sveltejs/kit@2.68.0)(@types/json-schema@7.0.15)(svelte@5.56.4)(typescript@6.0.3)
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.6.0
@@ -1830,8 +1830,8 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
 
-  '@sveltejs/kit@2.67.0':
-    resolution: {integrity: sha512-JXHbsDwRes1Wgyof3q5ApzzpbCWvinKXMQCiV67TFO6xlZPYLoK0fq3xQMqSicDMgCtFGqLkrQXkseOcASdZ8A==}
+  '@sveltejs/kit@2.68.0':
+    resolution: {integrity: sha512-PdKiWsqinAoubVsSiRgVFkg3MHzGhQPnwQ8VxnGQKpZYijpapZ3UHHBje0GeByt2TvfjHPw+kxV+dNK2RIZg9g==}
     engines: {node: '>=18.13'}
     hasBin: true
     peerDependencies:
@@ -2759,8 +2759,8 @@ packages:
     resolution: {integrity: sha512-aNnGCvbJ/RIyWo1IuhNdVjnNF+EjH9wpzpNHt+ci/m9He9LJvUN8wrCcXjp9cWsGNAuvSpVFTx/vraAFQ8qGjQ==}
     engines: {node: '>=10.13.0'}
 
-  enhanced-resolve@5.24.0:
-    resolution: {integrity: sha512-SkE2t82KlkkxQRVMVLAGKxLfORGQfrkx5dkj+vlgXRVNEdPc4eZcR+J/Fvj8C+yKSFH5L0q3NFlyufOVQnCcYQ==}
+  enhanced-resolve@5.24.1:
+    resolution: {integrity: sha512-7DdUaTjmNwMcH2gLr1qycesKII3BK4RLy/mdAb7x10Lq7bR4aNKHt1BR1ZALSv0rPM/hF5wYF0PhGop/rJm8vw==}
     engines: {node: '>=10.13.0'}
 
   enquirer@2.4.1:
@@ -3360,8 +3360,8 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@5.1.15:
-    resolution: {integrity: sha512-kBg3RpGtIe+RpTbyXwoI6pk5yD7KUiI3sygUqgeBMRst42KmhB4RZC7eiO9Wa1HIpaCCtpE2DJ6OI4Wi5ebwFw==}
+  nanoid@5.1.16:
+    resolution: {integrity: sha512-kVrnsrJqMR8+oLJnGEmSWw9BivK5mt7H3FZatVRjrc5wGqFYuBxX1yG7+A7Gi5AefkX6t/oCkizcQgpu0cY1dQ==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -5259,11 +5259,11 @@ snapshots:
     dependencies:
       acorn: 8.17.0
 
-  '@sveltejs/adapter-static@3.0.10(@sveltejs/kit@2.67.0)':
+  '@sveltejs/adapter-static@3.0.10(@sveltejs/kit@2.68.0)':
     dependencies:
-      '@sveltejs/kit': 2.67.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
+      '@sveltejs/kit': 2.68.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
 
-  '@sveltejs/kit@2.67.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)':
+  '@sveltejs/kit@2.68.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@sveltejs/acorn-typescript': 1.0.10(acorn@8.17.0)
@@ -5748,7 +5748,7 @@ snapshots:
 
   baseline-browser-mapping@2.10.38: {}
 
-  better-auth@1.6.20(@sveltejs/kit@2.67.0)(drizzle-orm@1.0.0-rc.3)(svelte@5.56.4)(vitest@4.1.9):
+  better-auth@1.6.20(@sveltejs/kit@2.68.0)(drizzle-orm@1.0.0-rc.3)(svelte@5.56.4)(vitest@4.1.9):
     dependencies:
       '@better-auth/core': 1.6.20(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.6)(jose@6.2.3)(kysely@0.29.2)(nanostores@1.3.0)
       '@better-auth/drizzle-adapter': 1.6.20(@better-auth/core@1.6.20)(@better-auth/utils@0.4.2)(drizzle-orm@1.0.0-rc.3)
@@ -5768,7 +5768,7 @@ snapshots:
       nanostores: 1.3.0
       zod: 4.4.3
     optionalDependencies:
-      '@sveltejs/kit': 2.67.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
+      '@sveltejs/kit': 2.68.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
       drizzle-orm: 1.0.0-rc.3(arktype@2.2.1)(postgres@3.4.9)(typebox@1.3.0)(valibot@1.4.1)(zod@4.4.3)
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
       vitest: 4.1.9(@types/node@25.9.2)(@vitest/browser-playwright@4.1.9)(@vitest/coverage-istanbul@4.1.9)(@vitest/ui@4.1.9)(vite@8.1.0)
@@ -5791,15 +5791,15 @@ snapshots:
 
   bignumber.js@9.3.1: {}
 
-  bits-ui@2.18.1(@internationalized/date@3.12.2)(@sveltejs/kit@2.67.0)(svelte@5.56.4):
+  bits-ui@2.18.1(@internationalized/date@3.12.2)(@sveltejs/kit@2.68.0)(svelte@5.56.4):
     dependencies:
       '@floating-ui/core': 1.7.5
       '@floating-ui/dom': 1.7.6
       '@internationalized/date': 3.12.2
       esm-env: 1.2.2
-      runed: 0.35.1(@sveltejs/kit@2.67.0)(svelte@5.56.4)
+      runed: 0.35.1(@sveltejs/kit@2.68.0)(svelte@5.56.4)
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
-      svelte-toolbelt: 0.10.6(@sveltejs/kit@2.67.0)(svelte@5.56.4)
+      svelte-toolbelt: 0.10.6(@sveltejs/kit@2.68.0)(svelte@5.56.4)
       tabbable: 6.5.0
     transitivePeerDependencies:
       - '@sveltejs/kit'
@@ -6069,7 +6069,7 @@ snapshots:
       graceful-fs: 4.2.11
       tapable: 2.3.3
 
-  enhanced-resolve@5.24.0:
+  enhanced-resolve@5.24.1:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
@@ -6126,7 +6126,7 @@ snapshots:
     dependencies:
       '@eslint/css-tree': 4.0.4
       '@valibot/to-json-schema': 1.7.1(valibot@1.4.1)
-      enhanced-resolve: 5.24.0
+      enhanced-resolve: 5.24.1
       jiti: 2.7.0
       synckit: 0.11.13
       tailwind-csstree: 0.3.3
@@ -6327,7 +6327,7 @@ snapshots:
     dependencies:
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
       svelte-toolbelt: 0.5.0(svelte@5.56.4)
-      sveltekit-superforms: 2.30.1(@sveltejs/kit@2.67.0)(@types/json-schema@7.0.15)(svelte@5.56.4)(typescript@6.0.3)
+      sveltekit-superforms: 2.30.1(@sveltejs/kit@2.68.0)(@types/json-schema@7.0.15)(svelte@5.56.4)(typescript@6.0.3)
 
   fs-extra@7.0.1:
     dependencies:
@@ -6499,7 +6499,7 @@ snapshots:
 
   kysely@0.29.2: {}
 
-  layerchart@2.0.0-next.65(@sveltejs/kit@2.67.0)(svelte@5.56.4)(zod@4.4.3):
+  layerchart@2.0.0-next.65(@sveltejs/kit@2.68.0)(svelte@5.56.4)(zod@4.4.3):
     dependencies:
       '@dagrejs/dagre': 2.0.4
       '@layerstack/svelte-actions': 1.0.1-next.18
@@ -6529,7 +6529,7 @@ snapshots:
       d3-tile: 1.0.0
       d3-time: 3.1.0
       memoize: 10.2.0
-      runed: 0.37.1(@sveltejs/kit@2.67.0)(svelte@5.56.4)(zod@4.4.3)
+      runed: 0.37.1(@sveltejs/kit@2.68.0)(svelte@5.56.4)(zod@4.4.3)
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
     transitivePeerDependencies:
       - '@sveltejs/kit'
@@ -6677,7 +6677,7 @@ snapshots:
 
   nanoid@3.3.15: {}
 
-  nanoid@5.1.15: {}
+  nanoid@5.1.16: {}
 
   nanostores@1.3.0: {}
 
@@ -6917,23 +6917,23 @@ snapshots:
       esm-env: 1.2.2
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
 
-  runed@0.35.1(@sveltejs/kit@2.67.0)(svelte@5.56.4):
+  runed@0.35.1(@sveltejs/kit@2.68.0)(svelte@5.56.4):
     dependencies:
       dequal: 2.0.3
       esm-env: 1.2.2
       lz-string: 1.5.0
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
     optionalDependencies:
-      '@sveltejs/kit': 2.67.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
+      '@sveltejs/kit': 2.68.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
 
-  runed@0.37.1(@sveltejs/kit@2.67.0)(svelte@5.56.4)(zod@4.4.3):
+  runed@0.37.1(@sveltejs/kit@2.68.0)(svelte@5.56.4)(zod@4.4.3):
     dependencies:
       dequal: 2.0.3
       esm-env: 1.2.2
       lz-string: 1.5.0
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
     optionalDependencies:
-      '@sveltejs/kit': 2.67.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
+      '@sveltejs/kit': 2.68.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
       zod: 4.4.3
 
   rw@1.3.3: {}
@@ -7112,10 +7112,10 @@ snapshots:
       runed: 0.28.0(svelte@5.56.4)
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
 
-  svelte-toolbelt@0.10.6(@sveltejs/kit@2.67.0)(svelte@5.56.4):
+  svelte-toolbelt@0.10.6(@sveltejs/kit@2.68.0)(svelte@5.56.4):
     dependencies:
       clsx: 2.1.1
-      runed: 0.35.1(@sveltejs/kit@2.67.0)(svelte@5.56.4)
+      runed: 0.35.1(@sveltejs/kit@2.68.0)(svelte@5.56.4)
       style-to-object: 1.0.14
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
     transitivePeerDependencies:
@@ -7169,9 +7169,9 @@ snapshots:
     transitivePeerDependencies:
       - '@typescript-eslint/types'
 
-  sveltekit-superforms@2.30.1(@sveltejs/kit@2.67.0)(@types/json-schema@7.0.15)(svelte@5.56.4)(typescript@6.0.3):
+  sveltekit-superforms@2.30.1(@sveltejs/kit@2.68.0)(@types/json-schema@7.0.15)(svelte@5.56.4)(typescript@6.0.3):
     dependencies:
-      '@sveltejs/kit': 2.67.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
+      '@sveltejs/kit': 2.68.0(@sveltejs/vite-plugin-svelte@7.1.2)(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.0)
       devalue: 5.8.1
       memoize-weak: 1.0.2
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
@@ -7262,7 +7262,7 @@ snapshots:
   tsconfig-paths-webpack-plugin@4.2.0:
     dependencies:
       chalk: 4.1.2
-      enhanced-resolve: 5.24.0
+      enhanced-resolve: 5.24.1
       tapable: 2.3.3
       tsconfig-paths: 4.2.0
 
