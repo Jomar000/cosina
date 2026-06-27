@@ -21,6 +21,7 @@ export type THonoBindings = TBaseHonoBindings<
         HYPERIONBOFC_HD: Hyperdrive
         HYPERIONBOFC_KV: KVNamespace
         HYPERIONPUB_DO_WSS: DurableObjectNamespace<WebSocketServer>
+        HYPERIONPUB_KV: KVNamespace
     } & Env
 >
 

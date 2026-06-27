@@ -4,6 +4,7 @@
     import * as Drawer from '@hyperion/ui/components/drawer'
     import { cn } from '@hyperion/ui/utils'
     import type { TApiResponse } from '@hyperion/types/shared'
+    import BookOpenCheckIcon from '@lucide/svelte/icons/book-open-check'
     import CalendarDaysIcon from '@lucide/svelte/icons/calendar-days'
     import CheckIcon from '@lucide/svelte/icons/check'
     import UtensilsCrossedIcon from '@lucide/svelte/icons/utensils-crossed'
@@ -23,6 +24,7 @@
     import { wsClientManager } from '$lib/utilities/wsClientManager'
     import type { TCartItem, TProduct, TProductTag } from '../types.js'
     import CartPanel from './CartPanel.svelte'
+    import HowToOrderDialog from './HowToOrderDialog.svelte'
     import OrderForm from './OrderForm.svelte'
     import ProductCard from './ProductCard.svelte'
     import { IMG_logo } from '$lib/assets/image/index.js'
@@ -83,6 +85,7 @@
     let nextKey = 0
     let closedDialogDismissed = $state(false)
     let closedDialogOpen = $state(false)
+    let howToOrderOpen = $state(false)
 
     /////////////////
     // 05. Queries //
@@ -312,7 +315,9 @@
     function addToCart(item: Omit<TCartItem, 'key'>) {
         const existingIdx = cart.findIndex(
             (c) =>
-                c.productId === item.productId && c.sizeName === item.sizeName,
+                c.productId === item.productId &&
+                c.sizeName === item.sizeName &&
+                c.flavorName === item.flavorName,
         )
         if (existingIdx !== -1) {
             cart = cart.map((c, i) =>
@@ -353,7 +358,7 @@
                 class="flex items-center gap-2"
             >
                 <div
-                    class="flex h-9 w-9 items-center justify-center rounded-full"
+                    class="flex size-9 items-center justify-center rounded-full"
                 >
                     <img
                         src={IMG_logo}
@@ -373,11 +378,19 @@
 
             <!-- Nav actions -->
             <div class="flex items-center gap-1.5">
+                <button
+                    type="button"
+                    onclick={() => (howToOrderOpen = true)}
+                    class="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-all hover:border-blue-500/40 hover:text-blue-300"
+                >
+                    <BookOpenCheckIcon class="size-3.5 " />
+                    <span class="hidden sm:inline">How to Order?</span>
+                </button>
                 <a
                     href="/track"
                     class="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-all hover:border-zinc-700 hover:text-zinc-200"
                 >
-                    <PackageSearchIcon class="h-3.5 w-3.5" />
+                    <PackageSearchIcon class="size-3.5 " />
                     <span class="hidden sm:inline">Track Order</span>
                 </a>
 
@@ -392,11 +405,11 @@
                             : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-blue-500/40 hover:text-zinc-100',
                     )}
                 >
-                    <ShoppingCartIcon class="h-3.5 w-3.5" />
+                    <ShoppingCartIcon class="size-3.5 " />
                     <span class="hidden sm:inline">Cart</span>
                     {#if cartItemCount > 0}
                         <span
-                            class="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white"
+                            class="absolute -right-1.5 -top-1.5 flex size-4 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white"
                         >
                             {cartItemCount > 99 ? '99+' : cartItemCount}
                         </span>
@@ -413,7 +426,7 @@
                 <div
                     class="mb-2 inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1"
                 >
-                    <span class="h-1 w-1 rounded-full bg-blue-400"></span>
+                    <span class="size-1 rounded-full bg-blue-400"></span>
                     <span class="text-[11px] font-medium text-blue-400"
                         >Order Online • Fresh Daily</span
                     >
@@ -444,12 +457,12 @@
                     class="flex items-start gap-2.5 rounded-xl border border-amber-500/25 bg-amber-500/8 px-3.5 py-3"
                 >
                     <span
-                        class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-400"
+                        class="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-400"
                         aria-hidden="true"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="h-2.5 w-2.5"
+                            class="size-2.5"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -476,7 +489,7 @@
                             />
                         </svg>
                     </span>
-                    <p class="text-xs leading-relaxed text-amber-300/80">
+                    <p class="text-xs/relaxed text-amber-300/80">
                         Orders must be placed at least
                         <strong class="font-semibold text-amber-300"
                             >{advanceDays}
@@ -495,14 +508,14 @@
             <div class="mb-2 flex gap-2 sm:mb-3">
                 <div class="relative flex-1">
                     <SearchIcon
-                        class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500"
+                        class="pointer-events-none absolute left-3 top-1/2 size-3.5  -translate-y-1/2 text-zinc-500"
                     />
                     <input
                         type="search"
                         placeholder="Search menu items..."
                         bind:value={searchQuery}
                         aria-label="Search menu items"
-                        class="w-full rounded-xl border border-zinc-800 bg-zinc-900 py-2.5 pl-9 pr-9 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-500 focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/20"
+                        class="w-full rounded-xl border border-zinc-800 bg-zinc-900 py-2.5 px-9 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-500 focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/20"
                     />
                     {#if searchQuery}
                         <button
@@ -511,7 +524,7 @@
                             aria-label="Clear search"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition-colors hover:text-zinc-300"
                         >
-                            <XIcon class="h-3.5 w-3.5" />
+                            <XIcon class="size-3.5 " />
                         </button>
                     {/if}
                 </div>
@@ -528,10 +541,10 @@
                             : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:text-zinc-300',
                     )}
                 >
-                    <SlidersHorizontalIcon class="h-3.5 w-3.5" />
+                    <SlidersHorizontalIcon class="size-3.5 " />
                     {#if activeFilterCount > 0}
                         <span
-                            class="flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white"
+                            class="flex size-4 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white"
                         >
                             {activeFilterCount}
                         </span>
@@ -554,7 +567,7 @@
                             class="flex shrink-0 items-center gap-1 rounded-full border border-blue-500/40 bg-blue-600/15 px-2.5 py-1 text-[11px] font-medium text-blue-400"
                         >
                             {activeCat?.label}
-                            <XIcon class="h-3 w-3" />
+                            <XIcon class="size-3 " />
                         </button>
                     {/if}
                     {#if selectedTag !== 'all'}
@@ -564,7 +577,7 @@
                             class="flex shrink-0 items-center gap-1 rounded-full border border-blue-500/40 bg-blue-600/15 px-2.5 py-1 text-[11px] font-medium text-blue-400"
                         >
                             {TAG_LABELS[selectedTag as TProductTag]}
-                            <XIcon class="h-3 w-3" />
+                            <XIcon class="size-3 " />
                         </button>
                     {/if}
                 </div>
@@ -585,7 +598,7 @@
                             )}
                             onclick={() => selectCategory(cat.value)}
                         >
-                            <Icon class="h-3 w-3 shrink-0" />
+                            <Icon class="size-3  shrink-0" />
                             {cat.label}
                         </button>
                     {/each}
@@ -640,7 +653,7 @@
                     class="mb-3 flex items-center gap-1.5 text-xs text-zinc-500"
                 >
                     <div
-                        class="h-3 w-3 animate-spin rounded-full border border-zinc-700 border-t-blue-400"
+                        class="size-3 animate-spin rounded-full border border-zinc-700 border-t-blue-400"
                     ></div>
                     Updating menu…
                 </div>
@@ -659,14 +672,14 @@
                             ></div>
                             <div class="flex flex-col gap-2 p-3">
                                 <div
-                                    class="h-3.5 w-3/4 animate-pulse rounded bg-zinc-800"
+                                    class="h-3.5 w-3/4 animate-pulse rounded-sm bg-zinc-800"
                                 ></div>
                                 <div
-                                    class="h-3 w-full animate-pulse rounded bg-zinc-800"
+                                    class="h-3 w-full animate-pulse rounded-sm bg-zinc-800"
                                 ></div>
                                 <div class="flex justify-between">
                                     <div
-                                        class="h-5 w-16 animate-pulse rounded bg-zinc-800"
+                                        class="h-5 w-16 animate-pulse rounded-sm bg-zinc-800"
                                     ></div>
                                     <div
                                         class="h-7 w-14 animate-pulse rounded-lg bg-zinc-800"
@@ -699,7 +712,7 @@
                         class="flex flex-col items-center justify-center gap-3 py-20 text-center"
                     >
                         {#if searchQuery.trim()}
-                            <SearchIcon class="h-12 w-12 text-zinc-700" />
+                            <SearchIcon class="size-12  text-zinc-700" />
                             <p class="text-sm text-zinc-500">
                                 No items match "<span class="text-zinc-400"
                                     >{searchQuery.trim()}</span
@@ -713,7 +726,7 @@
                                 Clear search
                             </button>
                         {:else}
-                            <UtensilsIcon class="h-12 w-12 text-zinc-700" />
+                            <UtensilsIcon class="size-12  text-zinc-700" />
                             <p class="text-sm text-zinc-500">
                                 {#if selectedTag !== 'all'}
                                     No items tagged "{TAG_LABELS[
@@ -753,7 +766,7 @@
     <!-- Floating Cart Button (mobile sticky) -->
     {#if cartItemCount > 0 && !cartOpen}
         <div
-            class="fixed bottom-6 left-0 right-0 z-30 flex justify-center px-5 sm:hidden"
+            class="fixed bottom-6 inset-x-0 z-30 flex justify-center px-5 sm:hidden"
         >
             <button
                 type="button"
@@ -762,11 +775,11 @@
             >
                 <!-- Cart icon with item-count badge -->
                 <div
-                    class="relative flex shrink-0 items-center justify-center px-3 py-3"
+                    class="relative flex shrink-0 items-center justify-center p-3"
                 >
-                    <ShoppingCartIcon class="h-4 w-4 text-white" />
+                    <ShoppingCartIcon class="size-4  text-white" />
                     <span
-                        class="absolute right-1.5 top-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-[8px] font-extrabold leading-none text-blue-600"
+                        class="absolute right-1.5 top-1.5 flex size-3.5 items-center justify-center rounded-full bg-white text-[8px] font-extrabold leading-none text-blue-600"
                     >
                         {cartItemCount > 99 ? '99+' : cartItemCount}
                     </span>
@@ -828,13 +841,13 @@
                                         : 'text-zinc-300 hover:text-zinc-100',
                                 )}
                             >
-                                <Icon class="h-4 w-4 shrink-0" />
+                                <Icon class="size-4  shrink-0" />
                                 <span class="flex-1 text-sm font-medium"
                                     >{cat.label}</span
                                 >
                                 <CheckIcon
                                     class={cn(
-                                        'h-4 w-4 transition-opacity',
+                                        'size-4  transition-opacity',
                                         selectedCategory === cat.value
                                             ? 'opacity-100'
                                             : 'opacity-0',
@@ -934,9 +947,9 @@
                     class="flex flex-col items-center gap-3 bg-amber-500/10 px-6 py-8"
                 >
                     <div
-                        class="flex h-16 w-16 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/15"
+                        class="flex size-16 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/15"
                     >
-                        <UtensilsCrossedIcon class="h-8 w-8 text-amber-400" />
+                        <UtensilsCrossedIcon class="size-8  text-amber-400" />
                     </div>
                     <div class="flex flex-col items-center gap-1 text-center">
                         <Dialog.Title
@@ -945,7 +958,7 @@
                             We're Temporarily Closed
                         </Dialog.Title>
                         <Dialog.Description
-                            class="text-xs leading-relaxed text-zinc-400"
+                            class="text-xs/relaxed  text-zinc-400"
                         >
                             Cosina is not accepting orders during this period.
                         </Dialog.Description>
@@ -958,7 +971,7 @@
                         class="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3"
                     >
                         <CalendarDaysIcon
-                            class="mt-0.5 h-4 w-4 shrink-0 text-amber-400"
+                            class="mt-0.5 size-4  shrink-0 text-amber-400"
                         />
                         <div class="flex flex-col gap-0.5">
                             <p class="text-sm font-semibold text-amber-300">
@@ -975,9 +988,7 @@
                         </div>
                     </div>
 
-                    <p
-                        class="text-center text-xs leading-relaxed text-zinc-500"
-                    >
+                    <p class="text-center text-xs/relaxed text-zinc-500">
                         You can still browse our menu and place orders for dates
                         outside this period.
                     </p>
@@ -996,3 +1007,5 @@
         </Dialog.Root>
     {/if}
 </div>
+
+<HowToOrderDialog bind:open={howToOrderOpen} />

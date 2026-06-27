@@ -7,8 +7,10 @@
     import CalendarClockIcon from '@lucide/svelte/icons/calendar-clock'
     import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2'
     import HistoryIcon from '@lucide/svelte/icons/history'
+    import ImageIcon from '@lucide/svelte/icons/image'
     import ImageOffIcon from '@lucide/svelte/icons/image-off'
     import PhoneIcon from '@lucide/svelte/icons/phone'
+    import ReceiptIcon from '@lucide/svelte/icons/receipt'
     import SearchIcon from '@lucide/svelte/icons/search'
     import TruckIcon from '@lucide/svelte/icons/truck'
     import XCircleIcon from '@lucide/svelte/icons/x-circle'
@@ -37,6 +39,7 @@
         productId: number | null
         name: string
         sizeName: string | null
+        flavorName: string | null
         quantity: number
         price: string
     }
@@ -242,65 +245,68 @@
     }
 </script>
 
-<main class="flex flex-1 flex-col gap-6 p-4 pt-0 md:p-6 md:pt-0">
+<main class="flex flex-1 flex-col gap-6 p-4 pt-2 md:p-6">
     <!-- Header -->
-    <div class="flex items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight">Order History</h1>
-            <p class="text-muted-foreground text-sm">
-                {#if ordersQuery.data}
-                    {historyOrders.length} of {completedCount + cancelledCount}
-                    {completedCount + cancelledCount === 1
-                        ? 'archived order'
-                        : 'archived orders'}
-                {:else}
-                    Completed and cancelled orders.
-                {/if}
-            </p>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div
+                class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 ring-1 ring-blue-500/20"
+            >
+                <HistoryIcon class="size-5 text-blue-400" />
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">Order History</h1>
+                <p class="text-muted-foreground text-sm">
+                    {#if ordersQuery.data}
+                        {historyOrders.length} of {completedCount +
+                            cancelledCount}
+                        {completedCount + cancelledCount === 1
+                            ? 'archived order'
+                            : 'archived orders'}
+                    {:else}
+                        Completed and cancelled orders.
+                    {/if}
+                </p>
+            </div>
         </div>
-    </div>
 
-    <!-- Summary stats -->
-    {#if ordersQuery.data && (completedCount > 0 || cancelledCount > 0)}
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:w-96">
-            <div
-                class="flex items-center gap-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-4 py-3"
-            >
-                <CheckCircle2Icon
-                    class="size-5 shrink-0 text-emerald-600 dark:text-emerald-400"
-                />
-                <div>
-                    <p
-                        class="text-lg font-bold tabular-nums text-emerald-700 dark:text-emerald-300"
-                    >
-                        {completedCount}
-                    </p>
-                    <p
-                        class="text-xs text-emerald-600/70 dark:text-emerald-400/70"
-                    >
-                        Completed
-                    </p>
+        {#if ordersQuery.data && (completedCount > 0 || cancelledCount > 0)}
+            <div class="flex gap-2">
+                <div
+                    class="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2"
+                >
+                    <CheckCircle2Icon
+                        class="size-4 shrink-0 text-emerald-400"
+                    />
+                    <div>
+                        <p
+                            class="text-base font-bold tabular-nums text-emerald-300 leading-none"
+                        >
+                            {completedCount}
+                        </p>
+                        <p class="mt-0.5 text-[10px] text-emerald-400/60">
+                            Completed
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2"
+                >
+                    <XCircleIcon class="size-4 shrink-0 text-red-400" />
+                    <div>
+                        <p
+                            class="text-base font-bold tabular-nums text-red-300 leading-none"
+                        >
+                            {cancelledCount}
+                        </p>
+                        <p class="mt-0.5 text-[10px] text-red-400/60">
+                            Cancelled
+                        </p>
+                    </div>
                 </div>
             </div>
-            <div
-                class="flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3"
-            >
-                <XCircleIcon
-                    class="size-5 shrink-0 text-red-600 dark:text-red-400"
-                />
-                <div>
-                    <p
-                        class="text-lg font-bold tabular-nums text-red-700 dark:text-red-300"
-                    >
-                        {cancelledCount}
-                    </p>
-                    <p class="text-xs text-red-600/70 dark:text-red-400/70">
-                        Cancelled
-                    </p>
-                </div>
-            </div>
-        </div>
-    {/if}
+        {/if}
+    </div>
 
     <!-- Filters -->
     <div class="flex flex-col gap-3">
@@ -480,8 +486,11 @@
                                     <span
                                         class="leading-snug text-muted-foreground"
                                     >
-                                        {item.name}{item.sizeName
-                                            ? ` (${item.sizeName})`
+                                        {item.name}{[
+                                            item.flavorName,
+                                            item.sizeName,
+                                        ].filter(Boolean).length
+                                            ? ` (${[item.flavorName, item.sizeName].filter(Boolean).join(' · ')})`
                                             : ''} &times; {item.quantity}
                                     </span>
                                     <span
@@ -577,7 +586,7 @@
                             </div>
                         {/if}
                         <span
-                            class="text-muted-foreground text-xs text-right leading-snug"
+                            class="text-muted-foreground text-xs/snug text-right"
                         >
                             Ordered<br />{formatDate(o.createdAt)}
                         </span>
@@ -590,32 +599,43 @@
 
 <!-- Order Detail Dialog -->
 <Dialog.Root bind:open={detailDialogOpen}>
-    <Dialog.Content class="sm:max-w-lg">
-        <Dialog.Header>
-            <Dialog.Title>Order #{viewingOrder?.id}</Dialog.Title>
-            <Dialog.Description>
-                Placed on {viewingOrder
-                    ? formatDate(viewingOrder.createdAt)
-                    : ''}
-            </Dialog.Description>
-        </Dialog.Header>
+    <Dialog.Content
+        class="flex max-h-[90dvh] flex-col gap-0 p-0 bg-zinc-950 border-zinc-800/80 shadow-2xl shadow-black/60 sm:max-w-lg"
+    >
+        <!-- Premium header -->
+        <div
+            class="shrink-0 flex items-center gap-3 px-5 pt-5 pb-4 pr-12 border-b border-zinc-800"
+        >
+            <div
+                class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-zinc-700/40 ring-1 ring-zinc-600/30"
+            >
+                <ReceiptIcon class="size-4.5 text-zinc-400" />
+            </div>
+            <div class="min-w-0 flex-1">
+                <Dialog.Title class="text-sm/tight font-semibold text-zinc-100">
+                    Order #{viewingOrder?.id}
+                </Dialog.Title>
+                <Dialog.Description class="mt-0.5 text-xs text-zinc-500">
+                    Placed on {viewingOrder
+                        ? formatDate(viewingOrder.createdAt)
+                        : ''}
+                </Dialog.Description>
+            </div>
+            {#if viewingOrder}
+                <span
+                    class="shrink-0 inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold {STATUS_COLORS[
+                        viewingOrder.status
+                    ]}"
+                >
+                    {STATUS_LABELS[viewingOrder.status]}
+                </span>
+            {/if}
+        </div>
 
         {#if viewingOrder}
-            <div class="flex flex-col gap-4 text-sm">
-                <!-- Status -->
-                <div class="flex items-center justify-between">
-                    <span class="text-muted-foreground">Status</span>
-                    <span
-                        class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {STATUS_COLORS[
-                            viewingOrder.status
-                        ]}"
-                    >
-                        {STATUS_LABELS[viewingOrder.status]}
-                    </span>
-                </div>
-
-                <Separator />
-
+            <div
+                class="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5 text-sm"
+            >
                 <!-- Customer -->
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2">
                     <span class="text-muted-foreground">Customer</span>
@@ -686,18 +706,24 @@
                 </div>
 
                 {#if viewingOrder.items.length > 0}
-                    <Separator />
+                    <Separator class="bg-zinc-800/60" />
                     <div class="flex flex-col gap-2">
-                        <p class="text-muted-foreground text-xs">Order Items</p>
+                        <p
+                            class="text-[10px] font-semibold uppercase tracking-widest text-zinc-500"
+                        >
+                            Order Items
+                        </p>
                         {#each viewingOrder.items as item (item.id)}
                             <div
                                 class="flex items-start justify-between gap-3 text-sm"
                             >
                                 <div class="leading-snug">
                                     <span class="font-medium">{item.name}</span>
-                                    {#if item.sizeName}
+                                    {#if item.flavorName || item.sizeName}
                                         <span class="text-muted-foreground">
-                                            · {item.sizeName}
+                                            · {[item.flavorName, item.sizeName]
+                                                .filter(Boolean)
+                                                .join(' · ')}
                                         </span>
                                     {/if}
                                     <span class="text-muted-foreground">
@@ -726,17 +752,23 @@
                 {/if}
 
                 {#if viewingOrder.notes}
-                    <Separator />
+                    <Separator class="bg-zinc-800/60" />
                     <div>
-                        <p class="text-muted-foreground mb-1 text-xs">Notes</p>
+                        <p
+                            class="mb-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-500"
+                        >
+                            Notes
+                        </p>
                         <p>{viewingOrder.notes}</p>
                     </div>
                 {/if}
 
                 {#if viewingOrder.proofOfPaymentUrl}
-                    <Separator />
+                    <Separator class="bg-zinc-800/60" />
                     <div>
-                        <p class="text-muted-foreground mb-2 text-xs">
+                        <p
+                            class="mb-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-500"
+                        >
                             Proof of Payment
                         </p>
                         <button
@@ -759,37 +791,59 @@
             </div>
         {/if}
 
-        <Dialog.Footer>
+        <div
+            class="flex shrink-0 items-center justify-end border-t border-zinc-800 bg-zinc-950/80 px-5 py-3.5"
+        >
             <Button
                 variant="outline"
+                class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
                 onclick={() => (detailDialogOpen = false)}
             >
                 Close
             </Button>
-        </Dialog.Footer>
+        </div>
     </Dialog.Content>
 </Dialog.Root>
 
 <!-- Proof of Payment Fullscreen Dialog -->
 <Dialog.Root bind:open={proofDialogOpen}>
-    <Dialog.Content class="sm:max-w-2xl">
-        <Dialog.Header>
-            <Dialog.Title>Proof of Payment</Dialog.Title>
-        </Dialog.Header>
+    <Dialog.Content
+        class="gap-0 p-0 bg-zinc-950 border-zinc-800/80 shadow-2xl shadow-black/60 sm:max-w-2xl"
+    >
+        <div
+            class="flex items-center gap-3 px-5 py-3.5 pr-12 border-b border-zinc-800"
+        >
+            <div
+                class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-800/80 ring-1 ring-zinc-700/50"
+            >
+                <ImageIcon class="size-4 text-zinc-400" />
+            </div>
+            <Dialog.Title class="text-sm font-semibold text-zinc-100">
+                Proof of Payment
+            </Dialog.Title>
+            <Dialog.Description class="sr-only"
+                >Full size proof of payment image</Dialog.Description
+            >
+        </div>
         {#if proofImageUrl}
-            <img
-                src={proofImageUrl}
-                alt="Proof of payment"
-                class="w-full rounded-lg object-contain max-h-[70vh]"
-            />
+            <div class="p-3">
+                <img
+                    src={proofImageUrl}
+                    alt="Proof of payment"
+                    class="w-full rounded-xl object-contain max-h-[72vh]"
+                />
+            </div>
         {/if}
-        <Dialog.Footer>
+        <div
+            class="flex justify-end border-t border-zinc-800 bg-zinc-950/80 px-5 py-3.5"
+        >
             <Button
                 variant="outline"
+                class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
                 onclick={() => (proofDialogOpen = false)}
             >
                 Close
             </Button>
-        </Dialog.Footer>
+        </div>
     </Dialog.Content>
 </Dialog.Root>

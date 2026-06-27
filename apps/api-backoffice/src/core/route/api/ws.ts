@@ -44,14 +44,51 @@ const createWsChannel = (
     })
 }
 
-export const wsRoute = new Hono<THonoInstance>().route(
-    '/general',
-    createWsChannel(
-        'general',
-        isAuthorized({
-            ws: ['listen'],
-        }),
-    ),
-)
+export const wsRoute = new Hono<THonoInstance>()
+    .route(
+        '/general',
+        createWsChannel(
+            'general',
+            isAuthorized({
+                ws: ['listen'],
+            }),
+        ),
+    )
+    .route(
+        '/orders',
+        createWsChannel(
+            'orders',
+            isAuthorized({
+                ws: ['listen'],
+            }),
+        ),
+    )
+    .route(
+        '/products',
+        createWsChannel(
+            'products',
+            isAuthorized({
+                ws: ['listen'],
+            }),
+        ),
+    )
+    .route(
+        '/settings',
+        createWsChannel(
+            'settings',
+            isAuthorized({
+                ws: ['listen'],
+            }),
+        ),
+    )
+    .route(
+        '/audit',
+        createWsChannel(
+            'audit',
+            isAuthorized({
+                ws: ['listen'],
+            }),
+        ),
+    )
 
 export default wsRoute

@@ -20,7 +20,7 @@ export const productRoute = new Hono<THonoInstance>().get(
     async (ctx) => {
         const { limit, offset, sortOrder } = ctx.req.valid('query')
 
-        const { product: productTable, productSize } = ctx.get('dbSchema')
+        const { product: productTable } = ctx.get('dbSchema')
 
         try {
             const count = (
@@ -68,9 +68,14 @@ export const productRoute = new Hono<THonoInstance>().get(
 
             const productIds = rows.map((r) => r.id)
 
-            const allSizes =
+            const { productFlavor, productSize } = ctx.get('dbSchema')
+
+            const [
+                allSizes,
+                allFlavors,
+            ] = await Promise.all([
                 productIds.length > 0
-                    ? await ctx
+                    ? ctx
                           .get('dbClient')
                           .select({
                               id: productSize.id,
@@ -81,12 +86,26 @@ export const productRoute = new Hono<THonoInstance>().get(
                           .from(productSize)
                           .where(inArray(productSize.productId, productIds))
                           .orderBy(asc(productSize.id))
-                    : []
+                    : Promise.resolve([]),
+                productIds.length > 0
+                    ? ctx
+                          .get('dbClient')
+                          .select({
+                              id: productFlavor.id,
+                              productId: productFlavor.productId,
+                              name: productFlavor.name,
+                          })
+                          .from(productFlavor)
+                          .where(inArray(productFlavor.productId, productIds))
+                          .orderBy(asc(productFlavor.id))
+                    : Promise.resolve([]),
+            ])
 
             const data = rows.map((row) => ({
                 ...row,
                 imageUrl: imageUrl(ctx, row.imageObjectStorageId),
                 sizes: allSizes.filter((s) => s.productId === row.id),
+                flavors: allFlavors.filter((f) => f.productId === row.id),
             }))
 
             return apiResponsePaginatedOkWrapper(ctx, {

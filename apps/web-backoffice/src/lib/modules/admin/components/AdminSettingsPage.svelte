@@ -12,6 +12,7 @@
     import CalendarOffIcon from '@lucide/svelte/icons/calendar-off'
     import InfoIcon from '@lucide/svelte/icons/info'
     import PlusIcon from '@lucide/svelte/icons/plus'
+    import SettingsIcon from '@lucide/svelte/icons/settings'
     import SmartphoneIcon from '@lucide/svelte/icons/smartphone'
     import Trash2Icon from '@lucide/svelte/icons/trash-2'
     import {
@@ -341,14 +342,20 @@
     }
 </script>
 
-<main class="flex flex-1 flex-col gap-6 p-4 pt-0 md:p-6 md:pt-0">
+<main class="flex flex-1 flex-col gap-6 p-4 pt-2 md:p-6">
     <!-- Page header -->
-    <div class="flex flex-col gap-1">
-        <h1 class="text-xl font-semibold tracking-tight">Settings</h1>
-        <p class="text-muted-foreground text-sm">
-            Manage order rules and restaurant configuration. Changes broadcast
-            instantly to all connected customers.
-        </p>
+    <div class="flex items-center gap-3">
+        <div
+            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 ring-1 ring-blue-500/20"
+        >
+            <SettingsIcon class="size-5 text-blue-400" />
+        </div>
+        <div>
+            <h1 class="text-xl font-bold tracking-tight">Settings</h1>
+            <p class="text-muted-foreground text-sm">
+                Manage order rules and restaurant configuration.
+            </p>
+        </div>
     </div>
 
     <!-- ── Card 1: Order Settings ─────────────────────────────────── -->
@@ -415,7 +422,7 @@
                                 Customer Preview
                             </p>
                             <p
-                                class="text-xs leading-relaxed text-blue-700/80 dark:text-blue-300/80"
+                                class="text-xs/relaxed text-blue-700/80 dark:text-blue-300/80"
                             >
                                 Orders must be placed at least
                                 <span
@@ -441,7 +448,7 @@
                             class="mt-0.5 size-3.5 shrink-0 text-emerald-500"
                         />
                         <p
-                            class="text-xs leading-relaxed text-emerald-700 dark:text-emerald-400"
+                            class="text-xs/relaxed text-emerald-700 dark:text-emerald-400"
                         >
                             Saving will broadcast the new value to all connected
                             customer devices in real time via WebSocket.

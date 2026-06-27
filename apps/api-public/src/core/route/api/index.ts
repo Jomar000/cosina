@@ -32,13 +32,25 @@ export const apiRoute = new Hono<THonoInstance>()
         const result = await ctx
             .get('kvClient')
             .getWithMetadata<{ mimeType: string }>(`img:${id}`, 'arrayBuffer')
-        if (!result.value) {
-            return ctx.text('Not found', 404)
+        if (result.value) {
+            return new Response(result.value as ArrayBuffer, {
+                headers: {
+                    'Content-Type':
+                        result.metadata?.mimeType ?? 'application/octet-stream',
+                    'Cache-Control': 'public, max-age=31536000, immutable',
+                },
+            })
         }
-        return new Response(result.value as ArrayBuffer, {
+        // Proxy to backoffice for product images stored in HYPERIONBOFC_KV
+        const upstream = await fetch(
+            `${ctx.env.URL_BOFC_BACKEND}/api/image/view/${id}`,
+        )
+        if (!upstream.ok) return ctx.text('Not found', 404)
+        return new Response(upstream.body, {
             headers: {
                 'Content-Type':
-                    result.metadata?.mimeType ?? 'application/octet-stream',
+                    upstream.headers.get('Content-Type') ??
+                    'application/octet-stream',
                 'Cache-Control': 'public, max-age=31536000, immutable',
             },
         })

@@ -500,6 +500,38 @@ export const productSize = pgTable(
     ],
 )
 
+export const productFlavor = pgTable(
+    'product_flavor',
+    {
+        id: bigint('id', { mode: 'number' })
+            .generatedByDefaultAsIdentity()
+            .primaryKey(),
+        productId: bigint('product_id', { mode: 'number' }).notNull(),
+        name: text('name').notNull(),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        index().on(t.productId),
+        foreignKey({
+            columns: [t.productId],
+            foreignColumns: [product.id],
+        })
+            .onDelete('cascade')
+            .onUpdate('no action'),
+    ],
+)
+
 export const order = pgTable(
     'order',
     {
@@ -527,7 +559,11 @@ export const order = pgTable(
             'remaining_balance_proof_object_storage_id',
         ),
         proofOfPaymentStatus: text('proof_of_payment_status'),
+        proofOfPaymentFakeReason: text('proof_of_payment_fake_reason'),
         remainingBalanceProofStatus: text('remaining_balance_proof_status'),
+        remainingBalanceProofFakeReason: text(
+            'remaining_balance_proof_fake_reason',
+        ),
         remainingBalanceSenderName: text('remaining_balance_sender_name'),
         remainingBalanceSenderNumber: text('remaining_balance_sender_number'),
         remainingBalanceAmountSent: numeric('remaining_balance_amount_sent'),
@@ -587,6 +623,7 @@ export const orderItem = pgTable(
         productId: bigint('product_id', { mode: 'number' }),
         name: text('name').notNull(),
         sizeName: text('size_name'),
+        flavorName: text('flavor_name'),
         quantity: integer('quantity').notNull().default(1),
         price: numeric('price').notNull(),
         createdAt: timestamp('created_at', {

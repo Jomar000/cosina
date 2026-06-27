@@ -1,9 +1,15 @@
 import type { MiddlewareHandler } from 'hono'
 import { Hono } from 'hono'
+import { createMiddleware } from 'hono/factory'
 
 import type { THonoInstance } from '../../../types.js'
 import { apiResponseErrorWrapper } from '../../../utilities/helpers.js'
-import { isAuthorized } from '../../middleware/isAuthorized.js'
+
+// Public WS channels are unauthenticated — customers browse products and track
+// orders without signing in. canBroadcast falls back to false for guests.
+const publicAccess = createMiddleware<THonoInstance>(async (ctx, next) => {
+    await next()
+})
 
 const createWsChannel = (
     channel: string,
@@ -22,16 +28,16 @@ const createWsChannel = (
 
         const authHeaders = ctx.req.raw.headers
 
-        const { success: canBroadcast } = await ctx
-            .get('auth')
-            .api.hasPermission({
+        let canBroadcast = false
+        try {
+            const { success } = await ctx.get('auth').api.hasPermission({
                 headers: authHeaders,
-                body: {
-                    permissions: {
-                        ws: ['broadcast'],
-                    },
-                },
+                body: { permissions: { ws: ['broadcast'] } },
             })
+            canBroadcast = success
+        } catch {
+            // Unauthenticated or session-less requests — listen-only
+        }
 
         const headers = new Headers(authHeaders)
         headers.set('X-WS-Can-Broadcast', canBroadcast ? 'true' : 'false')
@@ -44,14 +50,10 @@ const createWsChannel = (
     })
 }
 
-export const wsRoute = new Hono<THonoInstance>().route(
-    '/general',
-    createWsChannel(
-        'general',
-        isAuthorized({
-            ws: ['listen'],
-        }),
-    ),
-)
+export const wsRoute = new Hono<THonoInstance>()
+    .route('/general', createWsChannel('general', publicAccess))
+    .route('/orders', createWsChannel('orders', publicAccess))
+    .route('/products', createWsChannel('products', publicAccess))
+    .route('/settings', createWsChannel('settings', publicAccess))
 
 export default wsRoute

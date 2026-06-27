@@ -11,6 +11,7 @@
     // 01. Properties //
     ////////////////////
 
+    type TFlavor = { id: number; name: string }
     type TSize = { id: number; name: string; price: string }
 
     type TTag = 'new' | 'best_seller' | 'seasonal' | 'limited'
@@ -23,6 +24,7 @@
         price: string
         imageUrl: string | null
         tags: TTag[]
+        flavors: TFlavor[]
         sizes: TSize[]
     }
 
@@ -30,6 +32,7 @@
         productId: number
         name: string
         sizeName?: string
+        flavorName?: string
         quantity: number
         price: string
         imageUrl?: string | null
@@ -80,7 +83,9 @@
     ///////////////
 
     let selectedSizeId = $state<number | null>(null)
-    let drawerOpen = $state(false)
+    let selectedFlavorId = $state<number | null>(null)
+    let sizeDrawerOpen = $state(false)
+    let flavorDrawerOpen = $state(false)
 
     /////////////////
     // 04. Derived //
@@ -88,6 +93,10 @@
 
     const selectedSize = $derived(
         product.sizes.find((s) => s.id === selectedSizeId) ?? null,
+    )
+
+    const selectedFlavor = $derived(
+        product.flavors.find((f) => f.id === selectedFlavorId) ?? null,
     )
 
     const displayPrice = $derived(selectedSize?.price ?? product.price)
@@ -100,6 +109,9 @@
         if (selectedSizeId === null && product.sizes.length > 0) {
             selectedSizeId = product.sizes[0].id
         }
+        if (selectedFlavorId === null && product.flavors.length > 0) {
+            selectedFlavorId = product.flavors[0].id
+        }
     })
 
     //////////////////
@@ -108,7 +120,12 @@
 
     function selectSize(sizeId: number) {
         selectedSizeId = sizeId
-        drawerOpen = false
+        sizeDrawerOpen = false
+    }
+
+    function selectFlavor(flavorId: number) {
+        selectedFlavorId = flavorId
+        flavorDrawerOpen = false
     }
 
     function handleAddToCart() {
@@ -116,6 +133,7 @@
             productId: product.id,
             name: product.name,
             sizeName: selectedSize?.name,
+            flavorName: selectedFlavor?.name,
             quantity: 1,
             price: displayPrice,
             imageUrl: product.imageUrl,
@@ -132,14 +150,14 @@
             <img
                 src={product.imageUrl}
                 alt={product.name}
-                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                class="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
             />
         {:else}
             <div
-                class="flex h-full w-full flex-col items-center justify-center gap-2"
+                class="flex size-full flex-col items-center justify-center gap-2"
             >
-                <UtensilsIcon class="h-8 w-8 text-zinc-600" />
+                <UtensilsIcon class="size-8  text-zinc-600" />
                 <span class="text-[10px] font-medium text-zinc-600"
                     >No photo</span
                 >
@@ -161,7 +179,7 @@
         {#if cartQuantity > 0}
             <div class="absolute right-2 top-2 z-10">
                 <span
-                    class="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[9px] font-bold text-white shadow ring-2 ring-zinc-900"
+                    class="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[9px] font-bold text-white shadow-sm ring-2 ring-zinc-900"
                 >
                     {cartQuantity > 99 ? '99+' : cartQuantity}
                 </span>
@@ -172,7 +190,7 @@
     <!-- Card Body -->
     <div class="flex flex-1 flex-col gap-2 p-3">
         <div class="flex-1">
-            <h3 class="text-sm font-semibold leading-tight text-zinc-100">
+            <h3 class="text-sm/tight font-semibold text-zinc-100">
                 {product.name}
             </h3>
             {#if product.tags.length > 0}
@@ -197,10 +215,88 @@
             {/if}
         </div>
 
+        <!-- Flavor Selector -->
+        {#if product.flavors.length === 1}
+            <div
+                class="flex items-center gap-1.5 rounded-sm border border-amber-500/30 bg-amber-500/10 px-3 py-2"
+            >
+                <span
+                    class="text-[10px] font-semibold uppercase tracking-wide text-amber-400/70"
+                    >Flavor</span
+                >
+                <span class="text-xs font-medium text-amber-300"
+                    >{product.flavors[0].name}</span
+                >
+            </div>
+        {:else if product.flavors.length > 1}
+            <Drawer.Root
+                bind:open={flavorDrawerOpen}
+                shouldScaleBackground={false}
+            >
+                <Drawer.Trigger
+                    class={cn(
+                        'flex w-full items-center justify-between rounded-sm border px-3 py-2 text-left transition-colors',
+                        'border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/15',
+                    )}
+                >
+                    <div class="flex min-w-0 items-center gap-1.5">
+                        <span
+                            class="text-[10px] font-semibold uppercase tracking-wide text-amber-400/70"
+                            >Flavor</span
+                        >
+                        <span
+                            class="truncate text-xs font-medium text-amber-300"
+                            >{selectedFlavor?.name}</span
+                        >
+                    </div>
+                    <ChevronDownIcon
+                        class={cn(
+                            'size-3.5  shrink-0 text-amber-400 transition-transform duration-200',
+                            flavorDrawerOpen && 'rotate-180',
+                        )}
+                    />
+                </Drawer.Trigger>
+                <Drawer.Content>
+                    <Drawer.Header class="pb-2">
+                        <Drawer.Title class="text-sm font-semibold"
+                            >Select a flavor</Drawer.Title
+                        >
+                        <p class="text-[11px] text-zinc-500">{product.name}</p>
+                    </Drawer.Header>
+                    <div class="flex flex-col px-4 pb-6">
+                        {#each product.flavors as flavor (flavor.id)}
+                            <button
+                                type="button"
+                                class={cn(
+                                    'flex min-h-12 w-full items-center justify-between border-b border-zinc-800 px-1 py-3 text-left transition-colors last:border-b-0',
+                                    selectedFlavorId === flavor.id
+                                        ? 'text-amber-400'
+                                        : 'text-zinc-300 hover:text-zinc-100',
+                                )}
+                                onclick={() => selectFlavor(flavor.id)}
+                            >
+                                <span class="text-sm font-medium"
+                                    >{flavor.name}</span
+                                >
+                                <CheckIcon
+                                    class={cn(
+                                        'size-4  transition-opacity',
+                                        selectedFlavorId === flavor.id
+                                            ? 'opacity-100'
+                                            : 'opacity-0',
+                                    )}
+                                />
+                            </button>
+                        {/each}
+                    </div>
+                </Drawer.Content>
+            </Drawer.Root>
+        {/if}
+
         <!-- Size Selector -->
         {#if product.sizes.length === 1}
             <div
-                class="flex items-center justify-between rounded border border-zinc-700 bg-zinc-800 px-3 py-2"
+                class="flex items-center justify-between rounded-sm border border-zinc-700 bg-zinc-800 px-3 py-2"
             >
                 <span class="text-xs font-medium text-zinc-300"
                     >{product.sizes[0].name}</span
@@ -214,12 +310,12 @@
             </div>
         {:else if product.sizes.length > 1}
             <Drawer.Root
-                bind:open={drawerOpen}
+                bind:open={sizeDrawerOpen}
                 shouldScaleBackground={false}
             >
                 <Drawer.Trigger
                     class={cn(
-                        'flex w-full items-center justify-between rounded border px-3 py-2 text-left transition-colors',
+                        'flex w-full items-center justify-between rounded-sm border px-3 py-2 text-left transition-colors',
                         'border-blue-500/60 bg-blue-500/10 hover:bg-blue-500/15',
                     )}
                 >
@@ -240,12 +336,11 @@
                     </div>
                     <ChevronDownIcon
                         class={cn(
-                            'h-3.5 w-3.5 shrink-0 text-blue-400 transition-transform duration-200',
-                            drawerOpen && 'rotate-180',
+                            'size-3.5  shrink-0 text-blue-400 transition-transform duration-200',
+                            sizeDrawerOpen && 'rotate-180',
                         )}
                     />
                 </Drawer.Trigger>
-
                 <Drawer.Content>
                     <Drawer.Header class="pb-2">
                         <Drawer.Title class="text-sm font-semibold"
@@ -280,7 +375,7 @@
                                     </span>
                                     <CheckIcon
                                         class={cn(
-                                            'h-4 w-4 transition-opacity',
+                                            'size-4  transition-opacity',
                                             selectedSizeId === size.id
                                                 ? 'opacity-100'
                                                 : 'opacity-0',
@@ -307,7 +402,7 @@
                 onclick={handleAddToCart}
                 class="h-11 gap-1.5 bg-blue-600 px-4 text-white hover:bg-blue-500 active:bg-blue-700 sm:h-8 sm:px-2.5"
             >
-                <ShoppingCartIcon class="h-4 w-4 sm:h-3 sm:w-3" />
+                <ShoppingCartIcon class="size-4  sm:size-3 " />
                 <span class="text-sm font-semibold sm:text-[11px]">Add</span>
             </Button>
         </div>

@@ -27,16 +27,34 @@ export const apiRoute = new Hono<THonoInstance>()
      */
     .get('/image/view/:id', async (ctx) => {
         const id = ctx.req.param('id')
-        const result = await ctx
+        // Check backoffice KV first (product images), then public KV (proof images)
+        let result = await ctx
             .get('kvClient')
             .getWithMetadata<{ mimeType: string }>(`img:${id}`, 'arrayBuffer')
         if (!result.value) {
-            return ctx.text('Not found', 404)
+            result = await ctx.env.HYPERIONPUB_KV.getWithMetadata<{
+                mimeType: string
+            }>(`img:${id}`, 'arrayBuffer')
         }
-        return new Response(result.value as ArrayBuffer, {
+        if (result.value) {
+            return new Response(result.value as ArrayBuffer, {
+                headers: {
+                    'Content-Type':
+                        result.metadata?.mimeType ?? 'application/octet-stream',
+                    'Cache-Control': 'public, max-age=31536000, immutable',
+                },
+            })
+        }
+        // Proxy to public API for proof images stored in its isolated KV
+        const upstream = await fetch(
+            `${ctx.env.URL_PUB_BACKEND}/api/image/view/${id}`,
+        )
+        if (!upstream.ok) return ctx.text('Not found', 404)
+        return new Response(upstream.body, {
             headers: {
                 'Content-Type':
-                    result.metadata?.mimeType ?? 'application/octet-stream',
+                    upstream.headers.get('Content-Type') ??
+                    'application/octet-stream',
                 'Cache-Control': 'public, max-age=31536000, immutable',
             },
         })

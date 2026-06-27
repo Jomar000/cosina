@@ -5,13 +5,16 @@
     import { Input } from '@hyperion/ui/components/input'
     import { Separator } from '@hyperion/ui/components/separator'
     import { Skeleton } from '@hyperion/ui/components/skeleton'
+    import AlertTriangleIcon from '@lucide/svelte/icons/alert-triangle'
     import CalendarClockIcon from '@lucide/svelte/icons/calendar-clock'
     import CheckIcon from '@lucide/svelte/icons/check'
     import CopyIcon from '@lucide/svelte/icons/copy'
     import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical'
     import HistoryIcon from '@lucide/svelte/icons/history'
+    import ImageIcon from '@lucide/svelte/icons/image'
     import ImageOffIcon from '@lucide/svelte/icons/image-off'
     import PhoneIcon from '@lucide/svelte/icons/phone'
+    import ReceiptIcon from '@lucide/svelte/icons/receipt'
     import SearchIcon from '@lucide/svelte/icons/search'
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart'
     import TruckIcon from '@lucide/svelte/icons/truck'
@@ -45,6 +48,7 @@
         productId: number | null
         name: string
         sizeName: string | null
+        flavorName: string | null
         quantity: number
         price: string
     }
@@ -63,10 +67,12 @@
         proofOfPaymentObjectStorageId: string | null
         proofOfPaymentUrl: string | null
         proofOfPaymentStatus: string | null
+        proofOfPaymentFakeReason: string | null
         remainingBalancePaymentMethod: string | null
         remainingBalanceProofObjectStorageId: string | null
         remainingBalanceProofUrl: string | null
         remainingBalanceProofStatus: string | null
+        remainingBalanceProofFakeReason: string | null
         remainingBalanceSenderName: string | null
         remainingBalanceSenderNumber: string | null
         remainingBalanceAmountSent: string | null
@@ -151,9 +157,17 @@
 
     let detailDialogOpen = $state(false)
     let proofDialogOpen = $state(false)
+    let fakeReasonDialogOpen = $state(false)
     let viewingOrder = $state<TOrder | null>(null)
     let proofImageUrl = $state<string | null>(null)
     let copiedPublicId = $state<string | null>(null)
+
+    let fakeReasonInput = $state('')
+    let pendingFakeAction = $state<{
+        orderId: number
+        proofType: TProofType
+    } | null>(null)
+    let isConfirmingFake = $state(false)
 
     let searchQuery = $state('')
     let filterStatus = $state<TOrderStatus | 'all'>('all')
@@ -250,6 +264,7 @@
             orderId: number
             proofType: TProofType
             status: TProofStatus
+            fakeReason?: string | null
         }) => {
             const response = await (
                 adminClient.order as unknown as {
@@ -279,6 +294,7 @@
                 orderId: number
                 proofType: TProofType
                 status: TProofStatus
+                fakeReason?: string | null
             },
         ) => {
             queryClient.invalidateQueries({
@@ -288,11 +304,25 @@
                 ],
             })
             if (viewingOrder?.id === variables.orderId) {
-                const field =
-                    variables.proofType === 'downpayment'
-                        ? 'proofOfPaymentStatus'
-                        : 'remainingBalanceProofStatus'
-                viewingOrder = { ...viewingOrder, [field]: variables.status }
+                if (variables.proofType === 'downpayment') {
+                    viewingOrder = {
+                        ...viewingOrder,
+                        proofOfPaymentStatus: variables.status,
+                        proofOfPaymentFakeReason:
+                            variables.status === 'fake'
+                                ? (variables.fakeReason ?? null)
+                                : null,
+                    }
+                } else {
+                    viewingOrder = {
+                        ...viewingOrder,
+                        remainingBalanceProofStatus: variables.status,
+                        remainingBalanceProofFakeReason:
+                            variables.status === 'fake'
+                                ? (variables.fakeReason ?? null)
+                                : null,
+                    }
+                }
             }
             toast.success('Proof status updated.')
         },
@@ -365,12 +395,36 @@
         updateStatusMutation.mutate({ orderId, status })
     }
 
-    function handleUpdateProofStatus(
-        orderId: number,
-        proofType: TProofType,
-        status: TProofStatus,
-    ) {
-        updateProofStatusMutation.mutate({ orderId, proofType, status })
+    function handleMarkReceived(orderId: number, proofType: TProofType) {
+        updateProofStatusMutation.mutate({
+            orderId,
+            proofType,
+            status: 'received',
+        })
+    }
+
+    function openFakeDialog(orderId: number, proofType: TProofType) {
+        pendingFakeAction = { orderId, proofType }
+        fakeReasonInput = ''
+        fakeReasonDialogOpen = true
+    }
+
+    async function confirmFake() {
+        if (!pendingFakeAction || isConfirmingFake) return
+        isConfirmingFake = true
+        try {
+            await updateProofStatusMutation.mutateAsync({
+                orderId: pendingFakeAction.orderId,
+                proofType: pendingFakeAction.proofType,
+                status: 'fake',
+                fakeReason: fakeReasonInput.trim() || null,
+            })
+            fakeReasonDialogOpen = false
+            pendingFakeAction = null
+            fakeReasonInput = ''
+        } finally {
+            isConfirmingFake = false
+        }
     }
 
     async function copyTrackingCode(publicId: string) {
@@ -443,32 +497,41 @@
     }
 </script>
 
-<main class="flex flex-1 flex-col gap-6 p-4 pt-0 md:p-6 md:pt-0">
+<main class="flex flex-1 flex-col gap-6 p-4 pt-2 md:p-6">
     <!-- Header -->
     <div class="flex items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight">Orders</h1>
-            <p class="text-muted-foreground text-sm">
-                {#if ordersQuery.data}
-                    {filteredOrders.length} of {activeOrderCount}
-                    {activeOrderCount === 1 ? 'active order' : 'active orders'}
-                {:else}
-                    Manage active customer orders.
-                {/if}
-            </p>
+        <div class="flex items-center gap-3">
+            <div
+                class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 ring-1 ring-blue-500/20"
+            >
+                <ShoppingCartIcon class="size-5 text-blue-400" />
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">Orders</h1>
+                <p class="text-muted-foreground text-sm">
+                    {#if ordersQuery.data}
+                        {filteredOrders.length} of {activeOrderCount}
+                        {activeOrderCount === 1
+                            ? 'active order'
+                            : 'active orders'}
+                    {:else}
+                        Manage active customer orders.
+                    {/if}
+                </p>
+            </div>
         </div>
     </div>
 
     <!-- History callout -->
     <div
-        class="flex items-center gap-2.5 rounded-lg border border-dashed px-3 py-2"
+        class="flex items-center gap-2.5 rounded-lg border border-blue-500/15 bg-blue-500/5 px-3 py-2"
     >
-        <HistoryIcon class="text-muted-foreground size-4 shrink-0" />
-        <p class="text-muted-foreground text-sm">
+        <HistoryIcon class="size-4 shrink-0 text-blue-400/70" />
+        <p class="text-sm text-zinc-400">
             Completed and cancelled orders are in
             <a
                 href="/app/admin/orders/history"
-                class="font-medium underline underline-offset-4 hover:text-foreground transition-colors"
+                class="font-medium text-blue-400 underline underline-offset-4 hover:text-blue-300 transition-colors"
             >
                 Order History
             </a>.
@@ -569,8 +632,18 @@
     {:else}
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {#each filteredOrders as o (o.id)}
+                {@const dpNeedsReview = !!(
+                    o.proofOfPaymentUrl && o.proofOfPaymentStatus === null
+                )}
+                {@const balNeedsReview = !!(
+                    o.remainingBalanceProofUrl &&
+                    o.remainingBalanceProofStatus === null
+                )}
                 <div
-                    class="bg-card flex flex-col overflow-hidden rounded-xl border shadow-sm transition-shadow hover:shadow-md"
+                    class="bg-card flex flex-col overflow-hidden rounded-xl border shadow-sm transition-shadow hover:shadow-md
+                        {dpNeedsReview || balNeedsReview
+                        ? 'border-amber-400/60 dark:border-amber-500/40'
+                        : ''}"
                 >
                     <!-- Card Header: status + actions -->
                     <div
@@ -732,8 +805,11 @@
                                     class="flex items-start justify-between gap-2 text-sm"
                                 >
                                     <span class="leading-snug">
-                                        {item.name}{item.sizeName
-                                            ? ` (${item.sizeName})`
+                                        {item.name}{[
+                                            item.flavorName,
+                                            item.sizeName,
+                                        ].filter(Boolean).length
+                                            ? ` (${[item.flavorName, item.sizeName].filter(Boolean).join(' · ')})`
                                             : ''} &times; {item.quantity}
                                     </span>
                                     <span
@@ -833,6 +909,28 @@
                         </div>
                     {/if}
 
+                    <!-- Proof review alert: shown when proof is submitted but not yet accepted/rejected -->
+                    {#if dpNeedsReview || balNeedsReview}
+                        <div
+                            class="border-t bg-amber-500/5 px-4 py-2.5 flex items-center gap-2"
+                        >
+                            <AlertTriangleIcon
+                                class="size-3.5 shrink-0 text-amber-600 dark:text-amber-400"
+                            />
+                            <span
+                                class="text-xs font-medium text-amber-700 dark:text-amber-300"
+                            >
+                                {#if dpNeedsReview && balNeedsReview}
+                                    2 proofs need review
+                                {:else if dpNeedsReview}
+                                    Downpayment proof needs review
+                                {:else}
+                                    Balance proof needs review
+                                {/if}
+                            </span>
+                        </div>
+                    {/if}
+
                     <!-- Footer: proof thumbnail + order date -->
                     <div
                         class="border-t px-4 py-3 flex items-center justify-between gap-3 mt-auto"
@@ -865,7 +963,7 @@
                             </div>
                         {/if}
                         <span
-                            class="text-muted-foreground text-xs text-right leading-snug"
+                            class="text-muted-foreground text-xs/snug text-right"
                         >
                             Ordered<br />{formatDate(o.createdAt)}
                         </span>
@@ -878,36 +976,47 @@
 
 <!-- Order Detail Dialog -->
 <Dialog.Root bind:open={detailDialogOpen}>
-    <Dialog.Content class="flex max-h-[90dvh] flex-col gap-0 p-0 sm:max-w-lg">
-        <Dialog.Header class="shrink-0 border-b px-6 py-4">
-            <Dialog.Title>Order #{viewingOrder?.id}</Dialog.Title>
-            <Dialog.Description>
-                Placed on {viewingOrder
-                    ? formatDate(viewingOrder.createdAt)
-                    : ''}
-            </Dialog.Description>
-        </Dialog.Header>
+    <Dialog.Content
+        class="flex max-h-[90dvh] flex-col gap-0 p-0 bg-zinc-950 border-zinc-800/80 shadow-2xl shadow-black/60 sm:max-w-lg"
+    >
+        <!-- Premium header -->
+        <div
+            class="shrink-0 flex items-center gap-3 px-5 pt-5 pb-4 pr-12 border-b border-zinc-800"
+        >
+            <div
+                class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 ring-1 ring-blue-500/20"
+            >
+                <ReceiptIcon class="size-4.5 text-blue-400" />
+            </div>
+            <div class="min-w-0 flex-1">
+                <Dialog.Title class="text-sm/tight font-semibold text-zinc-100">
+                    Order #{viewingOrder?.id}
+                </Dialog.Title>
+                <Dialog.Description class="mt-0.5 text-xs text-zinc-500">
+                    Placed on {viewingOrder
+                        ? formatDate(viewingOrder.createdAt)
+                        : ''}
+                </Dialog.Description>
+            </div>
+            {#if viewingOrder}
+                <span
+                    class="shrink-0 inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold {STATUS_COLORS[
+                        viewingOrder.status
+                    ]}"
+                >
+                    {STATUS_LABELS[viewingOrder.status]}
+                </span>
+            {/if}
+        </div>
 
         {#if viewingOrder}
             <div
                 class="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5 text-sm"
             >
-                <!-- Status -->
-                <div class="flex items-center justify-between">
-                    <span class="text-muted-foreground">Status</span>
-                    <span
-                        class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {STATUS_COLORS[
-                            viewingOrder.status
-                        ]}"
-                    >
-                        {STATUS_LABELS[viewingOrder.status]}
-                    </span>
-                </div>
-
-                <Separator />
-
                 <!-- Tracking code box -->
-                <div class="bg-muted/50 rounded-xl border px-4 py-3">
+                <div
+                    class="rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-3"
+                >
                     <p
                         class="text-muted-foreground mb-1 text-[10px] font-medium uppercase tracking-widest"
                     >
@@ -939,7 +1048,7 @@
                     </div>
                 </div>
 
-                <Separator />
+                <Separator class="bg-zinc-800/60" />
 
                 <!-- Customer -->
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2">
@@ -1011,18 +1120,24 @@
                 </div>
 
                 {#if viewingOrder.items.length > 0}
-                    <Separator />
+                    <Separator class="bg-zinc-800/60" />
                     <div class="flex flex-col gap-2">
-                        <p class="text-muted-foreground text-xs">Order Items</p>
+                        <p
+                            class="text-[10px] font-semibold uppercase tracking-widest text-zinc-500"
+                        >
+                            Order Items
+                        </p>
                         {#each viewingOrder.items as item (item.id)}
                             <div
                                 class="flex items-start justify-between gap-3 text-sm"
                             >
                                 <div class="leading-snug">
                                     <span class="font-medium">{item.name}</span>
-                                    {#if item.sizeName}
+                                    {#if item.flavorName || item.sizeName}
                                         <span class="text-muted-foreground">
-                                            · {item.sizeName}</span
+                                            · {[item.flavorName, item.sizeName]
+                                                .filter(Boolean)
+                                                .join(' · ')}</span
                                         >
                                     {/if}
                                     <span class="text-muted-foreground">
@@ -1051,40 +1166,45 @@
                 {/if}
 
                 {#if viewingOrder.notes}
-                    <Separator />
+                    <Separator class="bg-zinc-800/60" />
                     <div>
-                        <p class="text-muted-foreground mb-1 text-xs">Notes</p>
+                        <p
+                            class="mb-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-500"
+                        >
+                            Notes
+                        </p>
                         <p>{viewingOrder.notes}</p>
                     </div>
                 {/if}
 
                 {#if viewingOrder.proofOfPaymentUrl}
-                    <Separator />
+                    <Separator class="bg-zinc-800/60" />
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <p class="text-muted-foreground text-xs">
+                            <p
+                                class="text-[10px] font-semibold uppercase tracking-widest text-zinc-500"
+                            >
                                 Downpayment Proof
                             </p>
-                            {#if viewingOrder.proofOfPaymentStatus}
-                                <span
-                                    class="rounded-full border px-2 py-0.5 text-xs font-medium
-                                        {viewingOrder.proofOfPaymentStatus ===
-                                    'accepted'
-                                        ? 'border-emerald-600/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                                        : viewingOrder.proofOfPaymentStatus ===
-                                            'fake'
-                                          ? 'border-red-600/40 bg-red-500/10 text-red-600 dark:text-red-400'
-                                          : 'border-blue-600/40 bg-blue-500/10 text-blue-600 dark:text-blue-400'}"
-                                >
+                            <span
+                                class="rounded-full border px-2 py-0.5 text-xs font-medium
                                     {viewingOrder.proofOfPaymentStatus ===
-                                    'accepted'
-                                        ? 'Accepted'
-                                        : viewingOrder.proofOfPaymentStatus ===
-                                            'fake'
-                                          ? 'Fake'
-                                          : 'Received'}
-                                </span>
-                            {/if}
+                                    'received' ||
+                                viewingOrder.proofOfPaymentStatus === 'accepted'
+                                    ? 'border-emerald-600/40 bg-emerald-500/10 text-emerald-400'
+                                    : viewingOrder.proofOfPaymentStatus ===
+                                        'fake'
+                                      ? 'border-red-600/40 bg-red-500/10 text-red-400'
+                                      : 'border-amber-600/40 bg-amber-500/10 text-amber-400'}"
+                            >
+                                {#if viewingOrder.proofOfPaymentStatus === 'received' || viewingOrder.proofOfPaymentStatus === 'accepted'}
+                                    Accepted
+                                {:else if viewingOrder.proofOfPaymentStatus === 'fake'}
+                                    Rejected
+                                {:else}
+                                    Under Review
+                                {/if}
+                            </span>
                         </div>
                         <button
                             type="button"
@@ -1101,55 +1221,81 @@
                                 class="w-full max-h-48 rounded-lg object-contain border"
                             />
                         </button>
+                        {#if viewingOrder.proofOfPaymentStatus === 'fake' && viewingOrder.proofOfPaymentFakeReason}
+                            <div
+                                class="mt-2 rounded-lg border border-red-300/50 bg-red-500/5 px-3 py-2 text-xs text-red-700 dark:text-red-300"
+                            >
+                                <span class="font-medium"
+                                    >Rejection reason:
+                                </span>{viewingOrder.proofOfPaymentFakeReason}
+                            </div>
+                        {/if}
                         <div class="mt-2 flex gap-1.5">
-                            {#each [['accepted', 'Accept'], ['fake', 'Fake'], ['received', 'Received']] as [TProofStatus, string][] as [val, label] (val)}
-                                <button
-                                    type="button"
-                                    disabled={updateProofStatusMutation.isPending}
-                                    onclick={() =>
-                                        handleUpdateProofStatus(
-                                            viewingOrder!.id,
-                                            'downpayment',
-                                            val,
-                                        )}
-                                    class="flex-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50
-                                        {proofStatusButtonClass(
-                                        val,
-                                        viewingOrder.proofOfPaymentStatus,
-                                    )}"
-                                >
-                                    {label}
-                                </button>
-                            {/each}
+                            <button
+                                type="button"
+                                disabled={updateProofStatusMutation.isPending}
+                                onclick={() =>
+                                    handleMarkReceived(
+                                        viewingOrder!.id,
+                                        'downpayment',
+                                    )}
+                                class="flex-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50
+                                    {proofStatusButtonClass(
+                                    'received',
+                                    viewingOrder.proofOfPaymentStatus,
+                                )}"
+                            >
+                                Received
+                            </button>
+                            <button
+                                type="button"
+                                disabled={updateProofStatusMutation.isPending}
+                                onclick={() =>
+                                    openFakeDialog(
+                                        viewingOrder!.id,
+                                        'downpayment',
+                                    )}
+                                class="flex-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50
+                                    {proofStatusButtonClass(
+                                    'fake',
+                                    viewingOrder.proofOfPaymentStatus,
+                                )}"
+                            >
+                                Reject
+                            </button>
                         </div>
                     </div>
                 {/if}
 
                 {#if viewingOrder.remainingBalancePaymentMethod}
-                    <Separator />
+                    <Separator class="bg-zinc-800/60" />
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center justify-between">
-                            <p class="text-muted-foreground text-xs">
+                            <p
+                                class="text-[10px] font-semibold uppercase tracking-widest text-zinc-500"
+                            >
                                 Remaining Balance Payment
                             </p>
-                            {#if viewingOrder.remainingBalanceProofStatus}
+                            {#if viewingOrder.remainingBalanceProofObjectStorageId}
                                 <span
                                     class="rounded-full border px-2 py-0.5 text-xs font-medium
                                         {viewingOrder.remainingBalanceProofStatus ===
-                                    'accepted'
-                                        ? 'border-emerald-600/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                        'received' ||
+                                    viewingOrder.remainingBalanceProofStatus ===
+                                        'accepted'
+                                        ? 'border-emerald-600/40 bg-emerald-500/10 text-emerald-400'
                                         : viewingOrder.remainingBalanceProofStatus ===
                                             'fake'
-                                          ? 'border-red-600/40 bg-red-500/10 text-red-600 dark:text-red-400'
-                                          : 'border-blue-600/40 bg-blue-500/10 text-blue-600 dark:text-blue-400'}"
+                                          ? 'border-red-600/40 bg-red-500/10 text-red-400'
+                                          : 'border-amber-600/40 bg-amber-500/10 text-amber-400'}"
                                 >
-                                    {viewingOrder.remainingBalanceProofStatus ===
-                                    'accepted'
-                                        ? 'Accepted'
-                                        : viewingOrder.remainingBalanceProofStatus ===
-                                            'fake'
-                                          ? 'Fake'
-                                          : 'Received'}
+                                    {#if viewingOrder.remainingBalanceProofStatus === 'received' || viewingOrder.remainingBalanceProofStatus === 'accepted'}
+                                        Accepted
+                                    {:else if viewingOrder.remainingBalanceProofStatus === 'fake'}
+                                        Rejected
+                                    {:else}
+                                        Under Review
+                                    {/if}
                                 </span>
                             {/if}
                         </div>
@@ -1219,35 +1365,60 @@
                                 Cash on pickup — collect remaining balance
                             </div>
                         {/if}
+                        {#if viewingOrder.remainingBalanceProofStatus === 'fake' && viewingOrder.remainingBalanceProofFakeReason}
+                            <div
+                                class="rounded-lg border border-red-300/50 bg-red-500/5 px-3 py-2 text-xs text-red-700 dark:text-red-300"
+                            >
+                                <span class="font-medium"
+                                    >Rejection reason:
+                                </span>{viewingOrder.remainingBalanceProofFakeReason}
+                            </div>
+                        {/if}
                         <div class="flex gap-1.5">
-                            {#each [['accepted', 'Accept'], ['fake', 'Fake'], ['received', 'Received']] as [TProofStatus, string][] as [val, label] (val)}
-                                <button
-                                    type="button"
-                                    disabled={updateProofStatusMutation.isPending}
-                                    onclick={() =>
-                                        handleUpdateProofStatus(
-                                            viewingOrder!.id,
-                                            'remaining_balance',
-                                            val,
-                                        )}
-                                    class="flex-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50
-                                        {proofStatusButtonClass(
-                                        val,
-                                        viewingOrder.remainingBalanceProofStatus,
-                                    )}"
-                                >
-                                    {label}
-                                </button>
-                            {/each}
+                            <button
+                                type="button"
+                                disabled={updateProofStatusMutation.isPending}
+                                onclick={() =>
+                                    handleMarkReceived(
+                                        viewingOrder!.id,
+                                        'remaining_balance',
+                                    )}
+                                class="flex-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50
+                                    {proofStatusButtonClass(
+                                    'received',
+                                    viewingOrder.remainingBalanceProofStatus,
+                                )}"
+                            >
+                                Received
+                            </button>
+                            <button
+                                type="button"
+                                disabled={updateProofStatusMutation.isPending}
+                                onclick={() =>
+                                    openFakeDialog(
+                                        viewingOrder!.id,
+                                        'remaining_balance',
+                                    )}
+                                class="flex-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50
+                                    {proofStatusButtonClass(
+                                    'fake',
+                                    viewingOrder.remainingBalanceProofStatus,
+                                )}"
+                            >
+                                Reject
+                            </button>
                         </div>
                     </div>
                 {/if}
             </div>
         {/if}
 
-        <div class="flex shrink-0 items-center justify-end border-t px-6 py-4">
+        <div
+            class="flex shrink-0 items-center justify-end border-t border-zinc-800 bg-zinc-950/80 px-5 py-3.5"
+        >
             <Button
                 variant="outline"
+                class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
                 onclick={() => (detailDialogOpen = false)}
             >
                 Close
@@ -1256,26 +1427,108 @@
     </Dialog.Content>
 </Dialog.Root>
 
-<!-- Proof of Payment Fullscreen Dialog -->
-<Dialog.Root bind:open={proofDialogOpen}>
-    <Dialog.Content class="sm:max-w-2xl">
-        <Dialog.Header>
-            <Dialog.Title>Proof of Payment</Dialog.Title>
-        </Dialog.Header>
-        {#if proofImageUrl}
-            <img
-                src={proofImageUrl}
-                alt="Proof of payment"
-                class="w-full rounded-lg object-contain max-h-[70vh]"
-            />
-        {/if}
-        <Dialog.Footer>
+<!-- Reject Proof Dialog -->
+<Dialog.Root bind:open={fakeReasonDialogOpen}>
+    <Dialog.Content
+        class="gap-0 p-0 bg-zinc-950 border-zinc-800/80 shadow-2xl shadow-black/60 sm:max-w-sm"
+    >
+        <div
+            class="flex items-center gap-3 px-5 pt-5 pb-4 pr-12 border-b border-zinc-800"
+        >
+            <div
+                class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-red-500/10 ring-1 ring-red-500/20"
+            >
+                <AlertTriangleIcon class="size-4.5 text-red-400" />
+            </div>
+            <div class="min-w-0">
+                <Dialog.Title class="text-sm/tight font-semibold text-zinc-100">
+                    Reject Proof
+                </Dialog.Title>
+                <Dialog.Description class="mt-0.5 text-xs text-zinc-500">
+                    Provide a reason so the customer knows what went wrong.
+                </Dialog.Description>
+            </div>
+        </div>
+        <div class="flex flex-col gap-3 px-5 py-4">
+            <label class="flex flex-col gap-1.5">
+                <span class="text-xs font-medium text-zinc-400"
+                    >Reason <span class="text-zinc-600 font-normal"
+                        >(optional)</span
+                    ></span
+                >
+                <textarea
+                    bind:value={fakeReasonInput}
+                    placeholder="e.g. Screenshot is blurry, amount doesn't match…"
+                    rows={3}
+                    class="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-zinc-700 resize-none"
+                ></textarea>
+            </label>
+        </div>
+        <div
+            class="flex items-center justify-end gap-2 border-t border-zinc-800 bg-zinc-950/80 px-5 py-3.5"
+        >
             <Button
                 variant="outline"
+                class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+                disabled={isConfirmingFake}
+                onclick={() => {
+                    fakeReasonDialogOpen = false
+                    pendingFakeAction = null
+                    fakeReasonInput = ''
+                }}
+            >
+                Cancel
+            </Button>
+            <Button
+                variant="destructive"
+                disabled={isConfirmingFake}
+                onclick={confirmFake}
+            >
+                {isConfirmingFake ? 'Rejecting…' : 'Reject Proof'}
+            </Button>
+        </div>
+    </Dialog.Content>
+</Dialog.Root>
+
+<!-- Proof of Payment Fullscreen Dialog -->
+<Dialog.Root bind:open={proofDialogOpen}>
+    <Dialog.Content
+        class="gap-0 p-0 bg-zinc-950 border-zinc-800/80 shadow-2xl shadow-black/60 sm:max-w-2xl"
+    >
+        <div
+            class="flex items-center gap-3 px-5 py-3.5 pr-12 border-b border-zinc-800"
+        >
+            <div
+                class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-800/80 ring-1 ring-zinc-700/50"
+            >
+                <ImageIcon class="size-4 text-zinc-400" />
+            </div>
+            <Dialog.Title class="text-sm font-semibold text-zinc-100">
+                Proof of Payment
+            </Dialog.Title>
+            <Dialog.Description class="sr-only"
+                >Full size proof of payment image</Dialog.Description
+            >
+        </div>
+        {#if proofImageUrl}
+            <div class="p-3">
+                <img
+                    src={proofImageUrl}
+                    alt="Proof of payment"
+                    class="w-full rounded-xl object-contain max-h-[72vh]"
+                />
+            </div>
+        {/if}
+        <div
+            class="flex justify-end border-t border-zinc-800 bg-zinc-950/80 px-5 py-3.5"
+        >
+            <Button
+                variant="outline"
+                class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
                 onclick={() => (proofDialogOpen = false)}
             >
                 Close
             </Button>
-        </Dialog.Footer>
+        </div>
     </Dialog.Content>
 </Dialog.Root>

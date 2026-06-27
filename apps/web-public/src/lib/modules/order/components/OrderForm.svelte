@@ -199,6 +199,7 @@
                         productId: item.productId,
                         name: item.name,
                         sizeName: item.sizeName,
+                        flavorName: item.flavorName,
                         quantity: item.quantity,
                         price: item.price,
                     })),
@@ -391,9 +392,7 @@
                                 <p class="text-sm font-semibold text-amber-300">
                                     Remaining Balance Due
                                 </p>
-                                <p
-                                    class="text-xs leading-relaxed text-amber-300/70"
-                                >
+                                <p class="text-xs/relaxed text-amber-300/70">
                                     You paid a downpayment of
                                     <span class="font-semibold text-amber-200">
                                         {new Intl.NumberFormat('en-PH', {
@@ -464,7 +463,7 @@
                         }}
                     >
                         <div
-                            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors
+                            class="flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors
                                 {currentStep > step.num
                                 ? 'bg-blue-500 text-white'
                                 : currentStep === step.num
@@ -472,7 +471,7 @@
                                   : 'bg-zinc-800 text-zinc-500'}"
                         >
                             {#if currentStep > step.num}
-                                <CheckIcon class="h-3 w-3" />
+                                <CheckIcon class="size-3 " />
                             {:else}
                                 {step.num}
                             {/if}
@@ -496,7 +495,7 @@
                     class="flex flex-1 flex-col items-center justify-center gap-4 py-12"
                 >
                     <div
-                        class="h-9 w-9 animate-spin rounded-full border-2 border-zinc-700 border-t-blue-400"
+                        class="size-9 animate-spin rounded-full border-2 border-zinc-700 border-t-blue-400"
                     ></div>
                     <p class="text-sm font-medium text-zinc-300">
                         Placing your order…
@@ -535,7 +534,7 @@
                                 />
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <div class="flex flex-col gap-1.5">
                                     <Label
                                         for="contactNumber"
@@ -593,17 +592,17 @@
                                     class="flex items-start gap-2.5 rounded-xl border border-zinc-800 bg-zinc-900 px-3.5 py-3"
                                 >
                                     <div
-                                        class="mt-0.5 h-4 w-4 shrink-0 animate-pulse rounded bg-zinc-700"
+                                        class="mt-0.5 size-4 shrink-0 animate-pulse rounded-sm bg-zinc-700"
                                     ></div>
                                     <div class="flex flex-1 flex-col gap-2">
                                         <div
-                                            class="h-3 w-1/3 animate-pulse rounded bg-zinc-700"
+                                            class="h-3 w-1/3 animate-pulse rounded-sm bg-zinc-700"
                                         ></div>
                                         <div
-                                            class="h-3 w-full animate-pulse rounded bg-zinc-700"
+                                            class="h-3 w-full animate-pulse rounded-sm bg-zinc-700"
                                         ></div>
                                         <div
-                                            class="h-3 w-4/5 animate-pulse rounded bg-zinc-700"
+                                            class="h-3 w-4/5 animate-pulse rounded-sm bg-zinc-700"
                                         ></div>
                                     </div>
                                 </div>
@@ -612,7 +611,7 @@
                                     class="flex items-start gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3.5 py-3"
                                 >
                                     <InfoIcon
-                                        class="mt-0.5 h-4 w-4 shrink-0 text-amber-400"
+                                        class="mt-0.5 size-4  shrink-0 text-amber-400"
                                     />
                                     <div class="flex flex-col gap-0.5">
                                         <p
@@ -621,7 +620,7 @@
                                             Advance Order Only
                                         </p>
                                         <p
-                                            class="text-xs leading-relaxed text-amber-300/80"
+                                            class="text-xs/relaxed text-amber-300/80"
                                         >
                                             Orders must be placed at least
                                             <span
@@ -683,10 +682,10 @@
                                         class="flex items-center gap-2.5 border-b border-zinc-700/40 px-4 py-3"
                                     >
                                         <div
-                                            class="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-700/60"
+                                            class="flex size-7 items-center justify-center rounded-lg bg-zinc-700/60"
                                         >
                                             <MapPinIcon
-                                                class="h-4 w-4 text-zinc-300"
+                                                class="size-4  text-zinc-300"
                                             />
                                         </div>
                                         <span
@@ -698,7 +697,7 @@
                                     <div class="px-4 py-3">
                                         {#if restaurantAddress}
                                             <p
-                                                class="text-sm leading-relaxed text-zinc-300"
+                                                class="text-sm/relaxed text-zinc-300"
                                             >
                                                 {restaurantAddress}
                                             </p>
@@ -760,7 +759,7 @@
                                                         : 'text-zinc-500'}"
                                                 >
                                                     <CalendarIcon
-                                                        class="h-4 w-4 shrink-0 text-zinc-500"
+                                                        class="size-4  shrink-0 text-zinc-500"
                                                     />
                                                     <span class="truncate"
                                                         >{deliveryDateLabel}</span
@@ -795,7 +794,7 @@
                                     </Label>
                                     <div class="relative">
                                         <ClockIcon
-                                            class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-500"
+                                            class="pointer-events-none absolute top-1/2 left-3 size-4  -translate-y-1/2 text-zinc-500"
                                         />
                                         <Input
                                             id="deliveryTime"
@@ -814,7 +813,7 @@
                                 >
                                     <div class="flex items-center gap-2">
                                         <TriangleAlertIcon
-                                            class="h-4 w-4 shrink-0 text-amber-400"
+                                            class="size-4  shrink-0 text-amber-400"
                                         />
                                         <p
                                             class="text-xs font-semibold text-amber-300"
@@ -828,7 +827,7 @@
                                                 class="flex items-start gap-2 text-xs"
                                             >
                                                 <span
-                                                    class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/60"
+                                                    class="mt-1.5 size-1.5 shrink-0 rounded-full bg-amber-500/60"
                                                 ></span>
                                                 <span class="text-zinc-300">
                                                     {formatClosingRangeLabel(
@@ -891,11 +890,16 @@
                                                     class="truncate text-sm text-zinc-300"
                                                 >
                                                     {item.name}
-                                                    {#if item.sizeName}
+                                                    {#if item.flavorName || item.sizeName}
                                                         <span
                                                             class="text-zinc-500"
                                                         >
-                                                            ({item.sizeName})
+                                                            ({[
+                                                                item.flavorName,
+                                                                item.sizeName,
+                                                            ]
+                                                                .filter(Boolean)
+                                                                .join(' · ')})
                                                         </span>
                                                     {/if}
                                                 </p>
@@ -948,10 +952,10 @@
                                     class="flex items-center gap-2.5 border-b border-blue-500/20 px-4 py-3"
                                 >
                                     <div
-                                        class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/20"
+                                        class="flex size-7 items-center justify-center rounded-lg bg-blue-500/20"
                                     >
                                         <SmartphoneIcon
-                                            class="h-4 w-4 text-blue-400"
+                                            class="size-4  text-blue-400"
                                         />
                                     </div>
                                     <span
@@ -988,16 +992,16 @@
                                             <button
                                                 type="button"
                                                 onclick={copyGcashNumber}
-                                                class="flex h-6 w-6 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+                                                class="flex size-6 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                                                 aria-label="Copy GCash number"
                                             >
                                                 {#if gcashCopied}
                                                     <CheckIcon
-                                                        class="h-3.5 w-3.5 text-green-400"
+                                                        class="size-3.5  text-green-400"
                                                     />
                                                 {:else}
                                                     <CopyIcon
-                                                        class="h-3.5 w-3.5"
+                                                        class="size-3.5 "
                                                     />
                                                 {/if}
                                             </button>
@@ -1020,11 +1024,9 @@
                                     class="flex items-start gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2"
                                 >
                                     <TriangleAlertIcon
-                                        class="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400"
+                                        class="mt-0.5 size-3.5  shrink-0 text-amber-400"
                                     />
-                                    <p
-                                        class="text-xs leading-relaxed text-amber-300"
-                                    >
+                                    <p class="text-xs/relaxed text-amber-300">
                                         <span class="font-semibold">Note:</span>
                                         Please make a downpayment of at least
                                         <span
@@ -1108,7 +1110,7 @@
                             class="gap-1.5 bg-blue-600 text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             Next
-                            <ChevronRightIcon class="h-4 w-4" />
+                            <ChevronRightIcon class="size-4 " />
                         </Button>
                     {:else if currentStep === 2}
                         <Button
@@ -1116,7 +1118,7 @@
                             onclick={goBack}
                             class="gap-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
                         >
-                            <ChevronLeftIcon class="h-4 w-4" />
+                            <ChevronLeftIcon class="size-4 " />
                             Back
                         </Button>
                         <Button
@@ -1125,7 +1127,7 @@
                             class="gap-1.5 bg-blue-600 text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             Next
-                            <ChevronRightIcon class="h-4 w-4" />
+                            <ChevronRightIcon class="size-4 " />
                         </Button>
                     {:else}
                         <Button
@@ -1133,7 +1135,7 @@
                             onclick={goBack}
                             class="gap-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
                         >
-                            <ChevronLeftIcon class="h-4 w-4" />
+                            <ChevronLeftIcon class="size-4 " />
                             Back
                         </Button>
                         <Button

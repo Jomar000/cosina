@@ -16,7 +16,7 @@
 
     let {
         ref = $bindable(null),
-        collapsible = 'icon',
+        collapsible = 'offcanvas',
         session,
         navItems,
         mobile = false,
@@ -29,13 +29,14 @@
         onNavigate?: () => void
     } = $props()
 
-    const resolvedCollapsible = mobile ? 'none' : collapsible
+    const resolvedCollapsible = $derived(mobile ? 'none' : collapsible)
 </script>
 
 <Sidebar.Root
     bind:ref
     collapsible={resolvedCollapsible}
     {...restProps}
+    class="[--sidebar-accent:rgb(59_130_246/0.12)] [--sidebar-accent-foreground:rgb(96_165_250)] border-r border-zinc-800/60"
 >
     <Sidebar.Header>
         <SidebarBrand />
@@ -49,5 +50,4 @@
     <Sidebar.Footer>
         <NavUser user={session.data} />
     </Sidebar.Footer>
-    <Sidebar.Rail />
 </Sidebar.Root>

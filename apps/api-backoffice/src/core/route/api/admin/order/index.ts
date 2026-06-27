@@ -1,5 +1,15 @@
 import { order } from '@hyperion/validator/backoffice/admin/order'
-import { asc, count as countFn, desc, eq, inArray, sql } from 'drizzle-orm'
+import {
+    and,
+    asc,
+    count as countFn,
+    desc,
+    eq,
+    inArray,
+    ne,
+    or,
+    sql,
+} from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'
 
@@ -23,20 +33,64 @@ async function broadcastOrderEvent(
     event: string,
     data: unknown,
 ) {
+    const payload = JSON.stringify({ event, data })
+
+    // Broadcast to backoffice DO (admin orders WS clients)
     try {
-        // Broadcast on the PUBLIC API's DO so that the admin orders WS channel
-        // (which routes through HYPERIONPUB_DO_WSS) receives all order events.
+        const id = ctx.get('doWssClient').idFromName('orders')
+        const stub = ctx.get('doWssClient').get(id)
+        await stub.sendMessage(payload)
+    } catch {
+        // Non-fatal
+    }
+
+    // Broadcast to public DO (customer tracking page WS clients)
+    try {
         const id = ctx.env.HYPERIONPUB_DO_WSS.idFromName('orders')
         const stub = ctx.env.HYPERIONPUB_DO_WSS.get(id)
-        await stub.sendMessage(JSON.stringify({ event, data }))
+        await stub.sendMessage(payload)
     } catch {
-        // Non-fatal: WS broadcast failure should not abort the HTTP response
+        // Non-fatal
     }
 }
 
 function proofUrl(ctx: Context<THonoInstance>, objectStorageId: string | null) {
     if (!objectStorageId) return null
     return `${ctx.env.URL_BACKEND}/api/image/view/${objectStorageId}`
+}
+
+async function deleteProofImageIfUnused(
+    ctx: Context<THonoInstance>,
+    currentOrderId: number,
+    objectId: string,
+) {
+    const { order: orderTable, objectStorage: objectStorageTable } =
+        ctx.get('dbSchema')
+    const db = ctx.get('dbClient')
+
+    const [{ count }] = await db
+        .select({ count: countFn(orderTable.id) })
+        .from(orderTable)
+        .where(
+            and(
+                ne(orderTable.id, currentOrderId),
+                or(
+                    eq(orderTable.proofOfPaymentObjectStorageId, objectId),
+                    eq(
+                        orderTable.remainingBalanceProofObjectStorageId,
+                        objectId,
+                    ),
+                ),
+            ),
+        )
+
+    if (count === 0) {
+        await ctx.env.HYPERIONPUB_KV.delete(`img:${objectId}`)
+        await db
+            .update(objectStorageTable)
+            .set({ isUploaded: false })
+            .where(eq(objectStorageTable.id, objectId))
+    }
 }
 
 export const orderRoute = new Hono<THonoInstance>()
@@ -70,8 +124,12 @@ export const orderRoute = new Hono<THonoInstance>()
                         remainingBalanceProofObjectStorageId:
                             orderTable.remainingBalanceProofObjectStorageId,
                         proofOfPaymentStatus: orderTable.proofOfPaymentStatus,
+                        proofOfPaymentFakeReason:
+                            orderTable.proofOfPaymentFakeReason,
                         remainingBalanceProofStatus:
                             orderTable.remainingBalanceProofStatus,
+                        remainingBalanceProofFakeReason:
+                            orderTable.remainingBalanceProofFakeReason,
                         remainingBalanceSenderName:
                             orderTable.remainingBalanceSenderName,
                         remainingBalanceSenderNumber:
@@ -100,6 +158,7 @@ export const orderRoute = new Hono<THonoInstance>()
                         productId: orderItemTable.productId,
                         name: orderItemTable.name,
                         sizeName: orderItemTable.sizeName,
+                        flavorName: orderItemTable.flavorName,
                         quantity: orderItemTable.quantity,
                         price: orderItemTable.price,
                     })
@@ -200,8 +259,12 @@ export const orderRoute = new Hono<THonoInstance>()
                         remainingBalanceProofObjectStorageId:
                             orderTable.remainingBalanceProofObjectStorageId,
                         proofOfPaymentStatus: orderTable.proofOfPaymentStatus,
+                        proofOfPaymentFakeReason:
+                            orderTable.proofOfPaymentFakeReason,
                         remainingBalanceProofStatus:
                             orderTable.remainingBalanceProofStatus,
+                        remainingBalanceProofFakeReason:
+                            orderTable.remainingBalanceProofFakeReason,
                         remainingBalanceSenderName:
                             orderTable.remainingBalanceSenderName,
                         remainingBalanceSenderNumber:
@@ -228,6 +291,7 @@ export const orderRoute = new Hono<THonoInstance>()
                                   productId: orderItemTable.productId,
                                   name: orderItemTable.name,
                                   sizeName: orderItemTable.sizeName,
+                                  flavorName: orderItemTable.flavorName,
                                   quantity: orderItemTable.quantity,
                                   price: orderItemTable.price,
                               })
@@ -368,6 +432,8 @@ export const orderRoute = new Hono<THonoInstance>()
                                               productId: item.productId ?? null,
                                               name: item.name,
                                               sizeName: item.sizeName ?? null,
+                                              flavorName:
+                                                  item.flavorName ?? null,
                                               quantity: item.quantity,
                                               price: item.price,
                                           })),
@@ -377,6 +443,7 @@ export const orderRoute = new Hono<THonoInstance>()
                                           productId: orderItemTable.productId,
                                           name: orderItemTable.name,
                                           sizeName: orderItemTable.sizeName,
+                                          flavorName: orderItemTable.flavorName,
                                           quantity: orderItemTable.quantity,
                                           price: orderItemTable.price,
                                       })
@@ -597,7 +664,13 @@ export const orderRoute = new Hono<THonoInstance>()
                     .get('dbClient')
                     .transaction(async (tx) => {
                         const [oldData] = await tx
-                            .select({ status: orderTable.status })
+                            .select({
+                                status: orderTable.status,
+                                proofOfPaymentObjectStorageId:
+                                    orderTable.proofOfPaymentObjectStorageId,
+                                remainingBalanceProofObjectStorageId:
+                                    orderTable.remainingBalanceProofObjectStorageId,
+                            })
                             .from(orderTable)
                             .where(eq(orderTable.id, orderId))
 
@@ -619,18 +692,44 @@ export const orderRoute = new Hono<THonoInstance>()
                                 records: {
                                     table: 'order',
                                     id: String(orderId),
-                                    oldData,
+                                    oldData: { status: oldData.status },
                                 },
                             },
                             tx,
                         )
 
-                        return updated
+                        return {
+                            ...updated,
+                            _proofOfPaymentObjectStorageId:
+                                oldData.proofOfPaymentObjectStorageId,
+                            _remainingBalanceProofObjectStorageId:
+                                oldData.remainingBalanceProofObjectStorageId,
+                        }
                     })
 
-                await broadcastOrderEvent(ctx, 'order.statusUpdate', data)
+                await broadcastOrderEvent(ctx, 'order.statusUpdate', {
+                    id: data.id,
+                    status: data.status,
+                })
 
-                return apiResponseOkWrapper(ctx, { data })
+                if (status === 'completed' || status === 'cancelled') {
+                    for (const objectId of [
+                        data._proofOfPaymentObjectStorageId,
+                        data._remainingBalanceProofObjectStorageId,
+                    ]) {
+                        if (objectId) {
+                            await deleteProofImageIfUnused(
+                                ctx,
+                                orderId,
+                                objectId,
+                            ).catch(() => undefined)
+                        }
+                    }
+                }
+
+                return apiResponseOkWrapper(ctx, {
+                    data: { id: data.id, status: data.status },
+                })
             } catch (err) {
                 if (err instanceof AppError) throw err
 
@@ -820,19 +919,24 @@ export const orderRoute = new Hono<THonoInstance>()
         '/proof/updateStatus',
         validateRequest('json', order.updateProofStatusInputSchema),
         async (ctx) => {
-            const { orderId, proofType, status } = ctx.req.valid('json')
+            const { orderId, proofType, status, fakeReason } =
+                ctx.req.valid('json')
 
             const { order: orderTable } = ctx.get('dbSchema')
 
-            const existing = (
-                await ctx
-                    .get('dbClient')
-                    .select({ count: countFn(orderTable.id) })
-                    .from(orderTable)
-                    .where(eq(orderTable.id, orderId))
-            )[0].count
+            const [existingOrder] = await ctx
+                .get('dbClient')
+                .select({
+                    proofOfPaymentObjectStorageId:
+                        orderTable.proofOfPaymentObjectStorageId,
+                    remainingBalanceProofObjectStorageId:
+                        orderTable.remainingBalanceProofObjectStorageId,
+                })
+                .from(orderTable)
+                .where(eq(orderTable.id, orderId))
+                .limit(1)
 
-            if (existing === 0) {
+            if (!existingOrder) {
                 return apiResponseErrorWrapper(ctx, {
                     code: 'NOT_FOUND',
                     message: 'Order not found.',
@@ -841,10 +945,18 @@ export const orderRoute = new Hono<THonoInstance>()
             }
 
             try {
+                const reason = status === 'fake' ? (fakeReason ?? null) : null
+
                 const setFields =
                     proofType === 'downpayment'
-                        ? { proofOfPaymentStatus: status }
-                        : { remainingBalanceProofStatus: status }
+                        ? {
+                              proofOfPaymentStatus: status,
+                              proofOfPaymentFakeReason: reason,
+                          }
+                        : {
+                              remainingBalanceProofStatus: status,
+                              remainingBalanceProofFakeReason: reason,
+                          }
 
                 const [updated] = await ctx
                     .get('dbClient')
@@ -868,7 +980,22 @@ export const orderRoute = new Hono<THonoInstance>()
                     trackingCode: updated.trackingCode,
                     proofType,
                     status,
+                    fakeReason: reason,
                 })
+
+                if (status === 'accepted' || status === 'fake') {
+                    const objectId =
+                        proofType === 'downpayment'
+                            ? existingOrder.proofOfPaymentObjectStorageId
+                            : existingOrder.remainingBalanceProofObjectStorageId
+                    if (objectId) {
+                        await deleteProofImageIfUnused(
+                            ctx,
+                            orderId,
+                            objectId,
+                        ).catch(() => undefined)
+                    }
+                }
 
                 return apiResponseOkWrapper(ctx, {
                     data: { orderId, proofType, status },

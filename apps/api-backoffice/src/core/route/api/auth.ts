@@ -5,7 +5,7 @@ import {
     signInInputSchema,
     verifyEmailInputSchema,
 } from '@hyperion/validator/backoffice/auth'
-import { and, eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'
@@ -17,33 +17,27 @@ import {
     apiResponseErrorWrapper,
     apiResponseOkWrapper,
     auditTrailLogger,
-    canLoginAuthRole,
     parseAuthRoles,
 } from '../../../utilities/helpers.js'
 import { captchaHandler } from '../../middleware/captchaHandler.js'
 import { isAuthenticated } from '../../middleware/isAuthenticated.js'
 import { validateRequest } from '../../middleware/validateRequest.js'
 
-// Roles allowed to authenticate on this API surface.
-const loginAuthRoles = [] as const
-
 const signInHandler = async (
     ctx: Context<THonoInstance>,
     input: z.output<typeof signInInputSchema>,
     credentialType: 'email' | 'username',
 ) => {
-    const { organizationId, accountId, password } = input
+    const { accountId, password } = input
 
     const db = ctx.get('dbClient')
-    const {
-        member,
-        organization: organizationTable,
-        user,
-    } = ctx.get('dbSchema')
+    const { member, user } = ctx.get('dbSchema')
 
     /**
      * @description
-     * Verify organization membership
+     * Verify the user exists and has an organization membership.
+     * Organization ID is not required at sign-in — the session hook derives
+     * it from the member table automatically.
      */
     const orgMemberData =
         (
@@ -51,18 +45,12 @@ const signInHandler = async (
                 .select({ member, user })
                 .from(user)
                 .innerJoin(member, eq(user.id, member.userId))
-                .innerJoin(
-                    organizationTable,
-                    eq(member.organizationId, organizationTable.id),
-                )
                 .where(
-                    and(
-                        credentialType === 'email'
-                            ? eq(user.email, accountId)
-                            : eq(user.username, accountId),
-                        eq(organizationTable.slug, organizationId),
-                    ),
+                    credentialType === 'email'
+                        ? eq(user.email, accountId)
+                        : eq(user.username, accountId),
                 )
+                .limit(1)
         )[0] ?? null
 
     if (!orgMemberData) {
@@ -70,14 +58,6 @@ const signInHandler = async (
             code: 'UNPROCESSABLE_CONTENT',
             message: 'Invalid credentials provided.',
             status: 422,
-        })
-    }
-
-    if (!canLoginAuthRole(orgMemberData.member.role, loginAuthRoles)) {
-        return apiResponseErrorWrapper(ctx, {
-            code: 'FORBIDDEN',
-            message: 'You are not allowed to access this resource.',
-            status: 403,
         })
     }
 
@@ -94,14 +74,12 @@ const signInHandler = async (
         if (credentialType === 'email') {
             betterAuthResponse = await auth.api.signInEmail({
                 body: { email: accountId, password },
-                query: { organizationId },
                 headers: ctx.req.raw.headers,
                 asResponse: true,
             })
         } else {
             betterAuthResponse = await auth.api.signInUsername({
                 body: { username: accountId, password },
-                query: { organizationId },
                 headers: ctx.req.raw.headers,
                 asResponse: true,
             })

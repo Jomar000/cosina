@@ -22,6 +22,9 @@ export const orderItemInputSchema = z.object({
     sizeName: field
         .vText({ fieldName: 'Size Name', max: 64, min: 0 })
         .optional(),
+    flavorName: field
+        .vText({ fieldName: 'Flavor Name', max: 64, min: 0 })
+        .optional(),
     quantity: field.vInt({ fieldName: 'Quantity', min: 1, max: 100 }),
     price: field.vNumeric({ fieldName: 'Price', min: 0 }),
 })
@@ -51,6 +54,11 @@ export const submitRemainingBalanceInputSchema = z.object({
         .vText({ fieldName: 'GCash Number', max: 20 })
         .optional(),
     amountSent: field.vNumeric({ fieldName: 'Amount Sent', min: 0 }).optional(),
+})
+
+export const resubmitDownpaymentProofInputSchema = z.object({
+    trackingCode: field.vText({ fieldName: 'Tracking Code', min: 1, max: 20 }),
+    objectStorageId: z.string().trim().min(1).max(64),
 })
 
 export const createInputSchema = z.object({

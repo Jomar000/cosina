@@ -3,6 +3,7 @@
     import { Separator } from '@hyperion/ui/components/separator'
     import { Skeleton } from '@hyperion/ui/components/skeleton'
     import ClipboardListIcon from '@lucide/svelte/icons/clipboard-list'
+
     import { createQuery, useQueryClient } from '@tanstack/svelte-query'
 
     import { adminClient } from '$lib/clients'
@@ -85,21 +86,85 @@
         },
     ]
 
-    // Action categories for dot color
-    function dotColor(action: string): string {
-        if (
-            action === 'create' ||
-            action.startsWith('create') ||
-            action.includes('upload')
-        )
-            return 'bg-emerald-500'
-        if (
-            action === 'delete' ||
-            action.startsWith('delete') ||
-            action.includes('cancel')
-        )
-            return 'bg-red-500'
-        return 'bg-blue-500'
+    type TActionMeta = {
+        label: string
+        accent: string
+        border: string
+        text: string
+        pill: string
+    }
+
+    const ACTION_META_MAP: Record<string, TActionMeta> = {
+        'admin.product:create': {
+            label: 'Product Created',
+            accent: 'bg-emerald-500',
+            border: 'border-emerald-500/25',
+            text: 'text-emerald-400',
+            pill: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
+        },
+        'admin.product:update': {
+            label: 'Product Updated',
+            accent: 'bg-amber-500',
+            border: 'border-amber-500/25',
+            text: 'text-amber-400',
+            pill: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
+        },
+        'admin.product:delete': {
+            label: 'Product Deleted',
+            accent: 'bg-red-500',
+            border: 'border-red-500/25',
+            text: 'text-red-400',
+            pill: 'bg-red-500/10 text-red-400 border-red-500/25',
+        },
+        'admin.order:create': {
+            label: 'Order Created',
+            accent: 'bg-emerald-500',
+            border: 'border-emerald-500/25',
+            text: 'text-emerald-400',
+            pill: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
+        },
+        'admin.order:updateStatus': {
+            label: 'Order Status Updated',
+            accent: 'bg-blue-500',
+            border: 'border-blue-500/25',
+            text: 'text-blue-400',
+            pill: 'bg-blue-500/10 text-blue-400 border-blue-500/25',
+        },
+        'admin.order:proof.updateStatus': {
+            label: 'Payment Verified',
+            accent: 'bg-blue-500',
+            border: 'border-blue-500/25',
+            text: 'text-blue-400',
+            pill: 'bg-blue-500/10 text-blue-400 border-blue-500/25',
+        },
+        'admin.order:proof.upload': {
+            label: 'Proof Uploaded',
+            accent: 'bg-violet-500',
+            border: 'border-violet-500/25',
+            text: 'text-violet-400',
+            pill: 'bg-violet-500/10 text-violet-400 border-violet-500/25',
+        },
+        'admin.settings:update': {
+            label: 'Settings Changed',
+            accent: 'bg-amber-500',
+            border: 'border-amber-500/25',
+            text: 'text-amber-400',
+            pill: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
+        },
+    }
+
+    const DEFAULT_META: TActionMeta = {
+        label: '',
+        accent: 'bg-zinc-500',
+        border: 'border-zinc-700',
+        text: 'text-zinc-400',
+        pill: 'bg-zinc-800 text-zinc-400 border-zinc-700',
+    }
+
+    function actionMeta(component: string, action: string): TActionMeta {
+        const key = `${component}:${action}`
+        const found = ACTION_META_MAP[key]
+        return found ?? { ...DEFAULT_META, label: action }
     }
 
     ///////////////
@@ -240,33 +305,39 @@
     }
 </script>
 
-<main class="flex flex-1 flex-col gap-6 p-4 pt-0 md:p-6 md:pt-0">
+<main class="flex flex-1 flex-col gap-6 p-4 pt-2 md:p-6">
     <!-- Header -->
     <div class="flex items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight">Audit Trail</h1>
-            <p class="text-muted-foreground text-sm">
-                {#if auditQuery.data}
-                    {auditQuery.data.length} recent entries
-                {:else}
-                    Complete log of all admin actions.
-                {/if}
-            </p>
+        <div class="flex items-center gap-3">
+            <div
+                class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 ring-1 ring-blue-500/20"
+            >
+                <ClipboardListIcon class="size-5 text-blue-400" />
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">Audit Trail</h1>
+                <p class="text-muted-foreground text-sm">
+                    {#if auditQuery.data}
+                        {auditQuery.data.length} recent entries
+                    {:else}
+                        Complete log of all admin actions.
+                    {/if}
+                </p>
+            </div>
         </div>
         <!-- Live indicator -->
-        <div class="flex items-center gap-2 rounded-full border px-3 py-1.5">
+        <div
+            class="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/5 px-3 py-1.5"
+        >
             <span class="relative flex size-2">
                 <span
-                    class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"
+                    class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75"
                 ></span>
                 <span
                     class="relative inline-flex size-2 rounded-full bg-emerald-500"
                 ></span>
             </span>
-            <span
-                class="text-xs font-medium text-emerald-600 dark:text-emerald-400"
-                >Live</span
-            >
+            <span class="text-xs font-medium text-emerald-400">Live</span>
         </div>
     </div>
 
@@ -344,103 +415,98 @@
             {/if}
         </div>
     {:else}
-        <div class="flex flex-col">
-            {#each auditQuery.data as entry, i (entry.id)}
-                <div class="flex gap-3">
-                    <!-- Timeline dot + line -->
-                    <div class="mt-1.5 flex flex-col items-center">
-                        <div
-                            class="size-2.5 shrink-0 rounded-full {dotColor(
-                                entry.action,
-                            )}"
-                        ></div>
-                        {#if i < auditQuery.data.length - 1}
-                            <div
-                                class="bg-border mt-1 w-px flex-1"
-                                style="min-height: 16px;"
-                            ></div>
-                        {/if}
+        <div class="flex flex-col gap-2">
+            {#each auditQuery.data as entry (entry.id)}
+                {@const meta = actionMeta(entry.component, entry.action)}
+                <!-- Color-coded card with left accent border -->
+                <div
+                    class="relative overflow-hidden rounded-lg border {meta.border} bg-zinc-900/50 px-4 py-3"
+                >
+                    <!-- Left accent stripe -->
+                    <div
+                        class="absolute inset-y-0 left-0 w-0.75 {meta.accent} rounded-l-full"
+                    ></div>
+
+                    <!-- Top row: action label pill + timestamp -->
+                    <div class="mb-2 flex items-start justify-between gap-2">
+                        <span
+                            class="inline-flex items-center rounded-sm border {meta.pill} px-2 py-0.5 text-[11px] font-medium"
+                        >
+                            {meta.label}
+                        </span>
+                        <span class="shrink-0 text-[11px] text-zinc-500"
+                            >{formatLoggedAt(entry.loggedAt)}</span
+                        >
                     </div>
 
-                    <!-- Entry card -->
-                    <div class="flex flex-1 flex-col gap-1.5 pb-5">
-                        <!-- Timestamp -->
-                        <p class="text-muted-foreground text-xs">
-                            {formatLoggedAt(entry.loggedAt)}
-                        </p>
+                    <!-- Description — primary text -->
+                    <p class="mb-2 text-sm/snug font-medium text-zinc-100">
+                        {entry.description}
+                    </p>
 
-                        <!-- Component · Action badge -->
-                        <div class="flex flex-wrap items-center gap-1.5">
-                            <span
-                                class="bg-muted rounded px-1.5 py-0.5 font-mono text-xs"
-                            >
-                                {entry.component}
-                            </span>
-                            <span class="text-muted-foreground text-xs">·</span>
-                            <span
-                                class="bg-muted rounded px-1.5 py-0.5 font-mono text-xs"
-                            >
-                                {entry.action}
-                            </span>
-                        </div>
-
-                        <!-- Description -->
-                        <p class="text-sm font-medium">{entry.description}</p>
-
-                        <!-- Records -->
-                        {#if entry.records && entry.records.length > 0}
-                            <div class="flex flex-wrap gap-1.5">
-                                {#each entry.records as record (`${record.table}-${record.id}`)}
-                                    <span
-                                        class="text-muted-foreground inline-flex items-center gap-1 rounded border px-2 py-0.5 text-xs"
-                                    >
-                                        <span class="opacity-60"
-                                            >{record.table}</span
-                                        >
-                                        <span class="font-mono"
-                                            >#{record.id}</span
-                                        >
-                                    </span>
-                                    {#if record.oldData}
-                                        <details class="w-full">
-                                            <summary
-                                                class="text-muted-foreground cursor-pointer text-xs hover:underline"
-                                            >
-                                                View previous values
-                                            </summary>
-                                            <pre
-                                                class="bg-muted mt-1 overflow-x-auto rounded p-2 text-xs">{JSON.stringify(
-                                                    record.oldData,
-                                                    null,
-                                                    2,
-                                                )}</pre>
-                                        </details>
-                                    {/if}
-                                {/each}
-                            </div>
-                        {/if}
-
-                        <!-- Meta row -->
-                        <div
-                            class="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs"
+                    <!-- Technical context: component · action -->
+                    <div class="mb-2 flex flex-wrap items-center gap-1">
+                        <span
+                            class="rounded-sm bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400"
+                            >{entry.component}</span
                         >
-                            <span>
-                                User: <span class="font-mono"
-                                    >{entry.userId ?? 'System'}</span
-                                >
-                            </span>
-                            {#if entry.ipAddress}
-                                <span>IP: {entry.ipAddress}</span>
-                            {/if}
-                            {#if entry.userAgent}
+                        <span class="text-zinc-600 text-xs">·</span>
+                        <span
+                            class="rounded-sm bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400"
+                            >{entry.action}</span
+                        >
+                    </div>
+
+                    <!-- Affected records -->
+                    {#if entry.records && entry.records.length > 0}
+                        <div class="mb-2 flex flex-wrap gap-1">
+                            {#each entry.records as record (`${record.table}-${record.id}`)}
                                 <span
-                                    title={entry.userAgent}
-                                    class="cursor-default"
+                                    class="inline-flex items-center gap-1 rounded-sm border border-zinc-700 bg-zinc-800/60 px-2 py-0.5 text-[11px] text-zinc-400"
                                 >
-                                    {formatUserAgent(entry.userAgent)}
+                                    <span class="text-zinc-500"
+                                        >{record.table}</span
+                                    >
+                                    <span class="font-mono">#{record.id}</span>
                                 </span>
-                            {/if}
+                                {#if record.oldData}
+                                    <details class="w-full">
+                                        <summary
+                                            class="cursor-pointer text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                                        >
+                                            View previous values
+                                        </summary>
+                                        <pre
+                                            class="mt-1 overflow-x-auto rounded-sm bg-zinc-800 p-2 text-[11px] text-zinc-300 leading-relaxed">{JSON.stringify(
+                                                record.oldData,
+                                                null,
+                                                2,
+                                            )}</pre>
+                                    </details>
+                                {/if}
+                            {/each}
                         </div>
+                    {/if}
+
+                    <!-- Meta footer -->
+                    <div
+                        class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-zinc-500"
+                    >
+                        <span
+                            >By: <span class="font-mono text-zinc-400"
+                                >{entry.userId ?? 'System'}</span
+                            ></span
+                        >
+                        {#if entry.ipAddress}
+                            <span>IP: {entry.ipAddress}</span>
+                        {/if}
+                        {#if entry.userAgent}
+                            <span
+                                title={entry.userAgent}
+                                class="cursor-default"
+                                >{formatUserAgent(entry.userAgent)}</span
+                            >
+                        {/if}
                     </div>
                 </div>
             {/each}

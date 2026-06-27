@@ -95,10 +95,7 @@
             </div>
 
             <div class="hidden shrink-0 md:block">
-                <SiteHeader
-                    {role}
-                    {session}
-                />
+                <SiteHeader />
             </div>
 
             <main class="flex min-h-0 flex-1 flex-col overflow-hidden">

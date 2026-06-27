@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Button } from '@hyperion/ui/components/button'
+    import * as Dialog from '@hyperion/ui/components/dialog'
     import { Input } from '@hyperion/ui/components/input'
     import { Separator } from '@hyperion/ui/components/separator'
     import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left'
@@ -11,17 +12,22 @@
     import CircleXIcon from '@lucide/svelte/icons/circle-x'
     import ClockIcon from '@lucide/svelte/icons/clock'
     import PackageCheckIcon from '@lucide/svelte/icons/package-check'
+    import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw'
     import SearchIcon from '@lucide/svelte/icons/search'
     import ShieldCheckIcon from '@lucide/svelte/icons/shield-check'
-    import SmartphoneIcon from '@lucide/svelte/icons/smartphone'
     import TruckIcon from '@lucide/svelte/icons/truck'
     import WifiIcon from '@lucide/svelte/icons/wifi'
     import WifiOffIcon from '@lucide/svelte/icons/wifi-off'
-    import { createQuery, useQueryClient } from '@tanstack/svelte-query'
+    import {
+        createMutation,
+        createQuery,
+        useQueryClient,
+    } from '@tanstack/svelte-query'
     import { page } from '$app/state'
     import { toast } from 'svelte-sonner'
 
     import { orderClient } from '$lib/clients'
+    import ProofImageUploader from '$lib/components/upload/ProofImageUploader.svelte'
     import { wsClientManager } from '$lib/utilities/wsClientManager'
     import PayRemainingBalanceDialog from './PayRemainingBalanceDialog.svelte'
 
@@ -51,8 +57,11 @@
         downpayment: string | null
         amountToPay: string
         remainingBalancePaymentMethod: string | null
+        proofOfPaymentObjectStorageId: string | null
         proofOfPaymentStatus: TProofStatus
+        proofOfPaymentFakeReason: string | null
         remainingBalanceProofStatus: TProofStatus
+        remainingBalanceProofFakeReason: string | null
         status: TOrderStatus
         notes: string | null
         createdAt: string
@@ -60,6 +69,7 @@
             id: number
             name: string
             sizeName: string | null
+            flavorName: string | null
             quantity: number
             price: string
         }[]
@@ -147,6 +157,11 @@
     let searchStartTime = $state(0)
     let payDialogOpen = $state(false)
 
+    let resubmitDpDialogOpen = $state(false)
+    let resubmitDpObjectId = $state<string | null>(null)
+    let resubmitDpUploading = $state(false)
+    let resubmitDpError = $state<string | null>(null)
+
     /////////////////
     // 05. Queries //
     /////////////////
@@ -190,6 +205,70 @@
     const stepIndex = $derived(
         trackQuery.data ? STATUS_STEP[trackQuery.data.status] : -1,
     )
+
+    ///////////////////
+    // 06. Mutations //
+    ///////////////////
+
+    const resubmitDownpaymentMutation = createMutation(() => ({
+        mutationFn: async ({
+            trackingCode,
+            objectStorageId,
+        }: {
+            trackingCode: string
+            objectStorageId: string
+        }) => {
+            const response = await (
+                orderClient as unknown as {
+                    proof: {
+                        downpayment: {
+                            resubmit: {
+                                $post: (opts: {
+                                    json: {
+                                        trackingCode: string
+                                        objectStorageId: string
+                                    }
+                                }) => Promise<Response>
+                            }
+                        }
+                    }
+                }
+            ).proof.downpayment.resubmit.$post({
+                json: { trackingCode, objectStorageId },
+            })
+            const json = (await response.json()) as {
+                success: boolean
+                error?: { message: string }
+            }
+            if (!json.success)
+                throw new Error(json.error?.message ?? 'Failed to resubmit.')
+            return json
+        },
+        onSuccess: () => {
+            queryClient.setQueryData(
+                [
+                    'order',
+                    'track',
+                    searchedCode,
+                ],
+                (current: TTrackedOrder | undefined) =>
+                    current
+                        ? {
+                              ...current,
+                              proofOfPaymentStatus: null,
+                              proofOfPaymentFakeReason: null,
+                          }
+                        : current,
+            )
+            resubmitDpDialogOpen = false
+            resubmitDpObjectId = null
+            resubmitDpError = null
+            toast.success('Your proof has been resubmitted for review.')
+        },
+        onError: (err: Error) => {
+            resubmitDpError = err.message
+        },
+    }))
 
     /////////////////
     // 08. Effects //
@@ -261,6 +340,30 @@
                                       ...current,
                                       remainingBalancePaymentMethod:
                                           data.paymentMethod,
+                                      remainingBalanceProofStatus: null,
+                                      remainingBalanceProofFakeReason: null,
+                                  }
+                                : current,
+                    )
+                }
+
+                if (
+                    eventType === 'order.proofResubmit' &&
+                    trackQuery.data &&
+                    data?.trackingCode === trackQuery.data.trackingCode
+                ) {
+                    queryClient.setQueryData(
+                        [
+                            'order',
+                            'track',
+                            searchedCode,
+                        ],
+                        (current: TTrackedOrder | undefined) =>
+                            current
+                                ? {
+                                      ...current,
+                                      proofOfPaymentStatus: null,
+                                      proofOfPaymentFakeReason: null,
                                   }
                                 : current,
                     )
@@ -275,8 +378,11 @@
                         | 'downpayment'
                         | 'remaining_balance'
                     const status = data.status as TProofStatus
+                    const fakeReason = (data.fakeReason ?? null) as
+                        | string
+                        | null
 
-                    if (status === 'accepted') {
+                    if (status === 'accepted' || status === 'received') {
                         toast.success(
                             proofType === 'downpayment'
                                 ? 'Your downpayment proof has been accepted!'
@@ -286,8 +392,8 @@
                     } else if (status === 'fake') {
                         toast.error(
                             proofType === 'downpayment'
-                                ? 'Your downpayment proof was rejected. Please contact us.'
-                                : 'Your remaining balance proof was rejected. Please contact us.',
+                                ? 'Your downpayment proof was rejected.'
+                                : 'Your remaining balance proof was rejected.',
                             { duration: 8000 },
                         )
                     }
@@ -303,10 +409,20 @@
                                 ? {
                                       ...current,
                                       ...(proofType === 'downpayment'
-                                          ? { proofOfPaymentStatus: status }
+                                          ? {
+                                                proofOfPaymentStatus: status,
+                                                proofOfPaymentFakeReason:
+                                                    status === 'fake'
+                                                        ? fakeReason
+                                                        : null,
+                                            }
                                           : {
                                                 remainingBalanceProofStatus:
                                                     status,
+                                                remainingBalanceProofFakeReason:
+                                                    status === 'fake'
+                                                        ? fakeReason
+                                                        : null,
                                             }),
                                   }
                                 : current,
@@ -346,6 +462,15 @@
         searchedCode = code
     }
 
+    async function handleResubmitDownpayment(trackingCode: string) {
+        if (!resubmitDpObjectId || resubmitDownpaymentMutation.isPending) return
+        resubmitDpError = null
+        await resubmitDownpaymentMutation.mutateAsync({
+            trackingCode,
+            objectStorageId: resubmitDpObjectId,
+        })
+    }
+
     function handlePaySuccess(paymentMethod: 'gcash' | 'cash_on_pickup') {
         queryClient.setQueryData(
             [
@@ -358,6 +483,8 @@
                     ? {
                           ...current,
                           remainingBalancePaymentMethod: paymentMethod,
+                          remainingBalanceProofStatus: null,
+                          remainingBalanceProofFakeReason: null,
                       }
                     : current,
         )
@@ -812,8 +939,11 @@
                                         <span
                                             class="leading-snug text-zinc-300"
                                         >
-                                            {item.name}{item.sizeName
-                                                ? ` · ${item.sizeName}`
+                                            {item.name}{[
+                                                item.flavorName,
+                                                item.sizeName,
+                                            ].filter(Boolean).length
+                                                ? ` · ${[item.flavorName, item.sizeName].filter(Boolean).join(' · ')}`
                                                 : ''}
                                             <span class="text-zinc-500">
                                                 × {item.quantity}</span
@@ -885,9 +1015,9 @@
                         </div>
 
                         <!-- Downpayment proof status -->
-                        {#if o.downpayment && o.proofOfPaymentStatus}
+                        {#if o.downpayment && o.proofOfPaymentObjectStorageId}
                             <div class="mt-3">
-                                {#if o.proofOfPaymentStatus === 'accepted'}
+                                {#if o.proofOfPaymentStatus === 'received' || o.proofOfPaymentStatus === 'accepted'}
                                     <div
                                         class="flex items-center gap-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3.5 py-3"
                                     >
@@ -910,22 +1040,47 @@
                                     </div>
                                 {:else if o.proofOfPaymentStatus === 'fake'}
                                     <div
-                                        class="flex items-center gap-2.5 rounded-lg border border-red-500/30 bg-red-500/5 px-3.5 py-3"
+                                        class="flex flex-col gap-2 rounded-lg border border-red-500/30 bg-red-500/5 px-3.5 py-3"
                                     >
-                                        <CircleXIcon
-                                            class="size-4 shrink-0 text-red-400"
-                                        />
-                                        <div class="flex flex-col gap-0.5">
-                                            <p
-                                                class="text-xs font-semibold text-red-300"
-                                            >
-                                                Downpayment Proof Rejected
-                                            </p>
-                                            <p class="text-xs text-red-400/70">
-                                                Your proof was not accepted.
-                                                Please contact the restaurant.
-                                            </p>
+                                        <div class="flex items-start gap-2.5">
+                                            <CircleXIcon
+                                                class="size-4 shrink-0 text-red-400 mt-0.5"
+                                            />
+                                            <div class="flex flex-col gap-0.5">
+                                                <p
+                                                    class="text-xs font-semibold text-red-300"
+                                                >
+                                                    Downpayment Proof Rejected
+                                                </p>
+                                                {#if o.proofOfPaymentFakeReason}
+                                                    <p
+                                                        class="text-xs text-red-400/70"
+                                                    >
+                                                        Reason: {o.proofOfPaymentFakeReason}
+                                                    </p>
+                                                {:else}
+                                                    <p
+                                                        class="text-xs text-red-400/70"
+                                                    >
+                                                        Please contact the
+                                                        restaurant for details.
+                                                    </p>
+                                                {/if}
+                                            </div>
                                         </div>
+                                        {#if o.status !== 'cancelled' && o.status !== 'completed'}
+                                            <Button
+                                                variant="outline"
+                                                onclick={() =>
+                                                    (resubmitDpDialogOpen = true)}
+                                                class="w-full border-red-500/40 bg-red-500/10 text-red-300 hover:bg-red-500/20 hover:text-red-200 text-xs h-8"
+                                            >
+                                                <RefreshCwIcon
+                                                    class="size-3 mr-1.5"
+                                                />
+                                                Send Proof Again
+                                            </Button>
+                                        {/if}
                                     </div>
                                 {:else}
                                     <div
@@ -944,7 +1099,7 @@
                                                 class="text-xs text-yellow-500/70"
                                             >
                                                 We received your proof and are
-                                                reviewing it.
+                                                reviewing it. Please wait.
                                             </p>
                                         </div>
                                     </div>
@@ -969,7 +1124,7 @@
                             <Separator class="mt-4 bg-zinc-800" />
                             <div class="mt-4 flex flex-col gap-3">
                                 {#if o.remainingBalancePaymentMethod === 'gcash'}
-                                    {#if o.remainingBalanceProofStatus === 'accepted'}
+                                    {#if o.remainingBalanceProofStatus === 'received' || o.remainingBalanceProofStatus === 'accepted'}
                                         <div
                                             class="flex items-center gap-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3.5 py-3"
                                         >
@@ -992,44 +1147,72 @@
                                         </div>
                                     {:else if o.remainingBalanceProofStatus === 'fake'}
                                         <div
-                                            class="flex items-center gap-2.5 rounded-lg border border-red-500/30 bg-red-500/5 px-3.5 py-3"
+                                            class="flex flex-col gap-2 rounded-lg border border-red-500/30 bg-red-500/5 px-3.5 py-3"
                                         >
-                                            <CircleXIcon
-                                                class="size-4 shrink-0 text-red-400"
-                                            />
-                                            <div class="flex flex-col gap-0.5">
-                                                <p
-                                                    class="text-xs font-semibold text-red-300"
+                                            <div
+                                                class="flex items-start gap-2.5"
+                                            >
+                                                <CircleXIcon
+                                                    class="size-4 shrink-0 text-red-400 mt-0.5"
+                                                />
+                                                <div
+                                                    class="flex flex-col gap-0.5"
                                                 >
-                                                    GCash Proof Rejected
-                                                </p>
-                                                <p
-                                                    class="text-xs text-red-400/70"
-                                                >
-                                                    Your proof was not accepted.
-                                                    Please contact the
-                                                    restaurant.
-                                                </p>
+                                                    <p
+                                                        class="text-xs font-semibold text-red-300"
+                                                    >
+                                                        GCash Proof Rejected
+                                                    </p>
+                                                    {#if o.remainingBalanceProofFakeReason}
+                                                        <p
+                                                            class="text-xs text-red-400/70"
+                                                        >
+                                                            Reason: {o.remainingBalanceProofFakeReason}
+                                                        </p>
+                                                    {:else}
+                                                        <p
+                                                            class="text-xs text-red-400/70"
+                                                        >
+                                                            Please contact the
+                                                            restaurant for
+                                                            details.
+                                                        </p>
+                                                    {/if}
+                                                </div>
                                             </div>
+                                            {#if o.status !== 'cancelled' && o.status !== 'completed'}
+                                                <Button
+                                                    variant="outline"
+                                                    onclick={() =>
+                                                        (payDialogOpen = true)}
+                                                    class="w-full border-red-500/40 bg-red-500/10 text-red-300 hover:bg-red-500/20 hover:text-red-200 text-xs h-8"
+                                                >
+                                                    <RefreshCwIcon
+                                                        class="size-3 mr-1.5"
+                                                    />
+                                                    Send Proof Again
+                                                </Button>
+                                            {/if}
                                         </div>
                                     {:else}
                                         <div
-                                            class="flex items-center gap-2.5 rounded-lg border border-blue-500/30 bg-blue-500/5 px-3.5 py-3"
+                                            class="flex items-center gap-2.5 rounded-lg border border-yellow-500/20 bg-yellow-500/5 px-3.5 py-3"
                                         >
-                                            <SmartphoneIcon
-                                                class="size-4 shrink-0 text-blue-400"
+                                            <CircleAlertIcon
+                                                class="size-4 shrink-0 text-yellow-500"
                                             />
                                             <div class="flex flex-col gap-0.5">
                                                 <p
-                                                    class="text-xs font-semibold text-blue-300"
+                                                    class="text-xs font-semibold text-yellow-400"
                                                 >
-                                                    GCash Proof Submitted
+                                                    GCash Proof Under Review
                                                 </p>
                                                 <p
-                                                    class="text-xs text-blue-400/70"
+                                                    class="text-xs text-yellow-500/70"
                                                 >
-                                                    Your payment screenshot is
-                                                    being verified.
+                                                    We received your proof and
+                                                    are reviewing it. Please
+                                                    wait.
                                                 </p>
                                             </div>
                                         </div>
@@ -1097,6 +1280,73 @@
         paymentInstructions={settingsQuery.data?.paymentInstructions ?? null}
         onSuccess={handlePaySuccess}
     />
+{/if}
+
+{#if trackQuery.data && resubmitDpDialogOpen}
+    {@const o = trackQuery.data}
+    <Dialog.Root
+        bind:open={resubmitDpDialogOpen}
+        onOpenChange={(isOpen) => {
+            if (!isOpen) {
+                resubmitDpObjectId = null
+                resubmitDpError = null
+            }
+        }}
+    >
+        <Dialog.Content
+            class="flex max-h-[90dvh] flex-col gap-0 border-zinc-800 bg-zinc-900 text-zinc-100 sm:max-w-sm p-0"
+        >
+            <Dialog.Header class="shrink-0 border-b border-zinc-800 px-6 py-5">
+                <Dialog.Title class="text-base font-semibold text-zinc-100">
+                    Resubmit Downpayment Proof
+                </Dialog.Title>
+                <Dialog.Description class="mt-0.5 text-sm text-zinc-400">
+                    Upload a new payment screenshot for your downpayment.
+                </Dialog.Description>
+            </Dialog.Header>
+
+            <div class="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
+                <ProofImageUploader
+                    bind:objectStorageId={resubmitDpObjectId}
+                    bind:isUploading={resubmitDpUploading}
+                />
+
+                {#if resubmitDpError}
+                    <p
+                        class="rounded-lg border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-xs text-red-400"
+                    >
+                        {resubmitDpError}
+                    </p>
+                {/if}
+            </div>
+
+            <div
+                class="shrink-0 border-t border-zinc-800 px-6 py-4 flex items-center gap-3"
+            >
+                <Button
+                    variant="outline"
+                    onclick={() => (resubmitDpDialogOpen = false)}
+                    disabled={resubmitDownpaymentMutation.isPending}
+                    class="flex-1 border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+                >
+                    Cancel
+                </Button>
+                <Button
+                    onclick={() => handleResubmitDownpayment(o.trackingCode)}
+                    disabled={!resubmitDpObjectId ||
+                        resubmitDpUploading ||
+                        resubmitDownpaymentMutation.isPending}
+                    class="flex-1 bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50"
+                >
+                    {#if resubmitDownpaymentMutation.isPending}
+                        Submitting…
+                    {:else}
+                        Submit Proof
+                    {/if}
+                </Button>
+            </div>
+        </Dialog.Content>
+    </Dialog.Root>
 {/if}
 
 <style>

@@ -39,6 +39,7 @@ export const orderItemInputSchema = z.object({
     productId: field.vInt({ fieldName: 'Product ID', min: 1 }).optional(),
     name: field.vText({ fieldName: 'Item Name', max: 128 }),
     sizeName: field.vText({ fieldName: 'Size Name', max: 64 }).optional(),
+    flavorName: field.vText({ fieldName: 'Flavor Name', max: 64 }).optional(),
     quantity: field.vInt({ fieldName: 'Quantity', min: 1 }),
     price: field.vNumeric({ fieldName: 'Price', min: 0 }),
 })
@@ -129,6 +130,10 @@ export const updateProofStatusInputSchema = z.object({
         'remaining_balance',
     ]),
     status: proofStatusEnum,
+    fakeReason: field
+        .vText({ fieldName: 'Reason', max: 512 })
+        .nullable()
+        .optional(),
 })
 
 export const deleteInputSchema = z.object({

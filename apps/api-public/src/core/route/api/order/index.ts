@@ -19,12 +19,24 @@ async function broadcastOrderEvent(
     event: string,
     data: unknown,
 ) {
+    const payload = JSON.stringify({ event, data })
+
+    // Broadcast to public DO (customer tracking page WS clients)
     try {
         const id = ctx.get('doWssClient').idFromName('orders')
         const stub = ctx.get('doWssClient').get(id)
-        await stub.sendMessage(JSON.stringify({ event, data }))
+        await stub.sendMessage(payload)
     } catch {
-        // Non-fatal: WS broadcast failure should not abort the HTTP response
+        // Non-fatal
+    }
+
+    // Broadcast to backoffice DO (admin orders WS clients)
+    try {
+        const id = ctx.env.HYPERIONBOFC_DO_WSS.idFromName('orders')
+        const stub = ctx.env.HYPERIONBOFC_DO_WSS.get(id)
+        await stub.sendMessage(payload)
+    } catch {
+        // Non-fatal
     }
 }
 
@@ -114,6 +126,7 @@ export const orderRoute = new Hono<THonoInstance>()
                                     productId: item.productId ?? null,
                                     name: item.name,
                                     sizeName: item.sizeName ?? null,
+                                    flavorName: item.flavorName ?? null,
                                     quantity: item.quantity,
                                     price: item.price,
                                 })),
@@ -123,6 +136,7 @@ export const orderRoute = new Hono<THonoInstance>()
                                 productId: orderItem.productId,
                                 name: orderItem.name,
                                 sizeName: orderItem.sizeName,
+                                flavorName: orderItem.flavorName,
                                 quantity: orderItem.quantity,
                                 price: orderItem.price,
                             })
@@ -231,10 +245,19 @@ export const orderRoute = new Hono<THonoInstance>()
 
         let objectId: string
 
-        if (existing?.isUploaded) {
-            objectId = existing.id
-        } else {
-            try {
+        try {
+            if (existing?.isUploaded) {
+                objectId = existing.id
+                // Verify KV still holds the blob (state may have been reset in dev)
+                const kvExists = await ctx
+                    .get('kvClient')
+                    .get(`img:${objectId}`)
+                if (kvExists === null) {
+                    await ctx.get('kvClient').put(`img:${objectId}`, buffer, {
+                        metadata: { mimeType },
+                    })
+                }
+            } else {
                 if (existing) {
                     objectId = existing.id
                 } else {
@@ -262,18 +285,18 @@ export const orderRoute = new Hono<THonoInstance>()
                     .update(objectStorageTable)
                     .set({ isUploaded: true })
                     .where(eq(objectStorageTable.id, objectId))
-            } catch (err) {
-                if (err instanceof AppError) throw err
-
-                throw new AppError(
-                    {
-                        status: 500,
-                        code: 'PROOF_UPLOAD_FAILED',
-                        message: 'Proof of payment upload failed.',
-                    },
-                    err instanceof Error ? err : undefined,
-                )
             }
+        } catch (err) {
+            if (err instanceof AppError) throw err
+
+            throw new AppError(
+                {
+                    status: 500,
+                    code: 'PROOF_UPLOAD_FAILED',
+                    message: 'Proof of payment upload failed.',
+                },
+                err instanceof Error ? err : undefined,
+            )
         }
 
         await auditTrailLogger(ctx, {
@@ -404,9 +427,15 @@ export const trackOrderRoute = orderRoute
                     createdAt: orderTable.createdAt,
                     remainingBalancePaymentMethod:
                         orderTable.remainingBalancePaymentMethod,
+                    proofOfPaymentObjectStorageId:
+                        orderTable.proofOfPaymentObjectStorageId,
                     proofOfPaymentStatus: orderTable.proofOfPaymentStatus,
+                    proofOfPaymentFakeReason:
+                        orderTable.proofOfPaymentFakeReason,
                     remainingBalanceProofStatus:
                         orderTable.remainingBalanceProofStatus,
+                    remainingBalanceProofFakeReason:
+                        orderTable.remainingBalanceProofFakeReason,
                 })
                 .from(orderTable)
                 .where(eq(orderTable.trackingCode, trackingCode))
@@ -427,6 +456,7 @@ export const trackOrderRoute = orderRoute
                     id: orderItemTable.id,
                     name: orderItemTable.name,
                     sizeName: orderItemTable.sizeName,
+                    flavorName: orderItemTable.flavorName,
                     quantity: orderItemTable.quantity,
                     price: orderItemTable.price,
                 })
@@ -475,9 +505,12 @@ export const trackOrderRoute = orderRoute
                 .get('dbClient')
                 .select({
                     id: orderTable.id,
+                    customerName: orderTable.customerName,
                     status: orderTable.status,
                     remainingBalancePaymentMethod:
                         orderTable.remainingBalancePaymentMethod,
+                    remainingBalanceProofStatus:
+                        orderTable.remainingBalanceProofStatus,
                 })
                 .from(orderTable)
                 .where(eq(orderTable.trackingCode, trackingCode))
@@ -501,7 +534,10 @@ export const trackOrderRoute = orderRoute
                 })
             }
 
-            if (existing.remainingBalancePaymentMethod !== null) {
+            if (
+                existing.remainingBalancePaymentMethod !== null &&
+                existing.remainingBalanceProofStatus !== 'fake'
+            ) {
                 return apiResponseErrorWrapper(ctx, {
                     code: 'ALREADY_SUBMITTED',
                     message:
@@ -509,6 +545,8 @@ export const trackOrderRoute = orderRoute
                     status: 409,
                 })
             }
+
+            const isResubmit = existing.remainingBalanceProofStatus === 'fake'
 
             try {
                 await ctx
@@ -521,13 +559,17 @@ export const trackOrderRoute = orderRoute
                         remainingBalanceSenderName: senderName ?? null,
                         remainingBalanceSenderNumber: senderNumber ?? null,
                         remainingBalanceAmountSent: amountSent ?? null,
+                        remainingBalanceProofStatus: null,
+                        remainingBalanceProofFakeReason: null,
                         updatedAt: new Date(),
                     })
                     .where(eq(orderTable.id, existing.id))
 
                 console.log(
                     JSON.stringify({
-                        type: 'REMAINING_BALANCE_SUBMITTED',
+                        type: isResubmit
+                            ? 'REMAINING_BALANCE_RESUBMITTED'
+                            : 'REMAINING_BALANCE_SUBMITTED',
                         requestId: ctx.get('requestId'),
                         orderId: existing.id,
                         paymentMethod,
@@ -537,13 +579,18 @@ export const trackOrderRoute = orderRoute
                 await broadcastOrderEvent(ctx, 'order.remainingBalanceSubmit', {
                     id: existing.id,
                     trackingCode,
+                    customerName: existing.customerName,
                     paymentMethod,
                 })
 
                 await auditTrailLogger(ctx, {
                     component: 'order',
-                    action: 'remainingBalance.submit',
-                    description: `Customer submitted remaining balance payment via ${paymentMethod}`,
+                    action: isResubmit
+                        ? 'remainingBalance.resubmit'
+                        : 'remainingBalance.submit',
+                    description: isResubmit
+                        ? `Customer resubmitted remaining balance payment via ${paymentMethod} after rejection`
+                        : `Customer submitted remaining balance payment via ${paymentMethod}`,
                     records: { table: 'order', id: String(existing.id) },
                 })
 
@@ -562,6 +609,71 @@ export const trackOrderRoute = orderRoute
                     err instanceof Error ? err : undefined,
                 )
             }
+        },
+    )
+    .post(
+        '/proof/downpayment/resubmit',
+        validateRequest('json', order.resubmitDownpaymentProofInputSchema),
+        async (ctx) => {
+            const { trackingCode, objectStorageId } = ctx.req.valid('json')
+            const { order: orderTable } = ctx.get('dbSchema')
+
+            const [existing] = await ctx
+                .get('dbClient')
+                .select({
+                    id: orderTable.id,
+                    customerName: orderTable.customerName,
+                    proofOfPaymentStatus: orderTable.proofOfPaymentStatus,
+                })
+                .from(orderTable)
+                .where(eq(orderTable.trackingCode, trackingCode))
+                .limit(1)
+
+            if (!existing) {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'NOT_FOUND',
+                    message:
+                        'Order not found. Please check your Tracking Code.',
+                    status: 404,
+                })
+            }
+
+            if (existing.proofOfPaymentStatus !== 'fake') {
+                return apiResponseErrorWrapper(ctx, {
+                    code: 'INVALID_STATUS',
+                    message:
+                        'Your downpayment proof has not been rejected and cannot be resubmitted.',
+                    status: 409,
+                })
+            }
+
+            await ctx
+                .get('dbClient')
+                .update(orderTable)
+                .set({
+                    proofOfPaymentObjectStorageId: objectStorageId,
+                    proofOfPaymentStatus: null,
+                    proofOfPaymentFakeReason: null,
+                    updatedAt: new Date(),
+                })
+                .where(eq(orderTable.id, existing.id))
+
+            await broadcastOrderEvent(ctx, 'order.proofResubmit', {
+                id: existing.id,
+                trackingCode,
+                customerName: existing.customerName,
+                proofType: 'downpayment',
+            })
+
+            await auditTrailLogger(ctx, {
+                component: 'order',
+                action: 'proof.resubmit',
+                description:
+                    'Customer resubmitted downpayment proof after rejection',
+                records: { table: 'order', id: String(existing.id) },
+            })
+
+            return apiResponseOkWrapper(ctx, { data: { trackingCode } })
         },
     )
 

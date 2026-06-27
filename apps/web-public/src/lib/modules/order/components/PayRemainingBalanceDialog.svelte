@@ -39,10 +39,12 @@
     // 02. Constants //
     ///////////////////
 
-    const FORMATTED_BALANCE = new Intl.NumberFormat('en-PH', {
-        style: 'currency',
-        currency: 'PHP',
-    }).format(remainingBalance)
+    const FORMATTED_BALANCE = $derived(
+        new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+        }).format(remainingBalance),
+    )
 
     ///////////////
     // 03. State //
@@ -224,7 +226,7 @@
                                 class="flex items-center gap-2.5 border-b border-blue-500/20 px-4 py-3"
                             >
                                 <div
-                                    class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/20"
+                                    class="flex size-7 items-center justify-center rounded-lg bg-blue-500/20"
                                 >
                                     <SmartphoneIcon
                                         class="size-4 text-blue-400"
@@ -252,16 +254,16 @@
                                             <button
                                                 type="button"
                                                 onclick={copyGcashName}
-                                                class="flex h-6 w-6 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+                                                class="flex size-6 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                                                 aria-label="Copy account name"
                                             >
                                                 {#if gcashNameCopied}
                                                     <CheckIcon
-                                                        class="h-3.5 w-3.5 text-green-400"
+                                                        class="size-3.5  text-green-400"
                                                     />
                                                 {:else}
                                                     <CopyIcon
-                                                        class="h-3.5 w-3.5"
+                                                        class="size-3.5 "
                                                     />
                                                 {/if}
                                             </button>
@@ -283,16 +285,16 @@
                                             <button
                                                 type="button"
                                                 onclick={copyGcashNumber}
-                                                class="flex h-6 w-6 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+                                                class="flex size-6 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                                                 aria-label="Copy GCash number"
                                             >
                                                 {#if gcashNumberCopied}
                                                     <CheckIcon
-                                                        class="h-3.5 w-3.5 text-green-400"
+                                                        class="size-3.5  text-green-400"
                                                     />
                                                 {:else}
                                                     <CopyIcon
-                                                        class="h-3.5 w-3.5"
+                                                        class="size-3.5 "
                                                     />
                                                 {/if}
                                             </button>
@@ -305,7 +307,7 @@
 
                     {#if paymentInstructions}
                         <p
-                            class="rounded-lg border border-zinc-700 bg-zinc-800/50 px-3.5 py-2.5 text-xs leading-relaxed text-zinc-400"
+                            class="rounded-lg border border-zinc-700 bg-zinc-800/50 px-3.5 py-2.5 text-xs/relaxed text-zinc-400"
                         >
                             {paymentInstructions}
                         </p>
@@ -384,7 +386,7 @@
             <!-- Cash on pickup panel -->
             {#if selectedMethod === 'cash_on_pickup'}
                 <div
-                    class="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-4"
+                    class="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4"
                 >
                     <div class="flex items-start gap-3">
                         <BanknoteIcon
@@ -394,9 +396,7 @@
                             <p class="text-sm font-semibold text-amber-300">
                                 Pay Cash When You Pick Up
                             </p>
-                            <p
-                                class="text-xs leading-relaxed text-amber-300/70"
-                            >
+                            <p class="text-xs/relaxed text-amber-300/70">
                                 You'll pay <span
                                     class="font-semibold text-amber-200"
                                     >{FORMATTED_BALANCE}</span

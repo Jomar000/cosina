@@ -59,7 +59,11 @@ export const productRoute = new Hono<THonoInstance>()
         async (ctx) => {
             const { productId } = ctx.req.valid('query')
 
-            const { product: productTable, productSize } = ctx.get('dbSchema')
+            const {
+                product: productTable,
+                productSize,
+                productFlavor,
+            } = ctx.get('dbSchema')
 
             try {
                 const [row] = await ctx
@@ -86,22 +90,37 @@ export const productRoute = new Hono<THonoInstance>()
                     })
                 }
 
-                const sizes = await ctx
-                    .get('dbClient')
-                    .select({
-                        id: productSize.id,
-                        name: productSize.name,
-                        price: productSize.price,
-                    })
-                    .from(productSize)
-                    .where(eq(productSize.productId, productId))
-                    .orderBy(asc(productSize.id))
+                const [
+                    sizes,
+                    flavors,
+                ] = await Promise.all([
+                    ctx
+                        .get('dbClient')
+                        .select({
+                            id: productSize.id,
+                            name: productSize.name,
+                            price: productSize.price,
+                        })
+                        .from(productSize)
+                        .where(eq(productSize.productId, productId))
+                        .orderBy(asc(productSize.id)),
+                    ctx
+                        .get('dbClient')
+                        .select({
+                            id: productFlavor.id,
+                            name: productFlavor.name,
+                        })
+                        .from(productFlavor)
+                        .where(eq(productFlavor.productId, productId))
+                        .orderBy(asc(productFlavor.id)),
+                ])
 
                 return apiResponseOkWrapper(ctx, {
                     data: {
                         ...row,
                         imageUrl: imageUrl(ctx, row.imageObjectStorageId),
                         sizes,
+                        flavors,
                     },
                 })
             } catch (err) {
@@ -124,7 +143,11 @@ export const productRoute = new Hono<THonoInstance>()
         async (ctx) => {
             const { limit, offset, sortOrder } = ctx.req.valid('query')
 
-            const { product: productTable, productSize } = ctx.get('dbSchema')
+            const {
+                product: productTable,
+                productSize,
+                productFlavor,
+            } = ctx.get('dbSchema')
 
             try {
                 const count = (
@@ -172,9 +195,12 @@ export const productRoute = new Hono<THonoInstance>()
 
                 const productIds = rows.map((r) => r.id)
 
-                const allSizes =
+                const [
+                    allSizes,
+                    allFlavors,
+                ] = await Promise.all([
                     productIds.length > 0
-                        ? await ctx
+                        ? ctx
                               .get('dbClient')
                               .select({
                                   id: productSize.id,
@@ -185,12 +211,28 @@ export const productRoute = new Hono<THonoInstance>()
                               .from(productSize)
                               .where(inArray(productSize.productId, productIds))
                               .orderBy(asc(productSize.id))
-                        : []
+                        : Promise.resolve([]),
+                    productIds.length > 0
+                        ? ctx
+                              .get('dbClient')
+                              .select({
+                                  id: productFlavor.id,
+                                  productId: productFlavor.productId,
+                                  name: productFlavor.name,
+                              })
+                              .from(productFlavor)
+                              .where(
+                                  inArray(productFlavor.productId, productIds),
+                              )
+                              .orderBy(asc(productFlavor.id))
+                        : Promise.resolve([]),
+                ])
 
                 const data = rows.map((row) => ({
                     ...row,
                     imageUrl: imageUrl(ctx, row.imageObjectStorageId),
                     sizes: allSizes.filter((s) => s.productId === row.id),
+                    flavors: allFlavors.filter((f) => f.productId === row.id),
                 }))
 
                 return apiResponsePaginatedOkWrapper(ctx, {
@@ -224,6 +266,7 @@ export const productRoute = new Hono<THonoInstance>()
                 price,
                 imageObjectStorageId,
                 isAvailable,
+                flavors,
                 sizes,
                 tags,
             } = ctx.req.valid('json')
@@ -231,6 +274,7 @@ export const productRoute = new Hono<THonoInstance>()
             const {
                 member: memberTable,
                 product: productTable,
+                productFlavor,
                 productSize,
             } = ctx.get('dbSchema')
 
@@ -290,9 +334,12 @@ export const productRoute = new Hono<THonoInstance>()
                                 tags: productTable.tags,
                             })
 
-                        const insertedSizes =
+                        const [
+                            insertedSizes,
+                            insertedFlavors,
+                        ] = await Promise.all([
                             sizes && sizes.length > 0
-                                ? await tx
+                                ? tx
                                       .insert(productSize)
                                       .values(
                                           sizes.map((s) => ({
@@ -306,7 +353,22 @@ export const productRoute = new Hono<THonoInstance>()
                                           name: productSize.name,
                                           price: productSize.price,
                                       })
-                                : []
+                                : Promise.resolve([]),
+                            flavors && flavors.length > 0
+                                ? tx
+                                      .insert(productFlavor)
+                                      .values(
+                                          flavors.map((f) => ({
+                                              productId: created.id,
+                                              name: f.name,
+                                          })),
+                                      )
+                                      .returning({
+                                          id: productFlavor.id,
+                                          name: productFlavor.name,
+                                      })
+                                : Promise.resolve([]),
+                        ])
 
                         await auditTrailLogger(
                             ctx,
@@ -329,6 +391,7 @@ export const productRoute = new Hono<THonoInstance>()
                                 created.imageObjectStorageId,
                             ),
                             sizes: insertedSizes,
+                            flavors: insertedFlavors,
                         }
                     })
 
@@ -361,11 +424,16 @@ export const productRoute = new Hono<THonoInstance>()
                 price,
                 imageObjectStorageId,
                 isAvailable,
+                flavors,
                 sizes,
                 tags,
             } = ctx.req.valid('json')
 
-            const { product: productTable, productSize } = ctx.get('dbSchema')
+            const {
+                product: productTable,
+                productFlavor,
+                productSize,
+            } = ctx.get('dbSchema')
 
             const existing = (
                 await ctx
@@ -435,12 +503,12 @@ export const productRoute = new Hono<THonoInstance>()
                             name: string
                             price: string
                         }[] = []
+                        let updatedFlavors: { id: number; name: string }[] = []
 
                         if (sizes !== undefined) {
                             await tx
                                 .delete(productSize)
                                 .where(eq(productSize.productId, productId))
-
                             if (sizes.length > 0) {
                                 updatedSizes = await tx
                                     .insert(productSize)
@@ -469,6 +537,35 @@ export const productRoute = new Hono<THonoInstance>()
                                 .orderBy(asc(productSize.id))
                         }
 
+                        if (flavors !== undefined) {
+                            await tx
+                                .delete(productFlavor)
+                                .where(eq(productFlavor.productId, productId))
+                            if (flavors.length > 0) {
+                                updatedFlavors = await tx
+                                    .insert(productFlavor)
+                                    .values(
+                                        flavors.map((f) => ({
+                                            productId,
+                                            name: f.name,
+                                        })),
+                                    )
+                                    .returning({
+                                        id: productFlavor.id,
+                                        name: productFlavor.name,
+                                    })
+                            }
+                        } else {
+                            updatedFlavors = await tx
+                                .select({
+                                    id: productFlavor.id,
+                                    name: productFlavor.name,
+                                })
+                                .from(productFlavor)
+                                .where(eq(productFlavor.productId, productId))
+                                .orderBy(asc(productFlavor.id))
+                        }
+
                         await auditTrailLogger(
                             ctx,
                             {
@@ -491,6 +588,7 @@ export const productRoute = new Hono<THonoInstance>()
                                 updated.imageObjectStorageId,
                             ),
                             sizes: updatedSizes,
+                            flavors: updatedFlavors,
                         }
                     })
 
@@ -633,18 +731,23 @@ export const productRoute = new Hono<THonoInstance>()
 
         let objectId: string
 
-        if (existing?.isUploaded) {
-            // Identical file already in KV — reuse it, nothing to upload
-            objectId = existing.id
-        } else {
-            try {
+        try {
+            if (existing?.isUploaded) {
+                objectId = existing.id
+                // Verify KV still holds the blob (state may have been reset in dev)
+                const kvExists = await ctx
+                    .get('kvClient')
+                    .get(`img:${objectId}`)
+                if (kvExists === null) {
+                    await ctx.get('kvClient').put(`img:${objectId}`, buffer, {
+                        metadata: { mimeType },
+                    })
+                }
+            } else {
                 if (existing) {
-                    // Record exists but upload failed previously — retry with same ID
                     objectId = existing.id
                 } else {
-                    // Brand-new object — insert the tracking record first
                     objectId = nanoidCustom(32)
-
                     await ctx
                         .get('dbClient')
                         .insert(objectStorageTable)
@@ -658,7 +761,6 @@ export const productRoute = new Hono<THonoInstance>()
                         })
                 }
 
-                // Store image bytes in KV keyed by object ID
                 await ctx
                     .get('kvClient')
                     .put(`img:${objectId}`, buffer, { metadata: { mimeType } })
@@ -668,18 +770,18 @@ export const productRoute = new Hono<THonoInstance>()
                     .update(objectStorageTable)
                     .set({ isUploaded: true })
                     .where(eq(objectStorageTable.id, objectId))
-            } catch (err) {
-                if (err instanceof AppError) throw err
-
-                throw new AppError(
-                    {
-                        status: 500,
-                        code: 'IMAGE_UPLOAD_FAILED',
-                        message: 'Image upload failed.',
-                    },
-                    err instanceof Error ? err : undefined,
-                )
             }
+        } catch (err) {
+            if (err instanceof AppError) throw err
+
+            throw new AppError(
+                {
+                    status: 500,
+                    code: 'IMAGE_UPLOAD_FAILED',
+                    message: 'Image upload failed.',
+                },
+                err instanceof Error ? err : undefined,
+            )
         }
 
         await auditTrailLogger(ctx, {

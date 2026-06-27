@@ -38,9 +38,7 @@
                                 >CN</Avatar.Fallback
                             >
                         </Avatar.Root>
-                        <div
-                            class="grid flex-1 text-left text-sm leading-tight"
-                        >
+                        <div class="grid flex-1 text-left text-sm/tight">
                             <span class="truncate font-medium">{user.name}</span
                             >
                             <span class="truncate text-xs">{user.email}</span>
@@ -65,9 +63,7 @@
                                 >CN</Avatar.Fallback
                             >
                         </Avatar.Root>
-                        <div
-                            class="grid flex-1 text-left text-sm leading-tight"
-                        >
+                        <div class="grid flex-1 text-left text-sm/tight">
                             <span class="truncate font-medium">{user.name}</span
                             >
                             <span class="truncate text-xs">{user.email}</span>

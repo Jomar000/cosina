@@ -2,7 +2,7 @@
     import * as Dialog from '@hyperion/ui/components/dialog'
 
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
-    import { IMG_default } from '$lib/assets/image'
+    import { IMG_logo } from '$lib/assets/image'
 
     ////////////////////
     // 01. Properties //
@@ -31,7 +31,7 @@
                 class="relative mx-auto h-auto w-full space-y-2 overflow-auto rounded-md md:space-y-4"
             >
                 <img
-                    src={IMG_default}
+                    src={IMG_logo}
                     class="mx-auto mb-2 h-20"
                     alt=""
                 />

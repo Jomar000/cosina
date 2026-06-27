@@ -4,6 +4,7 @@
     import * as Tabs from '@hyperion/ui/components/tabs'
     import BanknoteIcon from '@lucide/svelte/icons/banknote'
     import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2'
+    import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
     import XCircleIcon from '@lucide/svelte/icons/x-circle'
     import { createQuery, useQueryClient } from '@tanstack/svelte-query'
 
@@ -154,43 +155,50 @@
     }
 </script>
 
-<main class="flex flex-1 flex-col gap-6 p-4 pt-0 md:p-6 md:pt-0">
+<main class="flex flex-1 flex-col gap-6 p-4 pt-2 md:p-6">
     <!-- Page header -->
-    <div>
-        <h1 class="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p class="text-muted-foreground text-sm">
-            Sales and order overview for your store.
-        </p>
+    <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div
+                class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 ring-1 ring-blue-500/20"
+            >
+                <LayoutDashboardIcon class="size-5 text-blue-400" />
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">Dashboard</h1>
+                <p class="text-muted-foreground text-sm">
+                    Sales and order overview for your store.
+                </p>
+            </div>
+        </div>
+        <Tabs.Root bind:value={selectedPeriod}>
+            <Tabs.List class="h-8">
+                {#each Object.entries(PERIOD_LABELS) as [value, label] (value)}
+                    <Tabs.Trigger
+                        {value}
+                        class="text-xs px-3 h-full">{label}</Tabs.Trigger
+                    >
+                {/each}
+            </Tabs.List>
+        </Tabs.Root>
     </div>
-
-    <!-- Period selector -->
-    <Tabs.Root bind:value={selectedPeriod}>
-        <Tabs.List class="w-fit">
-            {#each Object.entries(PERIOD_LABELS) as [value, label] (value)}
-                <Tabs.Trigger
-                    {value}
-                    class="text-xs">{label}</Tabs.Trigger
-                >
-            {/each}
-        </Tabs.List>
-    </Tabs.Root>
 
     <!-- Stat cards -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <!-- Total Revenue -->
-        <Card.Root class="relative overflow-hidden">
+        <div
+            class="relative overflow-hidden rounded-xl border border-blue-500/20 bg-blue-500/5 p-5"
+        >
             <div
-                class="from-primary/5 absolute inset-0 bg-linear-to-br via-transparent to-transparent"
+                class="absolute inset-0 bg-linear-to-br from-blue-500/8 via-transparent to-transparent pointer-events-none"
             ></div>
-            <Card.Header
-                class="relative flex flex-row items-start justify-between pb-2"
-            >
-                <Card.Description>Total Revenue</Card.Description>
-                <div class="bg-primary/10 shrink-0 rounded-lg p-2">
-                    <BanknoteIcon class="text-primary size-4" />
+            <div class="relative flex items-start justify-between">
+                <p class="text-xs font-medium text-zinc-400">Total Revenue</p>
+                <div class="shrink-0 rounded-lg bg-blue-500/15 p-2">
+                    <BanknoteIcon class="size-4 text-blue-400" />
                 </div>
-            </Card.Header>
-            <Card.Content class="relative">
+            </div>
+            <div class="relative mt-3">
                 {#if statsQuery.isPending}
                     <Skeleton class="mb-2 h-8 w-36" />
                     <Skeleton class="h-3 w-24" />
@@ -199,30 +207,34 @@
                         Failed to load
                     </p>
                 {:else}
-                    <p class="text-3xl font-bold tabular-nums tracking-tight">
+                    <p
+                        class="text-3xl font-bold tabular-nums tracking-tight text-zinc-100"
+                    >
                         {formatAmount(statsQuery.data.totalEarnings)}
                     </p>
-                    <p class="text-muted-foreground mt-1 text-xs">
+                    <p class="mt-1 text-xs text-zinc-500">
                         {PERIOD_LABELS[selectedPeriod]}
                     </p>
                 {/if}
-            </Card.Content>
-        </Card.Root>
+            </div>
+        </div>
 
         <!-- Completed -->
-        <Card.Root class="relative overflow-hidden">
+        <div
+            class="relative overflow-hidden rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5"
+        >
             <div
-                class="absolute inset-0 bg-linear-to-br from-emerald-500/5 via-transparent to-transparent"
+                class="absolute inset-0 bg-linear-to-br from-emerald-500/8 via-transparent to-transparent pointer-events-none"
             ></div>
-            <Card.Header
-                class="relative flex flex-row items-start justify-between pb-2"
-            >
-                <Card.Description>Completed Orders</Card.Description>
-                <div class="shrink-0 rounded-lg bg-emerald-500/10 p-2">
-                    <CheckCircle2Icon class="size-4 text-emerald-500" />
+            <div class="relative flex items-start justify-between">
+                <p class="text-xs font-medium text-zinc-400">
+                    Completed Orders
+                </p>
+                <div class="shrink-0 rounded-lg bg-emerald-500/15 p-2">
+                    <CheckCircle2Icon class="size-4 text-emerald-400" />
                 </div>
-            </Card.Header>
-            <Card.Content class="relative">
+            </div>
+            <div class="relative mt-3">
                 {#if statsQuery.isPending}
                     <Skeleton class="mb-2 h-8 w-16" />
                     <Skeleton class="h-3 w-24" />
@@ -231,30 +243,34 @@
                         Failed to load
                     </p>
                 {:else}
-                    <p class="text-3xl font-bold tabular-nums tracking-tight">
+                    <p
+                        class="text-3xl font-bold tabular-nums tracking-tight text-zinc-100"
+                    >
                         {statsQuery.data.completedCount}
                     </p>
-                    <p class="text-muted-foreground mt-1 text-xs">
+                    <p class="mt-1 text-xs text-zinc-500">
                         {PERIOD_LABELS[selectedPeriod]}
                     </p>
                 {/if}
-            </Card.Content>
-        </Card.Root>
+            </div>
+        </div>
 
         <!-- Cancelled -->
-        <Card.Root class="relative overflow-hidden">
+        <div
+            class="relative overflow-hidden rounded-xl border border-rose-500/20 bg-rose-500/5 p-5"
+        >
             <div
-                class="absolute inset-0 bg-linear-to-br from-rose-500/5 via-transparent to-transparent"
+                class="absolute inset-0 bg-linear-to-br from-rose-500/8 via-transparent to-transparent pointer-events-none"
             ></div>
-            <Card.Header
-                class="relative flex flex-row items-start justify-between pb-2"
-            >
-                <Card.Description>Cancelled Orders</Card.Description>
-                <div class="shrink-0 rounded-lg bg-rose-500/10 p-2">
-                    <XCircleIcon class="size-4 text-rose-500" />
+            <div class="relative flex items-start justify-between">
+                <p class="text-xs font-medium text-zinc-400">
+                    Cancelled Orders
+                </p>
+                <div class="shrink-0 rounded-lg bg-rose-500/15 p-2">
+                    <XCircleIcon class="size-4 text-rose-400" />
                 </div>
-            </Card.Header>
-            <Card.Content class="relative">
+            </div>
+            <div class="relative mt-3">
                 {#if statsQuery.isPending}
                     <Skeleton class="mb-2 h-8 w-16" />
                     <Skeleton class="h-3 w-24" />
@@ -263,26 +279,27 @@
                         Failed to load
                     </p>
                 {:else}
-                    <p class="text-3xl font-bold tabular-nums tracking-tight">
+                    <p
+                        class="text-3xl font-bold tabular-nums tracking-tight text-zinc-100"
+                    >
                         {statsQuery.data.cancelledCount}
                     </p>
-                    <p class="text-muted-foreground mt-1 text-xs">
+                    <p class="mt-1 text-xs text-zinc-500">
                         {PERIOD_LABELS[selectedPeriod]}
                     </p>
                 {/if}
-            </Card.Content>
-        </Card.Root>
+            </div>
+        </div>
     </div>
 
-    <!-- Charts row: donut first in DOM (visible on mobile without scrolling),
-         revenue first visually on desktop via lg:order-* -->
-    <div class="grid grid-cols-1 gap-4 lg:grid-cols-[320px_1fr]">
-        <!-- Order status donut — left on desktop, top on mobile -->
-        <Card.Root>
-            <Card.Header class="border-b pb-4">
-                <Card.Title class="text-sm font-medium">Order Status</Card.Title
+    <!-- Charts row -->
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-[300px_1fr]">
+        <Card.Root class="border-zinc-800 bg-zinc-900/50">
+            <Card.Header class="border-b border-zinc-800 pb-4">
+                <Card.Title class="text-sm font-medium text-zinc-200"
+                    >Order Status</Card.Title
                 >
-                <Card.Description class="text-xs">
+                <Card.Description class="text-xs text-zinc-500">
                     Completed vs. cancelled — {PERIOD_LABELS[selectedPeriod]}
                 </Card.Description>
             </Card.Header>
@@ -296,13 +313,12 @@
             </Card.Content>
         </Card.Root>
 
-        <!-- Revenue bar chart — right on desktop, bottom on mobile -->
-        <Card.Root>
-            <Card.Header class="border-b pb-4">
-                <Card.Title class="text-sm font-medium">
+        <Card.Root class="border-zinc-800 bg-zinc-900/50">
+            <Card.Header class="border-b border-zinc-800 pb-4">
+                <Card.Title class="text-sm font-medium text-zinc-200">
                     Revenue — {PERIOD_LABELS[selectedPeriod]}
                 </Card.Title>
-                <Card.Description class="text-xs">
+                <Card.Description class="text-xs text-zinc-500">
                     Completed order totals by {selectedPeriod === 'day'
                         ? 'hour'
                         : 'day'}

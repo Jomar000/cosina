@@ -8,7 +8,7 @@
     import { toast } from 'svelte-sonner'
 
     import { PUBLIC_API_URL } from '$env/static/public'
-    import { getCookie } from '$lib/utilities/helpers'
+    import { getCookie, getCsrfCookieName } from '$lib/utilities/helpers'
 
     ////////////////////
     // 01. Properties //
@@ -81,7 +81,7 @@
             const formData = new FormData()
             formData.append('file', file)
 
-            const csrfToken = getCookie('csrf_token')
+            const csrfToken = getCookie(getCsrfCookieName(import.meta.env.MODE))
 
             const response = await fetch(
                 `${PUBLIC_API_URL}/api/order/proof/upload`,
@@ -159,7 +159,7 @@
                         type="button"
                         variant="ghost"
                         size="icon"
-                        class="h-7 w-7 hover:bg-white/20"
+                        class="size-7  hover:bg-white/20"
                         onclick={removeImage}
                     >
                         <Trash2Icon class="size-3.5 text-zinc-200" />

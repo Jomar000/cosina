@@ -31,6 +31,10 @@ export const tagEnum = z.enum(
     },
 )
 
+export const flavorItemSchema = z.object({
+    name: field.vText({ fieldName: 'Flavor Name', max: 64 }),
+})
+
 export const sizeItemSchema = z.object({
     name: field.vText({ fieldName: 'Size Name', max: 64 }),
     price: field.vNumeric({ fieldName: 'Size Price', min: 0 }),
@@ -51,6 +55,7 @@ export const createInputSchema = z.object({
     price: field.vNumeric({ fieldName: 'Price', min: 0 }),
     imageObjectStorageId: z.string().min(1).max(64).nullable().optional(),
     isAvailable: field.vBoolean('Status'),
+    flavors: z.array(flavorItemSchema).optional().default([]),
     sizes: z.array(sizeItemSchema).optional().default([]),
     tags: z.array(tagEnum).optional().default([]),
 })
@@ -65,6 +70,7 @@ export const updateInputSchema = z.object({
     price: field.vNumeric({ fieldName: 'Price', min: 0 }).optional(),
     imageObjectStorageId: z.string().min(1).max(64).nullable().optional(),
     isAvailable: field.vBoolean('Status').optional(),
+    flavors: z.array(flavorItemSchema).optional(),
     sizes: z.array(sizeItemSchema).optional(),
     tags: z.array(tagEnum).optional(),
 })

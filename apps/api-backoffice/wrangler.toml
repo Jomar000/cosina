@@ -61,9 +61,14 @@ SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 URL_FRONTEND = "http://localhost:5173"
 URL_BACKEND = "http://localhost:8080"
+URL_PUB_BACKEND = "http://localhost:8081"
 
 [[kv_namespaces]]
 binding = "HYPERIONBOFC_KV"
+id = "00000000000000000000000000000000"
+
+[[kv_namespaces]]
+binding = "HYPERIONPUB_KV"
 id = "00000000000000000000000000000000"
 
 [[hyperdrive]]
@@ -75,12 +80,10 @@ localConnectionString = "postgres://postgres:password123@localhost:5432/cosina"
 name = "HYPERIONBOFC_DO_WSS"
 class_name = "WebSocketServer"
 
-# No script_name in dev — resolves to a local DO instance so api-public does
-# not need to be running. Staging/production bindings below add script_name to
-# point at the shared api-public DO.
 [[durable_objects.bindings]]
 name = "HYPERIONPUB_DO_WSS"
 class_name = "WebSocketServer"
+script_name = "hyperion-api-public"
 
 ########
 # TEST #
@@ -113,9 +116,14 @@ SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 URL_FRONTEND = "http://localhost:5173"
 URL_BACKEND = "http://localhost:8080"
+URL_PUB_BACKEND = "http://localhost:8081"
 
 [[env.test.kv_namespaces]]
 binding = "HYPERIONBOFC_KV"
+id = "00000000000000000000000000000001"
+
+[[env.test.kv_namespaces]]
+binding = "HYPERIONPUB_KV"
 id = "00000000000000000000000000000001"
 
 [[env.test.hyperdrive]]
@@ -163,9 +171,14 @@ SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 URL_FRONTEND = "http://localhost:5173"
 URL_BACKEND = "http://localhost:8080"
+URL_PUB_BACKEND = "http://localhost:8081"
 
 [[env.staging.kv_namespaces]]
 binding = "HYPERIONBOFC_KV"
+id = "00000000000000000000000000000002"
+
+[[env.staging.kv_namespaces]]
+binding = "HYPERIONPUB_KV"
 id = "00000000000000000000000000000002"
 
 [[env.staging.hyperdrive]]
@@ -212,9 +225,14 @@ SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 URL_FRONTEND = "http://localhost:5173"
 URL_BACKEND = "http://localhost:8080"
+URL_PUB_BACKEND = "http://localhost:8081"
 
 [[env.production.kv_namespaces]]
 binding = "HYPERIONBOFC_KV"
+id = "00000000000000000000000000000003"
+
+[[env.production.kv_namespaces]]
+binding = "HYPERIONPUB_KV"
 id = "00000000000000000000000000000003"
 
 [[env.production.hyperdrive]]

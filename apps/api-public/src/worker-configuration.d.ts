@@ -35,6 +35,7 @@ interface __BaseEnv_Env {
     SESSION_UPDATE_AGE: 86400
     URL_FRONTEND: 'http://localhost:5174'
     URL_BACKEND: 'http://localhost:8081'
+    URL_BOFC_BACKEND: string
     BETTER_AUTH_SECRET: string
     CF_ACCOUNT_ID: string
     CF_R2_ACCESS_KEY_ID: string
@@ -45,6 +46,9 @@ interface __BaseEnv_Env {
     RESEND_API_KEY: string
     DEFAULT_ORGANIZATION_ID: string
     HYPERIONPUB_DO_WSS: DurableObjectNamespace<
+        import('./core/index').WebSocketServer
+    >
+    HYPERIONBOFC_DO_WSS: DurableObjectNamespace<
         import('./core/index').WebSocketServer
     >
 }
@@ -77,6 +81,7 @@ declare namespace Cloudflare {
         SESSION_UPDATE_AGE: 86400
         URL_FRONTEND: 'http://localhost:5174'
         URL_BACKEND: 'http://localhost:8081'
+        URL_BOFC_BACKEND: string
         BETTER_AUTH_SECRET: string
         CF_ACCOUNT_ID: string
         CF_R2_ACCESS_KEY_ID: string
@@ -86,6 +91,9 @@ declare namespace Cloudflare {
         GOOGLE_CLIENT_SECRET: string
         RESEND_API_KEY: string
         HYPERIONPUB_DO_WSS: DurableObjectNamespace<
+            import('./core/index').WebSocketServer
+        >
+        HYPERIONBOFC_DO_WSS: DurableObjectNamespace<
             import('./core/index').WebSocketServer
         >
     }
@@ -113,6 +121,7 @@ declare namespace Cloudflare {
         SESSION_UPDATE_AGE: 86400
         URL_FRONTEND: 'http://localhost:5174'
         URL_BACKEND: 'http://localhost:8081'
+        URL_BOFC_BACKEND: string
         BETTER_AUTH_SECRET: string
         CF_ACCOUNT_ID: string
         CF_R2_ACCESS_KEY_ID: string
@@ -122,6 +131,9 @@ declare namespace Cloudflare {
         GOOGLE_CLIENT_SECRET: string
         RESEND_API_KEY: string
         HYPERIONPUB_DO_WSS: DurableObjectNamespace<
+            import('./core/index').WebSocketServer
+        >
+        HYPERIONBOFC_DO_WSS: DurableObjectNamespace<
             import('./core/index').WebSocketServer
         >
     }
@@ -149,6 +161,7 @@ declare namespace Cloudflare {
         SESSION_UPDATE_AGE: 86400
         URL_FRONTEND: 'http://localhost:5174'
         URL_BACKEND: 'http://localhost:8081'
+        URL_BOFC_BACKEND: string
         BETTER_AUTH_SECRET: string
         CF_ACCOUNT_ID: string
         CF_R2_ACCESS_KEY_ID: string
@@ -158,6 +171,9 @@ declare namespace Cloudflare {
         GOOGLE_CLIENT_SECRET: string
         RESEND_API_KEY: string
         HYPERIONPUB_DO_WSS: DurableObjectNamespace<
+            import('./core/index').WebSocketServer
+        >
+        HYPERIONBOFC_DO_WSS: DurableObjectNamespace<
             import('./core/index').WebSocketServer
         >
     }

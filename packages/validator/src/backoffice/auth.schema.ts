@@ -45,9 +45,12 @@ export const passwordResetRequestInputSchema = z.object({
 export const passwordResetRequestOutputSchema = base.outputSchema(z.null())
 
 export const signInInputSchema = z.object({
-    organizationId: field.vText({
-        fieldName: 'Organization ID',
-    }),
+    organizationId: field
+        .vText({
+            fieldName: 'Organization ID',
+        })
+        .optional()
+        .default(''),
     accountId: field.vText({
         fieldName: 'Account ID',
     }),

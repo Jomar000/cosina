@@ -9,6 +9,7 @@
 
     import { heartbeatClient } from '$lib/clients'
     import LoadingScreen from '$lib/components/loader/LoadingScreen.svelte'
+    import { IMG_logo } from '$lib/assets/image/index'
     import { SessionProvider } from '$lib/states/session'
 
     ////////////////////
@@ -51,7 +52,7 @@
 
 <ModeWatcher defaultMode="dark" />
 
-<div class="h-full w-full bg-muted">
+<div class="size-full bg-muted">
     {#if heartbeatQuery.isFetching}
         <LoadingScreen />
     {:else if heartbeatQuery.isSuccess}
@@ -66,6 +67,27 @@
             </SessionProvider>
         </QueryClientProvider>
     {:else}
-        UNAVAILABLE
+        <!-- Backend unreachable -->
+        <div
+            class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-zinc-950"
+        >
+            <img
+                src={IMG_logo}
+                alt="Cosina Admin"
+                class="size-16 rounded-xl opacity-60"
+            />
+            <div class="text-center">
+                <p class="font-semibold text-zinc-200">Service Unavailable</p>
+                <p class="mt-1 text-sm text-zinc-500">
+                    Unable to reach the server. Please check your connection.
+                </p>
+            </div>
+            <button
+                onclick={() => location.reload()}
+                class="rounded-lg bg-zinc-800 px-5 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
+            >
+                Retry
+            </button>
+        </div>
     {/if}
 </div>

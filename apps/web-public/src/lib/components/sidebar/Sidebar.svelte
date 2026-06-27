@@ -32,7 +32,7 @@
         onNavigate?: () => void
     } = $props()
 
-    const resolvedCollapsible = mobile ? 'none' : collapsible
+    const resolvedCollapsible = $derived(mobile ? 'none' : collapsible)
 
     ///////////////////
     // 02. Constants //

@@ -35,6 +35,7 @@ interface __BaseEnv_Env {
     SESSION_UPDATE_AGE: 86400
     URL_FRONTEND: 'http://localhost:5173'
     URL_BACKEND: 'http://localhost:8080'
+    URL_PUB_BACKEND: string
     BETTER_AUTH_SECRET: string
     CF_ACCOUNT_ID: string
     CF_R2_ACCESS_KEY_ID: string
@@ -79,6 +80,7 @@ declare namespace Cloudflare {
         SESSION_UPDATE_AGE: 86400
         URL_FRONTEND: 'http://localhost:5173'
         URL_BACKEND: 'http://localhost:8080'
+        URL_PUB_BACKEND: string
         BETTER_AUTH_SECRET: string
         CF_ACCOUNT_ID: string
         CF_R2_ACCESS_KEY_ID: string
@@ -115,6 +117,7 @@ declare namespace Cloudflare {
         SESSION_UPDATE_AGE: 86400
         URL_FRONTEND: 'http://localhost:5173'
         URL_BACKEND: 'http://localhost:8080'
+        URL_PUB_BACKEND: string
         BETTER_AUTH_SECRET: string
         CF_ACCOUNT_ID: string
         CF_R2_ACCESS_KEY_ID: string
@@ -151,6 +154,7 @@ declare namespace Cloudflare {
         SESSION_UPDATE_AGE: 86400
         URL_FRONTEND: 'http://localhost:5173'
         URL_BACKEND: 'http://localhost:8080'
+        URL_PUB_BACKEND: string
         BETTER_AUTH_SECRET: string
         CF_ACCOUNT_ID: string
         CF_R2_ACCESS_KEY_ID: string

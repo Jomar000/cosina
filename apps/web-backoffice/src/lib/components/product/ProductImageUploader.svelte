@@ -8,7 +8,7 @@
     import { toast } from 'svelte-sonner'
 
     import { PUBLIC_API_URL } from '$env/static/public'
-    import { getCookie } from '$lib/utilities/helpers'
+    import { getCookie, getCsrfCookieName } from '$lib/utilities/helpers'
 
     ////////////////////
     // 01. Properties //
@@ -33,7 +33,8 @@
     type UploadStatus = 'idle' | 'uploading' | 'done' | 'failed'
 
     let status = $state<UploadStatus>('idle')
-    let previewUrl = $state<string | null>(initialImageUrl ?? null)
+    // undefined = no user selection yet (falls through to initialImageUrl); null = user explicitly removed
+    let localPreviewUrl = $state<string | null | undefined>(undefined)
     let fileInputEl = $state<HTMLInputElement | null>(null)
     let errorMessage = $state<string | null>(null)
 
@@ -42,6 +43,11 @@
     /////////////////
 
     const busy = $derived(status === 'uploading')
+    const previewUrl = $derived<string | null>(
+        localPreviewUrl !== undefined
+            ? localPreviewUrl
+            : (initialImageUrl ?? null),
+    )
 
     /////////////////
     // 08. Effects //
@@ -80,14 +86,14 @@
         if (previewUrl && previewUrl !== initialImageUrl) {
             URL.revokeObjectURL(previewUrl)
         }
-        previewUrl = URL.createObjectURL(file)
+        localPreviewUrl = URL.createObjectURL(file)
         status = 'uploading'
 
         try {
             const formData = new FormData()
             formData.append('file', file)
 
-            const csrfToken = getCookie('csrf_token')
+            const csrfToken = getCookie(getCsrfCookieName(import.meta.env.MODE))
 
             const response = await fetch(
                 `${PUBLIC_API_URL}/api/admin/product/image/upload`,
@@ -116,7 +122,7 @@
             if (previewUrl && previewUrl !== initialImageUrl) {
                 URL.revokeObjectURL(previewUrl)
             }
-            previewUrl = initialImageUrl ?? null
+            localPreviewUrl = undefined
             objectStorageId = null
         } finally {
             if (fileInputEl) fileInputEl.value = ''
@@ -127,7 +133,7 @@
         if (previewUrl && previewUrl !== initialImageUrl) {
             URL.revokeObjectURL(previewUrl)
         }
-        previewUrl = null
+        localPreviewUrl = null
         objectStorageId = null
         status = 'idle'
         errorMessage = null
@@ -136,83 +142,112 @@
 </script>
 
 <div class="flex flex-col gap-1.5">
+    <!-- 4:3 matches the product card display ratio -->
     <div
-        class="bg-muted relative aspect-square w-full overflow-hidden rounded-lg border"
+        class="relative aspect-4/3 w-full overflow-hidden rounded-lg border border-zinc-700 bg-zinc-900"
     >
         {#if previewUrl}
+            <!-- object-contain so the entire image is always visible -->
             <img
                 src={previewUrl}
-                alt="Product image"
-                class="size-full object-cover"
+                alt="Product preview"
+                class="size-full object-contain"
             />
 
-            <div
-                class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/50 px-2 py-1"
-            >
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    class="h-7 gap-1 px-2 text-xs text-white hover:bg-white/20 hover:text-white"
-                    disabled={busy}
-                    onclick={() => fileInputEl?.click()}
+            <!-- overlay controls — only visible when not uploading -->
+            {#if !busy}
+                <div
+                    class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-linear-to-t from-black/70 to-transparent px-2 pb-2 pt-6"
                 >
-                    <RotateCcwIcon class="size-3" />
-                    Change
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    class="h-7 w-7 hover:bg-white/20"
-                    disabled={busy}
-                    onclick={removeImage}
-                >
-                    <Trash2Icon class="size-3.5 text-white" />
-                </Button>
-            </div>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        class="h-7 gap-1 px-2 text-xs text-white hover:bg-white/20 hover:text-white"
+                        onclick={() => fileInputEl?.click()}
+                    >
+                        <RotateCcwIcon class="size-3" />
+                        Change
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        class="size-7 hover:bg-white/20"
+                        onclick={removeImage}
+                    >
+                        <Trash2Icon class="size-3.5 text-white" />
+                    </Button>
+                </div>
+            {/if}
 
             {#if busy}
                 <div
-                    class="absolute inset-0 flex items-center justify-center bg-black/40"
+                    class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50"
                 >
                     <LoaderCircleIcon class="size-6 animate-spin text-white" />
+                    <span class="text-xs font-medium text-white"
+                        >Uploading…</span
+                    >
                 </div>
             {/if}
         {:else}
-            <button
-                type="button"
-                class="flex size-full flex-col items-center justify-center gap-2 transition-colors hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={busy}
-                onclick={() => fileInputEl?.click()}
+            <!--
+                <label> associates natively with the sr-only input below via `for`,
+                so the browser handles the tap without any programmatic .click().
+                This eliminates the iOS scroll-to-top caused by focusing a display:none input.
+            -->
+            <label
+                for="pf-img-input"
+                class="group flex size-full cursor-pointer flex-col items-center justify-center gap-2.5 transition-colors hover:bg-zinc-800 {busy
+                    ? 'pointer-events-none opacity-50'
+                    : ''}"
             >
                 {#if busy}
                     <LoaderCircleIcon
-                        class="text-muted-foreground size-7 animate-spin"
+                        class="size-8 animate-spin text-zinc-500"
                     />
-                    <span class="text-muted-foreground text-xs">Uploading…</span
-                    >
+                    <span class="text-xs text-zinc-500">Uploading…</span>
                 {:else}
-                    <ImageIcon class="text-muted-foreground size-7" />
-                    <span class="text-muted-foreground text-xs"
-                        >Click to upload</span
+                    <div
+                        class="flex size-14 items-center justify-center rounded-full border border-dashed border-zinc-600 bg-zinc-800 transition-colors group-hover:border-zinc-500 group-hover:bg-zinc-700"
                     >
+                        <ImageIcon
+                            class="size-6 text-zinc-500 transition-colors group-hover:text-zinc-400"
+                        />
+                    </div>
+                    <div class="text-center">
+                        <p
+                            class="text-xs font-medium text-zinc-400 group-hover:text-zinc-300"
+                        >
+                            Tap to upload photo
+                        </p>
+                        <p class="mt-0.5 text-[11px] text-zinc-600">
+                            JPG, PNG, WEBP · max 10 MB
+                        </p>
+                    </div>
                 {/if}
-            </button>
+            </label>
         {/if}
+
+        <!--
+            Always in the DOM so fileInputEl ref is always valid (needed by the
+            "Change" button). sr-only positions it absolutely at (0,0) of this
+            .relative div — always on-screen when the image box is visible, so
+            the browser never needs to scroll to bring it into view.
+        -->
+        <input
+            id="pf-img-input"
+            bind:this={fileInputEl}
+            type="file"
+            accept="image/*"
+            class="sr-only"
+            disabled={busy}
+            onchange={handleFileSelect}
+        />
     </div>
 
     {#if errorMessage}
         <p class="text-destructive text-xs">{errorMessage}</p>
-    {:else}
-        <p class="text-muted-foreground text-xs">JPG, PNG, WEBP · max 10 MB</p>
     {/if}
-
-    <input
-        bind:this={fileInputEl}
-        type="file"
-        accept="image/*"
-        class="hidden"
-        onchange={handleFileSelect}
-    />
 </div>

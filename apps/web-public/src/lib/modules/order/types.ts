@@ -3,6 +3,7 @@ export type TCartItem = {
     productId?: number
     name: string
     sizeName?: string
+    flavorName?: string
     quantity: number
     price: string
     imageUrl?: string | null
@@ -21,5 +22,6 @@ export type TProduct = {
     imageUrl: string | null
     isAvailable: boolean
     tags: TProductTag[]
+    flavors: { id: number; name: string }[]
     sizes: { id: number; name: string; price: string }[]
 }

@@ -119,7 +119,7 @@
                 <Sheet.Title
                     class="flex items-center gap-2 text-base font-semibold text-zinc-100"
                 >
-                    <ShoppingCartIcon class="h-5 w-5 text-blue-400" />
+                    <ShoppingCartIcon class="size-5  text-blue-400" />
                     Cart
                     {#if cartItemCount > 0}
                         <span
@@ -149,9 +149,9 @@
                     class="flex flex-col items-center justify-center gap-4 py-20 text-center"
                 >
                     <div
-                        class="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-900"
+                        class="flex size-16 items-center justify-center rounded-2xl bg-zinc-900"
                     >
-                        <ShoppingCartIcon class="h-8 w-8 text-zinc-600" />
+                        <ShoppingCartIcon class="size-8  text-zinc-600" />
                     </div>
                     <div>
                         <p class="text-sm font-medium text-zinc-400">
@@ -179,20 +179,20 @@
                             <!-- Top row: thumbnail + name + remove -->
                             <div class="flex gap-3">
                                 <div
-                                    class="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-800"
+                                    class="size-16 shrink-0 overflow-hidden rounded-lg bg-zinc-800"
                                 >
                                     {#if item.imageUrl}
                                         <img
                                             src={item.imageUrl}
                                             alt={item.name}
-                                            class="h-full w-full object-cover"
+                                            class="size-full object-cover"
                                         />
                                     {:else}
                                         <div
-                                            class="flex h-full w-full items-center justify-center"
+                                            class="flex size-full items-center justify-center"
                                         >
                                             <UtensilsIcon
-                                                class="h-6 w-6 text-zinc-600 opacity-50"
+                                                class="size-6  text-zinc-600 opacity-50"
                                             />
                                         </div>
                                     {/if}
@@ -205,7 +205,7 @@
                                         class="flex items-start justify-between gap-2"
                                     >
                                         <p
-                                            class="truncate text-sm font-semibold leading-snug text-zinc-100"
+                                            class="truncate text-sm/snug font-semibold text-zinc-100"
                                         >
                                             {item.name}
                                         </p>
@@ -213,14 +213,16 @@
                                             type="button"
                                             onclick={() => removeItem(item.key)}
                                             aria-label="Remove {item.name}"
-                                            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-800 hover:text-red-400"
+                                            class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-800 hover:text-red-400"
                                         >
-                                            <Trash2Icon class="h-3.5 w-3.5" />
+                                            <Trash2Icon class="size-3.5 " />
                                         </button>
                                     </div>
-                                    {#if item.sizeName}
+                                    {#if item.flavorName || item.sizeName}
                                         <p class="text-xs text-zinc-500">
-                                            {item.sizeName}
+                                            {[item.flavorName, item.sizeName]
+                                                .filter(Boolean)
+                                                .join(' · ')}
                                         </p>
                                     {/if}
                                     <p
@@ -247,9 +249,9 @@
                                         onclick={() => decrementQty(item.key)}
                                         disabled={item.quantity <= 1}
                                         aria-label="Decrease quantity"
-                                        class="flex h-9 w-9 items-center justify-center text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-100 disabled:opacity-30"
+                                        class="flex size-9 items-center justify-center text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-100 disabled:opacity-30"
                                     >
-                                        <MinusIcon class="h-3.5 w-3.5" />
+                                        <MinusIcon class="size-3.5 " />
                                     </button>
                                     <span
                                         class="min-w-8 text-center text-sm font-semibold tabular-nums text-zinc-100"
@@ -260,9 +262,9 @@
                                         type="button"
                                         onclick={() => incrementQty(item.key)}
                                         aria-label="Increase quantity"
-                                        class="flex h-9 w-9 items-center justify-center text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-100"
+                                        class="flex size-9 items-center justify-center text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-100"
                                     >
-                                        <PlusIcon class="h-3.5 w-3.5" />
+                                        <PlusIcon class="size-3.5 " />
                                     </button>
                                 </div>
 
