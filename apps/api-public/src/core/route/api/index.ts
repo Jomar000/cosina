@@ -7,6 +7,7 @@ import { initContext } from '../../middleware/initContext.js'
 import { wsOriginGuard } from '../../middleware/wsOriginGuard.js'
 import { adminRoute } from './admin/index.js'
 import { authRoute } from './auth.js'
+import feedbackRoute from './feedback/index.js'
 import { heartbeatRoute } from './heartbeat.js'
 import { objectStorageRoute } from './objectStorage/index.js'
 import orderRoute from './order/index.js'
@@ -57,6 +58,7 @@ export const apiRoute = new Hono<THonoInstance>()
     })
     .route('/admin', adminRoute)
     .route('/auth', authRoute)
+    .route('/feedback', feedbackRoute)
     .route('/heartbeat', heartbeatRoute)
     .route('/objectStorage', objectStorageRoute)
     .route('/order', orderRoute)

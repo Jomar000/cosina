@@ -64,6 +64,10 @@
             "types": "./dist/core/route/api/auth.d.ts",
             "default": "./dist/core/route/api/auth.js"
         },
+        "./api/feedback": {
+            "types": "./dist/core/route/api/feedback/index.d.ts",
+            "default": "./dist/core/route/api/feedback/index.js"
+        },
         "./api/objectStorage": {
             "types": "./dist/core/route/api/objectStorage/index.d.ts",
             "default": "./dist/core/route/api/objectStorage/index.js"

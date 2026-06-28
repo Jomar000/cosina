@@ -19,6 +19,8 @@
     import { animate, inView, stagger } from 'motion'
     import { slide } from 'svelte/transition'
 
+    import LandingFeedbackSection from '$lib/modules/feedback/components/LandingFeedbackSection.svelte'
+
     ///////////////
     // 03. State //
     ///////////////
@@ -1210,6 +1212,9 @@
             </div>
         </div>
     </section>
+
+    <!-- ===== CUSTOMER REVIEWS ===== -->
+    <LandingFeedbackSection />
 
     <!-- ===== FINAL CTA ===== -->
     <section class="py-24">

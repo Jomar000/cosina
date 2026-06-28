@@ -46,6 +46,15 @@ const createWsChannel = (
 
 export const wsRoute = new Hono<THonoInstance>()
     .route(
+        '/feedback',
+        createWsChannel(
+            'feedback',
+            isAuthorized({
+                ws: ['listen'],
+            }),
+        ),
+    )
+    .route(
         '/general',
         createWsChannel(
             'general',

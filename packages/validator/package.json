@@ -38,6 +38,10 @@
             "types": "./dist/backoffice/admin/audit/index.d.ts",
             "default": "./dist/backoffice/admin/audit/index.js"
         },
+        "./backoffice/admin/feedback": {
+            "types": "./dist/backoffice/admin/feedback/index.d.ts",
+            "default": "./dist/backoffice/admin/feedback/index.js"
+        },
         "./backoffice/admin/dashboard": {
             "types": "./dist/backoffice/admin/dashboard/index.d.ts",
             "default": "./dist/backoffice/admin/dashboard/index.js"
@@ -73,6 +77,10 @@
         "./public/auth": {
             "types": "./dist/public/auth.schema.d.ts",
             "default": "./dist/public/auth.schema.js"
+        },
+        "./public/feedback": {
+            "types": "./dist/public/feedback/index.d.ts",
+            "default": "./dist/public/feedback/index.js"
         },
         "./public/admin/user": {
             "types": "./dist/public/admin/user/index.d.ts",

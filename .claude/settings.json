@@ -22,7 +22,8 @@
       "Bash(pnpm --filter=@cosina/web-public check)",
       "Bash(pnpm check *)",
       "Bash(pnpm --filter=@cosina/web-backoffice --filter=@cosina/web-public lint)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(xargs grep -l \"order.remainingBalanceSubmit\")"
     ],
     "deny": [
       "Edit(.git/**)",

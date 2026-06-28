@@ -51,6 +51,7 @@ const createWsChannel = (
 }
 
 export const wsRoute = new Hono<THonoInstance>()
+    .route('/feedback', createWsChannel('feedback', publicAccess))
     .route('/general', createWsChannel('general', publicAccess))
     .route('/orders', createWsChannel('orders', publicAccess))
     .route('/products', createWsChannel('products', publicAccess))

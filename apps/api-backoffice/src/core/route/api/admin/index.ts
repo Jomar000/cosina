@@ -5,6 +5,7 @@ import type { TGlobalApiResponses, THonoInstance } from '../../../../types.js'
 import { isAuthorized } from '../../../middleware/isAuthorized.js'
 import auditRoute from './audit/index.js'
 import dashboardRoute from './dashboard/index.js'
+import feedbackRoute from './feedback/index.js'
 import orderRoute from './order/index.js'
 import { productRoute } from './product/index.js'
 import settingsRoute from './settings/index.js'
@@ -23,6 +24,12 @@ export const adminRoute = new Hono<THonoInstance>()
     )
     .use(
         '/dashboard/*',
+        isAuthorized({
+            SYSADMIN: ['ANY'],
+        }),
+    )
+    .use(
+        '/feedback/*',
         isAuthorized({
             SYSADMIN: ['ANY'],
         }),
@@ -57,6 +64,7 @@ export const adminRoute = new Hono<THonoInstance>()
      */
     .route('/audit', auditRoute)
     .route('/dashboard', dashboardRoute)
+    .route('/feedback', feedbackRoute)
     .route('/order', orderRoute)
     .route('/product', productRoute)
     .route('/settings', settingsRoute)

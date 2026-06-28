@@ -63,6 +63,12 @@ export const deliveryTypeEnum = pgEnum('delivery_type', [
     'other_courier',
 ])
 
+export const feedbackStatusEnum = pgEnum('feedback_status', [
+    'pending',
+    'published',
+    'rejected',
+])
+
 ///////////////////
 // Tables - Core //
 ///////////////////
@@ -654,6 +660,56 @@ export const orderItem = pgTable(
         })
             .onDelete('set null')
             .onUpdate('no action'),
+    ],
+)
+
+export const customerFeedback = pgTable(
+    'customer_feedback',
+    {
+        id: bigint('id', { mode: 'number' })
+            .generatedByDefaultAsIdentity()
+            .primaryKey(),
+        publicId: uuid('public_id')
+            .unique()
+            .notNull()
+            .default(sql`gen_random_uuid()`)
+            .$defaultFn(() => uuidv7()),
+        organizationId: text('organization_id').notNull(),
+        userId: text('user_id'),
+        customerName: text('customer_name').notNull(),
+        rating: smallint('rating').notNull(),
+        comment: text('comment'),
+        status: feedbackStatusEnum('status').notNull().default('pending'),
+        createdAt: timestamp('created_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp('updated_at', {
+            withTimezone: true,
+            mode: 'date',
+        })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        index().on(t.organizationId),
+        foreignKey({
+            columns: [t.organizationId],
+            foreignColumns: [organization.id],
+        })
+            .onDelete('no action')
+            .onUpdate('no action'),
+        index().on(t.userId),
+        foreignKey({
+            columns: [t.userId],
+            foreignColumns: [user.id],
+        })
+            .onDelete('set null')
+            .onUpdate('no action'),
+        index().on(t.status),
+        index().on(t.createdAt),
     ],
 )
 

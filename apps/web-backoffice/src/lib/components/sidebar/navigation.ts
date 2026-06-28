@@ -3,6 +3,7 @@ import BarChart3Icon from '@lucide/svelte/icons/bar-chart-3'
 import DownloadIcon from '@lucide/svelte/icons/download'
 import FolderIcon from '@lucide/svelte/icons/folder'
 import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
+import MessageSquareIcon from '@lucide/svelte/icons/message-square'
 import SettingsIcon from '@lucide/svelte/icons/settings'
 import TablePropertiesIcon from '@lucide/svelte/icons/table-properties'
 import UploadIcon from '@lucide/svelte/icons/upload'
@@ -36,6 +37,11 @@ export function createRoleNavigation(role: string): AppNavItem[] {
                 },
             ],
         },
+        {
+            title: 'Customer Feedback',
+            url: `${prefix}/feedback`,
+            icon: MessageSquareIcon,
+        },
         { title: 'Records', icon: TablePropertiesIcon, disabled: true },
         { title: 'Reports', icon: BarChart3Icon, disabled: true },
         { title: 'Settings', icon: SettingsIcon, disabled: true },
@@ -66,6 +72,10 @@ export function getRouteMeta(pathname: string): AppRouteMeta {
 
     if (pathname === '/app') {
         return { title: 'Role Selection' }
+    }
+
+    if (pathname.endsWith('/feedback')) {
+        return { title: 'Customer Feedback', breadcrumb: ['Customer Feedback'] }
     }
 
     return { title: 'Dashboard' }

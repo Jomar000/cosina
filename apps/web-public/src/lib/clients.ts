@@ -1,5 +1,6 @@
 import type { AdminRouteType } from '@cosina/api-public/api/admin'
 import type { AuthRouteType } from '@cosina/api-public/api/auth'
+import type { FeedbackRouteType } from '@cosina/api-public/api/feedback'
 import type { HeartbeatRouteType } from '@cosina/api-public/api/heartbeat'
 import type { ObjectStorageRouteType } from '@cosina/api-public/api/objectStorage'
 import type { OrderRouteType } from '@cosina/api-public/api/order'
@@ -61,6 +62,15 @@ export const authClient = hc<AuthRouteType>(`${PUBLIC_API_URL}/api/auth`, {
     init: { credentials: 'include' },
     fetch: kyClient,
 })
+
+/**
+ * @description
+ * Feedback RPC Client
+ */
+export const feedbackClient = hc<FeedbackRouteType>(
+    `${PUBLIC_API_URL}/api/feedback`,
+    { init: { credentials: 'include' }, fetch: kyClient },
+)
 
 /**
  * @description

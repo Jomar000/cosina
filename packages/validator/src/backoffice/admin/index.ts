@@ -1,5 +1,6 @@
 export * as audit from './audit/index.js'
 export * as dashboard from './dashboard/index.js'
+export * as feedback from './feedback/index.js'
 export * as order from './order/index.js'
 export * as product from './product/index.js'
 export * as settings from './settings/index.js'

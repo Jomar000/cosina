@@ -5,6 +5,7 @@
     import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
     import PackageIcon from '@lucide/svelte/icons/package'
     import SettingsIcon from '@lucide/svelte/icons/settings'
+    import FeedbackIcon from '@lucide/svelte/icons/message-circle-heart'
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart'
     import { createQuery, useQueryClient } from '@tanstack/svelte-query'
     import { onMount } from 'svelte'
@@ -85,6 +86,11 @@
             title: 'Order History',
             url: '/app/admin/orders/history',
             icon: HistoryIcon,
+        },
+        {
+            title: 'Customer Feedback',
+            url: '/app/admin/feedback',
+            icon: FeedbackIcon,
         },
         {
             title: 'Settings',

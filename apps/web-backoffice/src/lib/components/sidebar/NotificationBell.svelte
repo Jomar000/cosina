@@ -5,6 +5,7 @@
     import CheckIcon from '@lucide/svelte/icons/check'
     import ChevronRightIcon from '@lucide/svelte/icons/chevron-right'
     import CircleDollarSignIcon from '@lucide/svelte/icons/circle-dollar-sign'
+    import MessageCircleHeartIcon from '@lucide/svelte/icons/message-circle-heart'
     import PackageCheckIcon from '@lucide/svelte/icons/package-check'
     import ReceiptIcon from '@lucide/svelte/icons/receipt'
 
@@ -19,6 +20,7 @@
         | 'order.create'
         | 'order.remainingBalanceSubmit'
         | 'order.proofResubmit'
+        | 'feedback.create'
 
     type TNotification = {
         id: number
@@ -27,6 +29,7 @@
         body: string
         customerName: string | null
         trackingCode: string | null
+        rating: number | null
         at: Date
         href: string
     }
@@ -49,6 +52,11 @@
             title: 'Proof Resubmitted',
             body: 'Re-uploaded a previously rejected proof.',
             href: '/app/admin/orders',
+        },
+        'feedback.create': {
+            title: 'New Feedback',
+            body: 'Submitted a customer feedback.',
+            href: '/app/admin/feedback',
         },
     }
 
@@ -74,49 +82,55 @@
     // 08. Effects //
     /////////////////
 
-    $effect(() => {
-        const ws = wsClientManager.connect('orders')
-
-        function handleMessage(event: MessageEvent) {
-            try {
-                const parsed = JSON.parse(event.data as string) as {
-                    event: string
-                    data?: {
-                        trackingCode?: string
-                        customerName?: string
-                    }
+    function handleWsMessage(event: MessageEvent) {
+        try {
+            const parsed = JSON.parse(event.data as string) as {
+                event: string
+                data?: {
+                    trackingCode?: string
+                    customerName?: string
+                    rating?: number
                 }
-                const eventType = parsed.event as TNotifEvent
-                const meta = EVENT_META[eventType]
-                if (!meta) return
-
-                notifications = [
-                    {
-                        id: ++idSeq,
-                        type: eventType,
-                        title: meta.title,
-                        body: meta.body,
-                        customerName: parsed.data?.customerName ?? null,
-                        trackingCode: parsed.data?.trackingCode ?? null,
-                        at: new Date(),
-                        href: meta.href,
-                    },
-                    ...notifications,
-                ].slice(0, 20)
-
-                ringing = true
-                if (ringTimer) clearTimeout(ringTimer)
-                ringTimer = setTimeout(() => (ringing = false), 1200)
-            } catch {
-                // ignore malformed messages
             }
-        }
+            const eventType = parsed.event as TNotifEvent
+            const meta = EVENT_META[eventType]
+            if (!meta) return
 
-        ws.addEventListener('message', handleMessage)
+            notifications = [
+                {
+                    id: ++idSeq,
+                    type: eventType,
+                    title: meta.title,
+                    body: meta.body,
+                    customerName: parsed.data?.customerName ?? null,
+                    trackingCode: parsed.data?.trackingCode ?? null,
+                    rating: parsed.data?.rating ?? null,
+                    at: new Date(),
+                    href: meta.href,
+                },
+                ...notifications,
+            ].slice(0, 20)
+
+            ringing = true
+            if (ringTimer) clearTimeout(ringTimer)
+            ringTimer = setTimeout(() => (ringing = false), 1200)
+        } catch {
+            // ignore malformed messages
+        }
+    }
+
+    $effect(() => {
+        const wsOrders = wsClientManager.connect('orders')
+        const wsFeedback = wsClientManager.connect('feedback')
+
+        wsOrders.addEventListener('message', handleWsMessage)
+        wsFeedback.addEventListener('message', handleWsMessage)
 
         return () => {
-            ws.removeEventListener('message', handleMessage)
-            ws.release()
+            wsOrders.removeEventListener('message', handleWsMessage)
+            wsOrders.release()
+            wsFeedback.removeEventListener('message', handleWsMessage)
+            wsFeedback.release()
         }
     })
 
@@ -148,6 +162,7 @@
     function iconFor(type: TNotifEvent) {
         if (type === 'order.create') return ReceiptIcon
         if (type === 'order.remainingBalanceSubmit') return CircleDollarSignIcon
+        if (type === 'feedback.create') return MessageCircleHeartIcon
         return PackageCheckIcon
     }
 
@@ -156,6 +171,8 @@
             return 'bg-blue-500/10 text-blue-400 ring-blue-500/20'
         if (type === 'order.remainingBalanceSubmit')
             return 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20'
+        if (type === 'feedback.create')
+            return 'bg-pink-500/10 text-pink-400 ring-pink-500/20'
         return 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
     }
 </script>
@@ -275,13 +292,20 @@
                                 {notif.body}
                             </p>
 
-                            <!-- Tracking code + time -->
+                            <!-- Tracking code / rating + time -->
                             <div class="mt-1.5 flex items-center gap-2">
                                 {#if notif.trackingCode}
                                     <span
                                         class="rounded-sm bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px] font-medium tracking-wide text-zinc-400"
                                     >
                                         #{notif.trackingCode}
+                                    </span>
+                                {/if}
+                                {#if notif.rating}
+                                    <span class="text-[11px] text-amber-400">
+                                        {'★'.repeat(notif.rating)}{'☆'.repeat(
+                                            5 - notif.rating,
+                                        )}
                                     </span>
                                 {/if}
                                 <span class="text-[11px] text-zinc-600"
