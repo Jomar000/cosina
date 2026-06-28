@@ -1,5 +1,5 @@
-import { dbClient, dbSchema } from '@hyperion/database/postgres'
-import type { TApiResponseError } from '@hyperion/types/shared'
+import { dbClient, dbSchema } from '@cosina/database/postgres'
+import type { TApiResponseError } from '@cosina/types/shared'
 import { makeSignature } from 'better-auth/crypto'
 import { env } from 'cloudflare:workers'
 import { and, eq, inArray, like } from 'drizzle-orm'
@@ -128,12 +128,12 @@ export const interceptPasswordResetToken = async (
      * @description
      * Attempt 1: Read from KV (secondaryStorage).
      */
-    const kvKeys = await env.HYPERIONBOFC_KV.list({
+    const kvKeys = await env.COSINABOFC_KV.list({
         prefix: 'verification:reset-password:',
     })
 
     for (const key of kvKeys.keys) {
-        const value = await env.HYPERIONBOFC_KV.get(key.name)
+        const value = await env.COSINABOFC_KV.get(key.name)
         if (value) {
             const parsed = JSON.parse(value)
             if (parsed.value === userId) {
@@ -149,11 +149,11 @@ export const interceptPasswordResetToken = async (
     const { verification } = dbSchema
 
     const db = dbClient({
-        host: env.HYPERIONBOFC_HD.host,
-        port: Number(env.HYPERIONBOFC_HD.port) || 5432,
-        database: env.HYPERIONBOFC_HD.database,
-        user: env.HYPERIONBOFC_HD.user,
-        pass: env.HYPERIONBOFC_HD.password,
+        host: env.COSINABOFC_HD.host,
+        port: Number(env.COSINABOFC_HD.port) || 5432,
+        database: env.COSINABOFC_HD.database,
+        user: env.COSINABOFC_HD.user,
+        pass: env.COSINABOFC_HD.password,
     })
 
     try {
@@ -218,11 +218,11 @@ export const seedTestingCookies = async (): Promise<
     ]
 > => {
     const db = dbClient({
-        host: env.HYPERIONBOFC_HD.host,
-        port: Number(env.HYPERIONBOFC_HD.port) || 5432,
-        database: env.HYPERIONBOFC_HD.database,
-        user: env.HYPERIONBOFC_HD.user,
-        pass: env.HYPERIONBOFC_HD.password,
+        host: env.COSINABOFC_HD.host,
+        port: Number(env.COSINABOFC_HD.port) || 5432,
+        database: env.COSINABOFC_HD.database,
+        user: env.COSINABOFC_HD.user,
+        pass: env.COSINABOFC_HD.password,
     })
     const { organization, user } = dbSchema
 
@@ -280,12 +280,12 @@ export const seedTestingCookies = async (): Promise<
                 }
 
                 await Promise.all([
-                    env.HYPERIONBOFC_KV.put(
+                    env.COSINABOFC_KV.put(
                         token,
                         JSON.stringify({ session, user: seededUser }),
                         { expirationTtl: expiresIn },
                     ),
-                    env.HYPERIONBOFC_KV.put(
+                    env.COSINABOFC_KV.put(
                         `active-sessions-${userId}`,
                         JSON.stringify([
                             { token, expiresAt: expiresAt.getTime() },

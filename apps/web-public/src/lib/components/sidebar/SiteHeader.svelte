@@ -1,8 +1,8 @@
 <script lang="ts">
-    import * as Avatar from '@hyperion/ui/components/avatar'
-    import { Button } from '@hyperion/ui/components/button'
-    import * as DropdownMenu from '@hyperion/ui/components/dropdown-menu'
-    import * as Tooltip from '@hyperion/ui/components/tooltip'
+    import * as Avatar from '@cosina/ui/components/avatar'
+    import { Button } from '@cosina/ui/components/button'
+    import * as DropdownMenu from '@cosina/ui/components/dropdown-menu'
+    import * as Tooltip from '@cosina/ui/components/tooltip'
     import BellIcon from '@lucide/svelte/icons/bell'
     import LogOutIcon from '@lucide/svelte/icons/log-out'
     import SettingsIcon from '@lucide/svelte/icons/settings'

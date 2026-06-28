@@ -1,5 +1,5 @@
 <script lang="ts">
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import * as Sidebar from '@cosina/ui/components/sidebar'
 
     import { page } from '$app/state'
 

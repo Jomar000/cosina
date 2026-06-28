@@ -1,4 +1,4 @@
-# Hyperion
+# Cosina
 
 Base Template for SSG + CloudFlare Workers
 

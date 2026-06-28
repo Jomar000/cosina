@@ -1,8 +1,8 @@
 {
-    "name": "@hyperion/types",
+    "name": "@cosina/types",
     "version": "0.0.1",
     "author": "4thDEVisionTech",
-    "description": "Hyperion Types Component",
+    "description": "Cosina Types Component",
     "type": "module",
     "private": true,
     "license": "ISC",

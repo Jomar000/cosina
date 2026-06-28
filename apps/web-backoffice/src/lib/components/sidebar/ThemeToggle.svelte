@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { Button } from '@hyperion/ui/components/button'
-    import * as Tooltip from '@hyperion/ui/components/tooltip'
-    import { cn } from '@hyperion/ui/utils'
+    import { Button } from '@cosina/ui/components/button'
+    import * as Tooltip from '@cosina/ui/components/tooltip'
+    import { cn } from '@cosina/ui/utils'
     import MoonIcon from '@lucide/svelte/icons/moon'
     import SunIcon from '@lucide/svelte/icons/sun'
     import { mode, toggleMode } from 'mode-watcher'

@@ -254,10 +254,10 @@ importers:
 
   apps/api-backoffice:
     dependencies:
-      '@hyperion/types':
+      '@cosina/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@hyperion/validator':
+      '@cosina/validator':
         specifier: workspace:*
         version: link:../../packages/validator
       hono:
@@ -273,12 +273,12 @@ importers:
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
         version: 0.16.19(@vitest/runner@4.1.9)(@vitest/snapshot@4.1.9)(vitest@4.1.9)
+      '@cosina/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@hono/zod-validator':
         specifier: 'catalog:'
         version: 0.8.0(hono@4.12.27)(zod@4.4.3)
-      '@hyperion/database':
-        specifier: workspace:*
-        version: link:../../packages/database
       '@noble/hashes':
         specifier: 'catalog:'
         version: 2.2.0
@@ -324,10 +324,10 @@ importers:
 
   apps/api-public:
     dependencies:
-      '@hyperion/types':
+      '@cosina/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@hyperion/validator':
+      '@cosina/validator':
         specifier: workspace:*
         version: link:../../packages/validator
       hono:
@@ -343,12 +343,12 @@ importers:
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
         version: 0.16.19(@vitest/runner@4.1.9)(@vitest/snapshot@4.1.9)(vitest@4.1.9)
+      '@cosina/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@hono/zod-validator':
         specifier: 'catalog:'
         version: 0.8.0(hono@4.12.27)(zod@4.4.3)
-      '@hyperion/database':
-        specifier: workspace:*
-        version: link:../../packages/database
       '@noble/hashes':
         specifier: 'catalog:'
         version: 2.2.0
@@ -394,16 +394,16 @@ importers:
 
   apps/web-backoffice:
     devDependencies:
-      '@hyperion/api-backoffice':
+      '@cosina/api-backoffice':
         specifier: workspace:*
         version: link:../api-backoffice
-      '@hyperion/types':
+      '@cosina/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@hyperion/ui':
+      '@cosina/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      '@hyperion/validator':
+      '@cosina/validator':
         specifier: workspace:*
         version: link:../../packages/validator
       '@internationalized/date':
@@ -505,16 +505,16 @@ importers:
 
   apps/web-public:
     devDependencies:
-      '@hyperion/api-public':
+      '@cosina/api-public':
         specifier: workspace:*
         version: link:../api-public
-      '@hyperion/types':
+      '@cosina/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@hyperion/ui':
+      '@cosina/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      '@hyperion/validator':
+      '@cosina/validator':
         specifier: workspace:*
         version: link:../../packages/validator
       '@internationalized/date':
@@ -703,7 +703,7 @@ importers:
 
   packages/validator:
     dependencies:
-      '@hyperion/types':
+      '@cosina/types':
         specifier: workspace:*
         version: link:../types
       zod:

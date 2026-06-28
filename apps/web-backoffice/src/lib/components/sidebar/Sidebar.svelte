@@ -1,7 +1,7 @@
 <!-- https://shadcn-svelte.com/blocks/sidebar#sidebar-07 -->
 
 <script lang="ts">
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import * as Sidebar from '@cosina/ui/components/sidebar'
     import { type ComponentProps } from 'svelte'
 
     import type { SessionState } from '$lib/states/session'

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import * as Sidebar from '@cosina/ui/components/sidebar'
     import ClipboardListIcon from '@lucide/svelte/icons/clipboard-list'
     import HistoryIcon from '@lucide/svelte/icons/history'
     import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'

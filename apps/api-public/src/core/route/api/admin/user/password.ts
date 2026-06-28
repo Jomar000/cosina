@@ -1,4 +1,4 @@
-import { password } from '@hyperion/validator/public/admin/user'
+import { password } from '@cosina/validator/public/admin/user'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 

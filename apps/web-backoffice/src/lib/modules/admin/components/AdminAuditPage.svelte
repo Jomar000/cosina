@@ -1,7 +1,7 @@
 <script lang="ts">
-    import * as Select from '@hyperion/ui/components/select'
-    import { Separator } from '@hyperion/ui/components/separator'
-    import { Skeleton } from '@hyperion/ui/components/skeleton'
+    import * as Select from '@cosina/ui/components/select'
+    import { Separator } from '@cosina/ui/components/separator'
+    import { Skeleton } from '@cosina/ui/components/skeleton'
     import ClipboardListIcon from '@lucide/svelte/icons/clipboard-list'
 
     import { createQuery, useQueryClient } from '@tanstack/svelte-query'

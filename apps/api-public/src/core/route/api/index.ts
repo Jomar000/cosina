@@ -41,7 +41,7 @@ export const apiRoute = new Hono<THonoInstance>()
                 },
             })
         }
-        // Proxy to backoffice for product images stored in HYPERIONBOFC_KV
+        // Proxy to backoffice for product images stored in COSINABOFC_KV
         const upstream = await fetch(
             `${ctx.env.URL_BOFC_BACKEND}/api/image/view/${id}`,
         )

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { IMG_logo } from '$lib/assets/image/index'
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import * as Sidebar from '@cosina/ui/components/sidebar'
 </script>
 
 <Sidebar.Menu>

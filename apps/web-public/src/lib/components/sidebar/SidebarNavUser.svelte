@@ -1,8 +1,8 @@
 <script lang="ts">
-    import * as Avatar from '@hyperion/ui/components/avatar'
-    import * as DropdownMenu from '@hyperion/ui/components/dropdown-menu'
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
-    import { useSidebar } from '@hyperion/ui/components/sidebar'
+    import * as Avatar from '@cosina/ui/components/avatar'
+    import * as DropdownMenu from '@cosina/ui/components/dropdown-menu'
+    import * as Sidebar from '@cosina/ui/components/sidebar'
+    import { useSidebar } from '@cosina/ui/components/sidebar'
     import BadgeCheckIcon from '@lucide/svelte/icons/badge-check'
     import BellIcon from '@lucide/svelte/icons/bell'
     import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down'

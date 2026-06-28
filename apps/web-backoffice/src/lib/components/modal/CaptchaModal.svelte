@@ -1,5 +1,5 @@
 <script lang="ts">
-    import * as Dialog from '@hyperion/ui/components/dialog'
+    import * as Dialog from '@cosina/ui/components/dialog'
 
     import { PUBLIC_CF_TURNSTILE_SITE_KEY } from '$env/static/public'
     import { IMG_logo } from '$lib/assets/image'

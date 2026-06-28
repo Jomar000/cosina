@@ -1,4 +1,4 @@
-import { dbClient, dbSchema } from '@hyperion/database/postgres'
+import { dbClient, dbSchema } from '@cosina/database/postgres'
 import { AwsClient } from 'aws4fetch'
 import { createMiddleware } from 'hono/factory'
 
@@ -12,10 +12,10 @@ export const initRequestContext = () => {
             'correlationId',
             ctx.req.header('cf-ray') ?? ctx.req.header('x-request-id') ?? null,
         )
-        ctx.set('doWssClient', ctx.env.HYPERIONPUB_DO_WSS)
+        ctx.set('doWssClient', ctx.env.COSINAPUB_DO_WSS)
         ctx.set('ipAddress', ctx.req.header('cf-connecting-ip') || 'N/A')
         ctx.set('isPrivilegedRole', false)
-        ctx.set('kvClient', ctx.env.HYPERIONPUB_KV)
+        ctx.set('kvClient', ctx.env.COSINAPUB_KV)
         ctx.set('role', 'N/A')
         ctx.set('session', null)
         ctx.set('user', null)
@@ -28,11 +28,11 @@ export const initRequestContext = () => {
 export const initDatabaseContext = () => {
     return createMiddleware<THonoInstance>(async (ctx, next) => {
         const initDbClient = dbClient({
-            host: ctx.env.HYPERIONPUB_HD.host,
-            port: ctx.env.HYPERIONPUB_HD.port,
-            database: ctx.env.HYPERIONPUB_HD.database,
-            user: ctx.env.HYPERIONPUB_HD.user,
-            pass: ctx.env.HYPERIONPUB_HD.password,
+            host: ctx.env.COSINAPUB_HD.host,
+            port: ctx.env.COSINAPUB_HD.port,
+            database: ctx.env.COSINAPUB_HD.database,
+            user: ctx.env.COSINAPUB_HD.user,
+            pass: ctx.env.COSINAPUB_HD.password,
         })
 
         ctx.set('dbClient', initDbClient)

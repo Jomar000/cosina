@@ -13,8 +13,8 @@ import {
 } from './utilities.js'
 
 const envPath = fileURLToPath(new URL('../../.env.test', import.meta.url))
-const baseConnectionStringKey = 'HYPERION_TEST_DATABASE_BASE_URL'
-const setupStateKey = 'HYPERION_TEST_DATABASE_SETUP'
+const baseConnectionStringKey = 'COSINA_TEST_DATABASE_BASE_URL'
+const setupStateKey = 'COSINA_TEST_DATABASE_SETUP'
 
 const connectionStringFromEnv = () => {
     const connectionString = parseEnv(

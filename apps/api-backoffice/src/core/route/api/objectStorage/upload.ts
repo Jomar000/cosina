@@ -1,4 +1,4 @@
-import { uploadCommitInputSchema } from '@hyperion/validator/backoffice/objectStorage'
+import { uploadCommitInputSchema } from '@cosina/validator/backoffice/objectStorage'
 import { and, eq, inArray, notInArray } from 'drizzle-orm'
 import { Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'

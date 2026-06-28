@@ -15,7 +15,7 @@
 ### Template Tokens
 
 - Agent guidance and skills remain reusable by downstream template forks.
-- `PROJECT_NAME` is a documentation token for the package scope and uppercase binding prefix. In this repository, package examples resolve to `@hyperion/*`, while app-specific bindings include `HYPERIONPUB_KV` and `HYPERIONBOFC_KV`.
+- `PROJECT_NAME` is a documentation token for the package scope and uppercase binding prefix. In this repository, package examples resolve to `@cosina/*`, while app-specific bindings include `COSINAPUB_KV` and `COSINABOFC_KV`.
 - Commands copied into a concrete repository must replace `@PROJECT_NAME` with that repository's actual package scope.
 
 ## 2. Tech Stack & Standards

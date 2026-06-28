@@ -1,4 +1,4 @@
-import { audit } from '@hyperion/validator/backoffice/admin/audit'
+import { audit } from '@cosina/validator/backoffice/admin/audit'
 import { and, asc, count as countFn, desc, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'

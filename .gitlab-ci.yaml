@@ -73,10 +73,10 @@ build-backend:
   script:
     - >
       podman build \
-      --tag="registry.gitlab.com/4thDEVisionTech/hyperion/backend:$CI_COMMIT_SHORT_SHA" \
+      --tag="registry.gitlab.com/4thDEVisionTech/Cosina/backend:$CI_COMMIT_SHORT_SHA" \
       --target="backend" \
       .
-    - podman push registry.gitlab.com/4thDEVisionTech/hyperion/backend:$CI_COMMIT_SHORT_SHA
+    - podman push registry.gitlab.com/4thDEVisionTech/Cosina/backend:$CI_COMMIT_SHORT_SHA
   tags:
     - shell-executor
 
@@ -90,10 +90,10 @@ build-frontend-preview:
     - >
       podman build \
       --volume="$PS_FRONTEND_ENV_FILE_PREVIEW:/build/@frontend/.env" \
-      --tag="registry.gitlab.com/4thDEVisionTech/hyperion/frontend-preview:$CI_COMMIT_SHORT_SHA" \
+      --tag="registry.gitlab.com/4thDEVisionTech/Cosina/frontend-preview:$CI_COMMIT_SHORT_SHA" \
       --target="frontend" \
       .
-    - podman push registry.gitlab.com/4thDEVisionTech/hyperion/frontend-preview:$CI_COMMIT_SHORT_SHA
+    - podman push registry.gitlab.com/4thDEVisionTech/Cosina/frontend-preview:$CI_COMMIT_SHORT_SHA
   tags:
     - shell-executor
 
@@ -107,10 +107,10 @@ build-frontend-prod:
     - >
       podman build \
       --volume="$PS_FRONTEND_ENV_FILE_PROD:/build/@frontend/.env" \
-      --tag="registry.gitlab.com/4thDEVisionTech/hyperion/frontend-prod:$CI_COMMIT_SHORT_SHA" \
+      --tag="registry.gitlab.com/4thDEVisionTech/Cosina/frontend-prod:$CI_COMMIT_SHORT_SHA" \
       --target="frontend" \
       .
-    - podman push registry.gitlab.com/4thDEVisionTech/hyperion/frontend-prod:$CI_COMMIT_SHORT_SHA
+    - podman push registry.gitlab.com/4thDEVisionTech/Cosina/frontend-prod:$CI_COMMIT_SHORT_SHA
   tags:
     - shell-executor
 
@@ -130,6 +130,6 @@ build-frontend-prod:
 #       --tty \
 #       --secret="" \
 #       --secret="" \
-#       registry.gitlab.com/4thDEVisionTech/hyperion/frontend:$CI_COMMIT_SHORT_SHA
+#       registry.gitlab.com/4thDEVisionTech/Cosina/frontend:$CI_COMMIT_SHORT_SHA
 #   tags:
 #     - shell-executor

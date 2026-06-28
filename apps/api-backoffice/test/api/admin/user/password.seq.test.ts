@@ -1,5 +1,5 @@
-import { dbClient, dbSchema } from '@hyperion/database/postgres'
-import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
+import { dbClient, dbSchema } from '@cosina/database/postgres'
+import type { TApiResponseError, TApiResponseOk } from '@cosina/types/shared'
 import { env } from 'cloudflare:workers'
 import { and, desc, eq } from 'drizzle-orm'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -16,11 +16,11 @@ let db: ReturnType<typeof dbClient>
 
 beforeAll(async () => {
     db = dbClient({
-        host: env.HYPERIONBOFC_HD.host,
-        port: Number(env.HYPERIONBOFC_HD.port) || 5432,
-        database: env.HYPERIONBOFC_HD.database,
-        user: env.HYPERIONBOFC_HD.user,
-        pass: env.HYPERIONBOFC_HD.password,
+        host: env.COSINABOFC_HD.host,
+        port: Number(env.COSINABOFC_HD.port) || 5432,
+        database: env.COSINABOFC_HD.database,
+        user: env.COSINABOFC_HD.user,
+        pass: env.COSINABOFC_HD.password,
     })
     ;[privilegedCookie] = await seedTestingCookies()
 })

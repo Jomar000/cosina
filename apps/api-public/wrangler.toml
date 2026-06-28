@@ -1,4 +1,4 @@
-name = "hyperion-api-public"
+name = "cosina-api-public"
 main = "src/core/index.ts"
 compatibility_date = "2026-05-07"
 compatibility_flags = ['nodejs_compat']
@@ -46,9 +46,9 @@ port = 8081
 ENVIRONMENT = "development"
 STATUS = "up"
 DEFAULT_ORGANIZATION_ID = "cosina-org-001" # TODO: replace with your actual org id from the organization table
-CF_R2_BUCKET_PRIVATE = "hyperion-development-prv"
-CF_R2_BUCKET_PUBLIC = "hyperion-development-pub"
-CF_R2_BUCKET_PUBLIC_URL = "https://hyperion-development-r2.4thdevision.tech"
+CF_R2_BUCKET_PRIVATE = "cosina-development-prv"
+CF_R2_BUCKET_PUBLIC = "cosina-development-pub"
+CF_R2_BUCKET_PUBLIC_URL = "https://cosina-development-r2.4thdevision.tech"
 CF_R2_PRESIGN_EXPIRY = 300 # 5 minutes (seconds)
 CF_TURNSTILE_BYPASS = 1 # (0|1)
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
@@ -60,7 +60,7 @@ CORS_ALLOW_HEADERS = "Content-Type,User-Agent,X-CAPTCHA-Response,X-CSRF-Token"
 CORS_ALLOW_METHODS = "GET,POST"
 CORS_EXPOSE_HEADERS = "Content-Length"
 CORS_MAX_AGE = 7200 # 2 hours (seconds)
-MAILER_ACCOUNT = "no-reply@hyperion.app"
+MAILER_ACCOUNT = "no-reply@cosina.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 URL_FRONTEND = "http://localhost:5174"
@@ -68,22 +68,22 @@ URL_BACKEND = "http://localhost:8081"
 URL_BOFC_BACKEND = "http://localhost:8080"
 
 [[kv_namespaces]]
-binding = "HYPERIONPUB_KV"
+binding = "COSINAPUB_KV"
 id = "00000000000000000000000000000000"
 
 [[hyperdrive]]
-binding = "HYPERIONPUB_HD"
+binding = "COSINAPUB_HD"
 id = "00000000000000000000000000000000"
 localConnectionString = "postgres://postgres:password123@localhost:5432/cosina"
 
 [[durable_objects.bindings]]
-name = "HYPERIONPUB_DO_WSS"
+name = "COSINAPUB_DO_WSS"
 class_name = "WebSocketServer"
 
 [[durable_objects.bindings]]
-name = "HYPERIONBOFC_DO_WSS"
+name = "COSINABOFC_DO_WSS"
 class_name = "WebSocketServer"
-script_name = "hyperion-api-backoffice"
+script_name = "cosina-api-backoffice"
 
 ########
 # TEST #
@@ -98,9 +98,9 @@ route = { custom_domain = true, pattern = "" }
 ENVIRONMENT = "test"
 STATUS = "up"
 DEFAULT_ORGANIZATION_ID = ""
-CF_R2_BUCKET_PRIVATE = "hyperion-test-prv"
-CF_R2_BUCKET_PUBLIC = "hyperion-test-pub"
-CF_R2_BUCKET_PUBLIC_URL = "https://hyperion-development-r2.4thdevision.tech"
+CF_R2_BUCKET_PRIVATE = "cosina-test-prv"
+CF_R2_BUCKET_PUBLIC = "cosina-test-pub"
+CF_R2_BUCKET_PUBLIC_URL = "https://cosina-development-r2.4thdevision.tech"
 CF_R2_PRESIGN_EXPIRY = 300 # 5 minutes (seconds)
 CF_TURNSTILE_BYPASS = 1 # (0|1)
 CF_TURNSTILE_SITE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
@@ -112,7 +112,7 @@ CORS_ALLOW_HEADERS = "Content-Type,User-Agent,X-CAPTCHA-Response,X-CSRF-Token"
 CORS_ALLOW_METHODS = "GET,POST"
 CORS_EXPOSE_HEADERS = "Content-Length"
 CORS_MAX_AGE = 7200 # 2 hours (seconds)
-MAILER_ACCOUNT = "no-reply@hyperion.app"
+MAILER_ACCOUNT = "no-reply@cosina.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 URL_FRONTEND = "http://localhost:5174"
@@ -120,22 +120,22 @@ URL_BACKEND = "http://localhost:8081"
 URL_BOFC_BACKEND = "http://localhost:8080"
 
 [[env.test.kv_namespaces]]
-binding = "HYPERIONPUB_KV"
+binding = "COSINAPUB_KV"
 id = "00000000000000000000000000000001"
 
 [[env.test.hyperdrive]]
-binding = "HYPERIONPUB_HD"
+binding = "COSINAPUB_HD"
 id = "00000000000000000000000000000001"
-localConnectionString = "postgres://postgres:password123@localhost:5432/hyperion_test"
+localConnectionString = "postgres://postgres:password123@localhost:5432/COSINA_test"
 
 [[env.test.durable_objects.bindings]]
-name = "HYPERIONPUB_DO_WSS"
+name = "COSINAPUB_DO_WSS"
 class_name = "WebSocketServer"
 
 [[env.test.durable_objects.bindings]]
-name = "HYPERIONBOFC_DO_WSS"
+name = "COSINABOFC_DO_WSS"
 class_name = "WebSocketServer"
-script_name = "hyperion-api-backoffice"
+script_name = "cosina-api-backoffice"
 
 ###########
 # STAGING #
@@ -150,8 +150,8 @@ route = { custom_domain = true, pattern = "" }
 ENVIRONMENT = "staging"
 STATUS = "up"
 DEFAULT_ORGANIZATION_ID = ""
-CF_R2_BUCKET_PRIVATE = "hyperion-staging-prv"
-CF_R2_BUCKET_PUBLIC = "hyperion-staging-pub"
+CF_R2_BUCKET_PRIVATE = "cosina-staging-prv"
+CF_R2_BUCKET_PUBLIC = "cosina-staging-pub"
 CF_R2_BUCKET_PUBLIC_URL = ""
 CF_R2_PRESIGN_EXPIRY = 300 # 5 minutes (seconds)
 CF_TURNSTILE_BYPASS = 1 # (0|1)
@@ -164,7 +164,7 @@ CORS_ALLOW_HEADERS = "Content-Type,User-Agent,X-CAPTCHA-Response,X-CSRF-Token"
 CORS_ALLOW_METHODS = "GET,POST"
 CORS_EXPOSE_HEADERS = "Content-Length"
 CORS_MAX_AGE = 7200 # 2 hours (seconds)
-MAILER_ACCOUNT = "no-reply@hyperion.app"
+MAILER_ACCOUNT = "no-reply@cosina.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 URL_FRONTEND = "http://localhost:5174"
@@ -172,19 +172,19 @@ URL_BACKEND = "http://localhost:8081"
 URL_BOFC_BACKEND = "http://localhost:8080"
 
 [[env.staging.kv_namespaces]]
-binding = "HYPERIONPUB_KV"
+binding = "COSINAPUB_KV"
 id = "00000000000000000000000000000002"
 
 [[env.staging.hyperdrive]]
-binding = "HYPERIONPUB_HD"
+binding = "COSINAPUB_HD"
 id = "00000000000000000000000000000002"
 
 [[env.staging.durable_objects.bindings]]
-name = "HYPERIONPUB_DO_WSS"
+name = "COSINAPUB_DO_WSS"
 class_name = "WebSocketServer"
 
 [[env.staging.durable_objects.bindings]]
-name = "HYPERIONBOFC_DO_WSS"
+name = "COSINABOFC_DO_WSS"
 class_name = "WebSocketServer"
 
 [env.staging.triggers]
@@ -203,8 +203,8 @@ route = { custom_domain = true, pattern = "" }
 ENVIRONMENT = "production"
 STATUS = "up"
 DEFAULT_ORGANIZATION_ID = ""
-CF_R2_BUCKET_PRIVATE = "hyperion-production-prv"
-CF_R2_BUCKET_PUBLIC = "hyperion-production-pub"
+CF_R2_BUCKET_PRIVATE = "cosina-production-prv"
+CF_R2_BUCKET_PUBLIC = "cosina-production-pub"
 CF_R2_BUCKET_PUBLIC_URL = ""
 CF_R2_PRESIGN_EXPIRY = 300 # 5 minutes (seconds)
 CF_TURNSTILE_BYPASS = 0
@@ -217,7 +217,7 @@ CORS_ALLOW_HEADERS = "Content-Type,User-Agent,X-CAPTCHA-Response,X-CSRF-Token"
 CORS_ALLOW_METHODS = "GET,POST"
 CORS_EXPOSE_HEADERS = "Content-Length"
 CORS_MAX_AGE = 7200 # 2 hours (seconds)
-MAILER_ACCOUNT = "no-reply@hyperion.app"
+MAILER_ACCOUNT = "no-reply@cosina.app"
 SESSION_EXPIRATION = 604800 # 7 days (seconds)
 SESSION_UPDATE_AGE = 86400 # 1 day (seconds)
 URL_FRONTEND = "http://localhost:5174"
@@ -225,19 +225,19 @@ URL_BACKEND = "http://localhost:8081"
 URL_BOFC_BACKEND = "http://localhost:8080"
 
 [[env.production.kv_namespaces]]
-binding = "HYPERIONPUB_KV"
+binding = "COSINAPUB_KV"
 id = "00000000000000000000000000000003"
 
 [[env.production.hyperdrive]]
-binding = "HYPERIONPUB_HD"
+binding = "COSINAPUB_HD"
 id = "00000000000000000000000000000003"
 
 [[env.production.durable_objects.bindings]]
-name = "HYPERIONPUB_DO_WSS"
+name = "COSINAPUB_DO_WSS"
 class_name = "WebSocketServer"
 
 [[env.production.durable_objects.bindings]]
-name = "HYPERIONBOFC_DO_WSS"
+name = "COSINABOFC_DO_WSS"
 class_name = "WebSocketServer"
 
 [env.production.triggers]

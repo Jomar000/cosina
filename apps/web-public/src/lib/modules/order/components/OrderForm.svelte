@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { Button } from '@hyperion/ui/components/button'
-    import * as Calendar from '@hyperion/ui/components/calendar'
-    import * as Dialog from '@hyperion/ui/components/dialog'
-    import { Input } from '@hyperion/ui/components/input'
-    import { Label } from '@hyperion/ui/components/label'
-    import * as Popover from '@hyperion/ui/components/popover'
-    import * as Select from '@hyperion/ui/components/select'
-    import { Textarea } from '@hyperion/ui/components/textarea'
+    import { Button } from '@cosina/ui/components/button'
+    import * as Calendar from '@cosina/ui/components/calendar'
+    import * as Dialog from '@cosina/ui/components/dialog'
+    import { Input } from '@cosina/ui/components/input'
+    import { Label } from '@cosina/ui/components/label'
+    import * as Popover from '@cosina/ui/components/popover'
+    import * as Select from '@cosina/ui/components/select'
+    import { Textarea } from '@cosina/ui/components/textarea'
     import {
         getLocalTimeZone,
         today,

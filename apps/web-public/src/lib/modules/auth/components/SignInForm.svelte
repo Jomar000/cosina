@@ -1,18 +1,18 @@
 <!-- https://shadcn-svelte.com/blocks/login#login-03 -->
 
 <script lang="ts">
-    import { Button } from '@hyperion/ui/components/button'
-    import * as Card from '@hyperion/ui/components/card'
+    import { Button } from '@cosina/ui/components/button'
+    import * as Card from '@cosina/ui/components/card'
     import {
         Field,
         FieldDescription,
         FieldError,
         FieldGroup,
         FieldLabel,
-    } from '@hyperion/ui/components/field'
-    import { Input } from '@hyperion/ui/components/input'
-    import { cn } from '@hyperion/ui/utils'
-    import { auth as authValidator } from '@hyperion/validator/public'
+    } from '@cosina/ui/components/field'
+    import { Input } from '@cosina/ui/components/input'
+    import { cn } from '@cosina/ui/utils'
+    import { auth as authValidator } from '@cosina/validator/public'
     import Eye from '@lucide/svelte/icons/eye'
     import EyeOff from '@lucide/svelte/icons/eye-off'
     import { createForm } from '@tanstack/svelte-form'

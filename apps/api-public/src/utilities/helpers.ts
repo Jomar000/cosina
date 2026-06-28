@@ -1,10 +1,10 @@
-import { dbSchema } from '@hyperion/database/postgres'
+import { dbSchema } from '@cosina/database/postgres'
 import type {
     TApiResponseError,
     TApiResponseOk,
     TApiResponsePaginatedOk,
     TValidatorIssue,
-} from '@hyperion/types/shared'
+} from '@cosina/types/shared'
 import { sql } from 'drizzle-orm'
 import type { Context } from 'hono'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'

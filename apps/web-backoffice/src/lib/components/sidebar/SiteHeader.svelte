@@ -1,7 +1,7 @@
 <script lang="ts">
-    import * as Breadcrumb from '@hyperion/ui/components/breadcrumb'
-    import { Separator } from '@hyperion/ui/components/separator'
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import * as Breadcrumb from '@cosina/ui/components/breadcrumb'
+    import { Separator } from '@cosina/ui/components/separator'
+    import * as Sidebar from '@cosina/ui/components/sidebar'
 
     import { page } from '$app/state'
     import NotificationBell from './NotificationBell.svelte'

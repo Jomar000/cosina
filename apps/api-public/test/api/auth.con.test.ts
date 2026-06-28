@@ -1,4 +1,4 @@
-import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
+import type { TApiResponseError, TApiResponseOk } from '@cosina/types/shared'
 import { createEmailVerificationToken } from 'better-auth/api'
 import { env } from 'cloudflare:workers'
 import { beforeAll, describe, expect, it } from 'vitest'
@@ -282,7 +282,7 @@ describe('Auth Endpoint', () => {
                             },
                             body: JSON.stringify({
                                 organizationId: 'superorganization',
-                                accountId: 'superadministrator@hyperion.app',
+                                accountId: 'superadministrator@cosina.app',
                                 password: 'P@ssw0rd1234',
                             }),
                         },
@@ -307,7 +307,7 @@ describe('Auth Endpoint', () => {
                                 'content-type': 'application/json',
                             },
                             body: JSON.stringify({
-                                accountId: 'superadministrator@hyperion.app',
+                                accountId: 'superadministrator@cosina.app',
                                 password: 'P@ssw0rd1234',
                             }),
                         },
@@ -332,7 +332,7 @@ describe('Auth Endpoint', () => {
                             },
                             body: JSON.stringify({
                                 organizationId: 'INVALID',
-                                accountId: 'superadministrator@hyperion.app',
+                                accountId: 'superadministrator@cosina.app',
                                 password: 'P@ssw0rd1234',
                             }),
                         },
@@ -388,7 +388,7 @@ describe('Auth Endpoint', () => {
                             },
                             body: JSON.stringify({
                                 organizationId: 'superorganization',
-                                accountId: 'superadministrator@hyperion.app',
+                                accountId: 'superadministrator@cosina.app',
                                 password: 'P@ssw0rd4321',
                             }),
                         },
@@ -416,7 +416,7 @@ describe('Auth Endpoint', () => {
                             },
                             body: JSON.stringify({
                                 organizationId: 'superorganization',
-                                accountId: 'superadministrator@hyperion.app',
+                                accountId: 'superadministrator@cosina.app',
                                 password: 'weak',
                             }),
                         },
@@ -441,7 +441,7 @@ describe('Auth Endpoint', () => {
                             },
                             body: JSON.stringify({
                                 organizationId: 'superorganization',
-                                accountId: 'locked@hyperion.app',
+                                accountId: 'locked@cosina.app',
                                 password: 'P@ssw0rd1234',
                             }),
                         },
@@ -544,7 +544,7 @@ describe('Auth Endpoint', () => {
             it('Expired token should return 422.', async () => {
                 const token = await createEmailVerificationToken(
                     env.BETTER_AUTH_SECRET,
-                    'expired.email.verification.public@hyperion.app',
+                    'expired.email.verification.public@cosina.app',
                     undefined,
                     -1,
                 )
@@ -743,7 +743,7 @@ describe('Auth Endpoint', () => {
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
-                            email: 'member@hyperion.app',
+                            email: 'member@cosina.app',
                         }),
                     },
                     env,
@@ -766,7 +766,7 @@ describe('Auth Endpoint', () => {
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
-                            email: 'nonexistent@hyperion.app',
+                            email: 'nonexistent@cosina.app',
                         }),
                     },
                     env,

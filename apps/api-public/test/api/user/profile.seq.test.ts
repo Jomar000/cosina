@@ -1,8 +1,8 @@
-import { dbClient, dbSchema } from '@hyperion/database/postgres'
+import { dbClient, dbSchema } from '@cosina/database/postgres'
 import type {
     TApiResponseOk,
     TApiResponsePaginatedOk,
-} from '@hyperion/types/shared'
+} from '@cosina/types/shared'
 import { env } from 'cloudflare:workers'
 import { and, desc, eq, inArray } from 'drizzle-orm'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -64,11 +64,11 @@ const secondAddressPayload = {
 
 beforeAll(async () => {
     db = dbClient({
-        host: env.HYPERIONPUB_HD.host,
-        port: Number(env.HYPERIONPUB_HD.port) || 5432,
-        database: env.HYPERIONPUB_HD.database,
-        user: env.HYPERIONPUB_HD.user,
-        pass: env.HYPERIONPUB_HD.password,
+        host: env.COSINAPUB_HD.host,
+        port: Number(env.COSINAPUB_HD.port) || 5432,
+        database: env.COSINAPUB_HD.database,
+        user: env.COSINAPUB_HD.user,
+        pass: env.COSINAPUB_HD.password,
     })
     ;[
         privilegedCookie,

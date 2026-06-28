@@ -1,6 +1,6 @@
 <script lang="ts">
-    import * as Collapsible from '@hyperion/ui/components/collapsible'
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import * as Collapsible from '@cosina/ui/components/collapsible'
+    import * as Sidebar from '@cosina/ui/components/sidebar'
     import ChevronRightIcon from '@lucide/svelte/icons/chevron-right'
 
     import { page } from '$app/state'

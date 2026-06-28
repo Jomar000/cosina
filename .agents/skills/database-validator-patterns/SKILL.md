@@ -62,7 +62,7 @@ When a create endpoint needs retry safety:
 
 ## Zod Validators
 
-`PROJECT_NAME` is the reusable template token for the repository package scope; it resolves to `hyperion` in this repository.
+`PROJECT_NAME` is the reusable template token for the repository package scope; it resolves to `Cosina` in this repository.
 
 `@PROJECT_NAME/validator` depends on `@PROJECT_NAME/types` through a workspace dependency and TypeScript project reference.
 

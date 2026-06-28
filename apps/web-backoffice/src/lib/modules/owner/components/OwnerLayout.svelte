@@ -1,5 +1,5 @@
 <script lang="ts">
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import * as Sidebar from '@cosina/ui/components/sidebar'
     import ListIcon from '@lucide/svelte/icons/list'
     import UsersIcon from '@lucide/svelte/icons/users'
     import { onMount } from 'svelte'

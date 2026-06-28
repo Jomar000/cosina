@@ -1,4 +1,4 @@
-import { dbClient, dbSchema } from '@hyperion/database/postgres'
+import { dbClient, dbSchema } from '@cosina/database/postgres'
 import { and, inArray, isNotNull, lt, or } from 'drizzle-orm'
 
 /**
@@ -17,14 +17,14 @@ import { and, inArray, isNotNull, lt, or } from 'drizzle-orm'
  */
 export async function cleanupProofImages(env: Env): Promise<void> {
     const db = dbClient({
-        host: env.HYPERIONPUB_HD.host,
-        port: env.HYPERIONPUB_HD.port,
-        database: env.HYPERIONPUB_HD.database,
-        user: env.HYPERIONPUB_HD.user,
-        pass: env.HYPERIONPUB_HD.password,
+        host: env.COSINAPUB_HD.host,
+        port: env.COSINAPUB_HD.port,
+        database: env.COSINAPUB_HD.database,
+        user: env.COSINAPUB_HD.user,
+        pass: env.COSINAPUB_HD.password,
     })
 
-    const kv = env.HYPERIONPUB_KV
+    const kv = env.COSINAPUB_KV
     const {
         order: orderTable,
         objectStorage: objectStorageTable,

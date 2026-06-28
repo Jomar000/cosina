@@ -1,4 +1,4 @@
-import { product } from '@hyperion/validator/public/product'
+import { product } from '@cosina/validator/public/product'
 import { asc, count as countFn, desc, eq, inArray } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { Hono } from 'hono'

@@ -5,7 +5,7 @@ description: Project rules for pnpm workspace dependencies, package boundaries, 
 
 # Monorepo Troubleshooting
 
-`PROJECT_NAME` is the reusable template token for the package scope; it resolves to `hyperion` in this repository, so `@PROJECT_NAME/types` means `@hyperion/types`.
+`PROJECT_NAME` is the reusable template token for the package scope; it resolves to `Cosina` in this repository, so `@PROJECT_NAME/types` means `@cosina/types`.
 
 ## Dependency Graph
 

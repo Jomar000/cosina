@@ -1,5 +1,5 @@
-import { dbClient, dbSchema } from '@hyperion/database/postgres'
-import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
+import { dbClient, dbSchema } from '@cosina/database/postgres'
+import type { TApiResponseError, TApiResponseOk } from '@cosina/types/shared'
 import { createEmailVerificationToken } from 'better-auth/api'
 import { env } from 'cloudflare:workers'
 import { eq } from 'drizzle-orm'
@@ -12,11 +12,11 @@ let db: ReturnType<typeof dbClient>
 
 beforeAll(() => {
     db = dbClient({
-        host: env.HYPERIONPUB_HD.host,
-        port: Number(env.HYPERIONPUB_HD.port) || 5432,
-        database: env.HYPERIONPUB_HD.database,
-        user: env.HYPERIONPUB_HD.user,
-        pass: env.HYPERIONPUB_HD.password,
+        host: env.COSINAPUB_HD.host,
+        port: Number(env.COSINAPUB_HD.port) || 5432,
+        database: env.COSINAPUB_HD.database,
+        user: env.COSINAPUB_HD.user,
+        pass: env.COSINAPUB_HD.password,
     })
 })
 
@@ -62,7 +62,7 @@ const signInMutableAuthUser = async () => {
 const verificationUser = {
     id: 'USER_EMAIL_VERIFICATION_PUBLIC',
     name: 'EMAIL VERIFICATION PUBLIC',
-    email: 'email.verification.public@hyperion.app',
+    email: 'email.verification.public@cosina.app',
     username: 'email_verification_public',
 }
 
@@ -173,7 +173,7 @@ describe('Auth Endpoint', () => {
                         },
                         body: JSON.stringify({
                             organizationId: 'superorganization',
-                            accountId: 'no.attribute@hyperion.app',
+                            accountId: 'no.attribute@cosina.app',
                             password: 'P@ssw0rd1234',
                         }),
                     },
@@ -478,7 +478,7 @@ describe('Auth Endpoint', () => {
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
-                            email: 'auth.mutable@hyperion.app',
+                            email: 'auth.mutable@cosina.app',
                         }),
                     },
                     env,

@@ -32,7 +32,7 @@ export const apiRoute = new Hono<THonoInstance>()
             .get('kvClient')
             .getWithMetadata<{ mimeType: string }>(`img:${id}`, 'arrayBuffer')
         if (!result.value) {
-            result = await ctx.env.HYPERIONPUB_KV.getWithMetadata<{
+            result = await ctx.env.COSINAPUB_KV.getWithMetadata<{
                 mimeType: string
             }>(`img:${id}`, 'arrayBuffer')
         }

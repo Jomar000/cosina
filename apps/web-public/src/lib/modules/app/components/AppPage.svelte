@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { Button } from '@hyperion/ui/components/button'
-    import * as Card from '@hyperion/ui/components/card'
-    import * as Select from '@hyperion/ui/components/select'
+    import { Button } from '@cosina/ui/components/button'
+    import * as Card from '@cosina/ui/components/card'
+    import * as Select from '@cosina/ui/components/select'
     import GalleryVerticalEndIcon from '@lucide/svelte/icons/gallery-vertical-end'
     import UserStar from '@lucide/svelte/icons/user-star'
     import { onMount } from 'svelte'

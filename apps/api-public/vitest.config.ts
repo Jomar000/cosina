@@ -40,7 +40,7 @@ const onUnhandledError: NonNullable<TestUserConfig['onUnhandledError']> = (
         return false
 }
 
-prepareTestDatabaseEnvironment('HYPERIONPUB_HD')
+prepareTestDatabaseEnvironment('COSINAPUB_HD')
 
 export default defineConfig({
     plugins: [

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { Button } from '@hyperion/ui/components/button'
-    import * as Sheet from '@hyperion/ui/components/sheet'
-    import * as Tooltip from '@hyperion/ui/components/tooltip'
+    import { Button } from '@cosina/ui/components/button'
+    import * as Sheet from '@cosina/ui/components/sheet'
+    import * as Tooltip from '@cosina/ui/components/tooltip'
     import MenuIcon from '@lucide/svelte/icons/menu'
     import type { Snippet } from 'svelte'
 

@@ -1,10 +1,10 @@
-import type { dbClient, dbSchema } from '@hyperion/database/postgres'
+import type { dbClient, dbSchema } from '@cosina/database/postgres'
 import type {
     TBaseHonoBindings,
     TBaseHonoInstance,
     TBaseHonoVariables,
     TApiResponseError,
-} from '@hyperion/types/shared'
+} from '@cosina/types/shared'
 import type { AwsClient } from 'aws4fetch'
 import type {
     ClientErrorStatusCode,
@@ -17,9 +17,9 @@ import type { WebSocketServer } from './core/durableObject/webSocketServer.js'
 
 export type THonoBindings = TBaseHonoBindings<
     {
-        HYPERIONPUB_DO_WSS: DurableObjectNamespace<WebSocketServer>
-        HYPERIONPUB_HD: Hyperdrive
-        HYPERIONPUB_KV: KVNamespace
+        COSINAPUB_DO_WSS: DurableObjectNamespace<WebSocketServer>
+        COSINAPUB_HD: Hyperdrive
+        COSINAPUB_KV: KVNamespace
     } & Env
 >
 

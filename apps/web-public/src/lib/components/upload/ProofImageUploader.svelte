@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button } from '@hyperion/ui/components/button'
+    import { Button } from '@cosina/ui/components/button'
     import ImageIcon from '@lucide/svelte/icons/image'
     import LoaderCircleIcon from '@lucide/svelte/icons/loader-circle'
     import RotateCcwIcon from '@lucide/svelte/icons/rotate-ccw'

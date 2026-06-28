@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { Button } from '@hyperion/ui/components/button'
-    import * as Dialog from '@hyperion/ui/components/dialog'
-    import { Input } from '@hyperion/ui/components/input'
-    import { Separator } from '@hyperion/ui/components/separator'
+    import { Button } from '@cosina/ui/components/button'
+    import * as Dialog from '@cosina/ui/components/dialog'
+    import { Input } from '@cosina/ui/components/input'
+    import { Separator } from '@cosina/ui/components/separator'
     import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left'
     import BanknoteIcon from '@lucide/svelte/icons/banknote'
     import CalendarClockIcon from '@lucide/svelte/icons/calendar-clock'

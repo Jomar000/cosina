@@ -1,8 +1,8 @@
 {
-    "name": "@hyperion/database",
+    "name": "@cosina/database",
     "version": "0.0.1",
     "author": "4thDEVisionTech",
-    "description": "Hyperion Database Component",
+    "description": "Cosina Database Component",
     "type": "module",
     "private": true,
     "license": "ISC",

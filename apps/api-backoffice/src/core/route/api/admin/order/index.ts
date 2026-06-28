@@ -1,4 +1,4 @@
-import { order } from '@hyperion/validator/backoffice/admin/order'
+import { order } from '@cosina/validator/backoffice/admin/order'
 import {
     and,
     asc,
@@ -46,8 +46,8 @@ async function broadcastOrderEvent(
 
     // Broadcast to public DO (customer tracking page WS clients)
     try {
-        const id = ctx.env.HYPERIONPUB_DO_WSS.idFromName('orders')
-        const stub = ctx.env.HYPERIONPUB_DO_WSS.get(id)
+        const id = ctx.env.COSINAPUB_DO_WSS.idFromName('orders')
+        const stub = ctx.env.COSINAPUB_DO_WSS.get(id)
         await stub.sendMessage(payload)
     } catch {
         // Non-fatal
@@ -85,7 +85,7 @@ async function deleteProofImageIfUnused(
         )
 
     if (count === 0) {
-        await ctx.env.HYPERIONPUB_KV.delete(`img:${objectId}`)
+        await ctx.env.COSINAPUB_KV.delete(`img:${objectId}`)
         await db
             .update(objectStorageTable)
             .set({ isUploaded: false })

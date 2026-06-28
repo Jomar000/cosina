@@ -2,7 +2,7 @@ import type {
     TApiResponseError,
     TApiResponseOk,
     TApiResponsePaginatedOk,
-} from '@hyperion/types/shared'
+} from '@cosina/types/shared'
 import { env } from 'cloudflare:workers'
 import { v7 as uuidv7 } from 'uuid'
 import { beforeAll, describe, expect, it } from 'vitest'

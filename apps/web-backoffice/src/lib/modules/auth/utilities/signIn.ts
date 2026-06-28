@@ -1,4 +1,4 @@
-import { auth as authValidator } from '@hyperion/validator/backoffice'
+import { auth as authValidator } from '@cosina/validator/backoffice'
 import { toast } from 'svelte-sonner'
 import type { z } from 'zod'
 

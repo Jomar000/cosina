@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { Button } from '@hyperion/ui/components/button'
-    import * as Dialog from '@hyperion/ui/components/dialog'
+    import { Button } from '@cosina/ui/components/button'
+    import * as Dialog from '@cosina/ui/components/dialog'
     import BanknoteIcon from '@lucide/svelte/icons/banknote'
     import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2'
     import ClipboardListIcon from '@lucide/svelte/icons/clipboard-list'

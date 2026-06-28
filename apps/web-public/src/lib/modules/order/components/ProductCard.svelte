@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { Button } from '@hyperion/ui/components/button'
-    import * as Drawer from '@hyperion/ui/components/drawer'
-    import { cn } from '@hyperion/ui/utils'
+    import { Button } from '@cosina/ui/components/button'
+    import * as Drawer from '@cosina/ui/components/drawer'
+    import { cn } from '@cosina/ui/utils'
     import CheckIcon from '@lucide/svelte/icons/check'
     import ChevronDownIcon from '@lucide/svelte/icons/chevron-down'
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart'

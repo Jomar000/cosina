@@ -1,5 +1,5 @@
 <script lang="ts">
-    import * as DropdownMenu from '@hyperion/ui/components/dropdown-menu'
+    import * as DropdownMenu from '@cosina/ui/components/dropdown-menu'
     import BellIcon from '@lucide/svelte/icons/bell'
     import BellRingIcon from '@lucide/svelte/icons/bell-ring'
     import CheckIcon from '@lucide/svelte/icons/check'

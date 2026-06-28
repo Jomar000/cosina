@@ -18,10 +18,10 @@
       "Bash(git branch *)",
       "Bash(git show *)",
       "Bash(git stash list)",
-      "Bash(pnpm --filter=@hyperion/web-backoffice check)",
-      "Bash(pnpm --filter=@hyperion/web-public check)",
+      "Bash(pnpm --filter=@cosina/web-backoffice check)",
+      "Bash(pnpm --filter=@cosina/web-public check)",
       "Bash(pnpm check *)",
-      "Bash(pnpm --filter=@hyperion/web-backoffice --filter=@hyperion/web-public lint)",
+      "Bash(pnpm --filter=@cosina/web-backoffice --filter=@cosina/web-public lint)",
       "Bash(git add *)"
     ],
     "deny": [

@@ -1,8 +1,8 @@
 {
-    "name": "@hyperion/web-backoffice",
+    "name": "@cosina/web-backoffice",
     "version": "0.0.1",
     "author": "4thDEVisionTech",
-    "description": "Hyperion Backoffice Web UI Component",
+    "description": "Cosina Backoffice Web UI Component",
     "type": "module",
     "private": true,
     "license": "ISC",
@@ -24,12 +24,12 @@
         "test:e2e": "playwright test"
     },
     "devDependencies": {
-        "@hyperion/api-backoffice": "workspace:*",
+        "@cosina/api-backoffice": "workspace:*",
         "@internationalized/date": "catalog:",
         "apexcharts": "^4.7.0",
-        "@hyperion/types": "workspace:*",
-        "@hyperion/ui": "workspace:*",
-        "@hyperion/validator": "workspace:*",
+        "@cosina/types": "workspace:*",
+        "@cosina/ui": "workspace:*",
+        "@cosina/validator": "workspace:*",
         "@lucide/svelte": "catalog:",
         "@playwright/test": "catalog:",
         "@sveltejs/adapter-static": "catalog:",

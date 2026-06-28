@@ -1,4 +1,4 @@
-import { profile } from '@hyperion/validator/backoffice/user'
+import { profile } from '@cosina/validator/backoffice/user'
 import { and, eq } from 'drizzle-orm'
 import { getColumns } from 'drizzle-orm/utils'
 import { Hono } from 'hono'

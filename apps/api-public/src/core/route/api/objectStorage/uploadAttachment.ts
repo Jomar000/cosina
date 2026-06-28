@@ -2,7 +2,7 @@ import {
     uploadAttachmentCommitInputSchema,
     uploadAttachmentCreateInputSchema,
     uploadAttachmentRetryInputSchema,
-} from '@hyperion/validator/public/objectStorage'
+} from '@cosina/validator/public/objectStorage'
 import { hexToBytes } from '@noble/hashes/utils.js'
 import { and, eq, inArray, sql } from 'drizzle-orm'
 import { Hono } from 'hono'

@@ -1,8 +1,8 @@
 {
-    "name": "hyperion",
+    "name": "cosina",
     "version": "0.0.1",
     "author": "4thDEVisionTech",
-    "description": "Hyperion",
+    "description": "cosina",
     "type": "module",
     "private": true,
     "license": "ISC",

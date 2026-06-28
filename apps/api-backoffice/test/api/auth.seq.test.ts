@@ -1,5 +1,5 @@
-import { dbClient, dbSchema } from '@hyperion/database/postgres'
-import type { TApiResponseError, TApiResponseOk } from '@hyperion/types/shared'
+import { dbClient, dbSchema } from '@cosina/database/postgres'
+import type { TApiResponseError, TApiResponseOk } from '@cosina/types/shared'
 import { createEmailVerificationToken } from 'better-auth/api'
 import { env } from 'cloudflare:workers'
 import { eq } from 'drizzle-orm'
@@ -12,11 +12,11 @@ let db: ReturnType<typeof dbClient>
 
 beforeAll(() => {
     db = dbClient({
-        host: env.HYPERIONBOFC_HD.host,
-        port: Number(env.HYPERIONBOFC_HD.port) || 5432,
-        database: env.HYPERIONBOFC_HD.database,
-        user: env.HYPERIONBOFC_HD.user,
-        pass: env.HYPERIONBOFC_HD.password,
+        host: env.COSINABOFC_HD.host,
+        port: Number(env.COSINABOFC_HD.port) || 5432,
+        database: env.COSINABOFC_HD.database,
+        user: env.COSINABOFC_HD.user,
+        pass: env.COSINABOFC_HD.password,
     })
 })
 
@@ -62,7 +62,7 @@ const signInMutableAuthUser = async () => {
 const verificationUser = {
     id: 'USER_EMAIL_VERIFICATION_BACKOFFICE',
     name: 'EMAIL VERIFICATION BACKOFFICE',
-    email: 'email.verification.backoffice@hyperion.app',
+    email: 'email.verification.backoffice@cosina.app',
     username: 'email_verification_backoffice',
 }
 
@@ -173,7 +173,7 @@ describe('Auth Endpoint', () => {
                         },
                         body: JSON.stringify({
                             organizationId: 'superorganization',
-                            accountId: 'no.attribute@hyperion.app',
+                            accountId: 'no.attribute@cosina.app',
                             password: 'P@ssw0rd1234',
                         }),
                     },
@@ -474,7 +474,7 @@ describe('Auth Endpoint', () => {
                             'content-type': 'application/json',
                         },
                         body: JSON.stringify({
-                            email: 'auth.mutable@hyperion.app',
+                            email: 'auth.mutable@cosina.app',
                         }),
                     },
                     env,

@@ -4,7 +4,7 @@ import {
     passwordResetRequestInputSchema,
     signInInputSchema,
     verifyEmailInputSchema,
-} from '@hyperion/validator/public/auth'
+} from '@cosina/validator/public/auth'
 import { and, eq } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { Hono } from 'hono'

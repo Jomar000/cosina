@@ -1,4 +1,4 @@
-import { dashboard } from '@hyperion/validator/backoffice/admin/dashboard'
+import { dashboard } from '@cosina/validator/backoffice/admin/dashboard'
 import { and, count as countFn, eq, gte, inArray, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'

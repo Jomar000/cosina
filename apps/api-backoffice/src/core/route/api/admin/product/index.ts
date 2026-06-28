@@ -1,4 +1,4 @@
-import { product } from '@hyperion/validator/backoffice/admin/product'
+import { product } from '@cosina/validator/backoffice/admin/product'
 import { asc, count as countFn, desc, eq, inArray } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'
@@ -35,8 +35,8 @@ async function broadcastProductEvent(
 
     // Broadcast to public DO (customer landing page)
     try {
-        const id = ctx.env.HYPERIONPUB_DO_WSS.idFromName('products')
-        const stub = ctx.env.HYPERIONPUB_DO_WSS.get(id)
+        const id = ctx.env.COSINAPUB_DO_WSS.idFromName('products')
+        const stub = ctx.env.COSINAPUB_DO_WSS.get(id)
         await stub.sendMessage(payload)
     } catch {
         // Non-fatal

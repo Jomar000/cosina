@@ -1,4 +1,4 @@
-import { order } from '@hyperion/validator/public/order'
+import { order } from '@cosina/validator/public/order'
 import { asc, eq, inArray } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'
@@ -32,8 +32,8 @@ async function broadcastOrderEvent(
 
     // Broadcast to backoffice DO (admin orders WS clients)
     try {
-        const id = ctx.env.HYPERIONBOFC_DO_WSS.idFromName('orders')
-        const stub = ctx.env.HYPERIONBOFC_DO_WSS.get(id)
+        const id = ctx.env.COSINABOFC_DO_WSS.idFromName('orders')
+        const stub = ctx.env.COSINABOFC_DO_WSS.get(id)
         await stub.sendMessage(payload)
     } catch {
         // Non-fatal

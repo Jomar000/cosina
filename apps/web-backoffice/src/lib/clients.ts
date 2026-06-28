@@ -1,8 +1,8 @@
-import type { AdminRouteType } from '@hyperion/api-backoffice/api/admin'
-import type { AuthRouteType } from '@hyperion/api-backoffice/api/auth'
-import type { HeartbeatRouteType } from '@hyperion/api-backoffice/api/heartbeat'
-import type { ObjectStorageRouteType } from '@hyperion/api-backoffice/api/objectStorage'
-import type { UserRouteType } from '@hyperion/api-backoffice/api/user'
+import type { AdminRouteType } from '@cosina/api-backoffice/api/admin'
+import type { AuthRouteType } from '@cosina/api-backoffice/api/auth'
+import type { HeartbeatRouteType } from '@cosina/api-backoffice/api/heartbeat'
+import type { ObjectStorageRouteType } from '@cosina/api-backoffice/api/objectStorage'
+import type { UserRouteType } from '@cosina/api-backoffice/api/user'
 import { hc } from 'hono/client'
 import ky from 'ky'
 

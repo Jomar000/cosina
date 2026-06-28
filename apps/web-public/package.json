@@ -1,8 +1,8 @@
 {
-    "name": "@hyperion/web-public",
+    "name": "@cosina/web-public",
     "version": "0.0.1",
     "author": "4thDEVisionTech",
-    "description": "Hyperion Public Web UI Component",
+    "description": "Cosina Public Web UI Component",
     "type": "module",
     "private": true,
     "license": "ISC",
@@ -24,12 +24,12 @@
         "test:e2e": "playwright test"
     },
     "devDependencies": {
-        "@hyperion/api-public": "workspace:*",
+        "@cosina/api-public": "workspace:*",
         "@internationalized/date": "catalog:",
         "motion": "^12.40.0",
-        "@hyperion/types": "workspace:*",
-        "@hyperion/ui": "workspace:*",
-        "@hyperion/validator": "workspace:*",
+        "@cosina/types": "workspace:*",
+        "@cosina/ui": "workspace:*",
+        "@cosina/validator": "workspace:*",
         "@lucide/svelte": "catalog:",
         "@playwright/test": "catalog:",
         "@sveltejs/adapter-static": "catalog:",

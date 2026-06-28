@@ -1,7 +1,7 @@
 import {
     downloadLinkCreateInputSchema,
     downloadReadManyInputSchema,
-} from '@hyperion/validator/backoffice/objectStorage'
+} from '@cosina/validator/backoffice/objectStorage'
 import { and, asc, count as countFn, desc, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 

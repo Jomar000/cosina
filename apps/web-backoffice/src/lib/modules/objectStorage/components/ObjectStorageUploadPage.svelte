@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { Checkbox } from '@hyperion/ui/components/checkbox'
-    import { Label } from '@hyperion/ui/components/label'
+    import { Checkbox } from '@cosina/ui/components/checkbox'
+    import { Label } from '@cosina/ui/components/label'
 
     import MultiFileUpload from '$lib/components/upload/MultiFileUpload.svelte'
     import SingleFileUpload from '$lib/components/upload/SingleFileUpload.svelte'

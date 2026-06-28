@@ -1,4 +1,4 @@
-import { settings } from '@hyperion/validator/backoffice/admin/settings'
+import { settings } from '@cosina/validator/backoffice/admin/settings'
 import { eq, inArray, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'
@@ -27,8 +27,8 @@ async function broadcastSettingsEvent(
     data: unknown,
 ) {
     try {
-        const id = env.HYPERIONPUB_DO_WSS.idFromName('settings')
-        const stub = env.HYPERIONPUB_DO_WSS.get(id)
+        const id = env.COSINAPUB_DO_WSS.idFromName('settings')
+        const stub = env.COSINAPUB_DO_WSS.get(id)
         await stub.sendMessage(
             JSON.stringify({ event: 'settings.update', data }),
         )

@@ -1,7 +1,7 @@
 <!-- https://shadcn-svelte.com/blocks/sidebar#sidebar-07 -->
 
 <script lang="ts">
-    import * as Sidebar from '@hyperion/ui/components/sidebar'
+    import * as Sidebar from '@cosina/ui/components/sidebar'
     import AudioWaveformIcon from '@lucide/svelte/icons/audio-waveform'
     import CommandIcon from '@lucide/svelte/icons/command'
     import GalleryVerticalEndIcon from '@lucide/svelte/icons/gallery-vertical-end'

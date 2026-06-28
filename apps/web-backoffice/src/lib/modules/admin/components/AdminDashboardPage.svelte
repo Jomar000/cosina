@@ -1,7 +1,7 @@
 <script lang="ts">
-    import * as Card from '@hyperion/ui/components/card'
-    import { Skeleton } from '@hyperion/ui/components/skeleton'
-    import * as Tabs from '@hyperion/ui/components/tabs'
+    import * as Card from '@cosina/ui/components/card'
+    import { Skeleton } from '@cosina/ui/components/skeleton'
+    import * as Tabs from '@cosina/ui/components/tabs'
     import BanknoteIcon from '@lucide/svelte/icons/banknote'
     import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2'
     import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard'
