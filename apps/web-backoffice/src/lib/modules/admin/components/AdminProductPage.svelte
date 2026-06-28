@@ -15,7 +15,7 @@
     import PlusIcon from '@lucide/svelte/icons/plus'
     import ShoppingBagIcon from '@lucide/svelte/icons/shopping-bag'
     import Trash2Icon from '@lucide/svelte/icons/trash-2'
-    import ProductImageUploader from '$lib/components/product/ProductImageUploader.svelte'
+    import SingleFileUpload from '$lib/components/upload/SingleFileUpload.svelte'
     import {
         createMutation,
         createQuery,
@@ -116,7 +116,8 @@
     let nextSizeKey = 0
     let formImageObjectStorageId = $state<string | null>(null)
     let formInitialImageUrl = $state<string | null>(null)
-    let imageIsUploading = $state(false)
+    let imageIsCommitted = $state(false)
+    let imageObjectId = $state('')
 
     /////////////////
     // 05. Queries //
@@ -261,7 +262,7 @@
     /////////////////
 
     const isMutating = $derived(
-        imageIsUploading ||
+        (imageObjectId !== '' && !imageIsCommitted) ||
             createProductMutation.isPending ||
             updateProductMutation.isPending ||
             deleteProductMutation.isPending,
@@ -307,6 +308,8 @@
         formSizes = []
         formImageObjectStorageId = null
         formInitialImageUrl = null
+        imageIsCommitted = false
+        imageObjectId = ''
         dialogOpen = true
     }
 
@@ -386,7 +389,7 @@
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
 
-        if (imageIsUploading) return
+        if (imageObjectId !== '' && !imageIsCommitted) return
 
         const validFlavors = formFlavors
             .filter((f) => f.name.trim())
@@ -744,7 +747,15 @@
 </main>
 
 <!-- Create / Edit Dialog -->
-<Dialog.Root bind:open={dialogOpen}>
+<Dialog.Root
+    bind:open={dialogOpen}
+    onOpenChange={(isOpen) => {
+        if (!isOpen) {
+            imageIsCommitted = false
+            imageObjectId = ''
+        }
+    }}
+>
     <Dialog.Content
         class="flex max-h-[90dvh] w-full flex-col overflow-hidden p-0 bg-zinc-950 border-zinc-800/80 shadow-2xl shadow-black/60 sm:max-w-2xl"
     >
@@ -784,10 +795,31 @@
                 class="flex flex-col gap-4 border-b border-zinc-800 px-5 py-4 sm:border-b-0 sm:border-r sm:border-zinc-800"
             >
                 <!-- Image — full width so the 4:3 aspect ratio has room -->
-                <ProductImageUploader
-                    bind:objectStorageId={formImageObjectStorageId}
-                    bind:isUploading={imageIsUploading}
-                    initialImageUrl={formInitialImageUrl}
+                {#if formInitialImageUrl && imageObjectId === '' && !imageIsCommitted}
+                    <div
+                        class="aspect-video overflow-hidden rounded-lg border border-border"
+                    >
+                        <img
+                            src={formInitialImageUrl}
+                            alt={formName}
+                            class="size-full object-cover"
+                        />
+                    </div>
+                {/if}
+                <SingleFileUpload
+                    allowedMimeTypes={[
+                        'image/jpeg',
+                        'image/png',
+                        'image/webp',
+                        'image/gif',
+                    ]}
+                    isPublic={true}
+                    autoCommit={true}
+                    bind:isCommitted={imageIsCommitted}
+                    bind:objectId={imageObjectId}
+                    onCommit={(data) => {
+                        formImageObjectStorageId = data.attachments[0]
+                    }}
                 />
 
                 <!-- Name / Category / Price -->

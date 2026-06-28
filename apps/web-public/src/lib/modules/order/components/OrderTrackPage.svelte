@@ -27,7 +27,7 @@
     import { toast } from 'svelte-sonner'
 
     import { orderClient } from '$lib/clients'
-    import ProofImageUploader from '$lib/components/upload/ProofImageUploader.svelte'
+    import SingleFileUpload from '$lib/components/upload/SingleFileUpload.svelte'
     import { wsClientManager } from '$lib/utilities/wsClientManager'
     import PayRemainingBalanceDialog from './PayRemainingBalanceDialog.svelte'
 
@@ -159,7 +159,7 @@
 
     let resubmitDpDialogOpen = $state(false)
     let resubmitDpObjectId = $state<string | null>(null)
-    let resubmitDpUploading = $state(false)
+    let resubmitDpIsCommitted = $state(false)
     let resubmitDpError = $state<string | null>(null)
 
     /////////////////
@@ -262,6 +262,7 @@
             )
             resubmitDpDialogOpen = false
             resubmitDpObjectId = null
+            resubmitDpIsCommitted = false
             resubmitDpError = null
             toast.success('Your proof has been resubmitted for review.')
         },
@@ -1289,6 +1290,7 @@
         onOpenChange={(isOpen) => {
             if (!isOpen) {
                 resubmitDpObjectId = null
+                resubmitDpIsCommitted = false
                 resubmitDpError = null
             }
         }}
@@ -1306,9 +1308,14 @@
             </Dialog.Header>
 
             <div class="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
-                <ProofImageUploader
-                    bind:objectStorageId={resubmitDpObjectId}
-                    bind:isUploading={resubmitDpUploading}
+                <SingleFileUpload
+                    allowedMimeTypes={['image/jpeg', 'image/png', 'image/webp']}
+                    isPublic={false}
+                    autoCommit={true}
+                    bind:isCommitted={resubmitDpIsCommitted}
+                    onCommit={(data) => {
+                        resubmitDpObjectId = data.attachments[0]
+                    }}
                 />
 
                 {#if resubmitDpError}
@@ -1334,7 +1341,7 @@
                 <Button
                     onclick={() => handleResubmitDownpayment(o.trackingCode)}
                     disabled={!resubmitDpObjectId ||
-                        resubmitDpUploading ||
+                        !resubmitDpIsCommitted ||
                         resubmitDownpaymentMutation.isPending}
                     class="flex-1 bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50"
                 >

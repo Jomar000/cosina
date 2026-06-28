@@ -1,7 +1,13 @@
 import { order } from '@cosina/validator/public/order'
+import {
+    uploadAttachmentCommitInputSchema,
+    uploadAttachmentCreateInputSchema,
+} from '@cosina/validator/public/objectStorage'
 import { asc, eq, inArray } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import type { ApplyGlobalResponse } from 'hono/client'
+import { encodeBase64 } from 'hono/utils/encode'
+import { hexToBytes } from '@noble/hashes/utils.js'
 
 import { AppError } from '../../../../errors.js'
 import type { TGlobalApiResponses, THonoInstance } from '../../../../types.js'
@@ -313,6 +319,191 @@ export const orderRoute = new Hono<THonoInstance>()
             },
         })
     })
+    /**
+     * @description
+     * Unauthenticated R2 proof upload routes (for public checkout flow).
+     * Single-file upload: create → attachment/create → commit
+     */
+    .post('/proof/r2/upload/create', async (ctx) => {
+        const uploadId = nanoidCustom(32)
+        return apiResponseOkWrapper(ctx, { data: { uploadId } })
+    })
+    .post(
+        '/proof/r2/upload/attachment/create',
+        validateRequest('json', uploadAttachmentCreateInputSchema),
+        async (ctx) => {
+            const { uploadId, attachments } = ctx.req.valid('json')
+            const { objectStorage } = ctx.get('dbSchema')
+
+            const hashesToCheck = attachments.map(
+                ({ hashSha256 }) => hashSha256,
+            )
+
+            try {
+                const signedUrls = await ctx
+                    .get('dbClient')
+                    .transaction(async (tx) => {
+                        const existingObjects = await tx
+                            .select({
+                                id: objectStorage.id,
+                                hashSha256: objectStorage.hashSha256,
+                                isUploaded: objectStorage.isUploaded,
+                            })
+                            .from(objectStorage)
+                            .where(
+                                inArray(
+                                    objectStorage.hashSha256,
+                                    hashesToCheck,
+                                ),
+                            )
+
+                        const existingObjectsByHash = new Map(
+                            existingObjects.map((os) => [
+                                os.hashSha256,
+                                os,
+                            ]),
+                        )
+
+                        const prepared: {
+                            id: string
+                            hashSha256: string
+                            encodedHash: string | null
+                            isPublic: boolean
+                            status: 201 | 409
+                        }[] = []
+
+                        for (const attachment of attachments) {
+                            const existingObject = existingObjectsByHash.get(
+                                attachment.hashSha256,
+                            )
+
+                            const objectStorageId =
+                                existingObject?.id ?? nanoidCustom(32)
+
+                            if (!existingObject) {
+                                await tx.insert(objectStorage).values({
+                                    id: objectStorageId,
+                                    ...attachment,
+                                    isPublic: false,
+                                    size: Number(attachment.size),
+                                })
+                            }
+
+                            if (existingObject?.isUploaded) {
+                                prepared.push({
+                                    id: objectStorageId,
+                                    hashSha256: attachment.hashSha256,
+                                    encodedHash: null,
+                                    isPublic: false,
+                                    status: 409,
+                                })
+                                continue
+                            }
+
+                            prepared.push({
+                                id: objectStorageId,
+                                hashSha256: attachment.hashSha256,
+                                encodedHash: encodeBase64(
+                                    hexToBytes(attachment.hashSha256).buffer,
+                                ),
+                                isPublic: false,
+                                status: 201,
+                            })
+                        }
+
+                        return prepared
+                    })
+
+                const signedUrlsWithUrls = await Promise.all(
+                    signedUrls.map(async (prepared) => {
+                        if (prepared.status === 409) {
+                            return {
+                                id: prepared.id,
+                                hashSha256: prepared.hashSha256,
+                                encodedHash: null,
+                                signedUrl: null,
+                                status: prepared.status,
+                            }
+                        }
+
+                        const signed = await ctx
+                            .get('aws4FetchClient')
+                            .sign(
+                                `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET_PRIVATE}/${prepared.id}?X-Amz-Expires=${ctx.env.CF_R2_PRESIGN_EXPIRY}`,
+                                {
+                                    method: 'PUT',
+                                    headers: {
+                                        'x-amz-checksum-sha256':
+                                            prepared.encodedHash!,
+                                    },
+                                    aws: {
+                                        service: 's3',
+                                        signQuery: true,
+                                    },
+                                },
+                            )
+
+                        return {
+                            id: prepared.id,
+                            hashSha256: prepared.hashSha256,
+                            encodedHash: prepared.encodedHash,
+                            signedUrl: signed.url,
+                            status: prepared.status,
+                        }
+                    }),
+                )
+
+                return apiResponseOkWrapper(ctx, {
+                    data: { uploadId, signedUrls: signedUrlsWithUrls },
+                })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'PROOF_R2_UPLOAD_FAILED',
+                        message: 'Proof upload to R2 failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
+    .post(
+        '/proof/r2/upload/commit',
+        validateRequest(
+            'json',
+            uploadAttachmentCommitInputSchema.pick({ attachments: true }),
+        ),
+        async (ctx) => {
+            const { attachments } = ctx.req.valid('json')
+            const { objectStorage } = ctx.get('dbSchema')
+
+            try {
+                await ctx
+                    .get('dbClient')
+                    .update(objectStorage)
+                    .set({ isUploaded: true })
+                    .where(inArray(objectStorage.id, attachments))
+
+                return apiResponseOkWrapper(ctx, {
+                    data: { attachments },
+                })
+            } catch (err) {
+                if (err instanceof AppError) throw err
+
+                throw new AppError(
+                    {
+                        status: 500,
+                        code: 'PROOF_R2_COMMIT_FAILED',
+                        message: 'Proof commit to R2 failed.',
+                    },
+                    err instanceof Error ? err : undefined,
+                )
+            }
+        },
+    )
 
 const ADVANCE_DAYS_KEY = 'order:settings:advanceDays'
 const DEFAULT_ADVANCE_DAYS = 3

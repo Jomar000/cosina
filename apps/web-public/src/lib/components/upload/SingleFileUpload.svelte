@@ -18,7 +18,6 @@
     import { createMutation } from '@tanstack/svelte-query'
     import { onDestroy } from 'svelte'
     import { toast } from 'svelte-sonner'
-    import { v7 as uuidv7 } from 'uuid'
 
     import { formatBytes } from '$lib/utilities/helpers'
     import {
@@ -61,7 +60,6 @@
     // 03. State //
     ///////////////
 
-    let createUploadIdempotencyKey = $state(uuidv7())
     let fileInput = $state<HTMLInputElement | null>(null)
     let selectedFile = $state<UploadMetadata | null>(null)
     let uploadMessage = $state('')
@@ -254,10 +252,7 @@
     async function ensureUploadId() {
         if (uploadId !== '') return
 
-        uploadId = await createUploadMutation.mutateAsync(
-            createUploadIdempotencyKey,
-        )
-        createUploadIdempotencyKey = uuidv7()
+        uploadId = await createUploadMutation.mutateAsync()
     }
 
     async function commitCurrentFile(file: UploadMetadata) {

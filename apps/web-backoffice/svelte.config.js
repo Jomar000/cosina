@@ -32,7 +32,7 @@ const config = {
                 'base-uri': ['self'],
                 'connect-src': [
                     'self',
-                    `https://${env.PUBLIC_CF_ACCOUNT_ID}.r2.cloudflarestorage.com/`,
+                    'https://*.r2.cloudflarestorage.com/',
                     `${env.PUBLIC_API_URL}/`,
                     `${env.PUBLIC_API_URL.replace(/^http?/, 'ws')}/`,
                 ],

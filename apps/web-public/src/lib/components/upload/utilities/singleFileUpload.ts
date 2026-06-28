@@ -1,9 +1,9 @@
 import { fileTypeFromBuffer } from 'file-type'
 import ky from 'ky'
 import PQueue from 'p-queue'
-import { v7 as uuidv7 } from 'uuid'
 
-import { objectStorageClient } from '$lib/clients'
+import { PUBLIC_API_URL } from '$env/static/public'
+import { getCookie, getCsrfCookieName } from '$lib/utilities/helpers'
 
 export type UploadMetadata = {
     file: File
@@ -24,21 +24,42 @@ export type PrepareUploadFilesResult = {
 
 export type UploadFileChangeHandler = (file: UploadMetadata) => void
 
+const CSRF_COOKIE_NAME = getCsrfCookieName(import.meta.env.MODE)
+
+function getCsrfHeaders(): Record<string, string> {
+    const csrfToken = getCookie(CSRF_COOKIE_NAME)
+    if (csrfToken) {
+        return { 'x-csrf-token': decodeURIComponent(csrfToken) }
+    }
+    return {}
+}
+
 export function getUploadMode(uploadId: string): UploadMode {
     return uploadId === '' ? 'NEW' : 'UPDATE'
 }
 
-export async function createUploadId(idempotencyKey = uuidv7()) {
-    const response = await objectStorageClient.upload.create.$post({
-        json: { idempotencyKey },
-    })
+export async function createUploadId() {
+    const response = await fetch(
+        `${PUBLIC_API_URL}/api/order/proof/r2/upload/create`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            headers: getCsrfHeaders(),
+        },
+    )
 
-    const responseJson = await response.json()
+    const responseJson = (await response.json()) as {
+        success: boolean
+        data?: { uploadId: string }
+        error?: { message: string }
+    }
     if (!responseJson.success) {
-        throw new Error(responseJson.error.message)
+        throw new Error(
+            responseJson.error?.message ?? 'Failed to create upload',
+        )
     }
 
-    return responseJson.data.uploadId
+    return responseJson.data!.uploadId
 }
 
 export async function commitUploadSession({
@@ -48,19 +69,35 @@ export async function commitUploadSession({
     objectIds: string[]
     uploadId: string
 }) {
-    const response = await objectStorageClient.upload.commit.$post({
-        json: {
-            uploadId,
-            attachments: objectIds,
-        },
-    })
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    }
+    Object.assign(headers, getCsrfHeaders())
 
-    const responseJson = await response.json()
+    const response = await fetch(
+        `${PUBLIC_API_URL}/api/order/proof/r2/upload/commit`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            headers,
+            body: JSON.stringify({
+                attachments: objectIds,
+            }),
+        },
+    )
+
+    const responseJson = (await response.json()) as {
+        success: boolean
+        data?: { attachments: string[] }
+        error?: { message: string }
+    }
     if (!responseJson.success) {
-        throw new Error(responseJson.error.message)
+        throw new Error(
+            responseJson.error?.message ?? 'Failed to commit upload',
+        )
     }
 
-    return responseJson.data
+    return { attachments: responseJson.data!.attachments, uploadId }
 }
 
 export async function prepareUploadFiles({
@@ -137,27 +174,50 @@ export async function uploadQueuedFiles({
 }) {
     if (queuedFiles.length === 0) return
 
-    const signingResponse =
-        await objectStorageClient.upload.attachment.create.$post({
-            json: {
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    }
+    Object.assign(headers, getCsrfHeaders())
+
+    const signingResponse = await fetch(
+        `${PUBLIC_API_URL}/api/order/proof/r2/upload/attachment/create`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            headers,
+            body: JSON.stringify({
                 uploadId,
                 attachments: queuedFiles.map((file) => ({
-                    size: `${file.file.size}`,
+                    size: file.file.size,
                     hashSha256: file.hashSha256,
                     isPublic: file.isPublic,
                     mimeType: file.mimeType,
                 })),
-            },
-        })
+            }),
+        },
+    )
 
-    const responseJson = await signingResponse.json()
+    const responseJson = (await signingResponse.json()) as {
+        success: boolean
+        data?: {
+            signedUrls: Array<{
+                id: string
+                signedUrl?: string | null
+                encodedHash?: string | null
+                status: number
+            }>
+        }
+        error?: { message: string }
+    }
     if (!responseJson.success) {
-        throw new Error(responseJson.error.message)
+        throw new Error(
+            responseJson.error?.message ?? 'Failed to get signed URLs',
+        )
     }
 
     const uploadQueue = new PQueue({ concurrency: 3 })
 
-    for (const signedUpload of responseJson.data.signedUrls) {
+    for (const signedUpload of responseJson.data!.signedUrls) {
         uploadQueue.add(() =>
             uploadSignedFile(signedUpload, queuedFiles, uploadId, onFileChange),
         )
@@ -175,23 +235,51 @@ export async function retryUploadFile({
     onFileChange?: UploadFileChangeHandler
     uploadId: string
 }) {
-    const retryResponse =
-        await objectStorageClient.upload.attachment.retry.$post({
-            json: {
-                uploadId,
-                attachments: [file.objectId],
-            },
-        })
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    }
+    Object.assign(headers, getCsrfHeaders())
 
-    const responseJson = await retryResponse.json()
+    const retryResponse = await fetch(
+        `${PUBLIC_API_URL}/api/order/proof/r2/upload/attachment/create`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            headers,
+            body: JSON.stringify({
+                uploadId,
+                attachments: [
+                    {
+                        size: file.file.size,
+                        hashSha256: file.hashSha256,
+                        isPublic: file.isPublic,
+                        mimeType: file.mimeType,
+                    },
+                ],
+            }),
+        },
+    )
+
+    const responseJson = (await retryResponse.json()) as {
+        success: boolean
+        data?: {
+            signedUrls: Array<{
+                id: string
+                signedUrl?: string | null
+                encodedHash?: string | null
+                status: number
+            }>
+        }
+        error?: { message: string }
+    }
     if (!responseJson.success) {
-        throw new Error(responseJson.error.message)
+        throw new Error(responseJson.error?.message ?? 'Failed to retry upload')
     }
 
-    for (const signedUpload of responseJson.data.signedUrls) {
+    for (const signedUpload of responseJson.data!.signedUrls) {
         if (signedUpload.status === 409) {
             updateFile(file, { status: 'UPLOADED' }, onFileChange)
-        } else if (signedUpload.status === 200) {
+        } else if (signedUpload.status === 201 || signedUpload.status === 200) {
             await uploadRetrySignedFile(
                 signedUpload,
                 file,
@@ -299,16 +387,29 @@ async function putSignedFile(
 }
 
 async function commitUploadedFile(uploadId: string, objectId: string) {
-    const response = await objectStorageClient.upload.attachment.commit.$post({
-        json: {
-            uploadId,
-            attachments: [objectId],
-        },
-    })
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    }
+    Object.assign(headers, getCsrfHeaders())
 
-    const responseJson = await response.json()
+    const response = await fetch(
+        `${PUBLIC_API_URL}/api/order/proof/r2/upload/commit`,
+        {
+            method: 'POST',
+            credentials: 'include',
+            headers,
+            body: JSON.stringify({
+                attachments: [objectId],
+            }),
+        },
+    )
+
+    const responseJson = (await response.json()) as {
+        success: boolean
+        error?: { message: string }
+    }
     if (!responseJson.success) {
-        throw new Error(responseJson.error.message)
+        throw new Error(responseJson.error?.message ?? 'Failed to commit file')
     }
 }
 

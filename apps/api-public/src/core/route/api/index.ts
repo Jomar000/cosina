@@ -30,6 +30,36 @@ export const apiRoute = new Hono<THonoInstance>()
      */
     .get('/image/view/:id', async (ctx) => {
         const id = ctx.req.param('id')
+
+        // Try R2 private bucket (proof images)
+        const privUrl = `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET_PRIVATE}/${id}`
+        const privResp = await ctx.get('aws4FetchClient').fetch(privUrl)
+        if (privResp.ok) {
+            return new Response(privResp.body, {
+                headers: {
+                    'Content-Type':
+                        privResp.headers.get('Content-Type') ??
+                        'application/octet-stream',
+                    'Cache-Control': 'private, max-age=300',
+                },
+            })
+        }
+
+        // Try R2 public bucket (product images)
+        const pubUrl = `https://${ctx.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com/${ctx.env.CF_R2_BUCKET_PUBLIC}/${id}`
+        const pubResp = await ctx.get('aws4FetchClient').fetch(pubUrl)
+        if (pubResp.ok) {
+            return new Response(pubResp.body, {
+                headers: {
+                    'Content-Type':
+                        pubResp.headers.get('Content-Type') ??
+                        'application/octet-stream',
+                    'Cache-Control': 'public, max-age=31536000, immutable',
+                },
+            })
+        }
+
+        // Fallback to KV (legacy images)
         const result = await ctx
             .get('kvClient')
             .getWithMetadata<{ mimeType: string }>(`img:${id}`, 'arrayBuffer')
@@ -42,6 +72,7 @@ export const apiRoute = new Hono<THonoInstance>()
                 },
             })
         }
+
         // Proxy to backoffice for product images stored in COSINABOFC_KV
         const upstream = await fetch(
             `${ctx.env.URL_BOFC_BACKEND}/api/image/view/${id}`,

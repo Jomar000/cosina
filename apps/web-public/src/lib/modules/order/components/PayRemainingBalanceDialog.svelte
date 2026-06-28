@@ -9,7 +9,7 @@
     import SmartphoneIcon from '@lucide/svelte/icons/smartphone'
 
     import { orderClient } from '$lib/clients'
-    import ProofImageUploader from '$lib/components/upload/ProofImageUploader.svelte'
+    import SingleFileUpload from '$lib/components/upload/SingleFileUpload.svelte'
 
     ////////////////////
     // 01. Properties //
@@ -52,7 +52,7 @@
 
     let selectedMethod = $state<'gcash' | 'cash_on_pickup' | null>(null)
     let proofObjectStorageId = $state<string | null>(null)
-    let proofUploading = $state(false)
+    let proofIsCommitted = $state(false)
     let submitting = $state(false)
     let submitError = $state<string | null>(null)
     let gcashNumberCopied = $state(false)
@@ -69,7 +69,7 @@
         selectedMethod === 'cash_on_pickup' ||
             (selectedMethod === 'gcash' &&
                 proofObjectStorageId !== null &&
-                !proofUploading &&
+                proofIsCommitted &&
                 senderName.trim().length > 0 &&
                 senderNumber.trim().length > 0 &&
                 Number(amountSent) > 0),
@@ -152,6 +152,7 @@
         if (!isOpen) {
             selectedMethod = null
             proofObjectStorageId = null
+            proofIsCommitted = false
             submitError = null
             senderName = ''
             senderNumber = ''
@@ -375,9 +376,18 @@
                                 >*</span
                             >
                         </Label>
-                        <ProofImageUploader
-                            bind:objectStorageId={proofObjectStorageId}
-                            bind:isUploading={proofUploading}
+                        <SingleFileUpload
+                            allowedMimeTypes={[
+                                'image/jpeg',
+                                'image/png',
+                                'image/webp',
+                            ]}
+                            isPublic={false}
+                            autoCommit={true}
+                            bind:isCommitted={proofIsCommitted}
+                            onCommit={(data) => {
+                                proofObjectStorageId = data.attachments[0]
+                            }}
                         />
                     </div>
                 </div>
@@ -431,7 +441,7 @@
             </Button>
             <Button
                 onclick={handleSubmit}
-                disabled={!canSubmit || submitting || proofUploading}
+                disabled={!canSubmit || submitting}
                 class="flex-1 bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50"
             >
                 {#if submitting}

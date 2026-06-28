@@ -27,7 +27,7 @@
     import { toast } from 'svelte-sonner'
 
     import { orderClient } from '$lib/clients'
-    import ProofImageUploader from '$lib/components/upload/ProofImageUploader.svelte'
+    import SingleFileUpload from '$lib/components/upload/SingleFileUpload.svelte'
     import type { TCartItem } from '../types.js'
 
     ////////////////////
@@ -109,7 +109,7 @@
     let downpayment = $state('')
     let notes = $state('')
     let proofObjectStorageId = $state<string | null>(null)
-    let proofUploading = $state(false)
+    let proofIsCommitted = $state(false)
     let gcashCopied = $state(false)
     // Success screen state
     let placedOrderCode = $state<string | null>(null)
@@ -167,7 +167,7 @@
 
     const step3Valid = $derived(
         proofObjectStorageId !== null &&
-            !proofUploading &&
+            proofIsCommitted &&
             Number(downpayment) > 0,
     )
 
@@ -309,6 +309,7 @@
         downpayment = ''
         notes = ''
         proofObjectStorageId = null
+        proofIsCommitted = false
         currentStep = 1
     }
 </script>
@@ -1066,9 +1067,19 @@
                                         >*</span
                                     >
                                 </Label>
-                                <ProofImageUploader
-                                    bind:objectStorageId={proofObjectStorageId}
-                                    bind:isUploading={proofUploading}
+                                <SingleFileUpload
+                                    allowedMimeTypes={[
+                                        'image/jpeg',
+                                        'image/png',
+                                        'image/webp',
+                                    ]}
+                                    isPublic={false}
+                                    autoCommit={true}
+                                    bind:isCommitted={proofIsCommitted}
+                                    onCommit={(data) => {
+                                        proofObjectStorageId =
+                                            data.attachments[0]
+                                    }}
                                 />
                             </div>
 
@@ -1142,7 +1153,8 @@
                             onclick={handleConfirm}
                             disabled={!isFormValid ||
                                 cart.length === 0 ||
-                                proofUploading ||
+                                (proofObjectStorageId !== null &&
+                                    !proofIsCommitted) ||
                                 createOrderMutation.isPending}
                             class="bg-blue-600 text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
                         >
